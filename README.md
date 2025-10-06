@@ -1,4 +1,4 @@
-# clena_stream_laundry_app
+# clean_stream_laundry_app
 
 Clean Stream Laundry Client Facing Application
 
