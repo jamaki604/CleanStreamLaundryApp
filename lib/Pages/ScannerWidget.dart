@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/QrScanner/QrScannerController.dart';
+import 'package:clean_stream_laundry_app/QrScanner/QrScannerParser.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -31,7 +31,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         });
 
         // Process Nayax QR code here
-        QrScannerController qrScannerController = QrScannerController(_scannedCode!);
+        QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
         _processNayaxCode(qrScannerController.getNayaxDeviceID());
         break;
       }

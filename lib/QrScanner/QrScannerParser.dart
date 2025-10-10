@@ -1,10 +1,10 @@
 
-class QrScannerController {
+class QrScannerParser {
 
   Uri? _uri;
   String? _nayaxID;
 
-  QrScannerController(String url){
+  QrScannerParser(String url){
     try {
       _uri = Uri.parse(url);
       _parseUrl();
