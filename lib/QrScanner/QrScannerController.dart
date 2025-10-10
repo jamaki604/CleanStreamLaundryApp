@@ -6,7 +6,7 @@ class QrScannerController {
 
   QrScannerController(String url){
     try {
-      this._uri = Uri.parse(url);
+      _uri = Uri.parse(url);
       _parseUrl();
     }catch (e){
       _uri = null;
