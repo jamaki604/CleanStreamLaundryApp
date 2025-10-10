@@ -1,14 +1,15 @@
+import 'package:clean_stream_laundry_app/QrScanner/QrScannerController.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class ScannerWidget extends StatefulWidget {
+  const ScannerWidget({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ScannerWidget> createState() => _ScannerWidgetState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ScannerWidgetState extends State<ScannerWidget> {
   MobileScannerController cameraController = MobileScannerController();
   bool _isScanning = false;
   String? _scannedCode;
@@ -30,13 +31,14 @@ class _HomePageState extends State<HomePage> {
         });
 
         // Process Nayax QR code here
-        _processNayaxCode(barcode.rawValue!);
+        QrScannerController qrScannerController = QrScannerController(_scannedCode!);
+        _processNayaxCode(qrScannerController.getNayaxDeviceID());
         break;
       }
     }
   }
 
-  void _processNayaxCode(String code) {
+  void _processNayaxCode(String? code) {
     showDialog(
       context: context,
       builder: (contect) => AlertDialog(
@@ -47,7 +49,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             const Text('Nayax Code:', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(code),
+            Text(code != null ? code : "Invalid QR Code"),
           ],
         ),
         actions: [

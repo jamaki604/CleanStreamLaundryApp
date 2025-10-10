@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'HomePage.dart';
+import 'ScannerWidget.dart';
 
-class Scanner extends StatelessWidget {
-  const Scanner({super.key});
+class RootApp extends StatelessWidget {
+  const RootApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,10 @@ class Scanner extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => ScannerWidget()
+      }
     );
   }
 }
