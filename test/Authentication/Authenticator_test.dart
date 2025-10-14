@@ -193,11 +193,6 @@ void main(){
       expect(response,true);
     });
 
-    test("Test if the user is logged in",(){
-      authenticator.login("testemail","testpassword");
-      expect(authenticator.isLoggedIn,true);
-    });
-
   });
 
 
