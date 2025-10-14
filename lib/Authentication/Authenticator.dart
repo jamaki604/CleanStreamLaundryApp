@@ -3,7 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Authenticator implements AuthSystem{
 
-  final SupabaseClient _client = Supabase.instance.client;
+  final SupabaseClient _client;
+
+  Authenticator(this._client);
 
   @override
   String? get currentUserId {
