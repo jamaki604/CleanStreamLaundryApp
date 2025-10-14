@@ -1,5 +1,5 @@
+import 'package:clean_stream_laundry_app/Pages/LogInScreen.dart';
 import 'package:flutter/material.dart';
-import 'ScannerWidget.dart';
 
 class RootApp extends StatelessWidget {
   const RootApp({super.key});
@@ -14,7 +14,7 @@ class RootApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => ScannerWidget()
+        '/': (context) => LoginScreen()
       }
     );
   }
