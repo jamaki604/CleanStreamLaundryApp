@@ -1,36 +1,33 @@
-import 'package:clean_stream_laundry_app/Pages/ScannerWidget.dart';
-import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
+  final TextEditingController _passwordConfirmCtrl = TextEditingController();
 
-  void _handleLogin() {
+  void _handleSignUp() {
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text;
+    final passwordConfirm = _passwordConfirmCtrl.text;
 
-    if (email.isEmpty || password.isEmpty) {
-      _showMessage('Please fill in both fields.');
+    if (email.isEmpty || password.isEmpty || passwordConfirm.isEmpty) {
+      _showMessage('Please fill in all fields.');
+      return;
+    }
+    if (password != passwordConfirm) {
+      _showMessage('Make sure your passwords match');
       return;
     }
 
-    // Authentication API goes here.
-    _showMessage('Logging in as $email...');
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return const ScannerWidget();
-        },
-      ),
-    );
+    _showMessage('Account Created');
+    Navigator.of(context).pop();
   }
 
   void _showMessage(String text) {
@@ -41,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _passwordConfirmCtrl.dispose();
     super.dispose();
   }
 
@@ -81,32 +79,21 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
 
+              TextField(
+                controller: _passwordConfirmCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 24),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _handleLogin,
-                  child: const Text('Log In'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) {
-                          return const SignUpScreen();
-                        },
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
+                  onPressed: _handleSignUp,
+                  child: const Text('Create Account'),
                 ),
               ),
             ],
