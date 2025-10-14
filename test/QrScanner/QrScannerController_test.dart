@@ -15,6 +15,11 @@ void main(){
       expect(qrScannerController.getNayaxDeviceID(),isNull);
     });
 
+    test("Returns null if the URL is malformed", () {
+      QrScannerParser qrScannerController = QrScannerParser("ht!tp://malformed-url");
+      expect(qrScannerController.getNayaxDeviceID(), isNull);
+    });
+
   });
 
 }
