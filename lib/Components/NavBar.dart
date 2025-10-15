@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../logic/app_router.dart';
+import '../Middleware/AppRouter.dart';
 
 class NavBar extends StatelessWidget {
   final int currentIndex;
