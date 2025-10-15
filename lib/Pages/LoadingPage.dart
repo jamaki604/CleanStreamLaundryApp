@@ -2,7 +2,6 @@ import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'RootApp.dart';
 
 class LoadingPage extends StatefulWidget {
   final Uri authRedirectUri;
