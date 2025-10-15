@@ -1,7 +1,8 @@
-import 'package:clean_stream_laundry_app/Pages/ScannerWidget.dart';
+import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Middleware/Authenticator.dart';
+import 'package:clean_stream_laundry_app/Pages/ScannerPage.dart';
 import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Components/AppBar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,8 +14,16 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
+  final Authenticator _auth = Authenticator();
 
-  void _handleLogin() {
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text;
 
@@ -25,12 +34,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return const ScannerWidget();
-        },
-      ),
+    final success = await _auth.login(email, password);
+    if (!mounted) return;
+
+    if (success) {
+      _showMessage('Logged in as $email');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ScannerWidget()),
+      );
+    } else {
+      _showMessage('Invalid email or password.');
+    }
+  }
+
+  void _navigateToSignUp() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SignUpScreen()),
     );
   }
 
@@ -38,17 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
-  @override
-  void dispose() {
-    _emailCtrl.dispose();
-    _passwordCtrl.dispose();
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(),
+    return BasePage(
+      currentIndex: 3,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -86,13 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) {
-                          return const SignUpScreen();
-                        },
-                      ),
-                    );
+                    _navigateToSignUp();
                   },
                   child: const Text(
                     'Create Account',
