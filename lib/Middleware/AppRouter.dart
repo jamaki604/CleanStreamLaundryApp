@@ -2,6 +2,7 @@ import 'package:clean_stream_laundry_app/Pages/Loading.dart';
 import 'package:clean_stream_laundry_app/Pages/Scanner.dart';
 import 'package:clean_stream_laundry_app/Pages/Signup.dart';
 import 'package:clean_stream_laundry_app/Pages/Login.dart';
+import 'package:clean_stream_laundry_app/Pages/NotFound.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
@@ -16,5 +17,7 @@ final router = GoRouter(
         return LoadingPage(authRedirectUri: uri);
       }
     )
-  ]
+  ],
+
+  errorBuilder: (context, state) => const NotFoundScreen(),
 );

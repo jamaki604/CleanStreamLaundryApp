@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class NavBar extends StatelessWidget {
-  final int currentIndex;
 
-  const NavBar({super.key, required this.currentIndex});
+  const NavBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: currentIndex,
       onTap: (index) {
         switch (index) {
           case 0:

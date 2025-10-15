@@ -36,7 +36,6 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      currentIndex: 0,
       body: Center(
         child: _error != null
             ? Column(

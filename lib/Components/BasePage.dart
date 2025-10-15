@@ -4,12 +4,10 @@ import 'package:clean_stream_laundry_app/Components/NavBar.dart';
 
 class BasePage extends StatelessWidget {
   final Widget body;
-  final int currentIndex;
 
   const BasePage({
     super.key,
     required this.body,
-    required this.currentIndex
   });
 
   @override
@@ -17,7 +15,7 @@ class BasePage extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(),
       body: body,
-      bottomNavigationBar: NavBar(currentIndex: currentIndex),
+      bottomNavigationBar: NavBar(),
     );
   }
 }

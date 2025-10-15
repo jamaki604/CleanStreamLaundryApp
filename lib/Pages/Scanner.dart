@@ -27,7 +27,6 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      currentIndex: 2,
       body: Column(
         children: [
           Expanded(

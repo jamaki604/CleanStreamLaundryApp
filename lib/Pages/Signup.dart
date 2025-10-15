@@ -67,7 +67,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      currentIndex: 1,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),

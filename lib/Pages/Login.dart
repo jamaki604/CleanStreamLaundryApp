@@ -57,7 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      currentIndex: 3,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
