@@ -1,6 +1,8 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/Authenticator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -51,7 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final success = await _auth.signUp(email, password);
       if (success) {
         _showMessage('Account created successfully.');
-        Navigator.pushReplacementNamed(context, '/home');
+        context.go('/scanner');
       } else {
         _showMessage('Sign-up failed. Try again.');
       }

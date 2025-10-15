@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Pages/LogInScreen.dart';
+import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 import 'package:flutter/material.dart';
 
 class RootApp extends StatelessWidget {
@@ -6,16 +6,13 @@ class RootApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Clean Stream Laundry Solutions',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => LoginScreen()
-      }
+      routerConfig: router,
     );
   }
 }

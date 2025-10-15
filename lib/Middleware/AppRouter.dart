@@ -1,22 +1,20 @@
-import 'package:flutter/cupertino.dart';
-import 'package:clean_stream_laundry_app/Pages/LogInScreen.dart';
+import 'package:clean_stream_laundry_app/Pages/Loading.dart';
+import 'package:clean_stream_laundry_app/Pages/Scanner.dart';
+import 'package:clean_stream_laundry_app/Pages/Signup.dart';
+import 'package:clean_stream_laundry_app/Pages/Login.dart';
+import 'package:go_router/go_router.dart';
 
-class AppRouter {
-  static final navigatorKey = GlobalKey<NavigatorState>();
-
-  static void navigateTo(int index) {
-    switch (index) {
-      case 0:
-        navigatorKey.currentState?.pushReplacementNamed('/home');
-        break;
-      case 1:
-        navigatorKey.currentState?.pushReplacementNamed('/settings');
-    }
-  }
-
-  static Map<String, WidgetBuilder> routes = {
-    '/': (context) => const LoginScreen(),
-    //'/home': (context) => const HomePage(),
-    //'/settings': (context) => const SettingsPage(),
-  };
-}
+final router = GoRouter(
+  initialLocation: '/login',
+  routes: [
+    GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+    GoRoute(path: '/signup', builder: (_, __) => const SignUpScreen()),
+    GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
+    GoRoute(path: '/loading',
+      builder: (context, state) {
+        final uri = Uri.parse(state.uri.queryParameters['uri'] ?? '');
+        return LoadingPage(authRedirectUri: uri);
+      }
+    )
+  ]
+);

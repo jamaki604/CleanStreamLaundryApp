@@ -1,8 +1,7 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/Authenticator.dart';
-import 'package:clean_stream_laundry_app/Pages/ScannerPage.dart';
-import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,20 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success) {
       _showMessage('Logged in as $email');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ScannerWidget()),
-      );
+      context.go("/scanner");
     } else {
       _showMessage('Invalid email or password.');
     }
   }
 
   void _navigateToSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SignUpScreen()),
-    );
+    context.go("/signup");
   }
 
   void _showMessage(String text) {
