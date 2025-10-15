@@ -1,6 +1,7 @@
-import 'package:clean_stream_laundry_app/QrScanner/QrScannerParser.dart';
+import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:clean_stream_laundry_app/Logic/QrScannerParser.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -10,9 +11,12 @@ class ScannerWidget extends StatefulWidget {
 }
 
 class _ScannerWidgetState extends State<ScannerWidget> {
-  MobileScannerController cameraController = MobileScannerController();
+  final MobileScannerController cameraController = MobileScannerController();
   bool _isScanning = false;
   String? _scannedCode;
+
+  static const Color _primaryColor = Color(0xFF2073A9);
+  static const Color _accentColor = Color(0xFFf3c404);
 
   @override
   void dispose() {
@@ -20,78 +24,22 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     super.dispose();
   }
 
-  void _handleQRCode(BarcodeCapture capture) {
-    final List<Barcode> barcodes = capture.barcodes;
-
-    for (final barcode in barcodes) {
-      if (barcode.rawValue != null) {
-        setState(() {
-          _scannedCode = barcode.rawValue;
-          _isScanning = false;
-        });
-
-        // Process Nayax QR code here
-        QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
-        _processNayaxCode(qrScannerController.getNayaxDeviceID());
-        break;
-      }
-    }
-  }
-
-  void _processNayaxCode(String? code) {
-    showDialog(
-      context: context,
-      builder: (contect) => AlertDialog(
-        title: const Text('QR Code Scanned'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Nayax Code:', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(code != null ? code : "Invalid QR Code"),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _scannedCode = null;
-              });
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      )
-    );
-  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BasePage(
+      currentIndex: 2,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 25),
-            child: AppBar(
-              title: Image.asset(
-                  'lib/assets/Slogan.png',
-                  height: 50,
-                  fit: BoxFit.contain
-              ),
-              centerTitle: true,
-              elevation: 0,
-            ),
-          ),
           Expanded(
-            child: _isScanning ? _buildScanner() : _buildHomePage(),
+            child: _isScanning ? _buildScannerCamera() : _buildScannerHomePage(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHomePage() {
+  //---------- UI Builders ----------//
+  Widget _buildScannerHomePage() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -101,7 +49,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           Icon(
             Icons.qr_code_scanner,
             size: 120,
-            color: Color(0xFF2073A9),
+            color: _primaryColor,
           ),
           const SizedBox(height: 32),
           const Text(
@@ -128,7 +76,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                 _isScanning = true;
               });
             },
-            icon: const Icon(Icons.camera_alt, size: 28, color: Color(0xFFf3c404)),
+            icon: const Icon(Icons.camera_alt, size: 28, color: _accentColor),
             label: const Text(
               'Start Scanning',
               style: TextStyle(
@@ -145,43 +93,50 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           ),
           if (_scannedCode != null) ...[
             const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.shade200),
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Last Scanned Code:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _scannedCode!,
-                    style: const TextStyle(fontSize: 14),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+            _buildLastScannedBox(_scannedCode!),
           ],
         ],
       ),
     );
   }
-  Widget _buildScanner() {
+
+  Widget _buildLastScannedBox(String code) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green.shade200),
+      ),
+      child: Column(
+        children: [
+          const Text(
+            'Last Scanned Code:',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _scannedCode!,
+            style: const TextStyle(fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScannerCamera() {
     return Stack(
       children: [
         MobileScanner(
           controller: cameraController,
           onDetect: _handleQRCode,
         ),
+
+        // Top overlay text
         Positioned(
           top: 0,
           left: 0,
@@ -200,6 +155,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             ),
           ),
         ),
+
+        // Cancel button
         Positioned(
           bottom: 32,
           left: 0,
@@ -217,6 +174,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             ),
           ),
         ),
+
+        // Center frame
         Center(
           child: Container(
             width: 250,
@@ -228,6 +187,55 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           ),
         ),
       ],
+    );
+  }
+
+  //---------- QR Logic ----------//
+
+  void _handleQRCode(BarcodeCapture capture) {
+    final List<Barcode> barcodes = capture.barcodes;
+
+    for (final barcode in barcodes) {
+      if (barcode.rawValue != null) {
+        setState(() {
+          _scannedCode = barcode.rawValue;
+          _isScanning = false;
+        });
+
+        // Process Nayax QR code
+        QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
+        _processNayaxCode(qrScannerController.getNayaxDeviceID());
+        break;
+      }
+    }
+  }
+
+  void _processNayaxCode(String? code) {
+    showDialog(
+        context: context,
+        builder: (contect) => AlertDialog(
+          title: const Text('QR Code Scanned'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Nayax Code:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text(code != null ? code : "Invalid QR Code"),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _scannedCode = null;
+                });
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        )
     );
   }
 }
