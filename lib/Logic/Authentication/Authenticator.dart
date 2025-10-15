@@ -1,9 +1,11 @@
-import 'package:clean_stream_laundry_app/Middleware/AuthSystem.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Authenticator implements AuthSystem{
 
-  final SupabaseClient _client = Supabase.instance.client;
+  final SupabaseClient _client;
+
+  Authenticator(this._client);
 
   @override
   String? get currentUserId {
