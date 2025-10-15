@@ -1,3 +1,5 @@
+import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'RootApp.dart';
@@ -24,9 +26,9 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _handleAuthRedirect() async {
     try {
       // Exchange the auth code for a session
-      await _supabase.auth.exchangeCodeForSession(widget.authRedirectUri);
+      await _supabase.auth.exchangeCodeForSession(widget.authRedirectUri.toString());
       // Hand off to route controller
-      RouteController.navigateAfterAuth(context);
+      AppRouter.navigateTo(2);
     } catch (e) {
       setState(() => _error = e.toString());
     }
@@ -34,8 +36,8 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
+    return BasePage(
+      currentIndex: 4,
       body: Center(
         child: _error != null
             ? Column(
@@ -48,7 +50,7 @@ class _LoadingPageState extends State<LoadingPage> {
             Text(_error!, style: TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => RouteController.navigateToLogin(context),
+              onPressed: () => AppRouter.navigateTo(3),
               child: const Text('Return to Login'),
             )
           ],
