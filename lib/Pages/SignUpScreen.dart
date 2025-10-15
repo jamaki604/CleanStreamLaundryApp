@@ -1,3 +1,5 @@
+import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Middleware/Authenticator.dart';
 import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -12,26 +14,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
 
-  void _handleSignUp() {
-    final email = _emailCtrl.text.trim();
-    final password = _passwordCtrl.text;
-    final passwordConfirm = _passwordConfirmCtrl.text;
-
-    if (email.isEmpty || password.isEmpty || passwordConfirm.isEmpty) {
-      _showMessage('Please fill in all fields.');
-      return;
-    }
-    if (password != passwordConfirm) {
-      _showMessage('Make sure your passwords match');
-      return;
-    }
-
-    _showMessage('Account Created');
-    Navigator.of(context).pop();
-  }
+  final Authenticator _auth = Authenticator();
+  bool _isLoading = false;
 
   void _showMessage(String text) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(text)));
   }
 
   @override
@@ -42,17 +30,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  Future<void> _handleSignUp() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+    final confirm = _passwordConfirmCtrl.text;
+
+    // Local validation first
+    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+      _showMessage('Please fill in all fields.');
+      return;
+    }
+    if (password != confirm) {
+      _showMessage('Passwords do not match.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final success = await _auth.signUp(email, password);
+      if (success) {
+        _showMessage('Account created successfully.');
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        _showMessage('Sign-up failed. Try again.');
+      }
+    } catch (e) {
+      _showMessage('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          'lib/assets/Slogan.png',
-          height: 50,
-          fit: BoxFit.contain,
-        ),
-        centerTitle: true,
-      ),
+    return BasePage(
+      currentIndex: 1,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -92,9 +105,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _handleSignUp,
-                  child: const Text('Create Account'),
-                ),
+                  onPressed: _isLoading ? null : _handleSignUp,
+                    child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Create Account'),
+                )
               ),
             ],
           ),
