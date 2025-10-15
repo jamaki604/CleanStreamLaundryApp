@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/Pages/ScannerWidget.dart';
 import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:clean_stream_laundry_app/Components/AppBar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,14 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          'lib/assets/Slogan.png',
-          height: 50,
-          fit: BoxFit.contain,
-        ),
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
