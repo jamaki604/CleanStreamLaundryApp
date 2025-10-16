@@ -25,7 +25,7 @@ class Authenticator implements AuthSystem{
       );
       output = response.session != null;
     }catch (e){
-      print(e);
+
     }
     return output;
   }
