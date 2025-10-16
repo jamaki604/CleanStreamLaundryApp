@@ -193,6 +193,20 @@ void main(){
       expect(response,true);
     });
 
+    test("Tests if login is unsuccessful",()async{
+
+      when(() =>
+          supabaseAuth.signInWithPassword(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+          )).thenAnswer((_) async => throw AuthException("Invalid password or username"));
+
+      final response = await authenticator.login("testemail", "testpassword");
+
+      expect(response,false);
+    });
+
+
   });
 
 }
