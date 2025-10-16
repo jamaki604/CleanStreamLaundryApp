@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,7 +18,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
 
-  final Authenticator _auth = Authenticator(Supabase.instance.client);
+  final AuthSystem _auth = Authenticator(Supabase.instance.client);
   bool _isLoading = false;
 
   void _showMessage(String text) {

@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
-  final Authenticator _auth = Authenticator(Supabase.instance.client);
+  final AuthSystem _auth = Authenticator(Supabase.instance.client);
 
   @override
   void dispose() {
