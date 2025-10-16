@@ -17,14 +17,15 @@ class Authenticator implements AuthSystem{
 
   @override
   Future<bool> login(String email, String password) async {
-    bool output = true;
+    bool output = false;
     try {
       final AuthResponse response = await _client.auth.signInWithPassword(
         email: email,
         password: password,
       );
+      output = response.session != null;
     }catch (e){
-      output = false;
+      print(e);
     }
     return output;
   }
