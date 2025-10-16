@@ -15,7 +15,7 @@ class QrScannerParser {
   }
 
   void _parseUrl(){
-    _nayaxID = _uri?.queryParameters['nayaxDeviceID'];
+    _nayaxID = _uri?.queryParameters['id'];
   }
 
   String? getNayaxDeviceID(){

@@ -6,12 +6,12 @@ void main(){
   group("QrScanner.parseURL",(){
 
     test("Returns the valid NayaxDeviceID",(){
-      QrScannerParser qrScannerController = QrScannerParser("https://cleanstreamlaundry.com/pay/?nayaxDeviceID=12345");
-      expect(qrScannerController.getNayaxDeviceID(),equals("12345"));
+      QrScannerParser qrScannerController = QrScannerParser("https://payment.nayax.com/device?id=12345678");
+      expect(qrScannerController.getNayaxDeviceID(),equals("12345678"));
     });
 
     test("Returns null if the URL is invalid",(){
-      QrScannerParser qrScannerController = QrScannerParser("https://cleanstreamlaundry.com/pay/");
+      QrScannerParser qrScannerController = QrScannerParser("https://payment.nayax.com/");
       expect(qrScannerController.getNayaxDeviceID(),isNull);
     });
 
