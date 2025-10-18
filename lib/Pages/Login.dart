@@ -46,25 +46,20 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _navigateToSignUp() {
-    context.go("/signup");
-  }
-
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    return BasePage(
+    return Scaffold(
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Image.asset("assets/Logo.png"),
               TextField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,
@@ -95,9 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: InkWell(
-                  onTap: () {
-                    _navigateToSignUp();
-                  },
+                  onTap: () => context.go("/signup"),
                   child: const Text(
                     'Create Account',
                     style: TextStyle(

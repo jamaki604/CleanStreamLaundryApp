@@ -12,7 +12,5 @@ void main() async{
     url: '${dotenv.env['SUPABASE_URL']}',
     anonKey: '${dotenv.env['ANON_KEY']}'
   );
-
-
   runApp(const RootApp());
 }
