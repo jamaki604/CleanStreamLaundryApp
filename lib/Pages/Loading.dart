@@ -2,11 +2,13 @@ import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 
 class LoadingPage extends StatefulWidget {
   final Uri authRedirectUri;
+  final AuthSystem auth;
 
-  const LoadingPage({Key? key, required this.authRedirectUri}) : super(key: key);
+  const LoadingPage({Key? key, required this.authRedirectUri, required this.auth}) : super(key: key);
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();
@@ -19,7 +21,8 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    _handleAuthRedirect();
+    _automaticLogIn();
+    //_handleAuthRedirect();
   }
 
   Future<void> _handleAuthRedirect() async {
@@ -32,6 +35,26 @@ class _LoadingPageState extends State<LoadingPage> {
       setState(() => _error = e.toString());
     }
   }
+
+
+  void _automaticLogIn() async {
+    // Wait until after the first frame
+    await Future.delayed(Duration.zero);
+
+    try {
+      if (await widget.auth.isLoggedIn()) {
+        if (!mounted) return;
+        context.go("/scanner");
+      } else {
+        if (!mounted) return;
+        context.go("/login");
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _error = e.toString());
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {

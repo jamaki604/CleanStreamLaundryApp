@@ -2,6 +2,6 @@ abstract class AuthSystem{
   Future<bool> login(String email, String password);
   Future<bool> signUp(String email, String password);
   Future<void> logout();
-  bool get isLoggedIn;
+  Future<bool> isLoggedIn();
   String? get currentUserId;
 }

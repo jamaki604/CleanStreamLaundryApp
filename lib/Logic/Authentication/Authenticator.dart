@@ -13,7 +13,14 @@ class Authenticator implements AuthSystem{
   }
 
   @override
-  bool get isLoggedIn => _client.auth.currentUser != null;
+  Future<bool> isLoggedIn() async {
+    try {
+      await _client.auth.refreshSession();
+      return _client.auth.currentUser != null;
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
   Future<bool> login(String email, String password) async {

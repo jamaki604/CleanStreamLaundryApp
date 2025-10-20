@@ -1,12 +1,13 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  late final AuthSystem _auth;
+
+  LoginScreen({super.key,required AuthSystem auth}){
+    this._auth = auth;
+  }
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -15,7 +16,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
-  final AuthSystem _auth = Authenticator(Supabase.instance.client);
 
   @override
   void dispose() {
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    final success = await _auth.login(email, password);
+    final success = await widget._auth.login(email, password);
     if (!mounted) return;
 
     if (success) {
