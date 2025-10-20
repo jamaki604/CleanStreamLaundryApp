@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset("assets/Logo.png"),
+              Image.asset("assets/Logo.png", height: 250, width: 250,),
               TextField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,

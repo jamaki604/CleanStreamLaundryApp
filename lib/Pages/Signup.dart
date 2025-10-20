@@ -78,7 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset("assets/Logo.png"),
+              Image.asset("assets/Logo.png", height: 250, width: 250),
               TextField(
                 controller: _nameCtrl,
                 keyboardType: TextInputType.name,
