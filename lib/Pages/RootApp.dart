@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 import 'package:flutter/material.dart';
+import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 
 class RootApp extends StatelessWidget {
   const RootApp({super.key});
