@@ -10,4 +10,9 @@ class LoyaltyCard {
       balance -= amount;
     }
   }
+
+  static void reset() {
+    balance = 0.0;
+  }
+
 }
