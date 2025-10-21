@@ -14,6 +14,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
@@ -35,12 +36,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _handleSignUp() async {
+    final name = _nameCtrl.text.trim();
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text;
     final confirm = _passwordConfirmCtrl.text;
 
+
     // Local validation first
-    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
       _showMessage('Please fill in all fields.');
       return;
     }
@@ -52,7 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _auth.signUp(email, password);
+      final success = await _auth.signUp( email, password);
       if (success) {
         _showMessage('Account created successfully.');
         context.go('/scanner');
@@ -68,13 +71,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage(
+    return Scaffold(
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Image.asset("assets/Logo.png", height: 250, width: 250),
+              TextField(
+                controller: _nameCtrl,
+                keyboardType: TextInputType.name,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+
               TextField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,
@@ -112,7 +126,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: _isLoading
                       ? const CircularProgressIndicator()
                       : const Text('Create Account'),
-                )
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 25.0),
+                child: InkWell(
+                  onTap: () => context.go("/login"),
+                  child: const Text(
+                    'Already have an account? Login',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
