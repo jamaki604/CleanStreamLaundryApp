@@ -99,6 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   prefixIcon: const Icon(Icons.lock, color: Colors.blue),
                 ),
+                  obscureText: true
               ),
               const SizedBox(height: 24),
 

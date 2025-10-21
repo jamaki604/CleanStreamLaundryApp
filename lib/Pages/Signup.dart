@@ -100,27 +100,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 16),
 
               TextField(
-                controller: _passwordCtrl,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: const Icon(Icons.lock, color: Colors.blue),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              TextField(
                 controller: _emailCtrl,
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -138,6 +117,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   prefixIcon: const Icon(Icons.email, color: Colors.blue),
                 ),
+              ),
+              const SizedBox(height: 16),
+
+              TextField(
+                controller: _passwordCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.lock, color: Colors.blue),
+                ),
+                obscureText: true,
               ),
               const SizedBox(height: 24),
 
@@ -159,6 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   prefixIcon: const Icon(Icons.lock, color: Colors.blue),
                 ),
+                obscureText: true,
               ),
               const SizedBox(height: 24),
 
