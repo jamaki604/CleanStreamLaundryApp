@@ -17,6 +17,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
+  var passwordText = "Password";
+  var confirmPasswordText = "Confirm Password";
+  var iconColor = Colors.blue;
+  var enabledBorderColor = Colors.grey;
+  var focusedBorderColor = Colors.blue;
+  var borderColor = Colors.blue;
+  var labelColor = Colors.blue;
 
   final AuthSystem _auth = Authenticator(Supabase.instance.client);
   bool _isLoading = false;
@@ -24,6 +31,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(text)));
+  }
+
+  void _changeColorsToRed(){
+    setState(() {
+      passwordText = "Passwords do not match";
+      confirmPasswordText = "Passwords do not match";
+      iconColor = Colors.red;
+      enabledBorderColor = Colors.red;
+      focusedBorderColor = Colors.red;
+      borderColor = Colors.red;
+      labelColor = Colors.red;
+    });
+  }
+
+  void _changeColorsToDefault(){
+    setState(() {
+      passwordText = "Password";
+      confirmPasswordText = "Confirm Password";
+      iconColor = Colors.blue;
+      enabledBorderColor = Colors.grey;
+      focusedBorderColor = Colors.blue;
+      borderColor = Colors.blue;
+      labelColor = Colors.blue;
+    });
   }
 
   @override
@@ -123,20 +154,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
               TextField(
                 controller: _passwordCtrl,
                 decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelText: passwordText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: enabledBorderColor),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: const Icon(Icons.lock, color: Colors.blue),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
                 obscureText: true,
               ),
@@ -145,22 +176,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
               TextField(
                 controller: _passwordConfirmCtrl,
                 decoration: InputDecoration(
-                  labelText: 'Confirm Password',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelText: confirmPasswordText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: enabledBorderColor),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: const Icon(Icons.lock, color: Colors.blue),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
                 obscureText: true,
+                onChanged: (value){
+
+                  if((_passwordCtrl.text.trim() != _passwordConfirmCtrl.text.trim())){
+                    if(iconColor != Colors.red) {
+                      _changeColorsToRed();
+                    }
+                  }else{
+                    _changeColorsToDefault();
+                  }
+
+                },
               ),
               const SizedBox(height: 24),
 

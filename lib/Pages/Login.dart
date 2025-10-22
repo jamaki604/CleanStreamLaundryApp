@@ -16,6 +16,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
+  var passwordText = "Password";
+  var emailText = "Email";
+  var iconColor = Colors.blue;
+  var enabledBorderColor = Colors.grey;
+  var focusedBorderColor = Colors.blue;
+  var borderColor = Colors.blue;
+  var labelColor = Colors.blue;
+
+
 
   @override
   void dispose() {
@@ -42,12 +51,24 @@ class _LoginScreenState extends State<LoginScreen> {
       _showMessage('Logged in as $email');
       context.go("/scanner");
     } else {
-      _showMessage('Invalid email or password.');
+      _changeColors();
     }
   }
 
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  void _changeColors(){
+    setState(() {
+      passwordText = "Invalid Password or Email";
+      emailText = "Invalid Password or Email";
+      iconColor = Colors.red;
+      enabledBorderColor = Colors.red;
+      focusedBorderColor = Colors.red;
+      borderColor = Colors.red;
+      labelColor = Colors.red;
+    });
   }
 
   @override
@@ -63,20 +84,20 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _emailCtrl,
                 decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelText: emailText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: BorderSide(color:focusedBorderColor, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: enabledBorderColor),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: const Icon(Icons.email, color: Colors.blue),
+                  prefixIcon: Icon(Icons.email, color: iconColor),
                 ),
               ),
               const SizedBox(height: 16),
@@ -84,20 +105,20 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _passwordCtrl,
                 decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelText: passwordText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: enabledBorderColor),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: const Icon(Icons.lock, color: Colors.blue),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
                   obscureText: true
               ),
