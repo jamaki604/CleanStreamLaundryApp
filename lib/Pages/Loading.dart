@@ -1,4 +1,3 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +17,9 @@ class _LoadingPageState extends State<LoadingPage> {
   final _supabase = Supabase.instance.client;
   String? _error;
 
+  double begin = 0.95;
+  double end = 1.05;
+
   @override
   void initState() {
     super.initState();
@@ -27,18 +29,14 @@ class _LoadingPageState extends State<LoadingPage> {
 
   Future<void> _handleAuthRedirect() async {
     try {
-      // Exchange the auth code for a session
       await _supabase.auth.exchangeCodeForSession(widget.authRedirectUri.toString());
-      // Hand off to route controller
       context.go("/scanner");
     } catch (e) {
       setState(() => _error = e.toString());
     }
   }
 
-
   void _automaticLogIn() async {
-    // Wait until after the first frame
     await Future.delayed(Duration.zero);
 
     try {
@@ -55,36 +53,66 @@ class _LoadingPageState extends State<LoadingPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return BasePage(
-      body: Center(
+    return Center(
         child: _error != null
             ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
-            const SizedBox(height: 16),
-            Text('Authentication failed', style: TextStyle(color: Colors.white)),
-            const SizedBox(height: 8),
-            Text(_error!, style: TextStyle(color: Colors.grey, fontSize: 12)),
+            Icon(Icons.error_outline, color: Colors.redAccent, size: 80),
             const SizedBox(height: 20),
-            ElevatedButton(
+            Text(
+              'Authentication Failed',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _error!,
+              style: TextStyle(
+                color: Colors.redAccent.withOpacity(0.8),
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 26),
+            ElevatedButton.icon(
               onPressed: () => context.go("/login"),
-              child: const Text('Return to Login'),
-            )
+              icon: const Icon(Icons.login),
+              label: const Text('Return to Login'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
           ],
         )
-            : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 20),
-            Text('Authenticating...', style: TextStyle(color: Colors.white)),
-          ],
+            : TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: begin, end: end),
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInOut,
+          builder: (context, scale, child) {
+            return Transform.scale(
+              scale: scale,
+              child: child,
+            );
+          },
+          child: Image.asset(
+            "assets/Logo.png",
+            height: 250,
+          ),
+          onEnd: () {
+            setState(() {
+              double temp = begin;
+              begin = end;
+              end = temp;
+            });
+          },
         ),
-      ),
-    );
-  }
+      );
+   }
 }
