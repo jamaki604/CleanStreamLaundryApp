@@ -68,3 +68,8 @@ doc/api/
 
 .flutter-plugins
 
+#Xcode
+ios/Pods/
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+
