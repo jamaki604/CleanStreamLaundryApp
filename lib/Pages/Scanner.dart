@@ -202,7 +202,6 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           _isScanning = false;
         });
 
-        // Process Nayax QR code
         QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
         _processNayaxCode(qrScannerController.getNayaxDeviceID());
         break;
@@ -211,6 +210,6 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   }
 
   void _processNayaxCode(String? code) {
-    context.go('/payment?machineId=$code');
+    context.go('/confirmation?machineId=$code');
   }
 }

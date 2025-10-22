@@ -3,9 +3,10 @@ import 'package:clean_stream_laundry_app/Pages/Scanner.dart';
 import 'package:clean_stream_laundry_app/Pages/Signup.dart';
 import 'package:clean_stream_laundry_app/Pages/Login.dart';
 import 'package:clean_stream_laundry_app/Pages/NotFound.dart';
-import 'package:clean_stream_laundry_app/Pages/Payment.dart';
+import 'package:clean_stream_laundry_app/Pages/Confirmation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Pages/LoyaltyCardPage.dart';
+import 'package:clean_stream_laundry_app/Pages/Payment.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -14,11 +15,12 @@ final router = GoRouter(
     GoRoute(path: '/signup', builder: (_, __) => const SignUpScreen()),
     GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
     GoRoute(path: '/loyalty', builder: (_, __) => const LoyaltyCardPage()),
+    GoRoute(path: '/payment', builder: (_, __) => const PayInvoicePage()),
     GoRoute(
-      path: '/payment',
+      path: '/confirmation',
       builder: (context, state) {
         final machineId = state.uri.queryParameters['machineId'] ?? '';
-        return PaymentPage(machineId: machineId);
+        return ConfirmationPage(machineId: machineId);
       },
     ),
     GoRoute(
