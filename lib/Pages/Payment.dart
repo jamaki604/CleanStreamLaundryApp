@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Stripe/Stripe_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -208,7 +209,9 @@ class _PayInvoicePageState extends State<PayInvoicePage> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _processPayment,
+                      onPressed:() {
+                        _processPayment();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue[700],
                         shape: RoundedRectangleBorder(
@@ -275,39 +278,47 @@ class _PayInvoicePageState extends State<PayInvoicePage> {
     );
   }
 
-  void _processPayment() {
-    if (_formKey.currentState!.validate()) {
-      showDialog(
+  void _processPayment() async {
+    showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Processing payment...'),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+        builder: (_) => const Center(child: CircularProgressIndicator())
+    );
 
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context);
-        _showSuccessDialog();
-      });
+    final int status = await StripeService.instance.makePayment();
+
+    Navigator.of(context).pop();
+
+    if(status == 200) {
+      _showPaymentResult(context,
+        title: "Payment Successful!",
+        message: "Thank you! Your payment was processed successfully.",
+        isSuccess: true
+      );
+    } else if (status == 401) {
+      _showPaymentResult(context,
+        title: "Payment Failed!",
+        message: "The payment was canceled or declined.",
+        isSuccess: false
+      );
+    } else {
+      _showPaymentResult(context,
+        title: "Payment Failed!",
+        message: "An unexpected error occurred.",
+        isSuccess: false
+      );
     }
   }
 
-  void _showSuccessDialog() {
+  void _showPaymentResult(
+      BuildContext, {
+        required String title,
+        required String message,
+        required bool isSuccess
+  }){
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -321,14 +332,14 @@ class _PayInvoicePageState extends State<PayInvoicePage> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.check_circle,
-                color: Colors.green[700],
+                isSuccess ? Icons.check_circle : Icons.error,
+                color: isSuccess ? Colors.green : Colors.red,
                 size: 64,
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Payment Successful!',
+            Text(
+              title,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -336,7 +347,7 @@ class _PayInvoicePageState extends State<PayInvoicePage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your payment of \$25.00 has been processed',
+              message,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
