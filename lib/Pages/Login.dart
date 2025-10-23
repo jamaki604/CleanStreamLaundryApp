@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await widget._auth.login(email, password);
     if (!mounted) return;
 
-    if (success) {
+    if (success == AuthenticationResponses.success) {
       _showMessage('Logged in as $email');
       context.go("/scanner");
     } else {

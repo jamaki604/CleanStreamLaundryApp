@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -103,7 +104,7 @@ void main(){
 
       final response = await authenticator.login("testemail@test.com","testpassword");
 
-      expect(response, true);
+      expect(response, AuthenticationResponses.success);
     });
 
     test("Sign up test",() async{
@@ -190,7 +191,7 @@ void main(){
 
       final response = await authenticator.signUp("testemail", "testpassword");
 
-      expect(response,true);
+      expect(response,AuthenticationResponses.success);
     });
 
     test("Tests if login is unsuccessful",()async{
@@ -203,7 +204,7 @@ void main(){
 
       final response = await authenticator.login("testemail", "testpassword");
 
-      expect(response,false);
+      expect(response,AuthenticationResponses.failure);
     });
 
 

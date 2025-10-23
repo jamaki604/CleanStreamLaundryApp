@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Authenticator implements AuthSystem{
@@ -13,24 +14,30 @@ class Authenticator implements AuthSystem{
   }
 
   @override
-  Future<bool> isLoggedIn() async {
+  Future<AuthenticationResponses> isLoggedIn() async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
     try {
       await _client.auth.refreshSession();
-      return _client.auth.currentUser != null;
+      if(_client.auth.currentUser != null){
+        output = AuthenticationResponses.success;
+      }
     } catch (e) {
-      return false;
+
     }
+    return output;
   }
 
   @override
-  Future<bool> login(String email, String password) async {
-    bool output = false;
+  Future<AuthenticationResponses> login(String email, String password) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
     try {
       final AuthResponse response = await _client.auth.signInWithPassword(
         email: email,
         password: password,
       );
-      output = response.session != null;
+      if(response.session != null){
+        output = AuthenticationResponses.success;
+      }
     }catch (e){
 
     }
@@ -43,12 +50,18 @@ class Authenticator implements AuthSystem{
   }
 
   @override
-  Future<bool> signUp(String email, String password) async{
+  Future<AuthenticationResponses> signUp(String email, String password) async{
+    AuthenticationResponses output = AuthenticationResponses.failure;
     final AuthResponse response = await _client.auth.signUp(
       email: email,
       password: password,
     );
-    return response.user != null;
+
+    if(response.user != null){
+      output = AuthenticationResponses.success;
+    }
+
+    return output;
   }
 
 }

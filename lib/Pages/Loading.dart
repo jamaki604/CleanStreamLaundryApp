@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -40,7 +41,7 @@ class _LoadingPageState extends State<LoadingPage> {
     await Future.delayed(Duration.zero);
 
     try {
-      if (await widget.auth.isLoggedIn()) {
+      if (await widget.auth.isLoggedIn() == AuthenticationResponses.success) {
         if (!mounted) return;
         context.go("/scanner");
       } else {

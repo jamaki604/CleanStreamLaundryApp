@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final success = await _auth.signUp( email, password);
-      if (success) {
+      if (success == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
         context.go('/scanner');
       } else {
