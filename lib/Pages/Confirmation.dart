@@ -90,16 +90,14 @@ class _PaymentPageState extends State<ConfirmationPage> {
                   ),
                   elevation: 2,
                 ),
-                child: _isConfirmed
-                    ? const SizedBox(
+                child: _isConfirmed ? const SizedBox(
                   height: 24,
                   width: 24,
                   child: CircularProgressIndicator(
                     color: Colors.white,
                     strokeWidth: 2.5,
                   ),
-                )
-                    : const Text(
+                ) : const Text(
                   'Pay',
                   style: TextStyle(
                     fontSize: 18,
