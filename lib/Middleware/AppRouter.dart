@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Pages/EmailVerification.dart';
 import 'package:clean_stream_laundry_app/Pages/Loading.dart';
 import 'package:clean_stream_laundry_app/Pages/Scanner.dart';
 import 'package:clean_stream_laundry_app/Pages/Signup.dart';
@@ -19,7 +20,8 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         return LoadingPage(authRedirectUri: uri,auth:authenticator);
       }
     ),
-    GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator))
+    GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator)),
+    GoRoute(path: '/emailVerification',builder: (_,__) => EmailVerificationPage(auth: authenticator))
   ],
 
   errorBuilder: (context, state) => const NotFoundScreen(),

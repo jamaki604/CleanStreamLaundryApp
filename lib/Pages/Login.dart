@@ -45,13 +45,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    final success = await widget._auth.login(email, password);
+    final authResposne = await widget._auth.login(email, password);
     if (!mounted) return;
 
-    if (success == AuthenticationResponses.success) {
+    if (authResposne == AuthenticationResponses.success) {
       _showMessage('Logged in as $email');
       context.go("/scanner");
-    } else {
+    } else if(authResposne == AuthenticationResponses.emailNotVerified) {
+      context.go("/emailVerification");
+    }else{
       _changeColors();
     }
   }

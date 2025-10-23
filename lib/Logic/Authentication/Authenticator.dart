@@ -35,8 +35,15 @@ class Authenticator implements AuthSystem{
         email: email,
         password: password,
       );
-      if(response.session != null){
-        output = AuthenticationResponses.success;
+
+      final user = response.user;
+      print(user?.emailConfirmedAt);
+      if (user == null) {
+        output = AuthenticationResponses.failure;
+      } else if (user.emailConfirmedAt == null) {
+        output = AuthenticationResponses.emailNotVerified;
+      } else {
+        return AuthenticationResponses.success;
       }
     }catch (e){
 
@@ -52,6 +59,7 @@ class Authenticator implements AuthSystem{
   @override
   Future<AuthenticationResponses> signUp(String email, String password) async{
     AuthenticationResponses output = AuthenticationResponses.failure;
+
     final AuthResponse response = await _client.auth.signUp(
       email: email,
       password: password,
