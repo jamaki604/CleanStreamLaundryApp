@@ -12,7 +12,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
   initialLocation: '/loading',
   routes: [
     GoRoute(path: '/login', builder: (_, __) => LoginScreen(auth:authenticator)),
-    GoRoute(path: '/signup', builder: (_, __) => const SignUpScreen()),
+    GoRoute(path: '/signup', builder: (_, __) => SignUpScreen(auth:authenticator)),
     GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
     GoRoute(path: '/loading',
       builder: (context, state) {

@@ -6,4 +6,5 @@ abstract class AuthSystem{
   Future<void> logout();
   Future<AuthenticationResponses> isLoggedIn();
   String? get currentUserId;
+  Future<AuthenticationResponses> resendVerification();
 }

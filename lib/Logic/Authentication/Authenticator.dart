@@ -72,4 +72,24 @@ class Authenticator implements AuthSystem{
     return output;
   }
 
+  Future<AuthenticationResponses> resendVerification() async {
+    AuthenticationResponses output = AuthenticationResponses.success;
+
+    final userEmail = _client.auth.currentUser?.email;
+
+    try {
+      if (userEmail != null) {
+        await _client.auth.resend(
+          type: OtpType.signup,
+          email: userEmail,
+        );
+      }else{
+        output = AuthenticationResponses.failure;
+      }
+    }catch(e){
+      output = AuthenticationResponses.failure;
+    }
+
+    return output;
+  }
 }

@@ -1,5 +1,5 @@
 enum AuthenticationResponses {
   success,
   emailNotVerified,
-  failure
+  failure,
 }
