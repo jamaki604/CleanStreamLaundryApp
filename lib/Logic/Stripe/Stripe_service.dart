@@ -6,9 +6,9 @@ class StripeService {
   StripeService._();
   static final StripeService instance = StripeService._();
 
-  Future<int> makePayment() async {
+  Future<int> makePayment(double amount) async {
     try{
-      String? paymentIntentClientSecret = await _createPaymentIntent(10, "usd");
+      String? paymentIntentClientSecret = await _createPaymentIntent(amount, "usd");
       if (paymentIntentClientSecret == null) {
         return 400;
       }
@@ -25,7 +25,7 @@ class StripeService {
     }
   }
 
-  Future<String?> _createPaymentIntent(int amount, String currency) async {
+  Future<String?> _createPaymentIntent(double amount, String currency) async {
     try {
       final Dio dio = Dio();
       await dotenv.load(fileName: '.env');
@@ -67,8 +67,8 @@ class StripeService {
     }
   }
 
-  String _calculateAmount(int amount) {
-    final calculatedAmount = amount * 100;
+  String _calculateAmount(double amount) {
+    final calculatedAmount = (amount * 100).toInt();
     return calculatedAmount.toString();
   }
 }
