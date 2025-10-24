@@ -2,7 +2,7 @@ import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Stripe/Stripe_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe_service.dart';
 
 class ConfirmationPage extends StatefulWidget {
   final String machineId;
