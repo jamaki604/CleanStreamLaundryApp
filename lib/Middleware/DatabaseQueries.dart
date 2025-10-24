@@ -42,4 +42,20 @@ class DatabaseService {
 
     return List<Map<String, dynamic>>.from(response);
   }
+
+  Future<Map<String, dynamic>?> getMachineById(String machineId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select("Name, Price")
+          .eq('id', machineId)
+          .single();
+      return response;
+    } on PostgrestException catch(e) {
+      print("Postgres error: ${e.message}");
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

@@ -16,11 +16,43 @@ class ConfirmationPage extends StatefulWidget {
 
 class _PaymentPageState extends State<ConfirmationPage> {
   bool _isConfirmed = false;
-  final double amount = 2.5;
+  double? _price;
+  String? _machineName;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMachineInfo();
+  }
+
+  Future<void> _fetchMachineInfo() async {
+
+    final data = await DatabaseService.instance.getMachineById(widget.machineId);
+
+    if (data != null) {
+      setState(() {
+        _machineName = data['Name'];
+        _price = (data['Price'] as num).toDouble();
+        _isLoading = false;
+      });
+    } else {
+
+      // handle error / machine not found
+      setState(() {
+        _machineName = 'Unknown';
+        _price = 0;
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: Column(
+      body: _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : Column(
         children: [
           Expanded(
             child: Padding(
@@ -30,7 +62,7 @@ class _PaymentPageState extends State<ConfirmationPage> {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'Machine ${widget.machineId}',
+                    'Machine ${_machineName}',
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -61,7 +93,7 @@ class _PaymentPageState extends State<ConfirmationPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          '\$${amount.toStringAsFixed(2)}',
+                          '\$${_price?.toStringAsFixed(2) ?? '0.00'}',
                           style: TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
@@ -82,25 +114,33 @@ class _PaymentPageState extends State<ConfirmationPage> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {_isConfirmed ? null : _processPayment(amount);},
+                onPressed: (_isConfirmed || _price == null || _price == 0)
+                    ? null
+                    : () => _processPayment(_price!),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: (_isConfirmed || _price == null || _price == 0)
+                      ? Colors.grey
+                      : Colors.blue,
                   disabledBackgroundColor: Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 2,
                 ),
-                child: _isConfirmed ? const SizedBox(
+                child: _isConfirmed
+                    ? const SizedBox(
                   height: 24,
                   width: 24,
                   child: CircularProgressIndicator(
                     color: Colors.white,
                     strokeWidth: 2.5,
                   ),
-                ) : const Text(
-                  'Pay',
-                  style: TextStyle(
+                )
+                    : Text(
+                  _price != null && _price! > 0
+                      ? 'Pay \$${_price!.toStringAsFixed(2)}'
+                      : 'Pay',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
