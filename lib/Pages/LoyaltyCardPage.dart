@@ -77,7 +77,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Card(
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
+            child: Card(
                 elevation: 10,
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -140,6 +142,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   ),
                 ),
               ),
+          ),
               SizedBox(height: 50),
               Text(
                 'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
