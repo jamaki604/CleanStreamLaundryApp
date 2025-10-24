@@ -131,7 +131,8 @@ void main(){
       when(() => supabaseAuth.signUp(
         email: any(named: 'email'),
         password: any(named: 'password'),
-      )).thenAnswer((_) async => // Some fields may be null if "confirm email" is enabled.
+          emailRedirectTo: 'clean-stream://email-verification'
+      )).thenAnswer((_) async =>
       AuthResponse(
         user: const User(
           id: '11111111-1111-1111-1111-111111111111',
@@ -219,7 +220,7 @@ void main(){
           supabaseAuth.signInWithPassword(
             email: any(named: 'email'),
             password: any(named: 'password'),
-          )).thenAnswer((_) async => throw AuthException("Invalid password or username"));
+          )).thenThrow(AuthException("Invalid credintials"));
 
       final response = await authenticator.login("testemail", "testpassword");
 
@@ -232,11 +233,11 @@ void main(){
           supabaseAuth.signInWithPassword(
             email: any(named: 'email'),
             password: any(named: 'password'),
-          )).thenThrow(AuthException("Invalid password or username"));
+          )).thenThrow(AuthApiException("Email Not Confirmed",code:'email_not_confirmed',statusCode:"400"));
 
       final response = await authenticator.login("testemail", "testpassword");
 
-      expect(response,AuthenticationResponses.failure);
+      expect(response,AuthenticationResponses.emailNotVerified);
     });
     
     test("Resend verfication email unsuccesfully",() async{
