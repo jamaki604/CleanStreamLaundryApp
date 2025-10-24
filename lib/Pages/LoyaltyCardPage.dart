@@ -1,74 +1,151 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/LoyaltyCard.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 
-class LoyaltyCardPage extends StatefulWidget {
-  const LoyaltyCardPage({super.key});
+
+class LoyaltyPage extends StatefulWidget {
+  const LoyaltyPage({super.key});
 
   @override
-  State<LoyaltyCardPage> createState() => _NotFoundScreenState();
+  State<LoyaltyPage> createState() => LoyaltyCardPage();
 }
 
-class _NotFoundScreenState extends State<LoyaltyCardPage> {
-  void _addMoney() {
-    setState(() {
-      LoyaltyCard.addMoney(5.0);
-    });
+class LoyaltyCardPage extends State<LoyaltyPage> {
+  double? _userBalance;
+  bool _isLoading = true;
+  String? _userName;
+  String? _errorMessage;
+  final userId = Supabase.instance.client.auth.currentUser?.id;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
   }
 
-  void _subtractMoney() {
-    setState(() {
-      LoyaltyCard.subtractMoney(5.0);
-    });
+  Future<void> _fetchBalance() async {
+    final currentUserId = userId;
+
+    if (currentUserId == null) {
+      setState(() {
+        _errorMessage = 'User not authenticated';
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final data = await DatabaseService.instance.getUserBalanceById(currentUserId);
+
+      if (data != null) {
+        setState(() {
+          _userBalance = (data['balance'] as num).toDouble();
+          _userName = (data['full_name'] );
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _userBalance = 0;
+          _userName = "John Doe";
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to fetch balance: $e';
+        _isLoading = false;
+      });
+    }
+
   }
 
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Card(
-              elevation: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 24),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Loyalty Card Balance',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '\$${LoyaltyCard.balance.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 24, color: Colors.green),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body:  _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Card(
+                elevation: 10,
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: SizedBox(
+                    height: 225,
+                    child: Stack(
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: _addMoney,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add \$5'),
+                        Positioned(
+                          top: -30,
+                          left: 15,
+                          child: Image.asset("assets/Slogan.png", width: 200, height: 150),
                         ),
-                        ElevatedButton.icon(
-                          onPressed: _subtractMoney,
-                          icon: const Icon(Icons.remove),
-                          label: const Text('Subtract \$5'),
+                        Positioned(
+                          top: -3,
+                          right: 0,
+                          child: Image.asset("assets/Icon.png", height: 95, width: 95),
+                        ),
+                        Positioned(
+                          left: 15,
+                          top: 80,
+                          child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
+                        ),
+                        Positioned(
+                          left: -4,
+                          right: 0,
+                          top: 130,
+                          child: Text(
+                            "1234    5678    9012    3456",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 15,
+                          top: 170,
+                          child: Text(
+                            (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 15,
+                          bottom: 10,
+                          top: 165,
+                          child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 50),
+              Text(
+                'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+            ]
+          ),
         ),
-      ),
     );
   }
 }

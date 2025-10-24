@@ -58,4 +58,21 @@ class DatabaseService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>?> getUserBalanceById(String userId) async {
+
+    try {
+      final response = await _client
+          .from('profiles')
+          .select("full_name, balance")
+          .eq('id', userId)
+          .single();
+      return response;
+    } on PostgrestException catch(e) {
+      print("Postgres error: ${e.message}");
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

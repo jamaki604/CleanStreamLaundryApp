@@ -13,7 +13,8 @@ final router = GoRouter(
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
     GoRoute(path: '/signup', builder: (_, __) => const SignUpScreen()),
     GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
-    GoRoute(path: '/loyalty', builder: (_, __) => const LoyaltyCardPage()),
+    GoRoute(path: '/loyalty', builder: (_, __) => const LoyaltyPage()),
+    GoRoute(path: '/settings', builder: (_, __) => const ScannerWidget()),
     GoRoute(
       path: '/confirmation',
       builder: (context, state) {
