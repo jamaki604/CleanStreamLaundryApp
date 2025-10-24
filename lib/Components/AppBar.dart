@@ -6,12 +6,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Image.asset(
-        'assets/Slogan.png',
-        height: 50,
-        fit: BoxFit.contain,
-      ),
-      centerTitle: true,
+      //
+      backgroundColor: Color(0xFF1D69A5),
     );
   }
 

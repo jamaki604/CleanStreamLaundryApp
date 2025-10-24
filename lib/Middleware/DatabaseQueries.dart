@@ -58,4 +58,42 @@ class DatabaseService {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>?> getUserBalanceById(String userId) async {
+
+    try {
+      final response = await _client
+          .from('profiles')
+          .select("full_name, balance")
+          .eq('id', userId)
+          .single();
+      return response;
+    } on PostgrestException catch(e) {
+      print("Postgres error: ${e.message}");
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> updateBalanceById(double balance) async {
+    final userId = _client.auth.currentUser?.id;
+
+    if (userId == null) {
+      print("User not authenticated");
+      return;
+    }
+    try {
+      await _client
+          .from("profiles")
+          .update({"balance": balance})
+          .eq("id", userId);
+    } on PostgrestException catch(e) {
+      print("Postgres error: ${e.message}");
+      return null;
+    } catch (e) {
+      return null;
+    }
+
+  }
 }
