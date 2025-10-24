@@ -14,14 +14,9 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
     GoRoute(path: '/login', builder: (_, __) => LoginScreen(auth:authenticator)),
     GoRoute(path: '/signup', builder: (_, __) => SignUpScreen(auth:authenticator)),
     GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
-    GoRoute(path: '/loading',
-      builder: (context, state) {
-        final uri = Uri.parse(state.uri.queryParameters['uri'] ?? '');
-        return LoadingPage(authRedirectUri: uri,auth:authenticator);
-      }
-    ),
+    GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
     GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator)),
-    GoRoute(path: '/emailVerification',builder: (_,__) => EmailVerificationPage(auth: authenticator))
+    GoRoute(path: '/email-Verification',builder: (_,__) => EmailVerificationPage(auth: authenticator))
   ],
 
   errorBuilder: (context, state) => const NotFoundScreen(),

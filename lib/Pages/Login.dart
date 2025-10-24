@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _showMessage('Logged in as $email');
       context.go("/scanner");
     } else if(authResposne == AuthenticationResponses.emailNotVerified) {
-      context.go("/emailVerification");
+      context.go("/email-Verification");
     }else{
       _changeColors();
     }

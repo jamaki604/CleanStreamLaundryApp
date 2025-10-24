@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:app_links/app_links.dart';
 
 class LoadingPage extends StatefulWidget {
-  final Uri authRedirectUri;
   final AuthSystem auth;
 
-  const LoadingPage({Key? key, required this.authRedirectUri, required this.auth}) : super(key: key);
+  const LoadingPage({Key? key, required this.auth}) : super(key: key);
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  final _supabase = Supabase.instance.client;
   String? _error;
 
   double begin = 0.95;
@@ -25,15 +24,20 @@ class _LoadingPageState extends State<LoadingPage> {
   void initState() {
     super.initState();
     _automaticLogIn();
-    //_handleAuthRedirect();
+    _coldStartRedirect();
   }
 
-  Future<void> _handleAuthRedirect() async {
+
+  Future<void>_coldStartRedirect() async {
     try {
-      await _supabase.auth.exchangeCodeForSession(widget.authRedirectUri.toString());
-      context.go("/scanner");
+      final AppLinks appLinks = AppLinks();
+      final Uri? initialUri = await appLinks.getInitialAppLink();
+
+      if (initialUri != null && initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
+        context.go("/scanner");
+      }
     } catch (e) {
-      setState(() => _error = e.toString());
+
     }
   }
 

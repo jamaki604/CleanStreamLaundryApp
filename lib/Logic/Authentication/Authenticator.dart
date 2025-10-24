@@ -38,16 +38,23 @@ class Authenticator implements AuthSystem{
 
       final user = response.user;
       print(user?.emailConfirmedAt);
+
       if (user == null) {
         output = AuthenticationResponses.failure;
-      } else if (user.emailConfirmedAt == null) {
+      } else {
+        output = AuthenticationResponses.success;
+      }
+
+    }on AuthApiException catch (e) {
+      if (e.code == 'email_not_confirmed') {
         output = AuthenticationResponses.emailNotVerified;
       } else {
-        return AuthenticationResponses.success;
+        print(e.message);
       }
-    }catch (e){
-
+    }catch(e){
+      print(e);
     }
+
     return output;
   }
 
@@ -63,6 +70,7 @@ class Authenticator implements AuthSystem{
     final AuthResponse response = await _client.auth.signUp(
       email: email,
       password: password,
+        emailRedirectTo: 'clean-stream://email-verification'
     );
 
     if(response.user != null){

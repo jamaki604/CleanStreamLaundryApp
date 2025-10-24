@@ -89,12 +89,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final authResponse = await widget._auth.signUp( email, password);
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
-        context.go('/emailVerification');
+        context.go('/email-Verification');
       } else {
         _showMessage('Sign-up failed. Try again.');
       }
     } catch (e) {
       _showMessage('Error: $e');
+      print(e);
     } finally {
       setState(() => _isLoading = false);
     }

@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:app_links/app_links.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   late final AuthSystem _auth;
@@ -14,13 +19,53 @@ class EmailVerificationPage extends StatefulWidget {
 }
 
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
-  Widget resendVerfication = const Text(
-    'Resend Verfication',
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      color: Colors.blue,
-      decoration: TextDecoration.underline,
-    )
+  late final _authSubscription;
+  late final StreamSubscription? _linkSub;
+  final AppLinks _appLinks = AppLinks();
+
+  @override
+  void initState() {
+    super.initState();
+
+    //Checks for if application has been updated
+    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((event) {
+      final User? user = event.session?.user;
+
+      if(user != null){
+        if(user.id == widget._auth.currentUserId) {
+          if (user.emailConfirmedAt != null) {
+            context.go("/scanner");
+          }
+        }
+      }
+    });
+
+    // Handles app links
+    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) {
+      if (uri != null && uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            print("Routing to /scanner...");
+            context.go('/scanner');
+          }
+        });
+      }});
+  }
+
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    _linkSub?.cancel();
+    super.dispose();
+  }
+
+  Widget resendVerification = const Text(
+      'Resend Verification',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.blue,
+        decoration: TextDecoration.underline,
+      )
   );
 
   bool resent = false;
@@ -49,15 +94,18 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               ),
               const SizedBox(height: 24),
               InkWell(
-                onTap: () {
+                onTap: () async {
                   if(resent == false) {
+
+                    final result = await widget._auth.resendVerification();
+
                     setState(() {
-                      if(widget._auth.resendVerification() == AuthenticationResponses.success) {
-                        resendVerfication = Icon(Icons.check_circle, size: 40,
+                      if(result == AuthenticationResponses.success) {
+                        resendVerification = Icon(Icons.check_circle, size: 40,
                             color: Colors.green);
                         resent = true;
                       }else{
-                        resendVerfication = Center(
+                        resendVerification = Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -89,8 +137,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                     });
                   }
                 },
-                child: resendVerfication,
-                ),
+                child: resendVerification,
+              ),
             ],
           ),
         ),
