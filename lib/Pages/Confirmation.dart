@@ -115,7 +115,7 @@ class _PaymentPageState extends State<ConfirmationPage> {
               child: ElevatedButton(
                 onPressed: (_isConfirmed || _price == null || _price == 0)
                     ? null
-                    : () => processPayment(context, _price!),
+                    : () => processPayment(context, _price!, "Machine"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: (_isConfirmed || _price == null || _price == 0)
                       ? Colors.grey

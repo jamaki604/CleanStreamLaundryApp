@@ -4,7 +4,7 @@ import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
 
 
-Future<bool> processPayment(BuildContext context, double amount) async {
+Future<bool> processPayment(BuildContext context, double amount, description) async {
   showDialog(
       context: context,
       barrierDismissible: false,
@@ -21,7 +21,7 @@ Future<bool> processPayment(BuildContext context, double amount) async {
         message: "Thank you! Your payment was processed successfully.",
         isSuccess: true
     );
-    DatabaseService.instance.recordTransaction(amount: amount, description: "Payment for machine", type: "Laundry");
+    DatabaseService.instance.recordTransaction(amount: amount, description: description, type: "Laundry");
     return true;
   } else if (status == 401) {
     showPaymentResult(context,

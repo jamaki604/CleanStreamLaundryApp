@@ -257,7 +257,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               Navigator.of(context).pop();
 
               if (amount > 0) {
-                bool result = await processPayment(context, amount);
+                bool result = await processPayment(context, amount, "Loyalty Card");
                 if (result) {
                   final newBalance = _userBalance! + amount;
                   DatabaseService.instance.updateBalanceById(newBalance);
