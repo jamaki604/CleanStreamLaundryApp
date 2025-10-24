@@ -14,7 +14,8 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
+    final router = GoRouter.of(context);
+    final location = router.routeInformationProvider.value.uri.toString();
     final currentIndex = _getIndex(location);
 
     return BottomNavigationBar(

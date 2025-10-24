@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/Pages/EmailVerification.dart';
 import 'package:clean_stream_laundry_app/Pages/Loading.dart';
+import 'package:clean_stream_laundry_app/Pages/LoyaltyCardPage.dart';
 import 'package:clean_stream_laundry_app/Pages/Scanner.dart';
 import 'package:clean_stream_laundry_app/Pages/Signup.dart';
 import 'package:clean_stream_laundry_app/Pages/Login.dart';
@@ -17,6 +18,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
     GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
     GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
     GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator)),
+    GoRoute(path: '/loyalty', builder: (_,__) => LoyaltyPage() ),
     GoRoute(
       path: '/confirmation',
       builder: (context, state) {
