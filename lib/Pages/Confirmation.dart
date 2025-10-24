@@ -2,7 +2,7 @@ import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Stripe/Stripe_service.dart';
 
 class ConfirmationPage extends StatefulWidget {
   final String machineId;
@@ -166,10 +166,9 @@ class _PaymentPageState extends State<ConfirmationPage> {
     Navigator.of(context).pop();
 
     if(status == 200) {
-
       _showPaymentResult(context,
           title: "Payment Successful!",
-          message: "Thank you! Your payment was processed successfully. Please press start on the machine!",
+          message: "Thank you! Your payment was processed successfully.",
           isSuccess: true
       );
       DatabaseService.instance.recordTransaction(amount: amount, description: "Payment for machine", type: "Laundry");
