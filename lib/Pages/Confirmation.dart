@@ -1,9 +1,12 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clean_stream_laundry_app/Logic/Stripe/Stripe_service.dart';
 
 class ConfirmationPage extends StatefulWidget {
   final String machineId;
+
 
   const ConfirmationPage({Key? key, required this.machineId}) : super(key: key);
 
@@ -13,27 +16,43 @@ class ConfirmationPage extends StatefulWidget {
 
 class _PaymentPageState extends State<ConfirmationPage> {
   bool _isConfirmed = false;
+  double? _price;
+  String? _machineName;
+  bool _isLoading = true;
 
-  void _confirmPayment() async {
-    setState(() {
-      _isConfirmed = true;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _fetchMachineInfo();
+  }
 
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _fetchMachineInfo() async {
 
-    setState(() {
-      _isConfirmed = false;
-    });
+    final data = await DatabaseService.instance.getMachineById(widget.machineId);
 
-    if (mounted) {
-      context.go('/payment');
+    if (data != null) {
+      setState(() {
+        _machineName = data['Name'];
+        _price = (data['Price'] as num).toDouble();
+        _isLoading = false;
+      });
+    } else {
+
+      // handle error / machine not found
+      setState(() {
+        _machineName = 'Unknown';
+        _price = 0;
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: Column(
+      body: _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : Column(
         children: [
           Expanded(
             child: Padding(
@@ -43,7 +62,7 @@ class _PaymentPageState extends State<ConfirmationPage> {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'Machine ${widget.machineId}',
+                    'Machine ${_machineName}',
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -73,8 +92,8 @@ class _PaymentPageState extends State<ConfirmationPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          '\$25.00',
+                        Text(
+                          '\$${_price?.toStringAsFixed(2) ?? '0.00'}',
                           style: TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
@@ -95,9 +114,13 @@ class _PaymentPageState extends State<ConfirmationPage> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: _isConfirmed ? null : _confirmPayment,
+                onPressed: (_isConfirmed || _price == null || _price == 0)
+                    ? null
+                    : () => _processPayment(_price!),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: (_isConfirmed || _price == null || _price == 0)
+                      ? Colors.grey
+                      : Colors.blue,
                   disabledBackgroundColor: Colors.grey,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -113,9 +136,11 @@ class _PaymentPageState extends State<ConfirmationPage> {
                     strokeWidth: 2.5,
                   ),
                 )
-                    : const Text(
-                  'Pay',
-                  style: TextStyle(
+                    : Text(
+                  _price != null && _price! > 0
+                      ? 'Pay \$${_price!.toStringAsFixed(2)}'
+                      : 'Pay',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -125,6 +150,108 @@ class _PaymentPageState extends State<ConfirmationPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _processPayment(double amount) async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator())
+    );
+
+    final int status = await StripeService.instance.makePayment(amount);
+
+    Navigator.of(context).pop();
+
+    if(status == 200) {
+      _showPaymentResult(context,
+          title: "Payment Successful!",
+          message: "Thank you! Your payment was processed successfully.",
+          isSuccess: true
+      );
+      DatabaseService.instance.recordTransaction(amount: amount, description: "Payment for machine", type: "Laundry");
+    } else if (status == 401) {
+      _showPaymentResult(context,
+          title: "Payment Failed!",
+          message: "The payment was canceled or declined.",
+          isSuccess: false
+      );
+    } else {
+      _showPaymentResult(context,
+          title: "Payment Failed!",
+          message: "An unexpected error occurred.",
+          isSuccess: false
+      );
+    }
+  }
+
+  void _showPaymentResult(
+      BuildContext, {
+        required String title,
+        required String message,
+        required bool isSuccess
+      }){
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isSuccess ? Icons.check_circle : Icons.error,
+                color: isSuccess ? Colors.green : Colors.red,
+                size: 64,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  if(isSuccess) {
+                    context.go("/scanner");
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Done'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
