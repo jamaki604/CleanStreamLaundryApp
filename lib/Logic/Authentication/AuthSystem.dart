@@ -1,7 +1,10 @@
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
+
 abstract class AuthSystem{
-  Future<bool> login(String email, String password);
-  Future<bool> signUp(String email, String password);
+  Future<AuthenticationResponses> login(String email, String password);
+  Future<AuthenticationResponses> signUp(String email, String password);
   Future<void> logout();
-  bool get isLoggedIn;
+  Future<AuthenticationResponses> isLoggedIn();
   String? get currentUserId;
+  Future<AuthenticationResponses> resendVerification();
 }

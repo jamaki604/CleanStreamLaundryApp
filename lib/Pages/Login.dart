@@ -1,11 +1,14 @@
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  late final AuthSystem _auth;
+
+  LoginScreen({super.key,required AuthSystem auth}){
+    this._auth = auth;
+  }
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -14,7 +17,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
-  final AuthSystem _auth = Authenticator(Supabase.instance.client);
+  var passwordText = "Password";
+  var emailText = "Email";
+  var iconColor = Colors.blue;
+  var enabledBorderColor = Colors.grey;
+  var focusedBorderColor = Colors.blue;
+  var borderColor = Colors.blue;
+  var labelColor = Colors.blue;
+
+
 
   @override
   void dispose() {
@@ -34,19 +45,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    final success = await _auth.login(email, password);
+    final authResposne = await widget._auth.login(email, password);
     if (!mounted) return;
 
-    if (success) {
+    if (authResposne == AuthenticationResponses.success) {
       _showMessage('Logged in as $email');
       context.go("/scanner");
-    } else {
-      _showMessage('Invalid email or password.');
+    } else if(authResposne == AuthenticationResponses.emailNotVerified) {
+      context.go("/email-Verification");
+    }else{
+      _changeColors();
     }
   }
 
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  void _changeColors(){
+    setState(() {
+      passwordText = "Invalid Password or Email";
+      emailText = "Invalid Password or Email";
+      iconColor = Colors.red;
+      enabledBorderColor = Colors.red;
+      focusedBorderColor = Colors.red;
+      borderColor = Colors.red;
+      labelColor = Colors.red;
+    });
   }
 
   @override
@@ -61,21 +86,44 @@ class _LoginScreenState extends State<LoginScreen> {
               Image.asset("assets/Logo.png", height: 250, width: 250,),
               TextField(
                 controller: _emailCtrl,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: emailText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color:focusedBorderColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.email, color: iconColor),
                 ),
               ),
               const SizedBox(height: 16),
 
               TextField(
                 controller: _passwordCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: passwordText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
+                  obscureText: true
               ),
               const SizedBox(height: 24),
 
@@ -84,6 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: _handleLogin,
                   child: const Text('Log In'),
+                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white)
                 ),
               ),
               Padding(

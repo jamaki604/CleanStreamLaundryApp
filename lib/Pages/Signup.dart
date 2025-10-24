@@ -1,13 +1,15 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  late final AuthSystem _auth;
+
+  SignUpScreen({super.key,required AuthSystem auth}){
+    this._auth = auth;
+  }
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -18,13 +20,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
-
-  final AuthSystem _auth = Authenticator(Supabase.instance.client);
+  var passwordText = "Password";
+  var confirmPasswordText = "Confirm Password";
+  var iconColor = Colors.blue;
+  var enabledBorderColor = Colors.grey;
+  var focusedBorderColor = Colors.blue;
+  var borderColor = Colors.blue;
+  var labelColor = Colors.blue;
   bool _isLoading = false;
 
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(text)));
+  }
+
+  void _changeColorsToRed(){
+    setState(() {
+      passwordText = "Passwords do not match";
+      confirmPasswordText = "Passwords do not match";
+      iconColor = Colors.red;
+      enabledBorderColor = Colors.red;
+      focusedBorderColor = Colors.red;
+      borderColor = Colors.red;
+      labelColor = Colors.red;
+    });
+  }
+
+  void _changeColorsToDefault(){
+    setState(() {
+      passwordText = "Password";
+      confirmPasswordText = "Confirm Password";
+      iconColor = Colors.blue;
+      enabledBorderColor = Colors.grey;
+      focusedBorderColor = Colors.blue;
+      borderColor = Colors.blue;
+      labelColor = Colors.blue;
+    });
   }
 
   @override
@@ -55,15 +86,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await _auth.signUp( email, password);
-      if (success) {
+      final authResponse = await widget._auth.signUp( email, password);
+      if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
-        context.go('/scanner');
+        context.go('/email-Verification');
       } else {
         _showMessage('Sign-up failed. Try again.');
       }
     } catch (e) {
       _showMessage('Error: $e');
+      print(e);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -81,41 +113,98 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Image.asset("assets/Logo.png", height: 250, width: 250),
               TextField(
                 controller: _nameCtrl,
-                keyboardType: TextInputType.name,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Name',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.person, color: Colors.blue),
                 ),
               ),
               const SizedBox(height: 16),
 
               TextField(
                 controller: _emailCtrl,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
-                  border: OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.email, color: Colors.blue),
                 ),
               ),
               const SizedBox(height: 16),
 
               TextField(
                 controller: _passwordCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: passwordText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
+                obscureText: true,
               ),
               const SizedBox(height: 24),
 
               TextField(
                 controller: _passwordConfirmCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm Password',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: confirmPasswordText,
+                  labelStyle: TextStyle(color: labelColor), // matches button color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
+                obscureText: true,
+                onChanged: (value){
+
+                  if((_passwordCtrl.text.trim() != _passwordConfirmCtrl.text.trim())){
+                    if(iconColor != Colors.red) {
+                      _changeColorsToRed();
+                    }
+                  }else{
+                    _changeColorsToDefault();
+                  }
+
+                },
               ),
               const SizedBox(height: 24),
 
@@ -126,6 +215,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: _isLoading
                       ? const CircularProgressIndicator()
                       : const Text('Create Account'),
+                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white),
                 ),
               ),
               Padding(
