@@ -37,24 +37,7 @@ class StripeService {
           'currency': currency
         },
       );
-      // final Dio dio = Dio();
-      // await dotenv.load(fileName: '.env');
-      // Map<String, dynamic> data = {
-      //   "amount": _calculateAmount(amount),
-      //   "currency": currency
-      // };
-      //
-      // var response = await dio.post(
-      //     "https://api.stripe.com/v1/payment_intents",
-      //     data: data,
-      //     options: Options(
-      //         contentType: Headers.formUrlEncodedContentType,
-      //         headers: {
-      //           "Authorization":"Bearer ${dotenv.env['STRIPE_SECRET_KEY']}",
-      //           "Content-Type": 'application/x-www-form-urlencoded'
-      //         }
-      //     )
-      // );
+
 
       if (response.data != null && response.data['clientSecret'] != null) {
         return response.data["clientSecret"];

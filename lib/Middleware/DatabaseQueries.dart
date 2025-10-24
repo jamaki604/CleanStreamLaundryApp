@@ -75,4 +75,25 @@ class DatabaseService {
       return null;
     }
   }
+
+  Future<void> updateBalanceById(double balance) async {
+    final userId = _client.auth.currentUser?.id;
+
+    if (userId == null) {
+      print("User not authenticated");
+      return;
+    }
+    try {
+      await _client
+          .from("profiles")
+          .update({"balance": balance})
+          .eq("id", userId);
+    } on PostgrestException catch(e) {
+      print("Postgres error: ${e.message}");
+      return null;
+    } catch (e) {
+      return null;
+    }
+
+  }
 }

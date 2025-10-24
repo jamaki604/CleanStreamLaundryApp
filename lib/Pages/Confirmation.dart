@@ -1,8 +1,7 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/ProcessPayment.dart';
 
 class ConfirmationPage extends StatefulWidget {
   final String machineId;
@@ -116,7 +115,7 @@ class _PaymentPageState extends State<ConfirmationPage> {
               child: ElevatedButton(
                 onPressed: (_isConfirmed || _price == null || _price == 0)
                     ? null
-                    : () => _processPayment(_price!),
+                    : () => processPayment(context, _price!),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: (_isConfirmed || _price == null || _price == 0)
                       ? Colors.grey
@@ -154,105 +153,5 @@ class _PaymentPageState extends State<ConfirmationPage> {
     );
   }
 
-  void _processPayment(double amount) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator())
-    );
 
-    final int status = await StripeService.instance.makePayment(amount);
-
-    Navigator.of(context).pop();
-
-    if(status == 200) {
-      _showPaymentResult(context,
-          title: "Payment Successful!",
-          message: "Thank you! Your payment was processed successfully.",
-          isSuccess: true
-      );
-      DatabaseService.instance.recordTransaction(amount: amount, description: "Payment for machine", type: "Laundry");
-    } else if (status == 401) {
-      _showPaymentResult(context,
-          title: "Payment Failed!",
-          message: "The payment was canceled or declined.",
-          isSuccess: false
-      );
-    } else {
-      _showPaymentResult(context,
-          title: "Payment Failed!",
-          message: "An unexpected error occurred.",
-          isSuccess: false
-      );
-    }
-  }
-
-  void _showPaymentResult(
-      BuildContext, {
-        required String title,
-        required String message,
-        required bool isSuccess
-      }){
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isSuccess ? Icons.check_circle : Icons.error,
-                color: isSuccess ? Colors.green : Colors.red,
-                size: 64,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if(isSuccess) {
-                    context.go("/scanner");
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[700],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text('Done'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

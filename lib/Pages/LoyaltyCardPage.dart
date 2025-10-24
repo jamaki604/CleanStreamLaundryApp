@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/ProcessPayment.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -149,6 +150,26 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   color: Colors.black,
                 ),
               ),
+              SizedBox(height: 25),
+              ElevatedButton(
+                onPressed: () => _loadCard(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  disabledBackgroundColor: Colors.grey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: Text(
+                  "Load card",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              )
             ]
           ),
         ),
@@ -181,4 +202,79 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       }
     );
   }
+
+  void _loadCard() {
+    TextEditingController _amountController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.blue[25],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Center(
+          child: Text(
+            "Enter load amount",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[900]
+            ),
+          ),
+        ),
+        content: TextField(
+          controller: _amountController,
+          autofocus: true,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            prefixText: '\$',
+            prefixStyle: TextStyle(
+              color: Colors.blue[800],
+              fontWeight: FontWeight.bold,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue[700]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue[300]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          style: TextStyle(color: Colors.blue[900]),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
+            onPressed: () {
+              Navigator.of(context).pop(null);
+            },
+          ),
+          ElevatedButton(
+            child: Text('Pay', style: TextStyle(color: Colors.blue[700])),
+            onPressed: () async {
+              final amountText = _amountController.text;
+              final amount = double.tryParse(amountText) ?? 0;
+
+              Navigator.of(context).pop();
+
+              if (amount > 0) {
+                bool result = await processPayment(context, amount);
+                if (result) {
+                  final newBalance = _userBalance! + amount;
+                  DatabaseService.instance.updateBalanceById(newBalance);
+                  setState(() {
+                    _userBalance = newBalance;
+                  });
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a valid amount')),
+                );
+              }
+            },
+          )
+        ]
+      )
+    );
+  }
+
 }
