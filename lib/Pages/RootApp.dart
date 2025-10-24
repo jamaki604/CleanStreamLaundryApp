@@ -3,6 +3,7 @@ import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart
 import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:clean_stream_laundry_app/Middleware/AppRouter.dart';
 
 class RootApp extends StatefulWidget {
   const RootApp({super.key});

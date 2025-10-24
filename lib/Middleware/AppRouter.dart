@@ -18,6 +18,5 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
     GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator)),
     GoRoute(path: '/email-Verification',builder: (_,__) => EmailVerificationPage(auth: authenticator))
   ],
-
   errorBuilder: (context, state) => const NotFoundScreen(),
 );
