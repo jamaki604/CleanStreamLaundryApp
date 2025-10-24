@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
-
+import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -30,8 +30,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
     if (currentUserId == null) {
       setState(() {
-        _errorMessage = 'User not authenticated';
+        _errorMessage = 'User not known';
         _isLoading = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showErrorDialog(context, _errorMessage);
       });
       return;
     }
@@ -54,8 +57,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to fetch balance: $e';
+        _errorMessage = 'Failed to fetch balance';
         _isLoading = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showErrorDialog(context, _errorMessage);
       });
     }
 
@@ -146,6 +152,33 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             ]
           ),
         ),
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String? message) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Error'),
+          content: Text(message ?? ''),
+          icon: Icon(Icons.error),
+          actions: [
+            TextButton(onPressed: () {
+              Navigator.of(dialogContext).pop();
+              if (message == "Failed to fetch balance") {
+                context.go("/scanner");
+              } else {
+                context.go("/login");
+              }
+            }, child: const Text('OK'),
+            ),
+          ]
+        );
+      }
     );
   }
 }
