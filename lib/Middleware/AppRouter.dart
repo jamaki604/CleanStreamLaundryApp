@@ -7,6 +7,7 @@ import 'package:clean_stream_laundry_app/Pages/NotFound.dart';
 import 'package:clean_stream_laundry_app/Pages/Settings.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:clean_stream_laundry_app/Pages/Confirmation.dart';
 
 GoRouter createRouter(AuthSystem authenticator) => GoRouter(
   initialLocation: '/loading',
@@ -16,6 +17,13 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
     GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
     GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
     GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator)),
+    GoRoute(
+      path: '/confirmation',
+      builder: (context, state) {
+        final machineId = state.uri.queryParameters['machineId'] ?? '';
+        return ConfirmationPage(machineId: machineId);
+      },
+    ),
     GoRoute(path: '/email-Verification',builder: (_,__) => EmailVerificationPage(auth: authenticator))
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),
