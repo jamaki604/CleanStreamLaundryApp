@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/Stripe_service.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
 
@@ -32,7 +32,14 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
         isSuccess: false
     );
     return false;
-  } else {
+  }else if (status == 403) {
+    showPaymentResult(context,
+        title: "Payment Failed!",
+        message: "Stripe service is not available on this platform.",
+        isSuccess: false
+    );
+    return false;
+  }  else {
     showPaymentResult(context,
         title: "Payment Failed!",
         message: "An unexpected error occurred.",
