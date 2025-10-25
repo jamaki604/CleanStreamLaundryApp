@@ -18,16 +18,13 @@ class DatabaseService {
       return;
     }
 
-    final response = await _client.from('transactions').insert({
+    await _client.from('transactions').insert({
       'user_id': user.id,
       'amount': amount,
       'description': description,
       'type': type,
     });
 
-    if (response.error != null) {
-      print("❌ Error inserting transaction: ${response.error!.message}");
-    }
   }
 
   Future<List<Map<String, dynamic>>> getTransactionsForUser() async {
