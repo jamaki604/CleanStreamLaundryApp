@@ -16,11 +16,13 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   Navigator.of(context).pop();
 
   if(status == 200) {
-    showPaymentResult(context,
-        title: "Payment Successful!",
-        message: "Thank you! Your payment was processed successfully.",
-        isSuccess: true
-    );
+    if (description != "Machine") {
+      showPaymentResult(context,
+          title: "Payment Successful!",
+          message: "Thank you! Your payment was processed successfully.",
+          isSuccess: true
+      );
+    }
     DatabaseService.instance.recordTransaction(amount: amount, description: description, type: "Laundry");
     return true;
   } else if (status == 401) {

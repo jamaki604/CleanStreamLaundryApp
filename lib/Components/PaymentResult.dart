@@ -30,6 +30,7 @@ void showPaymentResult(
           const SizedBox(height: 24),
           Text(
             title,
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,

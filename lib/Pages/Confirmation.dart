@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/ProcessPayment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
+import 'package:clean_stream_laundry_app/Middleware/MachineCommunication.dart';
 
 class ConfirmationPage extends StatefulWidget {
   final String machineId;
@@ -21,7 +22,6 @@ class _PaymentPageState extends State<ConfirmationPage> {
   double? _userBalance;
   bool _isLoading = true;
   final SupabaseClient _client = Supabase.instance.client;
-
 
   @override
   void initState() {
@@ -140,16 +140,46 @@ class _PaymentPageState extends State<ConfirmationPage> {
           child: ElevatedButton(
             onPressed: (_isConfirmed || _price == null || _price == 0)
                 ? null
-                : () => processPayment(context, _price!, "Machine"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (_isConfirmed || _price == null || _price == 0)
-                  ? Colors.grey
-                  : Colors.blue[700],
-              disabledBackgroundColor: Colors.grey,
-              shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 2,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+                : () async {
+                  final success = await processPayment(context, _price!, "Machine");
+
+                  if (success) {
+                    final nayaxCommunicator = MachineCommunicator();
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const Center(child: CircularProgressIndicator()),
+                    );
+                    final deviceAuthorized = await nayaxCommunicator.wakeDevice(
+                        widget.machineId);
+                    Navigator.of(context).pop();
+
+                    if (deviceAuthorized) {
+                      showPaymentResult(
+                        context,
+                        title: "Payment processed! Machine Ready!",
+                        message: "Machine ${_machineName} is now active.",
+                        isSuccess: true,
+                      );
+                    } else {
+                      showPaymentResult(
+                        context,
+                        title: "Machine Error",
+                        message: "Payment succeeded but machine did not wake up.",
+                        isSuccess: false,
+                      );
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: (_isConfirmed || _price == null || _price == 0)
+                      ? Colors.grey
+                      : Colors.blue[700],
+                  disabledBackgroundColor: Colors.grey,
+                  shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             child: _isConfirmed
                 ? const SizedBox(
@@ -211,6 +241,30 @@ class _PaymentPageState extends State<ConfirmationPage> {
     setState(() {
       _userBalance = updatedBalance;
     });
+        final nayaxCommunicator = MachineCommunicator();
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
+        final deviceAuthorized = await nayaxCommunicator.wakeDevice(widget.machineId);
+        Navigator.of(context).pop();
+
+        if (deviceAuthorized) {
+          showPaymentResult(
+            context,
+            title: "Machine Ready!",
+            message: "Machine ${_machineName} is now active.",
+            isSuccess: true,
+          );
+        } else {
+          showPaymentResult(
+            context,
+            title: "Machine Error",
+            message: "Payment succeeded but machine did not wake up.",
+            isSuccess: false,
+          );
+        }
     showPaymentResult(context,
         title: "Payment Successful!",
         message: "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
