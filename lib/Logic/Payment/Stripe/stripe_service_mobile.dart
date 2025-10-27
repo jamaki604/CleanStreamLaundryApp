@@ -1,7 +1,8 @@
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/PaymentProcessor.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class StripeService {
+class StripeService implements PaymentProcessor{
   StripeService._();
   static final StripeService instance = StripeService._();
 

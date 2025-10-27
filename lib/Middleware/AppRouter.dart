@@ -1,32 +1,92 @@
-import 'package:clean_stream_laundry_app/Pages/EmailVerification.dart';
-import 'package:clean_stream_laundry_app/Pages/Loading.dart';
+import 'package:clean_stream_laundry_app/Pages/EmailVerificationPage.dart';
+import 'package:clean_stream_laundry_app/Pages/LoadingPage.dart';
 import 'package:clean_stream_laundry_app/Pages/LoyaltyCardPage.dart';
-import 'package:clean_stream_laundry_app/Pages/Scanner.dart';
-import 'package:clean_stream_laundry_app/Pages/Signup.dart';
-import 'package:clean_stream_laundry_app/Pages/Login.dart';
-import 'package:clean_stream_laundry_app/Pages/NotFound.dart';
+import 'package:clean_stream_laundry_app/Pages/ScannerWidget.dart';
+import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
+import 'package:clean_stream_laundry_app/Pages/LoginScreen.dart';
+import 'package:clean_stream_laundry_app/Pages/NotFoundScreen.dart';
 import 'package:clean_stream_laundry_app/Pages/Settings.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Pages/Confirmation.dart';
+import 'package:clean_stream_laundry_app/Pages/PaymentPage.dart';
 
 GoRouter createRouter(AuthSystem authenticator) => GoRouter(
   initialLocation: '/loading',
   routes: [
-    GoRoute(path: '/login', builder: (_, __) => LoginScreen(auth:authenticator)),
-    GoRoute(path: '/signup', builder: (_, __) => SignUpScreen(auth:authenticator)),
-    GoRoute(path: '/scanner', builder: (_, __) => const ScannerWidget()),
-    GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
-    GoRoute(path: '/settings',builder: (_,__) => Settings(auth: authenticator)),
-    GoRoute(path: '/loyalty', builder: (_,__) => LoyaltyPage() ),
     GoRoute(
-      path: '/confirmation',
-      builder: (context, state) {
+      path: '/login',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: LoginScreen(auth: authenticator),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(
+      path: '/signup',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: SignUpScreen(auth:authenticator),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(
+      path: '/scanner',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: ScannerWidget(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
+    GoRoute(
+      path: '/settings',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: Settings(auth:authenticator),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(
+      path: '/loyalty',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: LoyaltyPage(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(
+      path: '/paymentPage',
+      pageBuilder: (context, state) {
         final machineId = state.uri.queryParameters['machineId'] ?? '';
-        return ConfirmationPage(machineId: machineId);
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: PaymentPage(machineId: machineId),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, __, ___, child) => child,
+        );
       },
     ),
-    GoRoute(path: '/email-Verification',builder: (_,__) => EmailVerificationPage(auth: authenticator))
+    GoRoute(
+      path: '/email-verification',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: EmailVerificationPage(auth: authenticator),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    )
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),
 );

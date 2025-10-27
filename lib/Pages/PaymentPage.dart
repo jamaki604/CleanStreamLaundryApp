@@ -1,21 +1,21 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/ProcessPayment.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
-import 'package:clean_stream_laundry_app/Middleware/MachineCommunication.dart';
+import 'package:clean_stream_laundry_app/Middleware/MachineCommunicator.dart';
 
-class ConfirmationPage extends StatefulWidget {
+class PaymentPage extends StatefulWidget {
   final String machineId;
 
-  const ConfirmationPage({Key? key, required this.machineId}) : super(key: key);
+  const PaymentPage({Key? key, required this.machineId}) : super(key: key);
 
   @override
-  State<ConfirmationPage> createState() => _PaymentPageState();
+  State<PaymentPage> createState() => _PaymentPageState();
 }
 
-class _PaymentPageState extends State<ConfirmationPage> {
+class _PaymentPageState extends State<PaymentPage> {
   bool _isConfirmed = false;
   double? _price;
   String? _machineName;

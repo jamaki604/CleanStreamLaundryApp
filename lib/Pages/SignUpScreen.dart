@@ -34,10 +34,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         SnackBar(content: Text(text)));
   }
 
-  void _changeColorsToRed(){
+  void _changeColorsToRed(String reason){
     setState(() {
-      passwordText = "Passwords do not match";
-      confirmPasswordText = "Passwords do not match";
+      passwordText = reason;
+      confirmPasswordText = reason;
       iconColor = Colors.red;
       enabledBorderColor = Colors.red;
       focusedBorderColor = Colors.red;
@@ -91,7 +91,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _showMessage('Account created successfully.');
         await DatabaseService.instance.createAccount(name: name);
         context.go('/email-Verification');
-      } else {
+      }else if(authResponse == AuthenticationResponses.noDigit){
+        _changeColorsToRed('Please include a digit');
+      }else if(authResponse == AuthenticationResponses.lessThanMinLength){
+        _changeColorsToRed("Password length is too short");
+      }else if(authResponse == AuthenticationResponses.noSpecialCharacter){
+        _changeColorsToRed("Please include a special character");
+      }else if(authResponse == AuthenticationResponses.noUppercase){
+        _changeColorsToRed("Please include an uppercase letter");
+      }else if(authResponse == AuthenticationResponses.invalidSpecialCharacter){
+        _changeColorsToRed("Please use a different special character");
+      }else {
         _showMessage('Sign-up failed. Try again.');
       }
     } catch (e) {
@@ -137,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _emailCtrl,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelStyle: const TextStyle(color: Colors.blue),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -173,6 +183,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
                 obscureText: true,
+                onChanged: (_){
+                  if (iconColor == Colors.red) {
+                    _changeColorsToDefault();
+                  }
+                },
               ),
               const SizedBox(height: 24),
 
@@ -199,7 +214,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                   if((_passwordCtrl.text.trim() != _passwordConfirmCtrl.text.trim())){
                     if(iconColor != Colors.red) {
-                      _changeColorsToRed();
+                      _changeColorsToRed("Passwords don't match");
                     }
                   }else{
                     _changeColorsToDefault();
