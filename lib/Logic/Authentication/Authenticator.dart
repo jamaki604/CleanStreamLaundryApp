@@ -37,7 +37,6 @@ class Authenticator implements AuthSystem{
       );
 
       final user = response.user;
-      print(user?.emailConfirmedAt);
 
       if (user == null) {
         output = AuthenticationResponses.failure;
@@ -66,19 +65,59 @@ class Authenticator implements AuthSystem{
   @override
   Future<AuthenticationResponses> signUp(String email, String password) async{
     AuthenticationResponses output = AuthenticationResponses.failure;
+    AuthenticationResponses validatePasswordResponse = _validatePassword(password);
 
-    final AuthResponse response = await _client.auth.signUp(
-      email: email,
-      password: password,
-        emailRedirectTo: 'clean-stream://email-verification'
-    );
+    if(validatePasswordResponse == AuthenticationResponses.success) {
+      final AuthResponse response = await _client.auth.signUp(
+          email: email,
+          password: password,
+          emailRedirectTo: 'clean-stream://email-verification'
+      );
 
-    if(response.user != null){
-      output = AuthenticationResponses.success;
+      if (response.user != null) {
+        output = AuthenticationResponses.success;
+      }
+    }else{
+      output = validatePasswordResponse;
     }
 
     return output;
   }
+
+  AuthenticationResponses _validatePassword(String password) {
+    AuthenticationResponses output = AuthenticationResponses.success;
+
+    bool hasDigit = false;
+    bool hasUpper = false;
+    bool hasSpecialCharacter = false;
+
+    var validSpecialCharacters = ['!', '@', '#', r'$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '[', ']', '{', '}', ';', ':', "'", ',', '.', '?', '/'];
+
+    if (password.length >= 8) {
+      for (String ch in password.split('')) {
+        if (int.tryParse(ch) != null) {
+          hasDigit = true;
+        } else if (validSpecialCharacters.contains(ch)) {
+          hasSpecialCharacter = true;
+        } else if (ch == ch.toUpperCase() && ch != ch.toLowerCase()) {
+          hasUpper = true;
+        }
+      }
+    } else {
+      return AuthenticationResponses.lessThanMinLength;
+    }
+
+    if (!hasDigit) {
+      output = AuthenticationResponses.noDigit;
+    } else if (!hasUpper) {
+      output = AuthenticationResponses.noUppercase;
+    } else if (!hasSpecialCharacter) {
+      output = AuthenticationResponses.noSpecialCharacter;
+    }
+
+    return output;
+  }
+
 
   Future<AuthenticationResponses> resendVerification() async {
     AuthenticationResponses output = AuthenticationResponses.success;
