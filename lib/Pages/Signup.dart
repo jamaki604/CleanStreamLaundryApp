@@ -2,6 +2,7 @@ import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
 
 class SignUpScreen extends StatefulWidget {
   late final AuthSystem _auth;
@@ -88,6 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final authResponse = await widget._auth.signUp( email, password);
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
+        await DatabaseService.instance.createAccount(name: name);
         context.go('/email-Verification');
       } else {
         _showMessage('Sign-up failed. Try again.');
