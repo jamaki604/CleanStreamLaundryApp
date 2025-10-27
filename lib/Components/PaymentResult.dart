@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 void showPaymentResult(
     BuildContext context, {
@@ -50,7 +51,11 @@ void showPaymentResult(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                if(isSuccess) {
+                  context.go("/scanner");
+                }else{
+                  Navigator.of(context).pop();
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[700],
