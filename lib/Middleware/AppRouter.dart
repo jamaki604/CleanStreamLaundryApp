@@ -65,7 +65,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
       ),
     ),
     GoRoute(
-      path: '/confirmation',
+      path: '/paymentPage',
       pageBuilder: (context, state) {
         final machineId = state.uri.queryParameters['machineId'] ?? '';
         return CustomTransitionPage(

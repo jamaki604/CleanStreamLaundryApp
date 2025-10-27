@@ -210,6 +210,6 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   }
 
   void _processNayaxCode(String? code) {
-    context.go('/confirmation?machineId=$code');
+    context.go('/paymentPage?machineId=$code');
   }
 }

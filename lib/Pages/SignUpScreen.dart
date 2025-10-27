@@ -145,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _emailCtrl,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelStyle: const TextStyle(color: Colors.blue),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
