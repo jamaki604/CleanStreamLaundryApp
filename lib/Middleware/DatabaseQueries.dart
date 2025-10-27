@@ -8,6 +8,20 @@ class DatabaseService {
   final SupabaseClient _client = Supabase.instance.client;
 
 
+  Future<void> createAccount({required String name}) async {
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    await _client.from('profiles').insert({
+      'id': user.id,
+      'full_name': name,
+    });
+
+  }
+
+
   Future<void> recordTransaction({
     required double amount,
     required String description,
