@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/ProcessPayment.dart';
