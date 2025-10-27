@@ -1,4 +1,6 @@
-class StripeService {
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/PaymentProcessor.dart';
+
+class StripeService implements PaymentProcessor {
   StripeService._();
   static final StripeService instance = StripeService._();
 
