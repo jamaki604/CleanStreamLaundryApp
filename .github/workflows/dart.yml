@@ -36,9 +36,9 @@ jobs:
         run: |
           mkdir -p assets
           cat <<EOF > assets/.env
-          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY=${{ secrets.ANON_KEY }}
-          STRIPE_SECRET=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          SUPABASE_URL=TEST
+          SUPABASE_KEY=TEST
+          STRIPE_SECRET=TEST
           EOF
 
 
