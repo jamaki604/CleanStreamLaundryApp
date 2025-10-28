@@ -26,7 +26,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0' # or whatever version you need
+          flutter-version: '3.35.5' # or whatever version you need
 
 
       - name: Install dependencies
