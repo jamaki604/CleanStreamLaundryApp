@@ -2,7 +2,7 @@ import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseQueries.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 
 class SignUpScreen extends StatefulWidget {
   late final AuthSystem _auth;
