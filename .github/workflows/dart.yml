@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Create .env file
+        run: |
+          mkdir -p assets
+          cat <<EOF > assets/.env
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY=${{ secrets.ANON_KEY }}
+          STRIPE_SECRET=${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          EOF
+
 
       # Your project will need to have tests in test/ and a dependency on
       # package:test for this step to succeed. Note that Flutter projects will
