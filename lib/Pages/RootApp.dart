@@ -5,12 +5,33 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
 class RootApp extends StatefulWidget {
-  const RootApp({super.key});
+  final ThemeData theme;
+  const RootApp({super.key, required this.theme});
 
   @override
   State<RootApp> createState() => _RootAppState();
 }
 
+class _RootAppState extends State<RootApp> {
+  late final AuthSystem _authenticator;
+
+  @override
+  void initState() {
+    super.initState();
+    _authenticator = Authenticator(Supabase.instance.client);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'Clean Stream Laundry Solutions',
+      theme: widget.theme,
+      routerConfig: createRouter(_authenticator),
+    );
+  }
+}
+/*
 class _RootAppState extends State<RootApp> {
   final AuthSystem _authenticator = Authenticator(Supabase.instance.client);
   @override
@@ -26,3 +47,4 @@ class _RootAppState extends State<RootApp> {
     );
   }
 }
+*/
