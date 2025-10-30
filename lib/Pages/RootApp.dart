@@ -31,20 +31,3 @@ class _RootAppState extends State<RootApp> {
     );
   }
 }
-/*
-class _RootAppState extends State<RootApp> {
-  final AuthSystem _authenticator = Authenticator(Supabase.instance.client);
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Clean Stream Laundry Solutions',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      routerConfig: createRouter(_authenticator),
-    );
-  }
-}
-*/
