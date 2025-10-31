@@ -27,6 +27,17 @@ class _SettingsState extends State<Settings> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text(
+                  "Settings \n",
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.fontPrimary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+
                 ElevatedButton(
                   onPressed: () {
                     widget._auth.logout();
