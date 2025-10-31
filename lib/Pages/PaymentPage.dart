@@ -5,6 +5,7 @@ import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
 import 'package:clean_stream_laundry_app/Middleware/MachineCommunicator.dart';
+import '../Logic/Theme/Theme.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
@@ -76,10 +77,10 @@ class _PaymentPageState extends State<PaymentPage> {
                   const SizedBox(height: 20),
                   Text(
                     'Machine ${_machineName}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.fontColor,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -114,17 +115,18 @@ class _PaymentPageState extends State<PaymentPage> {
             color: Colors.blue[700],
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Amount Due',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+            style: TextStyle(fontSize: 16,
+                color: Theme.of(context).colorScheme.fontColor.withOpacity(0.6)),
           ),
           const SizedBox(height: 10),
           Text(
             '\$${_price?.toStringAsFixed(2) ?? '0.00'}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Theme.of(context).colorScheme.fontColor,
             ),
           ),
         ],
