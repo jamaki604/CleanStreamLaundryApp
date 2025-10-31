@@ -80,7 +80,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.fontColor,
+                      color: Theme.of(context).colorScheme.fontPrimary,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -118,7 +118,7 @@ class _PaymentPageState extends State<PaymentPage> {
           Text(
             'Amount Due',
             style: TextStyle(fontSize: 16,
-                color: Theme.of(context).colorScheme.fontColor.withOpacity(0.6)),
+                color: Theme.of(context).colorScheme.fontPrimary.withOpacity(0.6)),
           ),
           const SizedBox(height: 10),
           Text(
@@ -126,7 +126,7 @@ class _PaymentPageState extends State<PaymentPage> {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.fontColor,
+              color: Theme.of(context).colorScheme.fontPrimary,
             ),
           ),
         ],

@@ -59,16 +59,16 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.fontColor,
+              color: Theme.of(context).colorScheme.fontPrimary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Scan machine codes for payment processing',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.fontSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -118,7 +118,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
-              color: Theme.of(context).colorScheme.fontColor,
+              color: Theme.of(context).colorScheme.fontPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -151,7 +151,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             child: Text(
               'Point camera at Nayax QR code',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.fontColor,
+                color: Theme.of(context).colorScheme.fontPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),

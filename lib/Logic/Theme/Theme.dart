@@ -29,10 +29,16 @@ extension ModeChangerText on ColorScheme {
         : "Change to Dark Mode";
   }
 
-  Color get fontColor {
+  Color get fontPrimary {
     return brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
+  }
+
+  Color get fontSecondary {
+    return brightness == Brightness.dark
+        ? Colors.grey
+        : Colors.grey;
   }
 
   Color get cardPrimary {
