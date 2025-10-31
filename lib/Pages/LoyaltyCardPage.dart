@@ -218,7 +218,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.blue[25],
+        backgroundColor: Theme.of(context).colorScheme.background,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Center(
           child: Text(
