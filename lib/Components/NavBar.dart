@@ -20,7 +20,8 @@ class NavBar extends StatelessWidget {
 
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      selectedItemColor: Colors.blue,
+      backgroundColor: Theme.of(context).colorScheme.background,
+      selectedItemColor: Theme.of(context).colorScheme.primary,
       unselectedItemColor: Colors.grey,
       onTap: (index) {
         switch (index) {
