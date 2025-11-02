@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Pages/EmailVerificationPage.dart';
+import 'package:clean_stream_laundry_app/Pages/HomePage.dart';
 import 'package:clean_stream_laundry_app/Pages/LoadingPage.dart';
 import 'package:clean_stream_laundry_app/Pages/LoyaltyCardPage.dart';
 import 'package:clean_stream_laundry_app/Pages/ScannerWidget.dart';
@@ -6,6 +7,7 @@ import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
 import 'package:clean_stream_laundry_app/Pages/LoginScreen.dart';
 import 'package:clean_stream_laundry_app/Pages/NotFoundScreen.dart';
 import 'package:clean_stream_laundry_app/Pages/Settings.dart';
+import 'package:clean_stream_laundry_app/Pages/StartPage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:clean_stream_laundry_app/Pages/PaymentPage.dart';
@@ -82,6 +84,26 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: EmailVerificationPage(auth: authenticator),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(
+      path: '/homePage',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: HomePage(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, __, ___, child) => child,
+      ),
+    ),
+    GoRoute(
+      path: '/startPage',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: StartPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, __, ___, child) => child,
