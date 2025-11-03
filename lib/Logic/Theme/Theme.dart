@@ -43,7 +43,7 @@ extension ModeChangerText on ColorScheme {
 
   Color get cardPrimary {
     return brightness == Brightness.dark
-        ? Color(0xFFf3c404)
+        ? Color(0xFFFCFCFCD)
         : Colors.white;
   }
 

@@ -78,6 +78,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
+              SizedBox(height: 10),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
                 child: Card(
@@ -86,7 +87,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 24),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
                     child: SizedBox(
                       height: 225,
                       child: Stack(
@@ -109,7 +110,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                           Positioned(
                             left: -4,
                             right: 0,
-                            top: 130,
+                            top: 125,
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               color: Theme.of(context).colorScheme.cardSecondary,
@@ -133,14 +134,14 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                               style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w500,
-                                color: Theme.of(context).colorScheme.fontPrimary,
+                                color: Colors.black87,
                               ),
                             ),
                           ),
                           Positioned(
                             right: 15,
                             bottom: 10,
-                            top: 165,
+                            top: 180,
                             child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
                           ),
                         ],
