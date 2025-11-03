@@ -5,6 +5,7 @@ import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
+import '../Logic/Theme/Theme.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -77,72 +78,79 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
-            child: Card(
-                elevation: 10,
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: SizedBox(
-                    height: 225,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: -30,
-                          left: 15,
-                          child: Image.asset("assets/Slogan.png", width: 200, height: 150),
-                        ),
-                        Positioned(
-                          top: -3,
-                          right: 0,
-                          child: Image.asset("assets/Icon.png", height: 95, width: 95),
-                        ),
-                        Positioned(
-                          left: 15,
-                          top: 80,
-                          child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
-                        ),
-                        Positioned(
-                          left: -4,
-                          right: 0,
-                          top: 130,
-                          child: Text(
-                            "1234    5678    9012    3456",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.black,
+              SizedBox(height: 10),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
+                child: Card(
+                  color: Theme.of(context).colorScheme.cardPrimary,
+                  elevation: 10,
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    child: SizedBox(
+                      height: 225,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: -30,
+                            left: 15,
+                            child: Image.asset("assets/Slogan.png", width: 200, height: 150),
+                          ),
+                          Positioned(
+                            top: -3,
+                            right: 0,
+                            child: Image.asset("assets/Icon.png", height: 95, width: 95),
+                          ),
+                          Positioned(
+                            left: 15,
+                            top: 80,
+                            child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
+                          ),
+                          Positioned(
+                            left: -4,
+                            right: 0,
+                            top: 125,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              color: Theme.of(context).colorScheme.cardSecondary,
+                              child: Text(
+                                "1234    5678    9012    3456",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w300,
+                                  color: Theme.of(context).colorScheme.fontPrimary,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          left: 15,
-                          top: 170,
-                          child: Text(
-                            (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
+                          Positioned(
+                            left: 15,
+                            top: 170,
+                            child: Text(
+                              (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          right: 15,
-                          bottom: 10,
-                          top: 165,
-                          child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
-                        ),
-                      ],
+                          Positioned(
+                            right: 15,
+                            bottom: 10,
+                            top: 180,
+                            child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-          ),
+
               SizedBox(height: 50),
               Text(
                 'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
@@ -150,7 +158,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.fontPrimary,
                 ),
               ),
               SizedBox(height: 25),
@@ -211,7 +219,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.blue[25],
+        backgroundColor: Theme.of(context).colorScheme.background,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Center(
           child: Text(

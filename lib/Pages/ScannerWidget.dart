@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/QrScannerParser.dart';
+import '../Logic/Theme/Theme.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -12,12 +13,12 @@ class ScannerWidget extends StatefulWidget {
 }
 
 class _ScannerWidgetState extends State<ScannerWidget> {
+  Color get _primaryColor => Theme.of(context).colorScheme.primary;
+  Color get _accentColor => Theme.of(context).colorScheme.secondary;
+
   final MobileScannerController cameraController = MobileScannerController();
   bool _isScanning = false;
   String? _scannedCode;
-
-  static const Color _primaryColor = Color(0xFF2073A9);
-  static const Color _accentColor = Color(0xFFf3c404);
 
   @override
   void dispose() {
@@ -27,6 +28,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return BasePage(
       body: Column(
         children: [
@@ -52,20 +54,21 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             color: _primaryColor,
           ),
           const SizedBox(height: 32),
-          const Text(
+          Text(
             'QR Code Scanner',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.fontPrimary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Scan machine codes for payment processing',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.fontSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -76,7 +79,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
                 _isScanning = true;
               });
             },
-            icon: const Icon(Icons.camera_alt, size: 28, color: _accentColor),
+            icon: Icon(Icons.camera_alt, size: 28, color: _accentColor),
             label: const Text(
               'Start Scanning',
               style: TextStyle(
@@ -110,11 +113,12 @@ class _ScannerWidgetState extends State<ScannerWidget> {
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'Last Scanned Code:',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
+              color: Theme.of(context).colorScheme.fontPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -144,10 +148,10 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           child: Container(
             color: Colors.black54,
             padding: const EdgeInsets.all(16),
-            child: const Text(
+            child: Text(
               'Point camera at Nayax QR code',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.fontPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
