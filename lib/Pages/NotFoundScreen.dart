@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../Logic/Theme/Theme.dart';
 
 class NotFoundScreen extends StatelessWidget {
   const NotFoundScreen({super.key});
@@ -14,9 +15,12 @@ class NotFoundScreen extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, color: Colors.redAccent, size: 80),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               '404 - Page Not Found',
-              style: TextStyle(fontSize: 24, color: Colors.white),
+              style: TextStyle(
+                fontSize: 24,
+                color: Theme.of(context).colorScheme.fontPrimary,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(

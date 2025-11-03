@@ -6,6 +6,7 @@ import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:app_links/app_links.dart';
+import '../Logic/Theme/Theme.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   late final AuthSystem _auth;
@@ -73,6 +74,8 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -81,16 +84,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             children: [
               Icon(Icons.email, size: 80, color: Colors.blueAccent),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Please verify your email address',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18,
+                  color: Theme.of(context).colorScheme.fontPrimary),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Check your inbox and click the verification link.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.fontSecondary),
               ),
               const SizedBox(height: 24),
               InkWell(
@@ -125,10 +129,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              const Text(
+                              Text(
                                 'Please resend verification again at another time.',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16),
+                                style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.fontPrimary),
                               ),
                             ],
                           ),
