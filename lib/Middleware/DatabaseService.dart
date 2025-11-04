@@ -182,5 +182,23 @@ class DatabaseService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getLocations() async {
+    try {
+      final response = await _client
+          .from('Locations')
+          .select('id, Address');
+
+      return response as List<Map<String, dynamic>>;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return [];
+    } catch (e) {
+      print("Unknown error: $e");
+      return [];
+    }
+  }
+
+
+
 
 }

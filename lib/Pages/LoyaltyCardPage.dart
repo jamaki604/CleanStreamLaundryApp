@@ -77,6 +77,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
+              SizedBox(height:20),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
             child: Card(
