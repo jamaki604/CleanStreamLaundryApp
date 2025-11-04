@@ -13,11 +13,7 @@ class ScannerWidget extends StatefulWidget {
 
 class _ScannerWidgetState extends State<ScannerWidget> {
   final MobileScannerController cameraController = MobileScannerController();
-  bool _isScanning = false;
   String? _scannedCode;
-
-  static const Color _primaryColor = Color(0xFF2073A9);
-  static const Color _accentColor = Color(0xFFf3c404);
 
   @override
   void dispose() {
@@ -28,105 +24,11 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: Column(
-        children: [
-          Expanded(
-            child: _isScanning ? _buildScannerCamera() : _buildScannerHomePage(),
-          ),
-        ],
-      ),
+      body: _buildScannerCamera()
     );
   }
 
   //---------- UI Builders ----------//
-  Widget _buildScannerHomePage() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.qr_code_scanner,
-            size: 120,
-            color: _primaryColor,
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'QR Code Scanner',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Scan machine codes for payment processing',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 48),
-          ElevatedButton.icon(
-            onPressed: () {
-              setState(() {
-                _isScanning = true;
-              });
-            },
-            icon: const Icon(Icons.camera_alt, size: 28, color: _accentColor),
-            label: const Text(
-              'Start Scanning',
-              style: TextStyle(
-                  fontSize: 18,
-                  color: Color(0xFF000000),),
-            ),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 10
-            ),
-          ),
-          if (_scannedCode != null) ...[
-            const SizedBox(height: 32),
-            _buildLastScannedBox(_scannedCode!),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLastScannedBox(String code) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade200),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            'Last Scanned Code:',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _scannedCode!,
-            style: const TextStyle(fontSize: 14),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildScannerCamera() {
     return Stack(
@@ -164,9 +66,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           child: Center(
             child: FloatingActionButton.extended(
               onPressed: () {
-                setState(() {
-                  _isScanning = false;
-                });
+                context.go("/homePage");
               },
               icon: const Icon(Icons.close),
               label: const Text('Cancel'),
@@ -199,7 +99,6 @@ class _ScannerWidgetState extends State<ScannerWidget> {
       if (barcode.rawValue != null) {
         setState(() {
           _scannedCode = barcode.rawValue;
-          _isScanning = false;
         });
 
         QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
