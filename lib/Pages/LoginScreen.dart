@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (authResposne == AuthenticationResponses.success) {
       _showMessage('Logged in as $email');
-      context.go("/scanner");
+      context.go("/homePage");
     } else if(authResposne == AuthenticationResponses.emailNotVerified) {
       context.go("/email-Verification");
     }else{

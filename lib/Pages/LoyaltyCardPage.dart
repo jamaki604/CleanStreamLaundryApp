@@ -78,51 +78,45 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              SizedBox(height: 10),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
-                child: Card(
-                  color: Theme.of(context).colorScheme.cardPrimary,
-                  elevation: 10,
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                    child: SizedBox(
-                      height: 225,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            top: -30,
-                            left: 15,
-                            child: Image.asset("assets/Slogan.png", width: 200, height: 150),
-                          ),
-                          Positioned(
-                            top: -3,
-                            right: 0,
-                            child: Image.asset("assets/Icon.png", height: 95, width: 95),
-                          ),
-                          Positioned(
-                            left: 15,
-                            top: 80,
-                            child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
-                          ),
-                          Positioned(
-                            left: -4,
-                            right: 0,
-                            top: 125,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              color: Theme.of(context).colorScheme.cardSecondary,
-                              child: Text(
-                                "1234    5678    9012    3456",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w300,
-                                  color: Theme.of(context).colorScheme.fontPrimary,
-                                ),
-                              ),
+              SizedBox(height:20),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
+            child: Card(
+                elevation: 10,
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: SizedBox(
+                    height: 225,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: -30,
+                          left: 15,
+                          child: Image.asset("assets/Slogan.png", width: 200, height: 150),
+                        ),
+                        Positioned(
+                          top: -3,
+                          right: 0,
+                          child: Image.asset("assets/Icon.png", height: 95, width: 95),
+                        ),
+                        Positioned(
+                          left: 15,
+                          top: 80,
+                          child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
+                        ),
+                        Positioned(
+                          left: -4,
+                          right: 0,
+                          top: 130,
+                          child: Text(
+                            "1234    5678    9012    3456",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black,
                             ),
                           ),
                           Positioned(

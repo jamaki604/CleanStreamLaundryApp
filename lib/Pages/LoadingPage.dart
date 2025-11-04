@@ -33,7 +33,7 @@ class _LoadingPageState extends State<LoadingPage> {
       final Uri? initialUri = await appLinks.getInitialAppLink();
 
       if (initialUri != null && initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
-        context.go("/scanner");
+        context.go("/homePage");
       }
     } catch (e) {
 
@@ -46,7 +46,7 @@ class _LoadingPageState extends State<LoadingPage> {
     try {
       if (await widget.auth.isLoggedIn() == AuthenticationResponses.success) {
         if (!mounted) return;
-        context.go("/scanner");
+        context.go("/homePage");
       } else {
         if (!mounted) return;
         context.go("/login");
