@@ -113,9 +113,9 @@ class DatabaseService {
       final response = await _client
           .from('Machines')
           .select('*')
-          .eq('location_id', locationId)
-          .eq('status', 'idle')
-          .eq('machine_type', 'washer')
+          .eq('Location_ID', locationId)
+          .eq('Status', 'idle')
+          .eq('Machine_type', 'Washer')
           .count(CountOption.exact);
 
       return response.count;
@@ -132,9 +132,9 @@ class DatabaseService {
       final response = await _client
           .from('Machines')
           .select('*')
-          .eq('location_id', locationId)
-          .eq('status', 'idle')
-          .eq('machine_type', 'washer')
+          .eq('Location_ID', locationId)
+          .eq('Status', 'idle')
+          .eq('Machine_type', 'Dryer')
           .count(CountOption.exact);
 
       return response.count;
@@ -151,8 +151,8 @@ class DatabaseService {
       final response = await _client
           .from('Machines')
           .select('*')
-          .eq('location_id', locationId)
-          .eq('machine_type', 'washer')
+          .eq('Location_ID', locationId)
+          .eq('Machine_type', 'Washer')
           .count(CountOption.exact);
 
       return response.count;
@@ -169,8 +169,8 @@ class DatabaseService {
       final response = await _client
           .from('Machines')
           .select('id',)
-          .eq('location_id', locationId)
-          .eq('machine_type', 'dryer')
+          .eq('Location_ID', locationId)
+          .eq('Machine_type', 'Dryer')
           .count(CountOption.exact);
 
       return response.count;

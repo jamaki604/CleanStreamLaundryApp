@@ -64,16 +64,42 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 40),
-            MachineAvailabilityButton(
-                headLineText: "${DatabaseService.instance.getIdleWasherCountByLocation("1")} available",
-                descripitionText: "${DatabaseService.instance.getIdleWasherCountByLocation("1")}/${DatabaseService.instance.getWasherCountByLocation("1")} dryers",
-                icon: Icons.dry_cleaning_rounded, onPressed: (){}
+            FutureBuilder(
+                future: Future.wait([DatabaseService.instance.getWasherCountByLocation("1"),DatabaseService.instance.getIdleWasherCountByLocation("1")]),
+                builder: (context, snapshot) {
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  final machineIdle = snapshot.data![0] as int;
+                  final totalMachine = snapshot.data![0] as int;
+
+                  return MachineAvailabilityButton(
+                      headLineText: "${totalMachine} available",
+                      descripitionText: "${totalMachine}/${machineIdle} washers",
+                      icon: Icons.local_laundry_service, onPressed: (){}
+                  );
+                }
             ),
             SizedBox(height:20),
-            MachineAvailabilityButton(
-                headLineText: "${DatabaseService.instance.getIdleDryerCountByLocation("1")} available",
-                descripitionText: "${DatabaseService.instance.getIdleDryerCountByLocation("1")}/${DatabaseService.instance.getDryerCountByLocation("1")} dryers",
-                icon: Icons.dry_cleaning_rounded, onPressed: (){}
+            FutureBuilder(
+                future: Future.wait([DatabaseService.instance.getDryerCountByLocation("1"),DatabaseService.instance.getIdleDryerCountByLocation("1")]),
+                builder: (context, snapshot) {
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  final machineIdle = snapshot.data![0] as int;
+                  final totalMachine = snapshot.data![0] as int;
+
+                  return MachineAvailabilityButton(
+                      headLineText: "${totalMachine} available",
+                      descripitionText: "${totalMachine}/${machineIdle} dryer",
+                      icon: Icons.local_laundry_service, onPressed: (){}
+                  );
+                }
             )
           ],
         ),
