@@ -82,6 +82,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
             child: Card(
+                color: Theme.of(context).colorScheme.cardPrimary,
                 elevation: 10,
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -110,19 +111,23 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                           left: -4,
                           right: 0,
                           top: 130,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            color: Theme.of(context).colorScheme.cardSecondary,
                           child: Text(
                             "1234    5678    9012    3456",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w300,
-                              color: Colors.black,
+                              color: Theme.of(context).colorScheme.fontPrimary,
                             ),
                           ),
+                          )
                         ),
                           Positioned(
                             left: 15,
-                            top: 170,
+                            top: 178,
                             child: Text(
                               (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
                               textAlign: TextAlign.center,
