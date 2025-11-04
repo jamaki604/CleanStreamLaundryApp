@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Components/LargeButton.dart';
+import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 import 'package:clean_stream_laundry_app/Pages/MachineAvailabilityButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -64,14 +65,14 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 40),
             MachineAvailabilityButton(
-                headLineText: "5 available",
-                descripitionText: "5/5 washers",
-                icon: Icons.local_laundry_service, onPressed: (){}
+                headLineText: "${DatabaseService.instance.getIdleWasherCountByLocation("1")} available",
+                descripitionText: "${DatabaseService.instance.getIdleWasherCountByLocation("1")}/${DatabaseService.instance.getWasherCountByLocation("1")} dryers",
+                icon: Icons.dry_cleaning_rounded, onPressed: (){}
             ),
             SizedBox(height:20),
             MachineAvailabilityButton(
-                headLineText: "5 available",
-                descripitionText: "5/5 dryers",
+                headLineText: "${DatabaseService.instance.getIdleDryerCountByLocation("1")} available",
+                descripitionText: "${DatabaseService.instance.getIdleDryerCountByLocation("1")}/${DatabaseService.instance.getDryerCountByLocation("1")} dryers",
                 icon: Icons.dry_cleaning_rounded, onPressed: (){}
             )
           ],

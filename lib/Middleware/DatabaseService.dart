@@ -108,13 +108,33 @@ class DatabaseService {
 
   }
 
-  Future<int> getIdleMachineCountByLocation(String locationId) async {
+  Future<int> getIdleWasherCountByLocation(String locationId) async {
     try {
       final response = await _client
           .from('Machines')
           .select('*')
           .eq('location_id', locationId)
           .eq('status', 'idle')
+          .eq('machine_type', 'washer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getIdleDryerCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('*')
+          .eq('location_id', locationId)
+          .eq('status', 'idle')
+          .eq('machine_type', 'washer')
           .count(CountOption.exact);
 
       return response.count;
