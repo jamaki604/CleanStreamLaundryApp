@@ -5,6 +5,7 @@ import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
+import '../Logic/Theme/Theme.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -118,32 +119,32 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                               color: Colors.black,
                             ),
                           ),
-                        ),
-                        Positioned(
-                          left: 15,
-                          top: 170,
-                          child: Text(
-                            (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
+                          Positioned(
+                            left: 15,
+                            top: 170,
+                            child: Text(
+                              (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          right: 15,
-                          bottom: 10,
-                          top: 165,
-                          child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
-                        ),
-                      ],
+                          Positioned(
+                            right: 15,
+                            bottom: 10,
+                            top: 180,
+                            child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-          ),
+
               SizedBox(height: 50),
               Text(
                 'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
@@ -151,7 +152,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.fontPrimary,
                 ),
               ),
               SizedBox(height: 25),
@@ -211,8 +212,8 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     TextEditingController _amountController = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.blue[25],
+      builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.background,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Center(
           child: Text(
@@ -220,7 +221,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.blue[900]
+              color: Colors.blue[900],
             ),
           ),
         ),
@@ -229,7 +230,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           autofocus: true,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            prefixText: '\$',
+            prefixText: '\$ ',
             prefixStyle: TextStyle(
               color: Colors.blue[800],
               fontWeight: FontWeight.bold,
@@ -243,13 +244,13 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          style: TextStyle(color: Colors.blue[900]),
+          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
         ),
         actions: <Widget>[
           TextButton(
             child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
             onPressed: () {
-              Navigator.of(context).pop(null);
+              Navigator.of(dialogContext).pop();
             },
           ),
           ElevatedButton(
@@ -257,14 +258,12 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             onPressed: () async {
               final amountText = _amountController.text;
               final amount = double.tryParse(amountText) ?? 0;
-
-              Navigator.of(context).pop();
-
+              Navigator.of(dialogContext).pop();
               if (amount > 0) {
                 bool result = await processPayment(context, amount, "Loyalty Card");
                 if (result) {
                   final newBalance = _userBalance! + amount;
-                  DatabaseService.instance.updateBalanceById(newBalance);
+                  await DatabaseService.instance.updateBalanceById(newBalance);
                   setState(() {
                     _userBalance = newBalance;
                   });

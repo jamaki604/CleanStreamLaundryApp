@@ -2,6 +2,9 @@ import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../Logic/Authentication/AuthSystem.dart';
+import '../Logic/Theme/Theme.dart';
+import '../Logic/Theme/ThemeManager.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   late final AuthSystem _auth;
@@ -15,14 +18,56 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-
   @override
   Widget build(BuildContext context) {
-    return BasePage(body: Center(child:ElevatedButton(onPressed:(){
-      widget._auth.logout();
-      context.go('/login');
-      }, child: Text("Sign Out"),
-    style:ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white)))
+    return Consumer<ThemeManager>(
+      builder: (context, themeManager, child) {
+        return BasePage(
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Settings \n",
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.fontPrimary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+
+                ElevatedButton(
+                  onPressed: () {
+                    widget._auth.logout();
+                    context.go('/login');
+                  },
+                  child: Text("Sign Out"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    themeManager.toggleTheme();
+                  },
+                  child: Text(Theme.of(context).colorScheme.modeChangerText),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme
+                        .of(context)
+                        .colorScheme
+                        .tertiary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/QrScannerParser.dart';
+import '../Logic/Theme/Theme.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -12,6 +13,9 @@ class ScannerWidget extends StatefulWidget {
 }
 
 class _ScannerWidgetState extends State<ScannerWidget> {
+  Color get _primaryColor => Theme.of(context).colorScheme.primary;
+  Color get _accentColor => Theme.of(context).colorScheme.secondary;
+
   final MobileScannerController cameraController = MobileScannerController();
   String? _scannedCode;
 
@@ -23,6 +27,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return BasePage(
       body: _buildScannerCamera()
     );
@@ -46,10 +51,10 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           child: Container(
             color: Colors.black54,
             padding: const EdgeInsets.all(16),
-            child: const Text(
+            child: Text(
               'Point camera at Nayax QR code',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.fontPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),

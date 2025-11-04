@@ -13,9 +13,11 @@ class BasePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: CustomAppBar(),
       body: body,
       bottomNavigationBar: NavBar(),
     );
+
   }
 }

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
+import '../Logic/Theme/Theme.dart';
 
 class SignUpScreen extends StatefulWidget {
   late final AuthSystem _auth;
 
   SignUpScreen({super.key,required AuthSystem auth}){
-    this._auth = auth;
+    _auth = auth;
   }
 
   @override
@@ -115,6 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -126,19 +128,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _nameCtrl,
                 decoration: InputDecoration(
                   labelText: 'Name',
-                  labelStyle: const TextStyle(color: Colors.blue), // matches button color
+                  labelStyle: TextStyle(color: Colors.blue), // matches button color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: const Icon(Icons.person, color: Colors.blue),
+                  prefixIcon: Icon(Icons.person, color: Colors.blue),
                 ),
               ),
               const SizedBox(height: 16),
@@ -156,7 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   prefixIcon: const Icon(Icons.email, color: Colors.blue),
