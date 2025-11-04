@@ -107,4 +107,60 @@ class DatabaseService {
     }
 
   }
+
+  Future<int> getIdleMachineCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('*')
+          .eq('location_id', locationId)
+          .eq('status', 'idle')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getWasherCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('*')
+          .eq('location_id', locationId)
+          .eq('machine_type', 'washer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getDryerCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('id',)
+          .eq('location_id', locationId)
+          .eq('machine_type', 'dryer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+
 }
