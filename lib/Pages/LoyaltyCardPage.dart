@@ -119,6 +119,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                               color: Colors.black,
                             ),
                           ),
+                        ),
                           Positioned(
                             left: 15,
                             top: 170,
