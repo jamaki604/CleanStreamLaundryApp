@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../Logic/Authentication/auth_system.dart';

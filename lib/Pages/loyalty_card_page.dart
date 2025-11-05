@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
-import 'package:clean_stream_laundry_app/Components/CreditCard.dart';
+import 'package:clean_stream_laundry_app/Components/credit_card.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
