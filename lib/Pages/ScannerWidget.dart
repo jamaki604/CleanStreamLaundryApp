@@ -13,8 +13,6 @@ class ScannerWidget extends StatefulWidget {
 }
 
 class _ScannerWidgetState extends State<ScannerWidget> {
-  Color get _primaryColor => Theme.of(context).colorScheme.primary;
-  Color get _accentColor => Theme.of(context).colorScheme.secondary;
 
   final MobileScannerController cameraController = MobileScannerController();
   String? _scannedCode;
@@ -71,7 +69,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           child: Center(
             child: FloatingActionButton.extended(
               onPressed: () {
-                context.go("/homePage");
+                context.go("/startPage");
               },
               icon: const Icon(Icons.close),
               label: const Text('Cancel'),
