@@ -1,6 +1,6 @@
 {
-    "name": "clena_stream_laundry_app",
-    "short_name": "clena_stream_laundry_app",
+    "name": "clean_stream_laundry_app",
+    "short_name": "clean_stream_laundry_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

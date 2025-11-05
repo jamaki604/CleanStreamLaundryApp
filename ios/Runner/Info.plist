@@ -11,7 +11,7 @@
 	<key>NSCameraUsageDescription</key>
     <string>Camera permission is required for scanning QR codes</string>
 	<key>CFBundleDisplayName</key>
-	<string>Clena Stream Laundry App</string>
+	<string>Clean Stream Laundry App</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,7 +19,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>clena_stream_laundry_app</string>
+	<string>clean_stream_laundry_app</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
