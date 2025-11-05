@@ -1,16 +1,12 @@
-# clean_stream_laundry_app
+# Clean Stream Laundry App
 
-Clean Stream Laundry Client Facing Application
+Code repository for the Clean Stream Laundry Client mobile/web app.
 
-## Getting Started
+## Summary
 
-This project is a starting point for a Flutter application.
+The Clean Stream Laundry app is a mobile and web app that allows users to easily manage their laundry. From payments to getting notified that your laundry has finished the Clean Stream Laundry app streamlines your visit to a Clean Stream Laundry Solutions laundromat easily.
 
-A few resources to get you started if this is your first Flutter project:
+## Documentation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+All documentation for this software can be found [here](https://github.com/JasonYoder2026/Clean-Stream/tree/main/Documentation)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
