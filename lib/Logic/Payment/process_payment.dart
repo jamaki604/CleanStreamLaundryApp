@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/Stripe_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
 

@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/PaymentProcessor.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/payment_processor.dart';
 
 class StripeService implements PaymentProcessor {
   StripeService._();

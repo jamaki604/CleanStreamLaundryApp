@@ -2,8 +2,8 @@ import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:clean_stream_laundry_app/Logic/QrScanner/QrScannerParser.dart';
-import '../Logic/Theme/Theme.dart';
+import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
+import '../Logic/Theme/theme.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});

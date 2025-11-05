@@ -1,11 +1,11 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
 import 'package:clean_stream_laundry_app/Middleware/machine_communicator.dart';
-import '../Logic/Theme/Theme.dart';
+import '../Logic/Theme/theme.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;

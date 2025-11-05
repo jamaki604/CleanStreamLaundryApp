@@ -1,9 +1,9 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../Logic/Authentication/AuthSystem.dart';
-import '../Logic/Theme/Theme.dart';
-import '../Logic/Theme/ThemeManager.dart';
+import '../Logic/Authentication/auth_system.dart';
+import '../Logic/Theme/theme.dart';
+import '../Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {

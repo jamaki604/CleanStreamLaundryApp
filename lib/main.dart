@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-import 'Logic/Theme/ThemeManager.dart';
+import 'Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

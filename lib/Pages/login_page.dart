@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

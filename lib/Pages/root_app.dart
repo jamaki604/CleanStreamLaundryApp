@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/Authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/authenticator.dart';
 import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
