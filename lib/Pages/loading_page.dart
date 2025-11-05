@@ -7,7 +7,7 @@ import 'package:app_links/app_links.dart';
 class LoadingPage extends StatefulWidget {
   final AuthSystem auth;
 
-  const LoadingPage({Key? key, required this.auth}) : super(key: key);
+  const LoadingPage({super.key, required this.auth});
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();

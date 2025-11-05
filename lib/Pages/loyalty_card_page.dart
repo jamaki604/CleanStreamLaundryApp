@@ -82,7 +82,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         _recentTransactions.removeWhere((e) => e.isEmpty);
       });
     } catch (e) {
-      print('Failed to fetch transactions: $e');
+      _showErrorDialog(context, e.toString());
     }
   }
 
@@ -234,11 +234,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   void _loadCard() {
-    TextEditingController _amountController = TextEditingController();
+    TextEditingController amountController = TextEditingController();
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Center(
               child: Text(
@@ -251,7 +251,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ),
             ),
             content: TextField(
-              controller: _amountController,
+              controller: amountController,
               autofocus: true,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
@@ -281,7 +281,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ElevatedButton(
                 child: Text('Pay', style: TextStyle(color: Colors.blue[700])),
                 onPressed: () async {
-                  final amountText = _amountController.text;
+                  final amountText = amountController.text;
                   final amount = double.tryParse(amountText) ?? 0;
 
                   Navigator.of(context).pop();

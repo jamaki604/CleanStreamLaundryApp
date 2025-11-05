@@ -10,14 +10,14 @@ import '../Logic/Theme/Theme.dart';
 class PaymentPage extends StatefulWidget {
   final String machineId;
 
-  const PaymentPage({Key? key, required this.machineId}) : super(key: key);
+  const PaymentPage({super.key, required this.machineId});
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  bool _isConfirmed = false;
+  final bool _isConfirmed = false;
   double? _price;
   String? _machineName;
   double? _userBalance;
@@ -36,7 +36,6 @@ class _PaymentPageState extends State<PaymentPage> {
     final userId = _client.auth.currentUser?.id;
 
     if (userId == null) {
-      print("User not authenticated");
       return;
     }
     final balance = await DatabaseService.instance.getUserBalanceById(userId);
@@ -76,7 +75,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'Machine ${_machineName}',
+                    'Machine $_machineName',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -161,7 +160,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       showPaymentResult(
                         context,
                         title: "Payment processed! Machine Ready!",
-                        message: "Machine ${_machineName} is now active.",
+                        message: "Machine $_machineName is now active.",
                         isSuccess: true,
                       );
                     } else {
@@ -257,7 +256,7 @@ class _PaymentPageState extends State<PaymentPage> {
           showPaymentResult(
             context,
             title: "Machine Ready!",
-            message: "Machine ${_machineName} is now active.",
+            message: "Machine $_machineName is now active.",
             isSuccess: true,
           );
         } else {

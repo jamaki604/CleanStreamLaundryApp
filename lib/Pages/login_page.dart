@@ -7,7 +7,7 @@ class LoginScreen extends StatefulWidget {
   late final AuthSystem _auth;
 
   LoginScreen({super.key,required AuthSystem auth}){
-    this._auth = auth;
+    _auth = auth;
   }
 
   @override
@@ -132,8 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _handleLogin,
+                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white),
                   child: const Text('Log In'),
-                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white)
                 ),
               ),
               Padding(

@@ -10,7 +10,7 @@ class Settings extends StatefulWidget {
   late final AuthSystem _auth;
 
   Settings({super.key,required AuthSystem auth}){
-    this._auth = auth;
+    _auth = auth;
   }
 
   @override
@@ -43,18 +43,17 @@ class _SettingsState extends State<Settings> {
                     widget._auth.logout();
                     context.go('/login');
                   },
-                  child: Text("Sign Out"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
+                  child: Text("Sign Out"),
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     themeManager.toggleTheme();
                   },
-                  child: Text(Theme.of(context).colorScheme.modeChangerText),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme
                         .of(context)
@@ -62,6 +61,7 @@ class _SettingsState extends State<Settings> {
                         .tertiary,
                     foregroundColor: Colors.white,
                   ),
+                  child: Text(Theme.of(context).colorScheme.modeChangerText),
                 ),
               ],
             ),

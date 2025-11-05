@@ -12,7 +12,7 @@ class EmailVerificationPage extends StatefulWidget {
   late final AuthSystem _auth;
 
   EmailVerificationPage({super.key,required AuthSystem auth}){
-    this._auth = auth;
+    _auth = auth;
   }
 
   @override
@@ -20,7 +20,7 @@ class EmailVerificationPage extends StatefulWidget {
 }
 
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
-  late final _authSubscription;
+  late final StreamSubscription? _authSubscription;
   late final StreamSubscription? _linkSub;
   final AppLinks _appLinks = AppLinks();
 
@@ -46,7 +46,6 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
       if (uri != null && uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            print("Routing to /scanner...");
             context.go('/scanner');
           }
         });
@@ -55,7 +54,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
   @override
   void dispose() {
-    _authSubscription.cancel();
+    _authSubscription?.cancel();
     _linkSub?.cancel();
     super.dispose();
   }
