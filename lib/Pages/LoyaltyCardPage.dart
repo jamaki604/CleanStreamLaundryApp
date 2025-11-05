@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
 import '../Logic/Theme/Theme.dart';
+import 'package:clean_stream_laundry_app/Logic/Transaction/TransactionParser.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -19,12 +20,15 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   bool _isLoading = true;
   String? _userName;
   String? _errorMessage;
+  List<String> _recentTransactions = [];
   final userId = Supabase.instance.client.auth.currentUser?.id;
+  bool _showPastTransactions = false;
 
   @override
   void initState() {
     super.initState();
     _fetchBalance();
+    _fetchTransactions();
   }
 
   Future<void> _fetchBalance() async {
@@ -67,6 +71,26 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       });
     }
 
+  }
+
+  Future<void> _fetchTransactions() async {
+    try {
+      final transactions = await DatabaseService.instance.getTransactionsForUser();
+      final limit = _showPastTransactions ? 100 : 3;
+      setState(() {
+        _recentTransactions = TransactionParser.formatTransactionsList(transactions.take(limit));
+        _recentTransactions.removeWhere((e) => e.isEmpty);
+      });
+    } catch (e) {
+      print('Failed to fetch transactions: $e');
+    }
+  }
+
+  void _toggleTransactionView() {
+    setState(() {
+      _showPastTransactions = !_showPastTransactions;
+    });
+    _fetchTransactions();
   }
 
   @override
@@ -137,153 +161,237 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                                 color: Colors.black87,
                               ),
                             ),
-                          ),
-                          Positioned(
-                            right: 15,
-                            bottom: 10,
-                            top: 180,
-                            child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
-                          ),
-                        ],
+                            Positioned(
+                              left: 15,
+                              top: 170,
+                              child: Text(
+                                (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 15,
+                              bottom: 10,
+                              top: 180,
+                              child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              SizedBox(height: 50),
-              Text(
-                'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.fontPrimary,
-                ),
-              ),
-              SizedBox(height: 25),
-              ElevatedButton(
-                onPressed: () => _loadCard(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  disabledBackgroundColor: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                child: Text(
-                  "Load card",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                SizedBox(height: 50),
+                Text(
+                  'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.fontPrimary,
                   ),
                 ),
-              )
-            ]
+                SizedBox(height: 25),
+                ElevatedButton(
+                  onPressed: () => _loadCard(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    disabledBackgroundColor: Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    "Load card",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Transactions for This Month',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.fontPrimary,
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: _toggleTransactionView,
+                            icon: Icon(
+                              _showPastTransactions ? Icons.expand_less : Icons.expand_more,
+                              color: Colors.blue,
+                            ),
+                            label: Text(
+                              _showPastTransactions ? 'Show Less' : 'Show More',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      _recentTransactions.isEmpty
+                          ? Text(
+                        'No recent transactions',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
+                      )
+                          : Column(
+                        children: _recentTransactions.map((transaction) {
+                          return Card(
+                            margin: EdgeInsets.only(bottom: 8),
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.receipt_long,
+                                color: Colors.blue,
+                              ),
+                              title: Text(
+                                transaction.toString(),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context).colorScheme.fontPrimary,
+                                ),
+                              ),
+                              tileColor: Theme.of(context).colorScheme.background,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
           ),
-        ),
+        ],
+      ),
     );
   }
 
   void _showErrorDialog(BuildContext context, String? message) {
     showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text('Error'),
-          content: Text(message ?? ''),
-          icon: Icon(Icons.error),
-          actions: [
-            TextButton(onPressed: () {
-              Navigator.of(dialogContext).pop();
-              if (message == "Failed to fetch balance") {
-                context.go("/scanner");
-              } else {
-                context.go("/login");
-              }
-            }, child: const Text('OK'),
-            ),
-          ]
-        );
-      }
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Text('Error'),
+              content: Text(message ?? ''),
+              icon: Icon(Icons.error),
+              actions: [
+                TextButton(onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  if (message == "Failed to fetch balance") {
+                    context.go("/scanner");
+                  } else {
+                    context.go("/login");
+                  }
+                }, child: const Text('OK'),
+                ),
+              ]
+          );
+        }
     );
   }
 
   void _loadCard() {
     TextEditingController _amountController = TextEditingController();
     showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.background,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Center(
-          child: Text(
-            "Enter load amount",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue[900],
+        context: context,
+        builder: (_) => AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.background,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Center(
+              child: Text(
+                "Enter load amount",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[900]
+                ),
+              ),
             ),
-          ),
-        ),
-        content: TextField(
-          controller: _amountController,
-          autofocus: true,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            prefixText: '\$ ',
-            prefixStyle: TextStyle(
-              color: Colors.blue[800],
-              fontWeight: FontWeight.bold,
+            content: TextField(
+              controller: _amountController,
+              autofocus: true,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                prefixText: '\$',
+                prefixStyle: TextStyle(
+                  color: Colors.blue[800],
+                  fontWeight: FontWeight.bold,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue[700]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              style: TextStyle(color: Colors.blue[900]),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue[700]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue[300]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-            },
-          ),
-          ElevatedButton(
-            child: Text('Pay', style: TextStyle(color: Colors.blue[700])),
-            onPressed: () async {
-              final amountText = _amountController.text;
-              final amount = double.tryParse(amountText) ?? 0;
-              Navigator.of(dialogContext).pop();
-              if (amount > 0) {
-                bool result = await processPayment(context, amount, "Loyalty Card");
-                if (result) {
-                  final newBalance = _userBalance! + amount;
-                  await DatabaseService.instance.updateBalanceById(newBalance);
-                  setState(() {
-                    _userBalance = newBalance;
-                  });
-                }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter a valid amount')),
-                );
-              }
-            },
-          )
-        ]
-      )
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
+                onPressed: () {
+                  Navigator.of(context).pop(null);
+                },
+              ),
+              ElevatedButton(
+                child: Text('Pay', style: TextStyle(color: Colors.blue[700])),
+                onPressed: () async {
+                  final amountText = _amountController.text;
+                  final amount = double.tryParse(amountText) ?? 0;
+
+                  Navigator.of(context).pop();
+
+                  if (amount > 0) {
+                    bool result = await processPayment(context, amount, "Loyalty Card");
+                    if (result) {
+                      final newBalance = _userBalance! + amount;
+                      DatabaseService.instance.updateBalanceById(newBalance);
+                      setState(() {
+                        _userBalance = newBalance;
+                      });
+                      _fetchTransactions();
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a valid amount')),
+                    );
+                  }
+                },
+              )
+            ]
+        )
     );
   }
-
 }

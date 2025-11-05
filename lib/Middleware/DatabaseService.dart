@@ -47,7 +47,7 @@ class DatabaseService {
 
     final response = await _client
         .from('transactions')
-        .select()
+        .select('amount, description, created_at')
         .eq('user_id', user.id)
         .order('created_at', ascending: false);
 
