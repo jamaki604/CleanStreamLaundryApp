@@ -8,7 +8,7 @@ class TransactionParser {
     final formattedDate = DateFormat('MMM dd, yyyy').format(createdAt);
 
     final formattedAmount = '\$${amount.toStringAsFixed(2)}';
-    int currentMonth = new DateTime.now().month;
+    int currentMonth = DateTime.now().month;
 
     if(DateFormat('M').format(createdAt) != currentMonth.toString() ){
       return "";

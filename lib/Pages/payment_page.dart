@@ -1,23 +1,23 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
+import 'package:clean_stream_laundry_app/Components/base_page.dart';
+import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clean_stream_laundry_app/Components/PaymentResult.dart';
-import 'package:clean_stream_laundry_app/Middleware/MachineCommunicator.dart';
-import '../Logic/Theme/Theme.dart';
+import 'package:clean_stream_laundry_app/Components/payment_result.dart';
+import 'package:clean_stream_laundry_app/Middleware/machine_communicator.dart';
+import '../Logic/Theme/theme.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
 
-  const PaymentPage({Key? key, required this.machineId}) : super(key: key);
+  const PaymentPage({super.key, required this.machineId});
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  bool _isConfirmed = false;
+  final bool _isConfirmed = false;
   double? _price;
   String? _machineName;
   double? _userBalance;
@@ -36,7 +36,6 @@ class _PaymentPageState extends State<PaymentPage> {
     final userId = _client.auth.currentUser?.id;
 
     if (userId == null) {
-      print("User not authenticated");
       return;
     }
     final balance = await DatabaseService.instance.getUserBalanceById(userId);
@@ -76,7 +75,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'Machine ${_machineName}',
+                    'Machine $_machineName',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -161,7 +160,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       showPaymentResult(
                         context,
                         title: "Payment processed! Machine Ready!",
-                        message: "Machine ${_machineName} is now active.",
+                        message: "Machine $_machineName is now active.",
                         isSuccess: true,
                       );
                     } else {
@@ -257,7 +256,7 @@ class _PaymentPageState extends State<PaymentPage> {
           showPaymentResult(
             context,
             title: "Machine Ready!",
-            message: "Machine ${_machineName} is now active.",
+            message: "Machine $_machineName is now active.",
             isSuccess: true,
           );
         } else {

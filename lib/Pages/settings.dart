@@ -1,16 +1,16 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../Logic/Authentication/AuthSystem.dart';
-import '../Logic/Theme/Theme.dart';
-import '../Logic/Theme/ThemeManager.dart';
+import '../Logic/Authentication/auth_system.dart';
+import '../Logic/Theme/theme.dart';
+import '../Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   late final AuthSystem _auth;
 
   Settings({super.key,required AuthSystem auth}){
-    this._auth = auth;
+    _auth = auth;
   }
 
   @override
@@ -32,7 +32,7 @@ class _SettingsState extends State<Settings> {
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontPrimary,
+                    color: Theme.of(context).colorScheme.fontSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -43,25 +43,22 @@ class _SettingsState extends State<Settings> {
                     widget._auth.logout();
                     context.go('/login');
                   },
-                  child: Text("Sign Out"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
+                  child: Text("Sign Out"),
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     themeManager.toggleTheme();
                   },
-                  child: Text(Theme.of(context).colorScheme.modeChangerText),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme
-                        .of(context)
-                        .colorScheme
-                        .tertiary,
+                    backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
+                  child: Text(Theme.of(context).colorScheme.modeChangerText),
                 ),
               ],
             ),

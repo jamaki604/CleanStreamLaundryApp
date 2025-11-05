@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Components/CustomAppBar.dart';
-import 'package:clean_stream_laundry_app/Components/NavBar.dart';
+import 'package:clean_stream_laundry_app/Components/custom_app_bar.dart';
+import 'package:clean_stream_laundry_app/Components/navigation_bar.dart';
 
 class BasePage extends StatelessWidget {
   final Widget body;

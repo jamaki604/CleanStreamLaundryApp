@@ -19,14 +19,12 @@ class MachineCommunicator {
       );
 
       final data = response.data;
-      print('Device mock response: $data');
 
       if (data['success'] == true && data['status'] == 'authorized') {
         return true;
       }
       return false;
     } catch (e) {
-      print('Mock Nayax error: $e');
       return false;
     }
   }

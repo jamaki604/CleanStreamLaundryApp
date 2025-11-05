@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,7 +7,7 @@ class LoginScreen extends StatefulWidget {
   late final AuthSystem _auth;
 
   LoginScreen({super.key,required AuthSystem auth}){
-    this._auth = auth;
+    _auth = auth;
   }
 
   @override
@@ -132,8 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _handleLogin,
+                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white),
                   child: const Text('Log In'),
-                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white)
                 ),
               ),
               Padding(

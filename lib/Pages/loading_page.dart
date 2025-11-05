@@ -1,13 +1,13 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
 import 'package:app_links/app_links.dart';
 
 class LoadingPage extends StatefulWidget {
   final AuthSystem auth;
 
-  const LoadingPage({Key? key, required this.auth}) : super(key: key);
+  const LoadingPage({super.key, required this.auth});
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();

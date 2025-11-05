@@ -1,9 +1,9 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthenticationResponses.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
-import '../Logic/Theme/Theme.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import '../Logic/Theme/theme.dart';
 
 class SignUpScreen extends StatefulWidget {
   late final AuthSystem _auth;
@@ -13,10 +13,10 @@ class SignUpScreen extends StatefulWidget {
   }
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  SignUpScreenState createState() => SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
@@ -107,7 +107,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } catch (e) {
       _showMessage('Error: $e');
-      print(e);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -230,10 +229,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleSignUp,
-                    child: _isLoading
+                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white),
+                  child: _isLoading
                       ? const CircularProgressIndicator()
                       : const Text('Create Account'),
-                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white),
                 ),
               ),
               Padding(

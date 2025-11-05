@@ -62,8 +62,7 @@ class DatabaseService {
           .eq('id', machineId)
           .single();
       return response;
-    } on PostgrestException catch(e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException {
       return null;
     } catch (e) {
       return null;
@@ -79,8 +78,7 @@ class DatabaseService {
           .eq('id', userId)
           .single();
       return response;
-    } on PostgrestException catch(e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException  {
       return null;
     } catch (e) {
       return null;
@@ -91,7 +89,6 @@ class DatabaseService {
     final userId = _client.auth.currentUser?.id;
 
     if (userId == null) {
-      print("User not authenticated");
       return;
     }
     try {
@@ -99,11 +96,10 @@ class DatabaseService {
           .from("profiles")
           .update({"balance": balance})
           .eq("id", userId);
-    } on PostgrestException catch(e) {
-      print("Postgres error: ${e.message}");
-      return null;
+    } on PostgrestException {
+      return;
     } catch (e) {
-      return null;
+      return;
     }
 
   }
@@ -119,8 +115,7 @@ class DatabaseService {
           .count(CountOption.exact);
 
       return response.count;
-    } on PostgrestException catch (e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException {
       return 0;
     } catch (e) {
       return 0;
@@ -138,8 +133,7 @@ class DatabaseService {
           .count(CountOption.exact);
 
       return response.count;
-    } on PostgrestException catch (e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException  {
       return 0;
     } catch (e) {
       return 0;
@@ -156,8 +150,7 @@ class DatabaseService {
           .count(CountOption.exact);
 
       return response.count;
-    } on PostgrestException catch (e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException {
       return 0;
     } catch (e) {
       return 0;
@@ -174,8 +167,7 @@ class DatabaseService {
           .count(CountOption.exact);
 
       return response.count;
-    } on PostgrestException catch (e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException  {
       return 0;
     } catch (e) {
       return 0;
@@ -189,11 +181,9 @@ class DatabaseService {
           .select('id, Address');
 
       return response;
-    } on PostgrestException catch (e) {
-      print("Postgres error: ${e.message}");
+    } on PostgrestException  {
       return [];
     } catch (e) {
-      print("Unknown error: $e");
       return [];
     }
   }

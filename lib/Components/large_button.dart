@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class LargeButton extends StatelessWidget {
@@ -8,12 +7,12 @@ class LargeButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const LargeButton({
-    Key? key,
+    super.key,
     required this.headLineText,
     required this.descripitionText,
     required this.icon,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

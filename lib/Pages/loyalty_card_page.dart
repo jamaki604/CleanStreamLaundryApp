@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
+import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/processPayment.dart';
-import '../Logic/Theme/Theme.dart';
-import 'package:clean_stream_laundry_app/Logic/Transaction/TransactionParser.dart';
-import 'package:clean_stream_laundry_app/Components/CreditCard.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
+import '../Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
+import 'package:clean_stream_laundry_app/Components/credit_card.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -82,7 +82,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         _recentTransactions.removeWhere((e) => e.isEmpty);
       });
     } catch (e) {
-      print('Failed to fetch transactions: $e');
+      _showErrorDialog(context, e.toString());
     }
   }
 
@@ -111,7 +111,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontPrimary,
+                    color: Theme.of(context).colorScheme.fontSecondary,
                   ),
                 ),
               SizedBox(height: 25),
@@ -148,7 +148,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.fontPrimary,
+                              color: Theme.of(context).colorScheme.fontSecondary,
                             ),
                           ),
                           TextButton.icon(
@@ -234,11 +234,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   void _loadCard() {
-    TextEditingController _amountController = TextEditingController();
+    TextEditingController amountController = TextEditingController();
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Center(
               child: Text(
@@ -251,7 +251,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ),
             ),
             content: TextField(
-              controller: _amountController,
+              controller: amountController,
               autofocus: true,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
@@ -281,7 +281,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ElevatedButton(
                 child: Text('Pay', style: TextStyle(color: Colors.blue[700])),
                 onPressed: () async {
-                  final amountText = _amountController.text;
+                  final amountText = amountController.text;
                   final amount = double.tryParse(amountText) ?? 0;
 
                   Navigator.of(context).pop();

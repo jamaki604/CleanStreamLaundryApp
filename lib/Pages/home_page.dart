@@ -1,20 +1,19 @@
-import 'package:clean_stream_laundry_app/Components/BasePage.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/Theme.dart';
-import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
-import 'package:clean_stream_laundry_app/Pages/MachineAvailabilityButton.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:clean_stream_laundry_app/Components/base_page.dart';
+import 'package:clean_stream_laundry_app/Components/large_button.dart';
+import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   String? selectedName;
-  late final Map<String,int> locationID = Map();
+  late final Map<String,int> locationID = {};
   bool locationSelected = false;
   late int? locationIDSelected;
 
@@ -61,7 +60,7 @@ class _HomePageState extends State<HomePage> {
                                 "Select Location",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: Theme.of(context).colorScheme.fontPrimary
+                                    color: Colors.black87,
                                 ),
                               ),
                               onChanged: (String? newValue) {
@@ -76,7 +75,9 @@ class _HomePageState extends State<HomePage> {
                                   value: entry.key,
                                   child: Text(
                                     entry.key,
-                                    style: TextStyle(fontSize: 18),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                    color: Theme.of(context).colorScheme.fontSecondary),
                                   ),
                                 );
                               }).toList(),
@@ -103,9 +104,9 @@ class _HomePageState extends State<HomePage> {
                     final machineIdle = snapshot.data![0];
                     final totalMachine = snapshot.data![0];
 
-                    return MachineAvailabilityButton(
-                      headLineText: "${totalMachine} available",
-                      descripitionText: "${totalMachine}/${machineIdle} washers",
+                    return LargeButton(
+                      headLineText: "$totalMachine available",
+                      descripitionText: "$totalMachine/$machineIdle washers",
                       icon: Icons.local_laundry_service,
                       onPressed: () {},
                     );
@@ -126,9 +127,9 @@ class _HomePageState extends State<HomePage> {
                     final machineIdle = snapshot.data![0];
                     final totalMachine = snapshot.data![0];
 
-                    return MachineAvailabilityButton(
-                      headLineText: "${totalMachine} available",
-                      descripitionText: "${totalMachine}/${machineIdle} dryers",
+                    return LargeButton(
+                      headLineText: "$totalMachine available",
+                      descripitionText: "$totalMachine/$machineIdle dryers",
                       icon: Icons.local_laundry_service,
                       onPressed: () {},
                     );

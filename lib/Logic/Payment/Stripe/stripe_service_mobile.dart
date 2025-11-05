@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/PaymentProcessor.dart';
+import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/payment_processor.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

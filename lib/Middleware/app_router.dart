@@ -1,16 +1,16 @@
-import 'package:clean_stream_laundry_app/Pages/EmailVerificationPage.dart';
-import 'package:clean_stream_laundry_app/Pages/HomePage.dart';
-import 'package:clean_stream_laundry_app/Pages/LoadingPage.dart';
-import 'package:clean_stream_laundry_app/Pages/LoyaltyCardPage.dart';
-import 'package:clean_stream_laundry_app/Pages/ScannerWidget.dart';
-import 'package:clean_stream_laundry_app/Pages/SignUpScreen.dart';
-import 'package:clean_stream_laundry_app/Pages/LoginScreen.dart';
-import 'package:clean_stream_laundry_app/Pages/NotFoundScreen.dart';
-import 'package:clean_stream_laundry_app/Pages/Settings.dart';
-import 'package:clean_stream_laundry_app/Pages/StartPage.dart';
+import 'package:clean_stream_laundry_app/Pages/email_verification_page.dart';
+import 'package:clean_stream_laundry_app/Pages/home_page.dart';
+import 'package:clean_stream_laundry_app/Pages/loading_page.dart';
+import 'package:clean_stream_laundry_app/Pages/loyalty_card_page.dart';
+import 'package:clean_stream_laundry_app/Pages/scanner_widget.dart';
+import 'package:clean_stream_laundry_app/Pages/sign_up_screen.dart';
+import 'package:clean_stream_laundry_app/Pages/login_page.dart';
+import 'package:clean_stream_laundry_app/Pages/not_found_page.dart';
+import 'package:clean_stream_laundry_app/Pages/settings.dart';
+import 'package:clean_stream_laundry_app/Pages/start_machine_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/AuthSystem.dart';
-import 'package:clean_stream_laundry_app/Pages/PaymentPage.dart';
+import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
 
 GoRouter createRouter(AuthSystem authenticator) => GoRouter(
   initialLocation: '/loading',
@@ -22,7 +22,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: LoginScreen(auth: authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -32,7 +32,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: SignUpScreen(auth:authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -42,7 +42,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: ScannerWidget(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
@@ -53,7 +53,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: Settings(auth:authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -63,7 +63,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: LoyaltyPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -75,7 +75,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
           child: PaymentPage(machineId: machineId),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
-          transitionsBuilder: (_, __, ___, child) => child,
+          transitionsBuilder: (_, _, _, child) => child,
         );
       },
     ),
@@ -86,7 +86,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: EmailVerificationPage(auth: authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -96,7 +96,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: HomePage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -106,7 +106,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: StartPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     )
   ],

@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/Theme.dart';
+import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CreditCard extends StatelessWidget {
@@ -8,9 +7,9 @@ class CreditCard extends StatelessWidget {
   final String? username;
 
   const CreditCard({
-    Key? key,
+    super.key,
     required this.username,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
