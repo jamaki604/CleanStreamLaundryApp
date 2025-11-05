@@ -103,8 +103,8 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               SizedBox(height:20),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400, maxHeight: 250),
+              ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400, maxHeight: 230),
             child: Card(
                 color: Theme.of(context).colorScheme.cardPrimary,
                 elevation: 10,
@@ -118,53 +118,45 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       children: [
                         Positioned(
                           top: -30,
-                          left: 15,
-                          child: Image.asset("assets/Slogan.png", width: 200, height: 150),
+                          left: 10,
+                          child: Image.asset("assets/Slogan.png", width: 200, height: 135),
                         ),
                         Positioned(
-                          top: -3,
+                          top: -10,
                           right: 0,
-                          child: Image.asset("assets/Icon.png", height: 95, width: 95),
+                          child: Image.asset("assets/Icon.png", height: 85, width: 85),
                         ),
                         Positioned(
                           left: 15,
-                          top: 80,
+                          top: 65,
                           child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
                         ),
                         Positioned(
                           left: -4,
                           right: 0,
-                          top: 130,
+                          top: 120,
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 4),
-                            color: Theme.of(context).colorScheme.cardSecondary,
                           child: Text(
-                            "1234    5678    9012    3456",
+                            "1234   5678   9012   3456",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 26,
-                              fontWeight: FontWeight.w300,
-                              color: Theme.of(context).colorScheme.fontPrimary,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black87,
                             ),
                           ),
                           )
                         ),
-                          Positioned(
-                            left: 15,
-                            top: 178,
-                            child: Text(
-                              (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            Positioned(
-                              left: 15,
-                              top: 170,
-                              child: Text(
+                        Positioned(
+                          left: 15,
+                          right: 15,
+                          top: 170,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
                                 (_userName == null || _userName!.isEmpty) ? 'John Doe' : _userName!,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -173,22 +165,22 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                                   color: Colors.black87,
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              right: 15,
-                              bottom: 10,
-                              top: 180,
-                              child: Image.asset("assets/Mastercard.png", width: 85, height: 60),
-                            ),
+                              Image.asset(
+                                "assets/Mastercard.png",
+                                width: 60,
+                                height: 35,
+                              ),
+                            ],
+                          ),
+                        ),
                           ],
                         ),
                       ),
                     ),
                   ),
                 ),
-
-                SizedBox(height: 50),
-                Text(
+              SizedBox(height: 50),
+              Text(
                   'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -197,8 +189,8 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     color: Theme.of(context).colorScheme.fontPrimary,
                   ),
                 ),
-                SizedBox(height: 25),
-                ElevatedButton(
+              SizedBox(height: 25),
+              ElevatedButton(
                   onPressed: () => _loadCard(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
@@ -217,8 +209,8 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 40),
-                Padding(
+              SizedBox(height: 40),
+              Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +219,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Transactions for This Month',
+                            'Transactions',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -260,23 +252,21 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                         children: _recentTransactions.map((transaction) {
                           return Card(
                             margin: EdgeInsets.only(bottom: 8),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            elevation: 7,
+                            color: Theme.of(context).colorScheme.cardPrimary,
                             child: ListTile(
                               leading: Icon(
                                 Icons.receipt_long,
-                                color: Colors.blue,
+                                color: Color(0xFF2073A9),
                               ),
                               title: Text(
                                 transaction.toString(),
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Theme.of(context).colorScheme.fontPrimary,
+                                  color: Colors.black87,
                                 ),
                               ),
-                              tileColor: Theme.of(context).colorScheme.background,
                             ),
                           );
                         }).toList(),
@@ -284,12 +274,10 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
-              ],
-            ),
+              SizedBox(height: 20),
+            ],
           ),
-        ],
-      ),
+        )
     );
   }
 

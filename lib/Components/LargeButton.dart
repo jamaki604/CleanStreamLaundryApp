@@ -31,7 +31,7 @@ class LargeButton extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
-              elevation: 12,
+              elevation: 8,
               backgroundColor: Colors.blue.shade800,
               shadowColor: Colors.blueAccent.shade400,
             ),

@@ -15,6 +15,16 @@ class StartPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 50),
+
+          LargeButton(
+            headLineText: "Tap to Pay",
+            descripitionText: "Tap phone to machine to pay",
+            icon: Icons.tap_and_play,
+            onPressed: () {
+
+            },
+          ),
+          const SizedBox(height: 50),
           LargeButton(
               headLineText: "Scan QR code",
               descripitionText: "Scan QR code on the machine",
