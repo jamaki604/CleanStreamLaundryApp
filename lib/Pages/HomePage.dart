@@ -100,8 +100,8 @@ class _HomePageState extends State<HomePage> {
                       return const CircularProgressIndicator();
                     }
 
-                    final machineIdle = snapshot.data![0] as int;
-                    final totalMachine = snapshot.data![0] as int;
+                    final machineIdle = snapshot.data![0];
+                    final totalMachine = snapshot.data![0];
 
                     return MachineAvailabilityButton(
                       headLineText: "${totalMachine} available",
@@ -123,8 +123,8 @@ class _HomePageState extends State<HomePage> {
                       return const CircularProgressIndicator();
                     }
 
-                    final machineIdle = snapshot.data![0] as int;
-                    final totalMachine = snapshot.data![0] as int;
+                    final machineIdle = snapshot.data![0];
+                    final totalMachine = snapshot.data![0];
 
                     return MachineAvailabilityButton(
                       headLineText: "${totalMachine} available",
