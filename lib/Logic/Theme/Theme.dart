@@ -25,8 +25,8 @@ ThemeData darkMode = ThemeData(
 extension ModeChangerText on ColorScheme {
   String get modeChangerText {
     return brightness == Brightness.dark
-        ? "Change to Light Mode"
-        : "Change to Dark Mode";
+        ? "Light Mode"
+        : "Dark Mode";
   }
 
   Color get fontPrimary {
