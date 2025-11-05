@@ -52,7 +52,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             child: Text(
               'Point camera at Nayax QR code',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.fontPrimary,
+                color: Colors.grey,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),

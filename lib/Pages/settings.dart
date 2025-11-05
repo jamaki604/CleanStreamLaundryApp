@@ -32,7 +32,7 @@ class _SettingsState extends State<Settings> {
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontPrimary,
+                    color: Theme.of(context).colorScheme.fontSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -55,10 +55,7 @@ class _SettingsState extends State<Settings> {
                     themeManager.toggleTheme();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme
-                        .of(context)
-                        .colorScheme
-                        .tertiary,
+                    backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
                   child: Text(Theme.of(context).colorScheme.modeChangerText),

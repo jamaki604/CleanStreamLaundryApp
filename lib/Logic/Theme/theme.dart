@@ -38,7 +38,7 @@ extension ModeChangerText on ColorScheme {
   Color get fontSecondary {
     return brightness == Brightness.dark
         ? Colors.grey
-        : Colors.grey;
+        : Colors.black87;
   }
 
   Color get cardPrimary {

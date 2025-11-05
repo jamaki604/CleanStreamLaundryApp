@@ -111,7 +111,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontPrimary,
+                    color: Theme.of(context).colorScheme.fontSecondary,
                   ),
                 ),
               SizedBox(height: 25),
@@ -148,7 +148,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.fontPrimary,
+                              color: Theme.of(context).colorScheme.fontSecondary,
                             ),
                           ),
                           TextButton.icon(

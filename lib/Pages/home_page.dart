@@ -60,7 +60,7 @@ class HomePageState extends State<HomePage> {
                                 "Select Location",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: Theme.of(context).colorScheme.fontPrimary
+                                    color: Colors.black87,
                                 ),
                               ),
                               onChanged: (String? newValue) {
@@ -75,7 +75,9 @@ class HomePageState extends State<HomePage> {
                                   value: entry.key,
                                   child: Text(
                                     entry.key,
-                                    style: TextStyle(fontSize: 18),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                    color: Theme.of(context).colorScheme.fontSecondary),
                                   ),
                                 );
                               }).toList(),
