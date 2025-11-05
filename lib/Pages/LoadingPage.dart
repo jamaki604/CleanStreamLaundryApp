@@ -79,7 +79,7 @@ class _LoadingPageState extends State<LoadingPage> {
             Text(
               _error!,
               style: TextStyle(
-                color: Colors.redAccent.withOpacity(0.8),
+                color: Colors.redAccent.withValues(alpha: 0.8),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,

@@ -21,7 +21,7 @@ class NavBar extends StatelessWidget {
 
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       selectedItemColor: Theme.of(context).colorScheme.primary,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,

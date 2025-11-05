@@ -4,7 +4,7 @@ ThemeData lightMode = ThemeData(
   brightness: Brightness.light,
   colorScheme: ColorScheme.light(
     brightness: Brightness.light,
-    background: Colors.white,
+    surface: Colors.white,
     primary: Color(0xFF2073A9),
     secondary: Color(0xFFf3c404),
     tertiary: Colors.indigo[900],
@@ -15,7 +15,7 @@ ThemeData darkMode = ThemeData(
   brightness: Brightness.dark,
     colorScheme: ColorScheme.light(
       brightness: Brightness.dark,
-      background: Colors.grey.shade900,
+      surface: Colors.grey.shade900,
       primary: Color(0xFF2073A9),
       secondary: Color(0xFFf3c404),
       tertiary: Colors.deepPurple,
@@ -31,8 +31,8 @@ extension ModeChangerText on ColorScheme {
 
   Color get fontPrimary {
     return brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+        ? Colors.black
+        : Colors.white;
   }
 
   Color get fontSecondary {

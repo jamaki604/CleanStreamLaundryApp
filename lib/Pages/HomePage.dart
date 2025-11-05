@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Components/BasePage.dart';
+import 'package:clean_stream_laundry_app/Logic/Theme/Theme.dart';
 import 'package:clean_stream_laundry_app/Middleware/DatabaseService.dart';
 import 'package:clean_stream_laundry_app/Pages/MachineAvailabilityButton.dart';
 import 'package:flutter/cupertino.dart';
@@ -58,7 +59,10 @@ class _HomePageState extends State<HomePage> {
                               value: selectedName,
                               hint: Text(
                                 "Select Location",
-                                style: TextStyle(fontSize: 18),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Theme.of(context).colorScheme.fontPrimary
+                                ),
                               ),
                               onChanged: (String? newValue) {
                                 setState(() {
