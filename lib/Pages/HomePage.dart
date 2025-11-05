@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
 
                     return MachineAvailabilityButton(
                       headLineText: "${totalMachine} available",
-                      descripitionText: "${totalMachine}/${machineIdle} dryer",
+                      descripitionText: "${totalMachine}/${machineIdle} dryers",
                       icon: Icons.local_laundry_service,
                       onPressed: () {},
                     );
