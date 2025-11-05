@@ -22,7 +22,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: LoginScreen(auth: authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -32,7 +32,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: SignUpScreen(auth:authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -42,7 +42,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: ScannerWidget(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
@@ -53,7 +53,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: Settings(auth:authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -63,7 +63,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: LoyaltyPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -75,7 +75,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
           child: PaymentPage(machineId: machineId),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
-          transitionsBuilder: (_, __, ___, child) => child,
+          transitionsBuilder: (_, _, _, child) => child,
         );
       },
     ),
@@ -86,7 +86,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: EmailVerificationPage(auth: authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -96,7 +96,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: HomePage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
     GoRoute(
@@ -106,7 +106,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         child: StartPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        transitionsBuilder: (_, __, ___, child) => child,
+        transitionsBuilder: (_, _, _, child) => child,
       ),
     )
   ],
