@@ -104,7 +104,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Theme.of(context).colorScheme.cardPrimary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -112,13 +112,14 @@ class _PaymentPageState extends State<PaymentPage> {
           Icon(
             Icons.local_laundry_service,
             size: 80,
-            color: Colors.blue[700],
+            color: Color(0xFF2073A9),
           ),
           const SizedBox(height: 20),
           Text(
             'Amount Due',
             style: TextStyle(fontSize: 16,
-                color: Theme.of(context).colorScheme.fontPrimary.withOpacity(0.6)),
+                color: Colors.black87,
+            )
           ),
           const SizedBox(height: 10),
           Text(
@@ -126,7 +127,7 @@ class _PaymentPageState extends State<PaymentPage> {
             style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.fontPrimary,
+              color: Colors.black87,
             ),
           ),
         ],
