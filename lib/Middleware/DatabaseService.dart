@@ -107,4 +107,98 @@ class DatabaseService {
     }
 
   }
+
+  Future<int> getIdleWasherCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('*')
+          .eq('Location_ID', locationId)
+          .eq('Status', 'idle')
+          .eq('Machine_type', 'Washer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getIdleDryerCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('*')
+          .eq('Location_ID', locationId)
+          .eq('Status', 'idle')
+          .eq('Machine_type', 'Dryer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getWasherCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('*')
+          .eq('Location_ID', locationId)
+          .eq('Machine_type', 'Washer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> getDryerCountByLocation(String locationId) async {
+    try {
+      final response = await _client
+          .from('Machines')
+          .select('id',)
+          .eq('Location_ID', locationId)
+          .eq('Machine_type', 'Dryer')
+          .count(CountOption.exact);
+
+      return response.count;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getLocations() async {
+    try {
+      final response = await _client
+          .from('Locations')
+          .select('id, Address');
+
+      return response as List<Map<String, dynamic>>;
+    } on PostgrestException catch (e) {
+      print("Postgres error: ${e.message}");
+      return [];
+    } catch (e) {
+      print("Unknown error: $e");
+      return [];
+    }
+  }
+
+
+
+
 }
