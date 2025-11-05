@@ -31,7 +31,7 @@ class _SettingsState extends State<Settings> {
                   "Settings \n",
                   style: TextStyle(
                     fontSize: 48,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: Theme.of(context).colorScheme.fontPrimary,
                   ),
                   textAlign: TextAlign.center,

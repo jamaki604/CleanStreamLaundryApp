@@ -188,7 +188,7 @@ class DatabaseService {
           .from('Locations')
           .select('id, Address');
 
-      return response as List<Map<String, dynamic>>;
+      return response;
     } on PostgrestException catch (e) {
       print("Postgres error: ${e.message}");
       return [];
