@@ -2,7 +2,6 @@ import 'package:clean_stream_laundry_app/Logic/Supabase/Profile/profile_handler.
 import 'package:clean_stream_laundry_app/Logic/Supabase/Transaction/transaction_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:core';
-
 import 'Authentication/authenticator.dart';
 import 'Location/location_handler.dart';
 import 'Machine/machine_handler.dart';
