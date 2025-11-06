@@ -237,7 +237,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     TextEditingController amountController = TextEditingController();
     showDialog(
         context: context,
-        builder: (_) => AlertDialog(
+        builder: (BuildContext dialogContext) => AlertDialog(
             backgroundColor: Theme.of(context).colorScheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Center(
@@ -275,7 +275,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               TextButton(
                 child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
                 onPressed: () {
-                  Navigator.of(context).pop(null);
+                  Navigator.of(dialogContext).pop(null);
                 },
               ),
               ElevatedButton(
@@ -284,7 +284,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   final amountText = amountController.text;
                   final amount = double.tryParse(amountText) ?? 0;
 
-                  Navigator.of(context).pop();
+                  Navigator.of(dialogContext).pop();
 
                   if (amount > 0) {
                     bool result = await processPayment(context, amount, "Loyalty Card");
