@@ -1,14 +1,9 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
-  late final AuthSystem _auth;
-
-  LoginScreen({super.key,required AuthSystem auth}){
-    _auth = auth;
-  }
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -45,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    final authResposne = await widget._auth.login(email, password);
+    final authResposne = await DatabaseService.instance.authenticator.login(email, password);
     if (!mounted) return;
 
     if (authResposne == AuthenticationResponses.success) {

@@ -1,5 +1,5 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -32,13 +32,13 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Future<void> _fetchMachineInfo() async {
 
-    final data = await DatabaseService.instance.getMachineById(widget.machineId);
+    final data = await DatabaseService.instance.machineHandler.getMachineById(widget.machineId);
     final userId = _client.auth.currentUser?.id;
 
     if (userId == null) {
       return;
     }
-    final balance = await DatabaseService.instance.getUserBalanceById(userId);
+    final balance = await DatabaseService.instance.profileHandler.getUserBalanceById(userId);
 
 
     if (data != null && balance!= null) {
@@ -239,7 +239,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
   void _processLoyaltyPayment(BuildContext context) async {
     final updatedBalance = _userBalance! - _price!;
-    DatabaseService.instance.updateBalanceById(updatedBalance);
+    DatabaseService.instance.profileHandler.updateBalanceById(updatedBalance);
     setState(() {
       _userBalance = updatedBalance;
     });

@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authenticator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';

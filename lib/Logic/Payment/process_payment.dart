@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/stripe_service.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:clean_stream_laundry_app/Components/payment_result.dart';
 
 
@@ -23,7 +23,7 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
           isSuccess: true
       );
     }
-    DatabaseService.instance.recordTransaction(amount: amount, description: description, type: "Laundry");
+    DatabaseService.instance.transactionHandler.recordTransaction(amount: amount, description: description, type: "Laundry");
     return true;
   } else if (status == 401) {
     showPaymentResult(context,

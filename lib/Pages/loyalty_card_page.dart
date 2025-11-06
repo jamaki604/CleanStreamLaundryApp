@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
@@ -46,7 +46,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     try {
-      final data = await DatabaseService.instance.getUserBalanceById(currentUserId);
+      final data = await DatabaseService.instance.profileHandler.getUserBalanceById(currentUserId);
 
       if (data != null) {
         setState(() {
@@ -75,7 +75,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
   Future<void> _fetchTransactions() async {
     try {
-      final transactions = await DatabaseService.instance.getTransactionsForUser();
+      final transactions = await DatabaseService.instance.transactionHandler.getTransactionsForUser();
       final limit = _showPastTransactions ? 100 : 3;
       setState(() {
         _recentTransactions = TransactionParser.formatTransactionsList(transactions.take(limit));
@@ -290,7 +290,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     bool result = await processPayment(context, amount, "Loyalty Card");
                     if (result) {
                       final newBalance = _userBalance! + amount;
-                      DatabaseService.instance.updateBalanceById(newBalance);
+                      DatabaseService.instance.profileHandler.updateBalanceById(newBalance);
                       setState(() {
                         _userBalance = newBalance;
                       });

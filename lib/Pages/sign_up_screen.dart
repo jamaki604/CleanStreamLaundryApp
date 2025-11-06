@@ -1,16 +1,11 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/auth_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import '../Logic/Theme/theme.dart';
 
 class SignUpScreen extends StatefulWidget {
-  late final AuthSystem _auth;
-
-  SignUpScreen({super.key,required AuthSystem auth}){
-    _auth = auth;
-  }
 
   @override
   SignUpScreenState createState() => SignUpScreenState();
@@ -87,10 +82,10 @@ class SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final authResponse = await widget._auth.signUp( email, password);
+      final authResponse = await DatabaseService.instance.authenticator.signUp( email, password);
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
-        await DatabaseService.instance.createAccount(name: name);
+        await DatabaseService.instance.profileHandler.createAccount(name: name);
         context.go('/email-Verification');
       }else if(authResponse == AuthenticationResponses.noDigit){
         _changeColorsToRed('Please include a digit');
