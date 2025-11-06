@@ -2,6 +2,7 @@ import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Components/large_button.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Middleware/storage_service.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +17,23 @@ class HomePageState extends State<HomePage> {
   late final Map<String,int> locationID = {};
   bool locationSelected = false;
   late int? locationIDSelected;
+  late StorageService storage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initStorage();
+  }
+
+  Future<void> _initStorage() async {
+    storage = StorageService();
+    await storage.init();
+
+    String? lastVal = await storage.getValue("lastSelectedLocation");
+    setState(() {
+      selectedName = lastVal;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +70,15 @@ class HomePageState extends State<HomePage> {
                             locationID[item["Address"]] = item["id"];
                           }
 
+                          if (selectedName != null && locationID.containsKey(selectedName!) && !locationSelected) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              setState(() {
+                                locationSelected = true;
+                                locationIDSelected = locationID[selectedName!];
+                              });
+                            });
+                          }
+
                           return DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
@@ -59,12 +86,17 @@ class HomePageState extends State<HomePage> {
                               hint: Text(
                                 "Select Location",
                                 style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black87,
+                                  fontSize: 18,
+                                  color: Colors.black87,
                                 ),
                               ),
                               onChanged: (String? newValue) {
-                                setState(() {
+
+                                if (newValue != null) {
+                                  storage.setValue("lastSelectedLocation", newValue);
+                                }
+
+                                setState((){
                                   selectedName = newValue;
                                   locationSelected = true;
                                   locationIDSelected = locationID[newValue];
@@ -77,7 +109,7 @@ class HomePageState extends State<HomePage> {
                                     entry.key,
                                     style: TextStyle(
                                         fontSize: 18,
-                                    color: Theme.of(context).colorScheme.fontSecondary),
+                                        color: Theme.of(context).colorScheme.fontSecondary),
                                   ),
                                 );
                               }).toList(),
