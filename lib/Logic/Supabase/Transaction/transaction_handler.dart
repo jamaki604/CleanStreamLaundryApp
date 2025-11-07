@@ -42,4 +42,21 @@ class TransactionHandler extends TransactionService{
     });
   }
 
+  @override
+  Future<void> recordRefundRequest({
+    required String transaction_id,
+    required String description,
+  }) async {
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    await _client.from('Refunds').insert({
+      'user_id': user.id,
+      'transaction_id': transaction_id,
+      'description': description
+    });
+  }
+
 }
