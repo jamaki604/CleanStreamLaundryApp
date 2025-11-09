@@ -33,6 +33,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Future<void> _fetchMachineInfo() async {
 
     final data = await DatabaseService.instance.machineHandler.getMachineById(widget.machineId);
+    print(data);
     final userId = _client.auth.currentUser?.id;
 
     if (userId == null) {
