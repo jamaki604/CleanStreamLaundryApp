@@ -5,6 +5,7 @@ import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Components/payment_result.dart';
 import 'package:clean_stream_laundry_app/Middleware/machine_communicator.dart';
+import 'package:clean_stream_laundry_app/Logic/Transaction/machine_formatter.dart';
 import '../Logic/Theme/theme.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -98,7 +99,6 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // Amount due card
   Widget _buildAmountCard() {
     return Container(
       padding: const EdgeInsets.all(30),
@@ -143,7 +143,7 @@ class _PaymentPageState extends State<PaymentPage> {
             onPressed: (_isConfirmed || _price == null || _price == 0)
                 ? null
                 : () async {
-                  final success = await processPayment(context, _price!, "Machine");
+                  final success = await processPayment(context, _price!, MachineFormatter.formatMachineType(_machineName.toString()));
 
                   if (success) {
                     final nayaxCommunicator = MachineCommunicator();
@@ -259,6 +259,7 @@ class _PaymentPageState extends State<PaymentPage> {
             message: "Machine $_machineName is now active.",
             isSuccess: true,
           );
+          await processPayment(context, _price!, "Loyalty Payment on ${MachineFormatter.formatMachineType(_machineName.toString())}");
         } else {
           showPaymentResult(
             context,

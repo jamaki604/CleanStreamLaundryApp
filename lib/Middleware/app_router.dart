@@ -11,6 +11,7 @@ import 'package:clean_stream_laundry_app/Pages/start_machine_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
 import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
+import 'package:clean_stream_laundry_app/Pages/monthly_transaction_history.dart';
 
 GoRouter createRouter(AuthSystem authenticator) => GoRouter(
   initialLocation: '/loading',
@@ -108,6 +109,19 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
       ),
+    ),
+    GoRoute(
+      path: '/monthlyTransactionHistory',
+      pageBuilder: (context, state) {
+        final transactions = state.extra as List<Map<String, dynamic>>? ?? [];
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: MonthlyTransactionHistory(transactions: transactions),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        );
+      },
     )
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),

@@ -5,11 +5,12 @@ import '../Logic/Authentication/auth_system.dart';
 import '../Logic/Theme/theme.dart';
 import '../Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 
 class Settings extends StatefulWidget {
   late final AuthSystem _auth;
 
-  Settings({super.key,required AuthSystem auth}){
+  Settings({super.key, required AuthSystem auth}) {
     _auth = auth;
   }
 
@@ -37,7 +38,6 @@ class _SettingsState extends State<Settings> {
                   textAlign: TextAlign.center,
                 ),
 
-
                 ElevatedButton(
                   onPressed: () {
                     widget._auth.logout();
@@ -59,6 +59,18 @@ class _SettingsState extends State<Settings> {
                     foregroundColor: Colors.white,
                   ),
                   child: Text(Theme.of(context).colorScheme.modeChangerText),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    final transactions = await DatabaseService.instance.getTransactionsForUser();
+                    context.go('/monthlyTransactionHistory', extra: transactions);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text("Monthly Report"),
                 ),
               ],
             ),
