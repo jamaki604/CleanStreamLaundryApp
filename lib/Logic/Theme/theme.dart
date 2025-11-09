@@ -35,6 +35,12 @@ extension ModeChangerText on ColorScheme {
         : Colors.white;
   }
 
+  Color get fontInverted {
+    return brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+  }
+
   Color get fontSecondary {
     return brightness == Brightness.dark
         ? Colors.grey

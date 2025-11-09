@@ -269,7 +269,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              style: TextStyle(color: Colors.blue[900]),
+              style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
             ),
             actions: <Widget>[
               TextButton(
@@ -279,7 +279,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                 },
               ),
               ElevatedButton(
-                child: Text('Pay', style: TextStyle(color: Colors.blue[700])),
                 onPressed: () async {
                   final amountText = amountController.text;
                   final amount = double.tryParse(amountText) ?? 0;
@@ -302,6 +301,22 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     );
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                ),
+                child: const Text(
+                  'Pay',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               )
             ]
         )
