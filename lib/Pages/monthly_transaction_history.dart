@@ -6,20 +6,18 @@ import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 
 class MonthlyTransactionHistory extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
-
-  const MonthlyTransactionHistory({Key? key, required this.transactions})
-    : super(key: key);
+  const MonthlyTransactionHistory({super.key, required this.transactions});
 
   @override
   Widget build(BuildContext context) {
     final monthlySums = TransactionParser.getMonthlySums(transactions);
-
     final sortedMonths = monthlySums.keys.toList()
       ..sort((a, b) {
         final dateA = DateFormat('MMM yyyy').parse(a);
         final dateB = DateFormat('MMM yyyy').parse(b);
         return dateB.compareTo(dateA);
       });
+
     return BasePage(
       body: Scaffold(
         appBar: AppBar(

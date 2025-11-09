@@ -33,6 +33,7 @@ class TransactionParser {
     final now = DateTime.now();
     final result = <String, Map<String, double>>{};
     int currentMonth = DateTime.now().month;
+    final cutoffDate = DateTime(now.year-1, now.month, 1);
 
     for (int i = 1; i <= 12; i++) {
       final monthDate = DateTime(now.year, now.month - i, 1);
@@ -40,16 +41,14 @@ class TransactionParser {
       result[monthKey] = {'washer': 0.0, 'dryer': 0.0, 'loyaltyCard': 0.0};
     }
 
-    final cutoffDate = DateTime(now.year-1, now.month, 1);
-    for (final transaction in transactions) {
 
+    for (final transaction in transactions) {
       final createdAt = DateTime.parse(transaction['created_at'] as String);
 
       if (createdAt.isBefore(cutoffDate)) {
         break;
       }
-
-      if(DateFormat('M').format(createdAt) == currentMonth.toString()){
+      if (DateFormat('M').format(createdAt) == currentMonth.toString()){
         continue;
       }
 
