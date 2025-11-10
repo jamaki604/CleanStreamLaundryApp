@@ -2,9 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MachineCommunicator {
-
   final Dio _dio = Dio(
-      BaseOptions(baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1')
+    BaseOptions(
+      baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
   );
 
   Future<bool> wakeDevice(String deviceId) async {
@@ -19,11 +22,7 @@ class MachineCommunicator {
       );
 
       final data = response.data;
-
-      if (data['success'] == true && data['status'] == 'authorized') {
-        return true;
-      }
-      return false;
+      return data['success'] == true && data['status'] == 'authorized';
     } catch (e) {
       return false;
     }
@@ -41,7 +40,6 @@ class MachineCommunicator {
       );
 
       final data = response.data;
-
       if (data['success'] == true && data['status'] == 'available') {
         return "true";
       } else {
