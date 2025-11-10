@@ -38,4 +38,14 @@ void main() {
     final result = await machineHandler.getIdleWasherCountByLocation('1');
     expect(result, 5);
   });
+
+
+  test('getMachineByIdTest',() async {
+    FakeFilterBuilderMap fakeFilterBuilderMap = FakeFilterBuilderMap({"Name": "Dryer 1", "Price": 2.75});
+    when(() => queryBuilderMock.select(any())).thenAnswer((_) => fakeFilterBuilderMap);
+    final result = await machineHandler.getMachineById("1");
+    expect(result?["Price"], 2.75);
+  });
+
+
 }
