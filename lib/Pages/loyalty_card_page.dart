@@ -5,7 +5,7 @@ import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
-import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
+import 'package:clean_stream_laundry_app/Logic/Parser/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/Components/credit_card.dart';
 
 class LoyaltyPage extends StatefulWidget {
