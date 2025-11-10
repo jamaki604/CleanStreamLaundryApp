@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authentication_response.dart';
 import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authenticator.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -635,6 +637,53 @@ void main(){
     test("Verifying that the logged out logic was called",() async {
       await authenticator.logout();
       verify(() => client.auth.signOut());
+    });
+
+    test("Should return that an email is not verified",() async{
+      when(() => supabaseAuth.signInWithPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      )).thenThrow(AuthApiException(
+        'Email not verified',
+        code: 'email_not_confirmed',
+      ));
+
+      final result = await authenticator.login("testEmail","testPassword");
+      expect(result, AuthenticationResponses.emailNotVerified);
+    });
+
+    test("Test if an exception is thrown with a different code",() async{
+      when(() => supabaseAuth.signInWithPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      )).thenThrow(AuthApiException(
+        'Email not verified',
+        code: 'random-test-code',
+      ));
+
+      final result = await authenticator.login("testEmail","testPassword");
+      expect(result, AuthenticationResponses.failure);
+    });
+
+    test("Test if an exception is thrown with an unkown exception",() async{
+      when(() => supabaseAuth.signInWithPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      )).thenThrow(Exception("Unkown exception"));
+
+      final result = await authenticator.login("testEmail","testPassword");
+      expect(result, AuthenticationResponses.failure);
+    });
+
+    test("Test that correctID is returned",(){
+      final result = authenticator.currentUserId;
+      expect(result, "11111111-1111-1111-1111-111111111111");
+    });
+
+    test("Test that null is returned for no user being able to be found",(){
+      when(() => supabaseAuth.currentUser).thenReturn(null);
+      final result = authenticator.currentUserId;
+      expect(result, null);
     });
 
   });

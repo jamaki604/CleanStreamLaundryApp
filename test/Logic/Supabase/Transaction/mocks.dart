@@ -3,8 +3,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseMock extends Mock implements SupabaseClient {}
-class QueryBuilderMock extends Mock implements SupabaseQueryBuilder {}
 class GoTrueMock extends Mock implements GoTrueClient {}
+
+class QueryBuilderMock extends Mock implements SupabaseQueryBuilder {
+
+  @override
+  PostgrestFilterBuilder<dynamic> insert(Object values, {bool defaultToNull = false}) {
+    return FakeFilterBuilder([{'status': 'success', 'inserted': values}]);
+  }
+
+}
 
 class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<PostgrestList> {
   final List<Map<String, dynamic>> fakeData;

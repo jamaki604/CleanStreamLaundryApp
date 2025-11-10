@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/Logic/Supabase/Machine/machine_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'mocks.dart';
 
 void main() {
@@ -24,9 +25,33 @@ void main() {
     expect(result, 5);
   });
 
+  test('getDryerCountByLocation throws Postgrest Exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(PostgrestException(message: "Test Exception"));
+    final result = await machineHandler.getDryerCountByLocation('1');
+    expect(result, 0);
+  });
+
+  test('getDryerCountByLocation throws unknown exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(Exception("Test exception"));
+    final result = await machineHandler.getDryerCountByLocation('1');
+    expect(result, 0);
+  });
+
   test('getIdleDryerCountByLocation returns correct count', () async {
     final result = await machineHandler.getIdleDryerCountByLocation('1');
     expect(result, 5);
+  });
+
+  test('getIdleDryerCountByLocation throws Postgres exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(PostgrestException(message: "Test Exception"));
+    final result = await machineHandler.getIdleDryerCountByLocation('1');
+    expect(result, 0);
+  });
+
+  test('getIdleDryerCountByLocation throws unknown exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(Exception("Test exception"));
+    final result = await machineHandler.getIdleDryerCountByLocation('1');
+    expect(result, 0);
   });
 
   test('getWasherCountByLocation returns correct count', () async {
@@ -34,11 +59,34 @@ void main() {
     expect(result, 5);
   });
 
+  test('getWasherCountByLocation throws Postgres exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(PostgrestException(message: "Test Exception"));
+    final result = await machineHandler.getWasherCountByLocation('1');
+    expect(result, 0);
+  });
+
+  test('getWasherCountByLocation throws unknown exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(Exception("Test exception"));
+    final result = await machineHandler.getWasherCountByLocation('1');
+    expect(result, 0);
+  });
+
   test('getIdleWasherCountByLocation returns correct count', () async {
     final result = await machineHandler.getIdleWasherCountByLocation('1');
     expect(result, 5);
   });
 
+  test('getIdleWasherCountByLocation throws Postgres exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(PostgrestException(message: "Test Exception"));
+    final result = await machineHandler.getIdleWasherCountByLocation('1');
+    expect(result, 0);
+  });
+
+  test('getIdleWasherCountByLocation throws unknown exception', () async {
+    when(() => supabaseMock.from('Machines')).thenThrow(Exception("Test exception"));
+    final result = await machineHandler.getIdleWasherCountByLocation('1');
+    expect(result, 0);
+  });
 
   test('getMachineByIdTest',() async {
     FakeFilterBuilderMap fakeFilterBuilderMap = FakeFilterBuilderMap({"Name": "Dryer 1", "Price": 2.75});
@@ -47,5 +95,18 @@ void main() {
     expect(result?["Price"], 2.75);
   });
 
+  test('getMachineByIdTest error is Postgres error is thrown',() async {
+    FakeFilterBuilderMap fakeFilterBuilderMap = FakeFilterBuilderMap({"Name": "Dryer 1", "Price": 2.75});
+    when(() => queryBuilderMock.select(any())).thenThrow(PostgrestException(message: "Test Exception"));
+    final result = await machineHandler.getMachineById("1");
+    expect(result,null);
+  });
+
+  test('getMachineByIdTest error is an unknown error',() async {
+    FakeFilterBuilderMap fakeFilterBuilderMap = FakeFilterBuilderMap({"Name": "Dryer 1", "Price": 2.75});
+    when(() => queryBuilderMock.select(any())).thenThrow(Exception("Test exception"));
+    final result = await machineHandler.getMachineById("1");
+    expect(result,null);
+  });
 
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/Logic/Supabase/Location/location_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'mocks.dart';
 
 void main() {
@@ -46,4 +47,19 @@ void main() {
 
     expect(locations.length, 0);
   });
+
+  test("Get locations if there is an PosgrestException",() async {
+    when(() => supabaseMock.from('Locations')).thenThrow(PostgrestException(message: "Test error"));
+    final locationHandler = LocationHandler(client: supabaseMock);
+    final result = await locationHandler.getLocations();
+    expect(result.length, 0);
+  });
+
+  test("Get locations if there is any other excpetion",() async {
+    when(() => supabaseMock.from('Locations')).thenThrow(Exception("Random test exception"));
+    final locationHandler = LocationHandler(client: supabaseMock);
+    final result = await locationHandler.getLocations();
+    expect(result.length, 0);
+  });
+
 }

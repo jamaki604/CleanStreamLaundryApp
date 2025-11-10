@@ -19,6 +19,7 @@ void main() {
     supabaseAuth = GoTrueMock();
 
     when(() => supabaseMock.from('transactions')).thenAnswer((_) => queryBuilderMock);
+    when(() => supabaseMock.from('Refunds')).thenAnswer((_) => queryBuilderMock);
     when(() => queryBuilderMock.select(any())).thenAnswer((_) => fakeFilterBuilder);
     when(() => supabaseMock.auth).thenReturn(supabaseAuth);
 
@@ -46,6 +47,23 @@ void main() {
     test("Get transaction history data",() async {
       final result = await transactionHandler.getTransactionsForUser();
       expect(result.length, 6);
+    });
+
+    test("Tests if the user is null",() async{
+      when(() => supabaseAuth.currentUser).thenReturn(null);
+      final result = await transactionHandler.getTransactionsForUser();
+      expect(result.length, 0);
+    });
+
+    test("Tests that transaction is recorded properly",() async {
+      await transactionHandler.recordTransaction(amount: 27.5, description: "Test transaction", type: "test type");
+      verify(() => supabaseMock.from("transactions"));
+    });
+
+    test("Tests if logic is correct for recording refunds",() async {
+      await transactionHandler.recordRefundRequest(transaction_id: "3kl24jkl23", description: "Test refund");
+      verify(() => supabaseMock.auth.currentUser!);
+      verify(() => supabaseMock.from("Refunds"));
     });
 
   });

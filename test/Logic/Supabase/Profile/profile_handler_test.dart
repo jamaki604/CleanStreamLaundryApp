@@ -43,9 +43,20 @@ void main() {
 
 
   test('getUserBalanceById returns fake user balance', () async {
-
     final result = await profileHandler.getUserBalanceById("1");
     expect(result?["balance"],0);
+  });
+
+  test('getUserBalanceById throws Postgres exception', () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    final result = await profileHandler.getUserBalanceById("1");
+    expect(result,null);
+  });
+
+  test('getUserBalanceById throws unknown exception', () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test execption"));
+    final result = await profileHandler.getUserBalanceById("1");
+    expect(result,null);
   });
 
   test("Tests that the logic was called correctly to create an account",() async {
@@ -59,4 +70,17 @@ void main() {
     verify(() => supabaseMock.auth.currentUser!);
     verify(() => supabaseMock.from("profiles"));
   });
+
+  test("Tests that updateBalanceID catches Postgrest exception",() async {
+    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    await profileHandler.updateBalanceById(47.20);
+    //Test will fail if exception was not caught
+  });
+
+  test("Tests that updateBalanceID catches unkown exception",() async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test execption"));
+    await profileHandler.updateBalanceById(47.20);
+    //Test will fail if exception was not caught
+  });
+
 }
