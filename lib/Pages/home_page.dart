@@ -50,7 +50,7 @@ class HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade400, width: 1),
-                  color: Colors.grey.shade100,
+                  color: Theme.of(context).colorScheme.cardSecondary,
                 ),
                 child: Row(
                   children: [
@@ -87,7 +87,7 @@ class HomePageState extends State<HomePage> {
                                 "Select Location",
                                 style: TextStyle(
                                   fontSize: 18,
-                                  color: Colors.black87,
+                                  color: Colors.white,
                                 ),
                               ),
                               onChanged: (String? newValue) {
@@ -109,7 +109,7 @@ class HomePageState extends State<HomePage> {
                                     entry.key,
                                     style: TextStyle(
                                         fontSize: 18,
-                                        color: Theme.of(context).colorScheme.fontSecondary),
+                                        color: Theme.of(context).colorScheme.fontInverted),
                                   ),
                                 );
                               }).toList(),

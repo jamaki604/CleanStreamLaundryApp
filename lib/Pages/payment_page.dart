@@ -80,7 +80,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.fontPrimary,
+                      color: Theme.of(context).colorScheme.fontInverted,
                     ),
                   ),
                   const SizedBox(height: 40),

@@ -21,7 +21,7 @@ class CreditCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 24),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.only(top: 10, bottom: 10),
           child: SizedBox(
             height: 225,
             child: Stack(
@@ -47,13 +47,14 @@ class CreditCard extends StatelessWidget {
                     top: 120,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 4),
+                      color: Theme.of(context).colorScheme.cardSecondary,
                       child: Text(
                         "1234   5678   9012   3456",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w400,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.fontInverted,
                         ),
                       ),
                     )
