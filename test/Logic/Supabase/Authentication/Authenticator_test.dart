@@ -37,6 +37,7 @@ void main(){
       when(() => supabaseAuth.currentUser).thenReturn(mockUser);
 
       when(() => supabaseAuth.refreshSession()).thenAnswer((_) async => AuthResponse());
+      when(() => supabaseAuth.signOut()).thenAnswer((_) async {});
 
     });
 
@@ -629,6 +630,11 @@ void main(){
 
       final response = await authenticator.isLoggedIn();
       expect(response,AuthenticationResponses.failure);
+    });
+
+    test("Verifying that the logged out logic was called",() async {
+      await authenticator.logout();
+      verify(() => client.auth.signOut());
     });
 
   });
