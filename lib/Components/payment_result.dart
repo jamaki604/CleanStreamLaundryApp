@@ -52,7 +52,7 @@ void showPaymentResult(
             child: ElevatedButton(
               onPressed: () {
                 if(isSuccess) {
-                  context.go("/scanner");
+                  context.go("/homePage");
                 }else{
                   Navigator.of(context).pop();
                 }
