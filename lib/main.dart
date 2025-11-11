@@ -26,7 +26,7 @@ void main() async {
 
   await dotenv.load(fileName: '.env');
   await _setupStripe();
-  await _setupSupabase();
+  await setupDependencies();
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeManager(),
@@ -37,10 +37,6 @@ void main() async {
 
 Future<void> _setupStripe() async {
   Stripe.publishableKey = "${dotenv.env['STRIPE_PUBLISHABLE_KEY']}";
-}
-
-Future<void> _setupSupabase() async {
-  Supabase.initialize(url: '${dotenv.env['SUPABASE_URL']}', anonKey: '${dotenv.env['ANON_KEY']}');
 }
 
 Future<void> setupDependencies() async{
