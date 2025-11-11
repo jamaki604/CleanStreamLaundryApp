@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authentication_response.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/authenticator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';

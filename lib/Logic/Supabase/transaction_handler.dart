@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/Transaction/transaction_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TransactionHandler extends TransactionService{

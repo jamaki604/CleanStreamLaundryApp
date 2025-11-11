@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/Function/edgeFunction.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edgeFunction.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FunctionRunner extends EdgeFunction{

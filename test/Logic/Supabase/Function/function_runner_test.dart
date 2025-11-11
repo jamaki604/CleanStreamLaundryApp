@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/Function/function_runner.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/function_runner.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

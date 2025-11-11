@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'machine_service.dart';
+import '../Services/machine_service.dart';
 
 class MachineHandler extends MachineService{
 

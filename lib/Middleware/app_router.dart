@@ -9,7 +9,7 @@ import 'package:clean_stream_laundry_app/Pages/not_found_page.dart';
 import 'package:clean_stream_laundry_app/Pages/settings.dart';
 import 'package:clean_stream_laundry_app/Pages/start_machine_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
 
 GoRouter createRouter(AuthSystem authenticator) => GoRouter(

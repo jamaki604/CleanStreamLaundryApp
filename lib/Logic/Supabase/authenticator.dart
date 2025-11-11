@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/auth_system.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Authenticator implements AuthSystem{

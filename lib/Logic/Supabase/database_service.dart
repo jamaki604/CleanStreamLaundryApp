@@ -1,17 +1,17 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/Function/edgeFunction.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/Profile/profile_handler.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/Transaction/transaction_handler.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edgeFunction.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/profile_handler.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/transaction_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:core';
-import 'Authentication/auth_system.dart';
-import 'Authentication/authenticator.dart';
-import 'Location/location_handler.dart';
-import 'Location/location_service.dart';
-import 'Machine/machine_handler.dart';
-import 'Machine/machine_service.dart';
-import 'Profile/profile_service.dart';
-import 'Transaction/transaction_service.dart';
-import 'Function/function_runner.dart';
+import '../Services/auth_service.dart';
+import 'authenticator.dart';
+import 'location_handler.dart';
+import '../Services/location_service.dart';
+import 'machine_handler.dart';
+import '../Services/machine_service.dart';
+import '../Services/profile_service.dart';
+import '../Services/transaction_service.dart';
+import 'function_runner.dart';
 
 class DatabaseService{
   static final DatabaseService instance = DatabaseService._();
