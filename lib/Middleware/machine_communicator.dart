@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:math'; // Remove once Nayax scanning is implemented
+import 'package:flutter/foundation.dart'; // for debugPrint
 
 class MachineCommunicator {
   final Dio _dio = Dio(
@@ -11,6 +13,7 @@ class MachineCommunicator {
   );
 
   Future<bool> wakeDevice(String deviceId) async {
+    debugPrint("Waking Device");
     try {
       final response = await _dio.post(
         '/wakeDevice',
@@ -22,6 +25,7 @@ class MachineCommunicator {
       );
 
       final data = response.data;
+      print(response.toString() + "Hello world");
       return data['success'] == true && data['status'] == 'authorized';
     } catch (e) {
       return false;
@@ -30,9 +34,9 @@ class MachineCommunicator {
 
   Future<String> pingMachine(String machineID) async {
     try {
-      final response = await _dio.get(
-        '/pingMachine',
-        queryParameters: {'machineID': machineID},
+      final response = await _dio.post(
+        '/wakeDevice',
+        data: {'deviceId': machineID},
         options: Options(headers: {
           'Authorization': 'Bearer ${dotenv.env['ANON_KEY']}',
           'Content-Type': 'application/json',
@@ -40,19 +44,15 @@ class MachineCommunicator {
       );
 
       final data = response.data;
-      if (data['success'] == true && data['status'] == 'available') {
-        return "true";
-      } else {
-        return "machine not available right now, come back later";
+      if(data['success'] == true && data['status'] == 'authorized')
+        {
+          return "true";
+        }
+      else{
+        return "Machine unavalible";
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        return "Took too long to get a response";
-      }
-      return "machine not available right now, come back later";
     } catch (e) {
-      return "machine not available right now, come back later";
+      return "Couldnt find machine";
     }
   }
 }

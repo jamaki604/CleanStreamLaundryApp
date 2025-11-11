@@ -105,23 +105,23 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           _scannedCode = barcode.rawValue;
         });
 
-        QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
-        _processNayaxCode(qrScannerController.getNayaxDeviceID());
+        //QrScannerParser qrScanner = QrScannerParser(_scannedCode!);
+        _processNayaxCode("1");
         break;
       }
     }
   }
 
-  Future<void> _processNayaxCode(String? code) async {
+  Future<void> _processNayaxCode(String code) async {
     cameraController.stop();
 
     final communicator = MachineCommunicator();
-    final result = await communicator.pingMachine(code!);
-
-    if (result == "true") {
+    final result = await communicator.wakeDevice(code);
+    if (result) {
+      debugPrint("Processing Nayax Code");
       context.go('/paymentPage?machineId=$code');
     } else {
-      _showError(result);
+      _showError("Didnt work");
       cameraController.start();
     }
   }
