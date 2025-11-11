@@ -1,11 +1,13 @@
 import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/payment_processor.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get_it/get_it.dart';
 
 class StripeService implements PaymentProcessor{
   StripeService._();
   static final StripeService instance = StripeService._();
+  final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
   Future<int> makePayment(double amount) async {
     try{
@@ -31,7 +33,7 @@ class StripeService implements PaymentProcessor{
 
   Future<String?> _createPaymentIntent(double amount, String currency) async {
     try {
-      final response = await DatabaseService.instance.functionRunner.runEdgeFunction(
+      final response = await edgeFunctionService.runEdgeFunction(
           name: 'paymentIntent',
           body: {
             'amount': _calculateAmount(amount),
