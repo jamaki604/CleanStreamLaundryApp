@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 
 class MonthlyTransactionHistory extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
@@ -20,10 +22,26 @@ class MonthlyTransactionHistory extends StatelessWidget {
 
     return BasePage(
       body: Scaffold(
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () async {
+              final refund = await DatabaseService.instance.getRefundForUser();
+              context.go('/refund_page', extra: refund);
+            },
+            child: Text("Refund"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ),
+
         appBar: AppBar(
           title: Text(
             'Monthly Transaction History',
-            style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.fontSecondary,
+            ),
           ),
           elevation: 2,
         ),
@@ -33,8 +51,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
           itemBuilder: (context, index) {
             final month = sortedMonths[index];
             final data = monthlySums[month]!;
-            final total =
-                data['washer']! + data['dryer']!;
+            final total = data['washer']! + data['dryer']!;
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
               elevation: 2,

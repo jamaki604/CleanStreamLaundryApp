@@ -7,20 +7,14 @@ class DatabaseService {
 
   final SupabaseClient _client = Supabase.instance.client;
 
-
   Future<void> createAccount({required String name}) async {
     final user = _client.auth.currentUser;
     if (user == null) {
       return;
     }
 
-    await _client.from('profiles').insert({
-      'id': user.id,
-      'full_name': name,
-    });
-
+    await _client.from('profiles').insert({'id': user.id, 'full_name': name});
   }
-
 
   Future<void> recordTransaction({
     required double amount,
@@ -38,7 +32,19 @@ class DatabaseService {
       'description': description,
       'type': type,
     });
+  }
 
+  Future<List<Map<String, dynamic>>> getRefundForUser() async {
+    final refund = _client.auth.currentUser;
+    if (refund == null) return [];
+
+    final response = await _client
+        .from('Refunds')
+        .select('refund_id, transaction_id, description, created_at')
+        .eq('user_id', refund.id)
+        .order('created_at', ascending: false);
+
+    return List<Map<String, dynamic>>.from(response);
   }
 
   Future<List<Map<String, dynamic>>> getTransactionsForUser() async {
@@ -70,7 +76,6 @@ class DatabaseService {
   }
 
   Future<Map<String, dynamic>?> getUserBalanceById(String userId) async {
-
     try {
       final response = await _client
           .from('profiles')
@@ -78,7 +83,7 @@ class DatabaseService {
           .eq('id', userId)
           .single();
       return response;
-    } on PostgrestException  {
+    } on PostgrestException {
       return null;
     } catch (e) {
       return null;
@@ -101,7 +106,6 @@ class DatabaseService {
     } catch (e) {
       return;
     }
-
   }
 
   Future<int> getIdleWasherCountByLocation(String locationId) async {
@@ -133,7 +137,7 @@ class DatabaseService {
           .count(CountOption.exact);
 
       return response.count;
-    } on PostgrestException  {
+    } on PostgrestException {
       return 0;
     } catch (e) {
       return 0;
@@ -161,13 +165,13 @@ class DatabaseService {
     try {
       final response = await _client
           .from('Machines')
-          .select('id',)
+          .select('id')
           .eq('Location_ID', locationId)
           .eq('Machine_type', 'Dryer')
           .count(CountOption.exact);
 
       return response.count;
-    } on PostgrestException  {
+    } on PostgrestException {
       return 0;
     } catch (e) {
       return 0;
@@ -176,19 +180,13 @@ class DatabaseService {
 
   Future<List<Map<String, dynamic>>> getLocations() async {
     try {
-      final response = await _client
-          .from('Locations')
-          .select('id, Address');
+      final response = await _client.from('Locations').select('id, Address');
 
       return response;
-    } on PostgrestException  {
+    } on PostgrestException {
       return [];
     } catch (e) {
       return [];
     }
   }
-
-
-
-
 }

@@ -63,8 +63,12 @@ class _SettingsState extends State<Settings> {
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
-                    final transactions = await DatabaseService.instance.getTransactionsForUser();
-                    context.go('/monthlyTransactionHistory', extra: transactions);
+                    final transactions = await DatabaseService.instance
+                        .getTransactionsForUser();
+                    context.go(
+                      '/monthlyTransactionHistory',
+                      extra: transactions,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,

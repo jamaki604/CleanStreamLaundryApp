@@ -2,6 +2,7 @@ import 'package:clean_stream_laundry_app/Pages/email_verification_page.dart';
 import 'package:clean_stream_laundry_app/Pages/home_page.dart';
 import 'package:clean_stream_laundry_app/Pages/loading_page.dart';
 import 'package:clean_stream_laundry_app/Pages/loyalty_card_page.dart';
+import 'package:clean_stream_laundry_app/Pages/refund_page.dart';
 import 'package:clean_stream_laundry_app/Pages/scanner_widget.dart';
 import 'package:clean_stream_laundry_app/Pages/sign_up_screen.dart';
 import 'package:clean_stream_laundry_app/Pages/login_page.dart';
@@ -30,7 +31,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
       path: '/signup',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: SignUpScreen(auth:authenticator),
+        child: SignUpScreen(auth: authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
@@ -46,12 +47,15 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
-    GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
+    GoRoute(
+      path: '/loading',
+      builder: (context, state) => LoadingPage(auth: authenticator),
+    ),
     GoRoute(
       path: '/settings',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: Settings(auth:authenticator),
+        child: Settings(auth: authenticator),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
@@ -122,7 +126,17 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
           transitionsBuilder: (_, _, _, child) => child,
         );
       },
-    )
+    ),
+    GoRoute(
+      path: '/refundPage',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: RefundPage(auth: authenticator),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, _, _, child) => child,
+      ),
+    ),
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),
 );
