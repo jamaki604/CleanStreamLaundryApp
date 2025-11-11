@@ -20,7 +20,7 @@ void main(){
       supabaseAuth = GoTrueMock();
       when(() => client.auth).thenReturn(supabaseAuth);
 
-      authenticator = SupabaseAuthService(client);
+      authenticator = SupabaseAuthService(client: client);
 
       final mockUser = User(
         id: '11111111-1111-1111-1111-111111111111',
