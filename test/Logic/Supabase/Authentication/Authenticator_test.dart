@@ -676,13 +676,13 @@ void main(){
     });
 
     test("Test that correctID is returned",(){
-      final result = authenticator.currentUserId;
+      final result = authenticator.getCurrentUserId;
       expect(result, "11111111-1111-1111-1111-111111111111");
     });
 
     test("Test that null is returned for no user being able to be found",(){
       when(() => supabaseAuth.currentUser).thenReturn(null);
-      final result = authenticator.currentUserId;
+      final result = authenticator.getCurrentUserId;
       expect(result, null);
     });
 

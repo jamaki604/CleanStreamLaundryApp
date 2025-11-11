@@ -5,6 +5,6 @@ abstract class AuthService{
   Future<AuthenticationResponses> signUp(String email, String password);
   Future<void> logout();
   Future<AuthenticationResponses> isLoggedIn();
-  String? get currentUserId;
+  String? get getCurrentUserId;
   Future<AuthenticationResponses> resendVerification();
 }

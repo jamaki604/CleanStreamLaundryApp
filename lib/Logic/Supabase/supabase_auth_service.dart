@@ -11,7 +11,7 @@ class SupabaseAuthService implements AuthService{
   }
 
   @override
-  String? get currentUserId {
+  String? get getCurrentUserId {
     return _client.auth.currentUser?.id;
   }
 

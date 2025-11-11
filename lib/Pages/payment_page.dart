@@ -1,7 +1,10 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
+import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clean_stream_laundry_app/Components/payment_result.dart';
 import 'package:clean_stream_laundry_app/Middleware/machine_communicator.dart';
@@ -22,7 +25,10 @@ class _PaymentPageState extends State<PaymentPage> {
   String? _machineName;
   double? _userBalance;
   bool _isLoading = true;
-  final SupabaseClient _client = Supabase.instance.client;
+
+  final machineService = GetIt.instance<MachineService>();
+  final profileService = GetIt.instance<ProfileService>();
+  final authService = GetIt.instance<AuthService>();
 
   @override
   void initState() {
@@ -32,14 +38,14 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Future<void> _fetchMachineInfo() async {
 
-    final data = await DatabaseService.instance.machineHandler.getMachineById(widget.machineId);
+    final data = await machineService.getMachineById(widget.machineId);
     print(data);
-    final userId = _client.auth.currentUser?.id;
+    final userId = authService.getCurrentUserId;
 
     if (userId == null) {
       return;
     }
-    final balance = await DatabaseService.instance.profileHandler.getUserBalanceById(userId);
+    final balance = await profileService.getUserBalanceById(userId);
 
 
     if (data != null && balance!= null) {
@@ -240,7 +246,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
   void _processLoyaltyPayment(BuildContext context) async {
     final updatedBalance = _userBalance! - _price!;
-    DatabaseService.instance.profileHandler.updateBalanceById(updatedBalance);
+    profileService.updateBalanceById(updatedBalance);
     setState(() {
       _userBalance = updatedBalance;
     });

@@ -33,7 +33,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
       final User? user = event.session?.user;
 
       if(user != null){
-        if(user.id == widget._auth.currentUserId) {
+        if(user.id == widget._auth.getCurrentUserId) {
           if (user.emailConfirmedAt != null) {
             context.go("/scanner");
           }
