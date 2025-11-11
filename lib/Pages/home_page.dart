@@ -1,8 +1,10 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Components/large_button.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +18,9 @@ class HomePageState extends State<HomePage> {
   late final Map<String,int> locationID = {};
   bool locationSelected = false;
   late int? locationIDSelected;
+  final machineService = GetIt.instance<MachineService>();
+  final locationService = GetIt.instance<LocationService>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +45,7 @@ class HomePageState extends State<HomePage> {
                     SizedBox(width: 8),
                     Expanded(
                       child: FutureBuilder(
-                        future: Future.wait([DatabaseService.instance.locationHandler.getLocations()]),
+                        future: Future.wait([locationService.getLocations()]),
                         builder: (context, snapshot) {
 
                           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -93,8 +98,8 @@ class HomePageState extends State<HomePage> {
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
-                    DatabaseService.instance.machineHandler.getWasherCountByLocation(locationIDSelected.toString()),
-                    DatabaseService.instance.machineHandler.getIdleWasherCountByLocation(locationIDSelected.toString())
+                    machineService.getWasherCountByLocation(locationIDSelected.toString()),
+                    machineService.getIdleWasherCountByLocation(locationIDSelected.toString())
                   ]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -116,8 +121,8 @@ class HomePageState extends State<HomePage> {
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
-                    DatabaseService.instance.machineHandler.getDryerCountByLocation(locationIDSelected.toString()),
-                    DatabaseService.instance.machineHandler.getIdleDryerCountByLocation(locationIDSelected.toString())
+                    machineService.getDryerCountByLocation(locationIDSelected.toString()),
+                    machineService.getIdleDryerCountByLocation(locationIDSelected.toString())
                   ]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
