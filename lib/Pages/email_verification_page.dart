@@ -9,9 +9,9 @@ import 'package:app_links/app_links.dart';
 import '../Logic/Theme/theme.dart';
 
 class EmailVerificationPage extends StatefulWidget {
-  late final AuthSystem _auth;
+  late final AuthService _auth;
 
-  EmailVerificationPage({super.key,required AuthSystem auth}){
+  EmailVerificationPage({super.key,required AuthService auth}){
     _auth = auth;
   }
 

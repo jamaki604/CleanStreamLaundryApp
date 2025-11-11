@@ -1,11 +1,11 @@
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ProfileHandler extends ProfileService{
+class SupabaseProfileService extends ProfileService{
 
   late final SupabaseClient _client;
 
-  ProfileHandler({required SupabaseClient client}){
+  SupabaseProfileService({required SupabaseClient client}){
     _client = client;
   }
 

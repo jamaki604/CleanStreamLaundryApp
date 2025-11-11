@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
 
-abstract class AuthSystem{
+abstract class AuthService{
   Future<AuthenticationResponses> login(String email, String password);
   Future<AuthenticationResponses> signUp(String email, String password);
   Future<void> logout();

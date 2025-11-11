@@ -8,13 +8,13 @@ void main() {
   late SupabaseMock supabaseMock;
   late QueryBuilderMock queryBuilderMock;
   late FakeFilterBuilder fakeFilterBuilder;
-  late MachineHandler machineHandler;
+  late SupabaseMachineService machineHandler;
 
   setUp(() {
     supabaseMock = SupabaseMock();
     queryBuilderMock = QueryBuilderMock();
     fakeFilterBuilder = FakeFilterBuilder(5);
-    machineHandler = MachineHandler(client: supabaseMock);
+    machineHandler = SupabaseMachineService(client: supabaseMock);
 
     when(() => supabaseMock.from('Machines')).thenAnswer((_) => queryBuilderMock);
     when(() => queryBuilderMock.select(any())).thenAnswer((_) => fakeFilterBuilder);

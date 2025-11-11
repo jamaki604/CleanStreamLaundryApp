@@ -27,7 +27,7 @@ void main() {
     when(() => queryBuilderMock.select('id, Address'))
         .thenAnswer((_) => FakeFilterBuilder(fakeLocations));
 
-    final locationHandler = LocationHandler(client: supabaseMock);
+    final locationHandler = SupabaseLocationHandler(client: supabaseMock);
 
     final locations = await locationHandler.getLocations();
 
@@ -41,7 +41,7 @@ void main() {
     when(() => queryBuilderMock.select('id, Address'))
         .thenAnswer((_) => FakeFilterBuilder(fakeLocations));
 
-    final locationHandler = LocationHandler(client: supabaseMock);
+    final locationHandler = SupabaseLocationHandler(client: supabaseMock);
 
     final locations = await locationHandler.getLocations();
 
@@ -50,14 +50,14 @@ void main() {
 
   test("Get locations if there is an PosgrestException",() async {
     when(() => supabaseMock.from('Locations')).thenThrow(PostgrestException(message: "Test error"));
-    final locationHandler = LocationHandler(client: supabaseMock);
+    final locationHandler = SupabaseLocationHandler(client: supabaseMock);
     final result = await locationHandler.getLocations();
     expect(result.length, 0);
   });
 
   test("Get locations if there is any other excpetion",() async {
     when(() => supabaseMock.from('Locations')).thenThrow(Exception("Random test exception"));
-    final locationHandler = LocationHandler(client: supabaseMock);
+    final locationHandler = SupabaseLocationHandler(client: supabaseMock);
     final result = await locationHandler.getLocations();
     expect(result.length, 0);
   });

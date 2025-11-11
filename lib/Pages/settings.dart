@@ -7,9 +7,9 @@ import '../Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
-  late final AuthSystem _auth;
+  late final AuthService _auth;
 
-  Settings({super.key,required AuthSystem auth}){
+  Settings({super.key,required AuthService auth}){
     _auth = auth;
   }
 

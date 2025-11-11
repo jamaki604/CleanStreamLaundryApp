@@ -1,11 +1,11 @@
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class FunctionRunner extends EdgeFunction{
+class SupabaseEdgeFunctionService extends EdgeFunctionService{
 
   late final SupabaseClient _client;
 
-  FunctionRunner({required SupabaseClient client}){
+  SupabaseEdgeFunctionService({required SupabaseClient client}){
     _client = client;
   }
 

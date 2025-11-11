@@ -2,11 +2,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Services/machine_service.dart';
 
-class MachineHandler extends MachineService{
+class SupabaseMachineService extends MachineService{
 
   late final SupabaseClient _client;
 
-  MachineHandler({required SupabaseClient client}){
+  SupabaseMachineService({required SupabaseClient client}){
     _client = client;
   }
 

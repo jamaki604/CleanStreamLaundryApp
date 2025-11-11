@@ -21,16 +21,16 @@ class DatabaseService{
   late final MachineService machineHandler;
   late final ProfileService profileHandler;
   late final LocationService locationHandler;
-  late final AuthSystem authenticator;
-  late final EdgeFunction functionRunner;
+  late final AuthService authenticator;
+  late final EdgeFunctionService functionRunner;
 
   DatabaseService._() {
-    transactionHandler = TransactionHandler(client: _client);
-    machineHandler = MachineHandler(client: _client);
-    profileHandler = ProfileHandler(client: _client);
-    locationHandler = LocationHandler(client: _client);
-    authenticator = Authenticator(_client);
-    functionRunner = FunctionRunner(client: _client);
+    transactionHandler = SupabaseTransactionService(client: _client);
+    machineHandler = SupabaseMachineService(client: _client);
+    profileHandler = SupabaseProfileService(client: _client);
+    locationHandler = SupabaseLocationHandler(client: _client);
+    authenticator = SupabaseAuthService(client: _client);
+    functionRunner = SupabaseEdgeFunctionService(client: _client);
   }
 
 }

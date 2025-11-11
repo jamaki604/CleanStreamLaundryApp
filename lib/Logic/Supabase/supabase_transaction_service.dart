@@ -1,11 +1,11 @@
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class TransactionHandler extends TransactionService{
+class SupabaseTransactionService extends TransactionService{
 
   late final SupabaseClient _client;
 
-  TransactionHandler({required SupabaseClient client}){
+  SupabaseTransactionService({required SupabaseClient client}){
     _client = client;
   }
 

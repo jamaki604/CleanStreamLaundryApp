@@ -13,12 +13,12 @@ class RootApp extends StatefulWidget {
 }
 
 class _RootAppState extends State<RootApp> {
-  late final AuthSystem _authenticator;
+  late final AuthService _authenticator;
 
   @override
   void initState() {
     super.initState();
-    _authenticator = Authenticator(Supabase.instance.client);
+    _authenticator = SupabaseAuthService(Supabase.instance.client);
   }
 
   @override

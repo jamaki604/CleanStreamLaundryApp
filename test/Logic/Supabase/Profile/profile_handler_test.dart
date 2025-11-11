@@ -8,14 +8,14 @@ void main() {
   late SupabaseMock supabaseMock;
   late QueryBuilderMock queryBuilderMock;
   late FakeFilterBuilder fakeFilterBuilder;
-  late ProfileHandler profileHandler;
+  late SupabaseProfileService profileHandler;
   late GoTrueClient supabaseAuth;
 
   setUp(() {
     supabaseMock = SupabaseMock();
     queryBuilderMock = QueryBuilderMock();
     fakeFilterBuilder = FakeFilterBuilder({"full_name": "Nolan Meyer", "balance": 0});
-    profileHandler = ProfileHandler(client: supabaseMock);
+    profileHandler = SupabaseProfileService(client: supabaseMock);
     supabaseAuth = GoTrueMock();
 
     when(() => supabaseMock.from('profiles')).thenAnswer((_) => queryBuilderMock);

@@ -1,11 +1,11 @@
 import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class LocationHandler extends LocationService{
+class SupabaseLocationHandler extends LocationService{
 
   late final SupabaseClient _client;
 
-  LocationHandler({required SupabaseClient client}){
+  SupabaseLocationHandler({required SupabaseClient client}){
     _client = client;
   }
 

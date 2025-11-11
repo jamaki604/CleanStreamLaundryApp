@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
 
-GoRouter createRouter(AuthSystem authenticator) => GoRouter(
+GoRouter createRouter(AuthService authenticator) => GoRouter(
   initialLocation: '/loading',
   routes: [
     GoRoute(

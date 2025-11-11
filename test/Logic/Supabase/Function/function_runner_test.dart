@@ -7,7 +7,7 @@ import 'mocks.dart';
 void main() {
   late SupabaseMock supabaseMock;
   late FunctionsClientMock functionClient;
-  late FunctionRunner functionRunner;
+  late SupabaseEdgeFunctionService functionRunner;
 
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
@@ -16,7 +16,7 @@ void main() {
   setUp(() {
     supabaseMock = SupabaseMock();
     functionClient = FunctionsClientMock();
-    functionRunner = FunctionRunner(client: supabaseMock);
+    functionRunner = SupabaseEdgeFunctionService(client: supabaseMock);
 
     when(() => supabaseMock.functions).thenReturn(functionClient);
 
