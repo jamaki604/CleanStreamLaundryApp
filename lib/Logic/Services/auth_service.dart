@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
 
 abstract class AuthSystem{
   Future<AuthenticationResponses> login(String email, String password);

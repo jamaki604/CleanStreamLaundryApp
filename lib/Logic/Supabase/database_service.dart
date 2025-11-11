@@ -1,17 +1,17 @@
-import 'package:clean_stream_laundry_app/Logic/Services/edgeFunction.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/profile_handler.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/transaction_handler.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_profile_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_transaction_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:core';
 import '../Services/auth_service.dart';
-import 'authenticator.dart';
-import 'location_handler.dart';
+import 'supabase_auth_service.dart';
+import 'supabase_location_service.dart';
 import '../Services/location_service.dart';
-import 'machine_handler.dart';
+import 'supabase_machine_service.dart';
 import '../Services/machine_service.dart';
 import '../Services/profile_service.dart';
 import '../Services/transaction_service.dart';
-import 'function_runner.dart';
+import 'supabase_edge_function_service.dart';
 
 class DatabaseService{
   static final DatabaseService instance = DatabaseService._();
