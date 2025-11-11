@@ -87,7 +87,7 @@ class HomePageState extends State<HomePage> {
                                 "Select Location",
                                 style: TextStyle(
                                   fontSize: 18,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.fontInverted,
                                 ),
                               ),
                               onChanged: (String? newValue) {
