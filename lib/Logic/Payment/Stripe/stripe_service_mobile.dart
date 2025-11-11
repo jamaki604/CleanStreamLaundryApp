@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/payment_processor.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/database_service.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,17 +31,17 @@ class StripeService implements PaymentProcessor{
 
   Future<String?> _createPaymentIntent(double amount, String currency) async {
     try {
-      final response = await Supabase.instance.client.functions.invoke(
-        'paymentIntent',
-        body: {
-          'amount': _calculateAmount(amount),
-          'currency': currency
-        },
+      final response = await DatabaseService.instance.functionRunner.runEdgeFunction(
+          name: 'paymentIntent',
+          body: {
+            'amount': _calculateAmount(amount),
+            'currency': currency
+          }
       );
 
 
-      if (response.data != null && response.data['clientSecret'] != null) {
-        return response.data["clientSecret"];
+      if (response?.data != null && response?.data['clientSecret'] != null) {
+        return response?.data["clientSecret"];
       }
 
       return null;
