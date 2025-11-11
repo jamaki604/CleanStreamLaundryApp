@@ -1,9 +1,9 @@
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:get_it/get_it.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
@@ -23,11 +23,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   String? _userName;
   String? _errorMessage;
   List<String> _recentTransactions = [];
-  final userId = Supabase.instance.client.auth.currentUser?.id;
   bool _showPastTransactions = false;
 
   final profileService = GetIt.instance<ProfileService>();
   final transactionService = GetIt.instance<TransactionService>();
+  final authService = GetIt.instance<AuthService>();
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   Future<void> _fetchBalance() async {
-    final currentUserId = userId;
+    final currentUserId = authService.getCurrentUserId;
 
     if (currentUserId == null) {
       setState(() {
