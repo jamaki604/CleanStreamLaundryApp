@@ -15,8 +15,6 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   final int status = await StripeService.instance.makePayment(amount);
   final transactionService = GetIt.instance<TransactionService>();
 
-  Navigator.of(context).pop();
-
   if(status == 200) {
     if (description != "Machine") {
       showPaymentResult(context,
