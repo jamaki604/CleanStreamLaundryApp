@@ -157,11 +157,11 @@ class _PaymentPageState extends State<PaymentPage> {
                     showDialog(
                       context: context,
                       barrierDismissible: false,
-                      builder: (_) => const Center(child: CircularProgressIndicator()),
+                      builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
                     );
                     final deviceAuthorized = await nayaxCommunicator.wakeDevice(
                         widget.machineId);
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
 
                     if (deviceAuthorized) {
                       showPaymentResult(

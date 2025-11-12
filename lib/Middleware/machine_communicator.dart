@@ -8,6 +8,7 @@ class MachineCommunicator {
   );
 
   Future<bool> wakeDevice(String deviceId) async {
+    print("here");
     try {
       final response = await _dio.post(
         '/wakeDevice',

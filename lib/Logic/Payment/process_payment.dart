@@ -9,11 +9,13 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator())
+      builder: (dialogConrext) => const Center(child: CircularProgressIndicator())
   );
 
   final int status = await StripeService.instance.makePayment(amount);
   final transactionService = GetIt.instance<TransactionService>();
+
+  Navigator.of(context, rootNavigator: true).pop();
 
   if(status == 200) {
     if (description != "Machine") {
