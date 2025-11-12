@@ -2,6 +2,7 @@ import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:get_it/get_it.dart';
@@ -29,6 +30,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final machineService = GetIt.instance<MachineService>();
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
+  final transactionService = GetIt.instance<TransactionService>();
 
   @override
   void initState() {
@@ -253,10 +255,10 @@ class _PaymentPageState extends State<PaymentPage> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
         );
         final deviceAuthorized = await nayaxCommunicator.wakeDevice(widget.machineId);
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
 
         if (deviceAuthorized) {
           showPaymentResult(
@@ -265,7 +267,7 @@ class _PaymentPageState extends State<PaymentPage> {
             message: "Machine $_machineName is now active.",
             isSuccess: true,
           );
-          await processPayment(context, _price!, "Loyalty Payment on ${MachineFormatter.formatMachineType(_machineName.toString())}");
+          await transactionService.recordTransaction(amount: _price!, description: "Loyalty Payment on ${MachineFormatter.formatMachineType(_machineName.toString())}", type: "laundry");
         } else {
           showPaymentResult(
             context,
