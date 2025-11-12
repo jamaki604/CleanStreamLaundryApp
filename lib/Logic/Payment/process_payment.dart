@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/stripe_service.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/Components/payment_result.dart';
+import 'package:get_it/get_it.dart';
 
 
 Future<bool> processPayment(BuildContext context, double amount, description) async {
   showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator())
+      builder: (dialogConrext) => const Center(child: CircularProgressIndicator())
   );
 
   final int status = await StripeService.instance.makePayment(amount);
+  final transactionService = GetIt.instance<TransactionService>();
 
-  Navigator.of(context).pop();
+  Navigator.of(context, rootNavigator: true).pop();
 
   if(status == 200) {
     if (description != "Machine") {
@@ -23,7 +25,7 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
           isSuccess: true
       );
     }
-    DatabaseService.instance.recordTransaction(amount: amount, description: description, type: "Laundry");
+    transactionService.recordTransaction(amount: amount, description: description, type: "Laundry");
     return true;
   } else if (status == 401) {
     showPaymentResult(context,

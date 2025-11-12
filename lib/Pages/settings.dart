@@ -1,16 +1,17 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../Logic/Authentication/auth_system.dart';
+import '../Logic/Services/auth_service.dart';
 import '../Logic/Theme/theme.dart';
 import '../Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:get_it/get_it.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 
 class Settings extends StatefulWidget {
-  late final AuthSystem _auth;
+  late final AuthService _auth;
 
-  Settings({super.key, required AuthSystem auth}) {
+  Settings({super.key,required AuthService auth}){
     _auth = auth;
   }
 
@@ -19,6 +20,8 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  final transactionService = GetIt.instance<TransactionService>();
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
@@ -63,7 +66,7 @@ class _SettingsState extends State<Settings> {
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
-                    final transactions = await DatabaseService.instance.getTransactionsForUser();
+                    final transactions = await transactionService.getTransactionsForUser();
                     context.go('/monthlyTransactionHistory', extra: transactions);
                   },
                   style: ElevatedButton.styleFrom(

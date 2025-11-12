@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';
@@ -7,7 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'mocks.dart';
 
 void main(){
-  late Authenticator authenticator;
+  late SupabaseAuthService authenticator;
   late SupabaseMock client;
   late GoTrueMock supabaseAuth;
 
@@ -18,7 +18,7 @@ void main(){
       supabaseAuth = GoTrueMock();
       when(() => client.auth).thenReturn(supabaseAuth);
 
-      authenticator = Authenticator(client);
+      authenticator = SupabaseAuthService(client: client);
 
       final mockUser = User(
         id: '11111111-1111-1111-1111-111111111111',
@@ -37,6 +37,7 @@ void main(){
       when(() => supabaseAuth.currentUser).thenReturn(mockUser);
 
       when(() => supabaseAuth.refreshSession()).thenAnswer((_) async => AuthResponse());
+      when(() => supabaseAuth.signOut()).thenAnswer((_) async {});
 
     });
 
@@ -129,84 +130,84 @@ void main(){
     test("Sign up test",() async{
 
       when(() => supabaseAuth.signUp(
-        email: any(named: 'email'),
-        password: any(named: 'password'),
+          email: any(named: 'email'),
+          password: any(named: 'password'),
           emailRedirectTo: 'clean-stream://email-verification'
       )).thenAnswer((_) async =>
-      AuthResponse(
-        user: const User(
-          id: '11111111-1111-1111-1111-111111111111',
-          aud: 'authenticated',
-          role: 'authenticated',
-          email: 'example@email.com',
-          emailConfirmedAt: '2024-01-01T00:00:00Z',
-          phone: '',
-          lastSignInAt: '2024-01-01T00:00:00Z',
-          appMetadata: {
-            'provider': 'email',
-            'providers': ['email']
-          },
-          userMetadata: {},
-          identities: [
-            UserIdentity(
-              identityId: '22222222-2222-2222-2222-222222222222',
+          AuthResponse(
+            user: const User(
               id: '11111111-1111-1111-1111-111111111111',
-              userId: '11111111-1111-1111-1111-111111111111',
-              identityData: {
-                'email': 'example@email.com',
-                'email_verified': false,
-                'phone_verified': false,
-                'sub': '11111111-1111-1111-1111-111111111111'
-              },
-              provider: 'email',
+              aud: 'authenticated',
+              role: 'authenticated',
+              email: 'example@email.com',
+              emailConfirmedAt: '2024-01-01T00:00:00Z',
+              phone: '',
               lastSignInAt: '2024-01-01T00:00:00Z',
+              appMetadata: {
+                'provider': 'email',
+                'providers': ['email']
+              },
+              userMetadata: {},
+              identities: [
+                UserIdentity(
+                  identityId: '22222222-2222-2222-2222-222222222222',
+                  id: '11111111-1111-1111-1111-111111111111',
+                  userId: '11111111-1111-1111-1111-111111111111',
+                  identityData: {
+                    'email': 'example@email.com',
+                    'email_verified': false,
+                    'phone_verified': false,
+                    'sub': '11111111-1111-1111-1111-111111111111'
+                  },
+                  provider: 'email',
+                  lastSignInAt: '2024-01-01T00:00:00Z',
+                  createdAt: '2024-01-01T00:00:00Z',
+                  updatedAt: '2024-01-01T00:00:00Z',
+                ),
+              ],
               createdAt: '2024-01-01T00:00:00Z',
               updatedAt: '2024-01-01T00:00:00Z',
             ),
-          ],
-          createdAt: '2024-01-01T00:00:00Z',
-          updatedAt: '2024-01-01T00:00:00Z',
-        ),
-        session: Session(
-          accessToken: '<ACCESS_TOKEN>',
-          tokenType: 'bearer',
-          expiresIn: 3600,
-          refreshToken: '<REFRESH_TOKEN>',
-          user: const User(
-            id: '11111111-1111-1111-1111-111111111111',
-            aud: 'authenticated',
-            role: 'authenticated',
-            email: 'example@email.com',
-            emailConfirmedAt: '2024-01-01T00:00:00Z',
-            phone: '',
-            lastSignInAt: '2024-01-01T00:00:00Z',
-            appMetadata: {
-              'provider': 'email',
-              'providers': ['email']
-            },
-            userMetadata: {},
-            identities: [
-              UserIdentity(
-                identityId: '22222222-2222-2222-2222-222222222222',
+            session: Session(
+              accessToken: '<ACCESS_TOKEN>',
+              tokenType: 'bearer',
+              expiresIn: 3600,
+              refreshToken: '<REFRESH_TOKEN>',
+              user: const User(
                 id: '11111111-1111-1111-1111-111111111111',
-                userId: '11111111-1111-1111-1111-111111111111',
-                identityData: {
-                  'email': 'example@email.com',
-                  'email_verified': false,
-                  'phone_verified': false,
-                  'sub': '11111111-1111-1111-1111-111111111111'
-                },
-                provider: 'email',
+                aud: 'authenticated',
+                role: 'authenticated',
+                email: 'example@email.com',
+                emailConfirmedAt: '2024-01-01T00:00:00Z',
+                phone: '',
                 lastSignInAt: '2024-01-01T00:00:00Z',
+                appMetadata: {
+                  'provider': 'email',
+                  'providers': ['email']
+                },
+                userMetadata: {},
+                identities: [
+                  UserIdentity(
+                    identityId: '22222222-2222-2222-2222-222222222222',
+                    id: '11111111-1111-1111-1111-111111111111',
+                    userId: '11111111-1111-1111-1111-111111111111',
+                    identityData: {
+                      'email': 'example@email.com',
+                      'email_verified': false,
+                      'phone_verified': false,
+                      'sub': '11111111-1111-1111-1111-111111111111'
+                    },
+                    provider: 'email',
+                    lastSignInAt: '2024-01-01T00:00:00Z',
+                    createdAt: '2024-01-01T00:00:00Z',
+                    updatedAt: '2024-01-01T00:00:00Z',
+                  )
+                ],
                 createdAt: '2024-01-01T00:00:00Z',
                 updatedAt: '2024-01-01T00:00:00Z',
-              )
-            ],
-            createdAt: '2024-01-01T00:00:00Z',
-            updatedAt: '2024-01-01T00:00:00Z',
+              ),
+            ),
           ),
-        ),
-      ),
       );
 
       final response = await authenticator.signUp("testemail", "testpassword123G@");
@@ -593,12 +594,12 @@ void main(){
 
       expect(response,AuthenticationResponses.emailNotVerified);
     });
-    
+
     test("Resend verfication email unsuccesfully",() async{
-      
+
       when(() => supabaseAuth.resend(
-        type: OtpType.signup,
-        email: any(named:"email")
+          type: OtpType.signup,
+          email: any(named:"email")
       )).thenThrow(AuthException("Invalid email"));
 
       final response = await authenticator.resendVerification();
@@ -629,6 +630,58 @@ void main(){
 
       final response = await authenticator.isLoggedIn();
       expect(response,AuthenticationResponses.failure);
+    });
+
+    test("Verifying that the logged out logic was called",() async {
+      await authenticator.logout();
+      verify(() => client.auth.signOut());
+    });
+
+    test("Should return that an email is not verified",() async{
+      when(() => supabaseAuth.signInWithPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      )).thenThrow(AuthApiException(
+        'Email not verified',
+        code: 'email_not_confirmed',
+      ));
+
+      final result = await authenticator.login("testEmail","testPassword");
+      expect(result, AuthenticationResponses.emailNotVerified);
+    });
+
+    test("Test if an exception is thrown with a different code",() async{
+      when(() => supabaseAuth.signInWithPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      )).thenThrow(AuthApiException(
+        'Email not verified',
+        code: 'random-test-code',
+      ));
+
+      final result = await authenticator.login("testEmail","testPassword");
+      expect(result, AuthenticationResponses.failure);
+    });
+
+    test("Test if an exception is thrown with an unkown exception",() async{
+      when(() => supabaseAuth.signInWithPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      )).thenThrow(Exception("Unkown exception"));
+
+      final result = await authenticator.login("testEmail","testPassword");
+      expect(result, AuthenticationResponses.failure);
+    });
+
+    test("Test that correctID is returned",(){
+      final result = authenticator.getCurrentUserId;
+      expect(result, "11111111-1111-1111-1111-111111111111");
+    });
+
+    test("Test that null is returned for no user being able to be found",(){
+      when(() => supabaseAuth.currentUser).thenReturn(null);
+      final result = authenticator.getCurrentUserId;
+      expect(result, null);
     });
 
   });

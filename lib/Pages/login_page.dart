@@ -1,14 +1,10 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
-  late final AuthSystem _auth;
-
-  LoginScreen({super.key,required AuthSystem auth}){
-    _auth = auth;
-  }
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -25,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   var borderColor = Colors.blue;
   var labelColor = Colors.blue;
 
+  final authService = GetIt.instance<AuthService>();
 
 
   @override
@@ -45,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    final authResposne = await widget._auth.login(email, password);
+    final authResposne = await authService.login(email, password);
     if (!mounted) return;
 
     if (authResposne == AuthenticationResponses.success) {
