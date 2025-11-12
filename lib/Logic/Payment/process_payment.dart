@@ -9,7 +9,7 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogConrext) => const Center(child: CircularProgressIndicator())
+      builder: (dialogContext) => const Center(child: CircularProgressIndicator())
   );
 
   final paymentService = GetIt.instance<PaymentService>();
@@ -20,13 +20,11 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   Navigator.of(context, rootNavigator: true).pop();
 
   if(status == 200) {
-    if (description != "Machine") {
-      showPaymentResult(context,
-          title: "Payment Successful!",
-          message: "Thank you! Your payment was processed successfully.",
-          isSuccess: true
-      );
-    }
+    showPaymentResult(context,
+        title: "Payment Successful!",
+        message: "Thank you! Your payment was processed successfully.",
+        isSuccess: true
+    );
     transactionService.recordTransaction(amount: amount, description: description, type: "Laundry");
     return true;
   } else if (status == 401) {
