@@ -2,7 +2,9 @@ import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_edge_function_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_location_service.dart';
@@ -25,7 +27,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: '.env');
-  await _setupStripe();
   await setupDependencies();
   runApp(
     ChangeNotifierProvider(
@@ -35,14 +36,12 @@ void main() async {
   );
 }                                              
 
-Future<void> _setupStripe() async {
-  Stripe.publishableKey = "${dotenv.env['STRIPE_PUBLISHABLE_KEY']}";
-}
 
 Future<void> setupDependencies() async{
   await Supabase.initialize(url: '${dotenv.env['SUPABASE_URL']}', anonKey: '${dotenv.env['ANON_KEY']}');
-
   final supabase = Supabase.instance.client;
+
+  Stripe.publishableKey = "${dotenv.env['STRIPE_PUBLISHABLE_KEY']}";
 
   getIt.registerLazySingleton<TransactionService>(
       () => SupabaseTransactionService(client: supabase)
@@ -66,6 +65,10 @@ Future<void> setupDependencies() async{
 
   getIt.registerLazySingleton<AuthService>(
           () => SupabaseAuthService(client: supabase)
+  );
+
+  getIt.registerLazySingleton<PaymentService>(
+      () => StripeService()
   );
 }
 
