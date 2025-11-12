@@ -42,13 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Authentication API goes here.
     _showMessage('Logging in as $email...');
-    final authResposne = await authService.login(email, password);
+    final authResponse = await authService.login(email, password);
     if (!mounted) return;
 
-    if (authResposne == AuthenticationResponses.success) {
+    if (authResponse == AuthenticationResponses.success) {
       _showMessage('Logged in as $email');
       context.go("/homePage");
-    } else if(authResposne == AuthenticationResponses.emailNotVerified) {
+    } else if(authResponse == AuthenticationResponses.emailNotVerified) {
       context.go("/email-Verification");
     }else{
       _changeColors();

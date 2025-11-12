@@ -141,4 +141,18 @@ class SupabaseAuthService implements AuthService{
 
     return output;
   }
+
+  @override
+  Stream<bool> get onAuthChange {
+    return _client.auth.onAuthStateChange.map((tuple) {
+      final session = tuple.session;
+      return session?. user != null;
+    });
+  }
+
+  @override
+  bool isEmailVerified() {
+    return _client.auth.currentUser?.emailConfirmedAt != null;
+  }
+
 }
