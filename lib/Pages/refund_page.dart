@@ -119,19 +119,21 @@ class _RefundPageState extends State<RefundPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: selectedTransaction != null
-                    ? () async {
-                  _showRefundDialog();
-                  context.go("/homePage");
-                }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+              Center(
+                child: ElevatedButton(
+                  onPressed: selectedTransaction != null
+                      ? () async {
+                    _showRefundDialog();
+                    context.go("/homePage");
+                  }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text("Submit refund"),
                 ),
-                child: Text("Submit refund"),
-              ),
+              )
             ],
           ),
         ),
