@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 

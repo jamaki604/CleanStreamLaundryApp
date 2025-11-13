@@ -89,7 +89,7 @@ class SignUpScreenState extends State<SignUpScreen> {
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
         await profileService.createAccount(name: name);
-        context.go('/email-Verification');
+        context.go('/email-verification');
       }else if(authResponse == AuthenticationResponses.noDigit){
         _changeColorsToRed('Please include a digit');
       }else if(authResponse == AuthenticationResponses.lessThanMinLength){
