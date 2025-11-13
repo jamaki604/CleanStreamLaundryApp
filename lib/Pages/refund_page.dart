@@ -88,7 +88,7 @@ class _RefundPageState extends State<RefundPage> {
                 items: List.generate(recentTransactions.length, (index) {
                   return DropdownMenuItem<int>(
                     value: index,
-                    child: Text(recentTransactions[index]),
+                    child: Text(recentTransactions[index], style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),),
                   );
                 }),
                 onChanged: (int? newIndex) {
@@ -103,19 +103,15 @@ class _RefundPageState extends State<RefundPage> {
                 },
               ),
               SizedBox(height: 20),
-              if (selectedTransaction != null)
-                Text(
-                  'Selected: $selectedTransaction',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.fontSecondary,
-                  ),
-                ),
               TextField(
                 minLines: 3,
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
                 decoration: InputDecoration(
                   hintText: 'Please explain your reason for the refund...',
+                  hintStyle: TextStyle(
+                    color:  Theme.of(context).colorScheme.fontSecondary
+                  ),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -131,6 +127,8 @@ class _RefundPageState extends State<RefundPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
+                    disabledBackgroundColor: Colors.transparent,
+                    disabledForegroundColor: Colors.transparent,
                   ),
                   child: Text("Submit refund"),
                 ),
