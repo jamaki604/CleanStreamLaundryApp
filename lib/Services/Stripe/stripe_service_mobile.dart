@@ -1,26 +1,31 @@
 import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
 
 class StripeService implements PaymentService{
 
-  StripeService();
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
+  late final _stripeInstance;
+
+  StripeService({required Stripe instance}){
+    _stripeInstance = instance;
+  }
 
   Future<int> makePayment(double amount) async {
     try{
-        String? paymentIntentClientSecret = await _createPaymentIntent(amount, "usd");
+        String? paymentIntentClientSecret = await createPaymentIntent(amount, "usd");
         if (paymentIntentClientSecret == null) {
           return 400;
         }
-        await Stripe.instance.initPaymentSheet(
+        await _stripeInstance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: paymentIntentClientSecret,
             merchantDisplayName: "Clean Stream Laundry Solutions",
           ),
         );
-        await Stripe.instance.presentPaymentSheet();
+        await _stripeInstance.presentPaymentSheet();
         return 200;
     } on StripeException {
       return 401;
@@ -30,7 +35,8 @@ class StripeService implements PaymentService{
     }
   }
 
-  Future<String?> _createPaymentIntent(double amount, String currency) async {
+  @protected
+  Future<String?> createPaymentIntent(double amount, String currency) async {
     try {
       final response = await edgeFunctionService.runEdgeFunction(
           name: 'paymentIntent',
