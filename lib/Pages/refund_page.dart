@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Components/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
@@ -142,22 +143,11 @@ class _RefundPageState extends State<RefundPage> {
   }
 
   void _showRefundDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Text('Your refund request has been submitted'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
+    statusDialog(
+      context,
+      title: "Success",
+      message: 'Your refund request has been submitted',
+      isSuccess: true,
     );
   }
 }
