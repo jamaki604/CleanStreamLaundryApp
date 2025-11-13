@@ -83,7 +83,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       final transactions = await transactionService.getTransactionsForUser();
       final limit = _showPastTransactions ? 100 : 3;
       setState(() {
-        _recentTransactions = TransactionParser.formatTransactionsList(transactions.take(limit));
+        _recentTransactions = TransactionParser.formatTransactionsList(transactions.take(limit),"transactionHistory");
         _recentTransactions.removeWhere((e) => e.isEmpty);
       });
     } catch (e) {
