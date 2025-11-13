@@ -62,7 +62,12 @@ void showPaymentResult(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Done'),
+              child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+              )),
             ),
           ),
         ],
