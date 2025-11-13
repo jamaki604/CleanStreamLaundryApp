@@ -4,7 +4,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Stripe/stripe_service.dart';
+import 'package:clean_stream_laundry_app/Services/Stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
 import 'package:clean_stream_laundry_app/Services/Supabase/supabase_edge_function_service.dart';
 import 'package:clean_stream_laundry_app/Services/Supabase/supabase_location_service.dart';
