@@ -1,12 +1,11 @@
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/payment_processor.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get_it/get_it.dart';
 
-class StripeService implements PaymentProcessor{
-  StripeService._();
-  static final StripeService instance = StripeService._();
+class StripeService implements PaymentService{
+
+  StripeService();
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
   Future<int> makePayment(double amount) async {

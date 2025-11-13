@@ -1,5 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseAuthService implements AuthService{
@@ -141,4 +141,18 @@ class SupabaseAuthService implements AuthService{
 
     return output;
   }
+
+  @override
+  Stream<bool> get onAuthChange {
+    return _client.auth.onAuthStateChange.map((tuple) {
+      final session = tuple.session;
+      return session?. user != null;
+    });
+  }
+
+  @override
+  bool isEmailVerified() {
+    return _client.auth.currentUser?.emailConfirmedAt != null;
+  }
+
 }

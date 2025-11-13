@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';

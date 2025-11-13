@@ -3,7 +3,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import '../Logic/Theme/theme.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -89,7 +89,7 @@ class SignUpScreenState extends State<SignUpScreen> {
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
         await profileService.createAccount(name: name);
-        context.go('/email-Verification');
+        context.go('/email-verification');
       }else if(authResponse == AuthenticationResponses.noDigit){
         _changeColorsToRed('Please include a digit');
       }else if(authResponse == AuthenticationResponses.lessThanMinLength){

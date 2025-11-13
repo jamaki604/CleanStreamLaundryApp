@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/Components/payment_result.dart';
-import 'package:clean_stream_laundry_app/Middleware/machine_communicator.dart';
 import 'package:clean_stream_laundry_app/Logic/Parser/machine_formatter.dart';
 import '../Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
@@ -31,6 +31,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
   final transactionService = GetIt.instance<TransactionService>();
+  final machineCommunicator = GetIt.instance<MachineCommunicationService>();
 
   @override
   void initState() {
@@ -41,7 +42,6 @@ class _PaymentPageState extends State<PaymentPage> {
   Future<void> _fetchMachineInfo() async {
 
     final data = await machineService.getMachineById(widget.machineId);
-    print(data);
     final userId = authService.getCurrentUserId;
 
     if (userId == null) {
@@ -154,13 +154,13 @@ class _PaymentPageState extends State<PaymentPage> {
                   final success = await processPayment(context, _price!, MachineFormatter.formatMachineType(_machineName.toString()));
 
                   if (success) {
-                    final nayaxCommunicator = MachineCommunicator();
+
                     showDialog(
                       context: context,
                       barrierDismissible: false,
                       builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
                     );
-                    final deviceAuthorized = await nayaxCommunicator.wakeDevice(
+                    final deviceAuthorized = await machineCommunicator.wakeDevice(
                         widget.machineId);
                     Navigator.of(context, rootNavigator: true).pop();
 
@@ -251,13 +251,12 @@ class _PaymentPageState extends State<PaymentPage> {
     setState(() {
       _userBalance = updatedBalance;
     });
-        final nayaxCommunicator = MachineCommunicator();
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
         );
-        final deviceAuthorized = await nayaxCommunicator.wakeDevice(widget.machineId);
+        final deviceAuthorized = await machineCommunicator.wakeDevice(widget.machineId);
         Navigator.of(context, rootNavigator: true).pop();
 
         if (deviceAuthorized) {

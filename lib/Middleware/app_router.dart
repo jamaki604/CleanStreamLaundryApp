@@ -84,7 +84,7 @@ GoRouter createRouter(AuthService authenticator) => GoRouter(
       path: '/email-verification',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: EmailVerificationPage(auth: authenticator),
+        child: EmailVerificationPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
