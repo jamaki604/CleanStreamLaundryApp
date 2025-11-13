@@ -5,11 +5,11 @@ import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Stripe/stripe_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_auth_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_edge_function_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_location_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_machine_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_profile_service.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_edge_function_service.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_location_service.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_machine_service.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Pages/root_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,7 +19,7 @@ import 'package:get_it/get_it.dart';
 import 'Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Supabase/supabase_transaction_service.dart';
+import 'package:clean_stream_laundry_app/Services/Supabase/supabase_transaction_service.dart';
 
 final getIt = GetIt.instance;
 

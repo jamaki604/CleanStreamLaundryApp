@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../Services/machine_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 
 class SupabaseMachineService extends MachineService{
 
