@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
 import 'package:clean_stream_laundry_app/Pages/monthly_transaction_history.dart';
+import 'package:clean_stream_laundry_app/Pages/refund_page.dart';
 
 GoRouter createRouter(AuthService authenticator) => GoRouter(
   initialLocation: '/loading',
@@ -122,6 +123,16 @@ GoRouter createRouter(AuthService authenticator) => GoRouter(
           transitionsBuilder: (_, _, _, child) => child,
         );
       },
+    ),
+    GoRoute(
+      path: '/refundPage',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: RefundPage(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        transitionsBuilder: (_, _, _, child) => child,
+      ),
     )
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),

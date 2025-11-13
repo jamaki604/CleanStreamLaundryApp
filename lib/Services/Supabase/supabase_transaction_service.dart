@@ -16,7 +16,7 @@ class SupabaseTransactionService extends TransactionService{
 
     final response = await _client
         .from('transactions')
-        .select('amount, description, created_at')
+        .select('id, amount, description, created_at')
         .eq('user_id', user.id)
         .order('created_at', ascending: false);
 

@@ -1,35 +1,50 @@
 import 'package:intl/intl.dart';
 
 class TransactionParser {
-  static String formatTransaction(Map<String, dynamic> transaction) {
+  static String formatTransaction(Map<String, dynamic> transaction, String type) {
     final amount = (transaction['amount'] as num).toDouble();
     final description = transaction['description'] as String;
     final createdAt = DateTime.parse(transaction['created_at'] as String);
     final formattedDate = DateFormat('MMM dd, yyyy').format(createdAt);
-
     final formattedAmount = '\$${amount.toStringAsFixed(2)}';
     int currentMonth = DateTime.now().month;
+    final twoWeeksAgo = DateTime.now().subtract(Duration(days: 14));
 
-    if (DateFormat('M').format(createdAt) != currentMonth.toString()) {
+    if (DateFormat('M').format(createdAt) != currentMonth.toString() && type == "transactionHistory") {
       return "";
     }
 
-    if (description == "Loyalty Card") {
-      return '$formattedAmount added to $description on $formattedDate';
-    } else {
-      return '$formattedAmount used on $description on $formattedDate';
+    if(createdAt.isBefore(twoWeeksAgo) && type == "refundHistory"){
+      return "";
     }
+    
+    final action = description == "Loyalty Card" ? "added to" : "used on";
+    return '$formattedAmount $action $description on $formattedDate';
   }
 
   static List<String> formatTransactionsList(
-    Iterable<Map<String, dynamic>> data,
+    Iterable<Map<String, dynamic>> data, String type
   ) {
-    return data.map((transaction) => formatTransaction(transaction)).toList();
+    return data.map((transaction) => formatTransaction(transaction, type)).toList();
   }
 
-  static Map<String, Map<String, double>> getMonthlySums(
-    List<Map<String, dynamic>> transactions,
-  ) {
+  static List<int> createTransactionIDList(Iterable<Map<String, dynamic>> data){
+    return data.map((transaction) => getTransactionIDs(transaction)).toList();
+  }
+
+  static int getTransactionIDs(Map<String, dynamic> transaction){
+    final id = (transaction['id'] as num).toInt();
+    final createdAt = DateTime.parse(transaction['created_at'] as String);
+    final twoWeeksAgo = DateTime.now().subtract(Duration(days: 14));
+
+    if(createdAt.isBefore(twoWeeksAgo)){
+      return -1;
+    }else{
+      return id;
+    }
+  }
+
+  static Map<String, Map<String, double>> getMonthlySums(List<Map<String, dynamic>> transactions,) {
     final now = DateTime.now();
     final result = <String, Map<String, double>>{};
     int currentMonth = DateTime.now().month;

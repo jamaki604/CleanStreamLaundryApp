@@ -75,6 +75,17 @@ class _SettingsState extends State<Settings> {
                   ),
                   child: Text("Monthly Report"),
                 ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    context.go('/refundPage');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text("Request Refund"),
+                ),
               ],
             ),
           ),

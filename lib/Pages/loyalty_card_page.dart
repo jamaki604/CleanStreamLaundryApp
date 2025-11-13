@@ -56,7 +56,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       if (data != null) {
         setState(() {
           _userBalance = (data['balance'] as num).toDouble();
-          _userName = (data['full_name']);
+          _userName = (data['full_name'] );
           _isLoading = false;
         });
       } else {
@@ -75,6 +75,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         _showErrorDialog(context, _errorMessage);
       });
     }
+
   }
 
   Future<void> _fetchTransactions() async {
@@ -312,44 +313,43 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               final amountText = amountController.text;
               final amount = double.tryParse(amountText) ?? 0;
 
-              Navigator.of(dialogContext).pop();
+                  Navigator.of(dialogContext).pop();
 
-              if (amount > 0) {
-                bool result = await processPayment(
-                  context,
-                  amount,
-                  "Loyalty Card",
-                );
-                if (result) {
-                  final newBalance = _userBalance! + amount;
-                  profileService.updateBalanceById(newBalance);
-                  setState(() {
-                    _userBalance = newBalance;
-                  });
-                  _fetchTransactions();
-                }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter a valid amount')),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 3,
-            ),
-            child: const Text(
-              'Pay',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
+                  if (amount > 0) {
+                    bool result = await processPayment(context, amount, "Loyalty Card");
+                    if (result) {
+                      final newBalance = _userBalance! + amount;
+                      profileService.updateBalanceById(newBalance);
+                      setState(() {
+                        _userBalance = newBalance;
+                      });
+                      _fetchTransactions();
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please enter a valid amount')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                ),
+                child: const Text(
+                  'Pay',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            ]
+        )
     );
   }
 }
