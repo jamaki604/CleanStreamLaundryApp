@@ -112,13 +112,14 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   }
 
   Future<void> _processNayaxCode(String? code) async {
+    cameraController.stop();
     MachineCommunicator comm = new MachineCommunicator();
-    final result = await comm.pingDevice(code!);
-    if (result) {
+    String result = await comm.pingDevice(code!);
+    if (result == "pass") {
       debugPrint("Processing Nayax Code");
       context.go('/paymentPage?machineId=$code');
     } else {
-      _showError("Didnt work");
+      _showError(result);
       cameraController.start();
     }
   }
@@ -131,7 +132,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Center(
           child: Text(
-            "" + message,
+            "Machine Unavailable",
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -140,10 +141,10 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           ),
         ),
         content: Text(
-          "" + message,
+          message,
           style: TextStyle(
             fontSize: 16,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.fontInverted,
           ),
           textAlign: TextAlign.center,
         ),
