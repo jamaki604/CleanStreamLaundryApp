@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
+import '../Logic/Theme/theme.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -24,9 +27,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return BasePage(
-      body: _buildScannerCamera()
+        body: _buildScannerCamera()
     );
   }
 
@@ -110,7 +112,94 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     }
   }
 
-  void _processNayaxCode(String? code) {
-    context.go('/paymentPage?machineId=$code');
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
+
+
+  Future<bool> pingDevice(String deviceId) async {
+    debugPrint("Pinging Device");
+    try {
+      final response = await _dio.post(
+        '/pingDevice',
+        data: {'deviceId': deviceId},
+        options: Options(headers: {
+          'Authorization': 'Bearer ${dotenv.env['ANON_KEY']}',
+          'Content-Type': 'application/json',
+        }),
+      );
+
+      final data = response.data;
+      print(response.toString() + "Hello world");
+      return data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> _processNayaxCode(String? code) async {
+    final result = await pingDevice(code!);
+    if (result) {
+      debugPrint("Processing Nayax Code");
+      context.go('/paymentPage?machineId=$code');
+    } else {
+      _showError("Didnt work");
+      cameraController.start();
+    }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Center(
+          child: Text(
+            "" + message,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[900],
+            ),
+          ),
+        ),
+        content: Text(
+          "" + message,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+            ),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
