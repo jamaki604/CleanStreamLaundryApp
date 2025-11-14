@@ -115,8 +115,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   Future<void> _processNayaxCode(String code) async {
     cameraController.stop();
 
-    final communicator = MachineCommunicator();
-    final result = await communicator.wakeDevice(code);
+    final comm = MachineCommunicator();
+    final result = await comm.pingDevice(code);
     if (result) {
       debugPrint("Processing Nayax Code");
       context.go('/paymentPage?machineId=$code');
