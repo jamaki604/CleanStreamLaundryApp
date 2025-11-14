@@ -1,34 +1,17 @@
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get_it/get_it.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 
 class SupabaseAvailabilityCheckService {
-  final Dio _dio;
+  final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
-  SupabaseAvailabilityCheckService({Dio? dio})
-      : _dio = dio ??
-      Dio(BaseOptions(
-        baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
-      ));
-
+  SupabaseAvailabilityCheckService();
 
   Future<String> checkAvailability(String deviceId) async {
     try {
-      final response = await _dio.post(
-        '/ping-device',
-        data: {
-          'deviceId': deviceId,
-        },
+      final response = await edgeFunctionService.runEdgeFunction(name: "ping-device", body: {'deviceId': deviceId});
 
-        options: Options(headers: {
-          'Authorization': 'Bearer ${dotenv.env['ANON_KEY']}',
-          'Content-Type': 'application/json',
-        }),
-      );
-
-      final data = response.data;
-      print(response.toString());
+      final data = response?.data;
+      print(data.toString());
 
       if(data['success'] == false){
         return "Could not find that machine, please try again";
@@ -42,9 +25,6 @@ class SupabaseAvailabilityCheckService {
       else{
         return "Machine is offline right now.";
       }
-    } on DioError catch (e) {
-      print("Dio error: ${e.response?.statusCode} ${e.response?.data}");
-      return "Dio Server Error, maybe try again?";
     } catch (e) {
       print("Ping error: $e");
       return "Ping Server Error";
