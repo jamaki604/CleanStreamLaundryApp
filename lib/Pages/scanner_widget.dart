@@ -1,10 +1,11 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
 import '../Logic/Theme/theme.dart';
-import '../Services/Supabase/supabase_check_availability_service.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -16,6 +17,7 @@ class ScannerWidget extends StatefulWidget {
 class _ScannerWidgetState extends State<ScannerWidget> {
 
   final MobileScannerController cameraController = MobileScannerController();
+  final machineCommunicator = GetIt.instance<MachineCommunicationService>();
   String? _scannedCode;
 
   @override
@@ -113,8 +115,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   Future<void> processNayaxCode(String? code) async {
     cameraController.stop();
-    SupabaseAvailabilityCheckService check = new SupabaseAvailabilityCheckService();
-    String result = await check.checkAvailability(code!);
+    String result = await machineCommunicator.checkAvailability(code!);
     if (result == "pass") {
       context.go('/paymentPage?machineId=$code');
     } else {
