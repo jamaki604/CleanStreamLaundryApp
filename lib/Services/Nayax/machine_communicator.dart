@@ -34,7 +34,7 @@ class MachineCommunicator implements MachineCommunicationService {
       print(data.toString());
 
       if(data['success'] == false){
-        return "Could not find that machine, please try again";
+        return "Could not find that machine, please try again.";
       }
       else if(data['success'] == true && data['message'] == "idle"){
         return "pass";
