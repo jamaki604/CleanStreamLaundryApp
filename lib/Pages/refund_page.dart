@@ -85,6 +85,7 @@ class _RefundPageState extends State<RefundPage> {
                   ),
                 ),
                 isExpanded: true,
+                menuMaxHeight: 250,
                 items: List.generate(recentTransactions.length, (index) {
                   return DropdownMenuItem<int>(
                     value: index,
