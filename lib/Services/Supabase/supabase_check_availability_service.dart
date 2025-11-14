@@ -11,7 +11,7 @@ class SupabaseAvailabilityCheckService{
     ),
   );
 
-  Future<String> pingDevice(String deviceId) async {
+  Future<String> checkAvailability(String deviceId) async {
     try {
       final response = await _dio.post(
         '/ping-device',
@@ -35,7 +35,7 @@ class SupabaseAvailabilityCheckService{
         return "pass";
       }
       else if(data['success'] == true && data['message'] == "in-use"){
-        return "Machine is being used right now.";
+        return "Machine is in use right now.";
       }
       else{
         return "Machine is offline right now.";

@@ -114,7 +114,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
   Future<void> processNayaxCode(String? code) async {
     cameraController.stop();
     SupabaseAvailabilityCheckService check = new SupabaseAvailabilityCheckService();
-    String result = await check.pingDevice(code!);
+    String result = await check.checkAvailability(code!);
     if (result == "pass") {
       context.go('/paymentPage?machineId=$code');
     } else {
