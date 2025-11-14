@@ -41,7 +41,7 @@ class StripeService implements PaymentService{
       final response = await edgeFunctionService.runEdgeFunction(
           name: 'paymentIntent',
           body: {
-            'amount': _calculateAmount(amount),
+            'amount': convertDollarsToCents(amount),
             'currency': currency
           }
       );
@@ -58,8 +58,8 @@ class StripeService implements PaymentService{
     }
   }
 
-
-  String _calculateAmount(double amount) {
+  @protected
+  String convertDollarsToCents(double amount) {
     final calculatedAmount = (amount * 100).toInt();
     return calculatedAmount.toString();
   }

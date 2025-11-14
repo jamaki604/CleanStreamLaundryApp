@@ -128,6 +128,11 @@ void main() {
 
       expect(result, null);
     });
+
+    test("Tests that the correct amount is calculated",(){
+      final result = stripeService.convertDollarsToCents(2.75);
+      expect(result, "275");
+    });
     
   });
 }
