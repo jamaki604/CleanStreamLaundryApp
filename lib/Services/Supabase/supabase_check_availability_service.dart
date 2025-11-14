@@ -1,15 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class SupabaseAvailabilityCheckService{
+class SupabaseAvailabilityCheckService {
+  final Dio _dio;
 
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    ),
-  );
+  SupabaseAvailabilityCheckService({Dio? dio})
+      : _dio = dio ??
+      Dio(BaseOptions(
+        baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+      ));
+
 
   Future<String> checkAvailability(String deviceId) async {
     try {
