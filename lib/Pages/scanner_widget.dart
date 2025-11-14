@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
 import '../Logic/Theme/theme.dart';
-import '../Services/Nayax/machine_communicator.dart';
+import '../Services/Supabase/supabase_check_availability_service.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -113,8 +113,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   Future<void> processNayaxCode(String? code) async {
     cameraController.stop();
-    MachineCommunicator comm = new MachineCommunicator();
-    String result = await comm.pingDevice(code!);
+    SupabaseAvailabilityCheckService check = new SupabaseAvailabilityCheckService();
+    String result = await check.pingDevice(code!);
     if (result == "pass") {
       context.go('/paymentPage?machineId=$code');
     } else {
