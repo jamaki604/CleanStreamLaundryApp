@@ -1,11 +1,11 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
 import '../Logic/Theme/theme.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -17,6 +17,7 @@ class ScannerWidget extends StatefulWidget {
 class _ScannerWidgetState extends State<ScannerWidget> {
 
   final MobileScannerController cameraController = MobileScannerController();
+  final machineCommunicator = GetIt.instance<MachineCommunicationService>();
   String? _scannedCode;
 
   @override
@@ -106,53 +107,24 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         });
 
         QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
-        _processNayaxCode(qrScannerController.getNayaxDeviceID());
+        processNayaxCode(qrScannerController.getNayaxDeviceID());
         break;
       }
     }
   }
 
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    ),
-  );
-
-
-  Future<bool> pingDevice(String deviceId) async {
-    debugPrint("Pinging Device");
-    try {
-      final response = await _dio.post(
-        '/pingDevice',
-        data: {'deviceId': deviceId},
-        options: Options(headers: {
-          'Authorization': 'Bearer ${dotenv.env['ANON_KEY']}',
-          'Content-Type': 'application/json',
-        }),
-      );
-
-      final data = response.data;
-      print(response.toString() + "Hello world");
-      return data['success'] == true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<void> _processNayaxCode(String? code) async {
-    final result = await pingDevice(code!);
-    if (result) {
-      debugPrint("Processing Nayax Code");
+  Future<void> processNayaxCode(String? code) async {
+    cameraController.stop();
+    String result = await machineCommunicator.checkAvailability(code!);
+    if (result == "pass") {
       context.go('/paymentPage?machineId=$code');
     } else {
-      _showError("Didnt work");
+      showError(result);
       cameraController.start();
     }
   }
 
-  void _showError(String message) {
+  void showError(String message) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
@@ -160,7 +132,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Center(
           child: Text(
-            "" + message,
+            "Machine Unavailable",
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -169,10 +141,10 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           ),
         ),
         content: Text(
-          "" + message,
+          message,
           style: TextStyle(
             fontSize: 16,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.fontInverted,
           ),
           textAlign: TextAlign.center,
         ),
