@@ -9,7 +9,7 @@ void showPaymentResult(
     }){
   showDialog(
     context: context,
-    builder: (_) => AlertDialog(
+    builder: (dialogContext) => AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -51,10 +51,9 @@ void showPaymentResult(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
+                Navigator.of(dialogContext).pop();
                 if(isSuccess) {
-                  context.go("/scanner");
-                }else{
-                  Navigator.of(context).pop();
+                  context.go("/homePage");
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -63,7 +62,12 @@ void showPaymentResult(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Done'),
+              child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+              )),
             ),
           ),
         ],

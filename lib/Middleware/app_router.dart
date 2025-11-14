@@ -9,17 +9,18 @@ import 'package:clean_stream_laundry_app/Pages/not_found_page.dart';
 import 'package:clean_stream_laundry_app/Pages/settings.dart';
 import 'package:clean_stream_laundry_app/Pages/start_machine_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
+import 'package:clean_stream_laundry_app/Pages/monthly_transaction_history.dart';
 
-GoRouter createRouter(AuthSystem authenticator) => GoRouter(
+GoRouter createRouter(AuthService authenticator) => GoRouter(
   initialLocation: '/loading',
   routes: [
     GoRoute(
       path: '/login',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: LoginScreen(auth: authenticator),
+        child: LoginScreen(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
@@ -29,7 +30,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
       path: '/signup',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: SignUpScreen(auth:authenticator),
+        child: SignUpScreen(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
@@ -45,7 +46,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         transitionsBuilder: (_, _, _, child) => child,
       ),
     ),
-    GoRoute(path: '/loading', builder: (context, state)  => LoadingPage(auth:authenticator)),
+    GoRoute(path: '/loading', builder: (context, state)  => LoadingPage()),
     GoRoute(
       path: '/settings',
       pageBuilder: (context, state) => CustomTransitionPage(
@@ -83,7 +84,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
       path: '/email-verification',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: EmailVerificationPage(auth: authenticator),
+        child: EmailVerificationPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
@@ -108,6 +109,19 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
       ),
+    ),
+    GoRoute(
+      path: '/monthlyTransactionHistory',
+      pageBuilder: (context, state) {
+        final transactions = state.extra as List<Map<String, dynamic>>? ?? [];
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: MonthlyTransactionHistory(transactions: transactions),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        );
+      },
     )
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),

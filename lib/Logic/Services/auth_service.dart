@@ -1,10 +1,12 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 
-abstract class AuthSystem{
+abstract class AuthService{
   Future<AuthenticationResponses> login(String email, String password);
   Future<AuthenticationResponses> signUp(String email, String password);
   Future<void> logout();
   Future<AuthenticationResponses> isLoggedIn();
-  String? get currentUserId;
+  String? get getCurrentUserId;
   Future<AuthenticationResponses> resendVerification();
+  Stream<bool> get onAuthChange;
+  bool isEmailVerified();
 }

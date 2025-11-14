@@ -10,6 +10,7 @@ class NavBar extends StatelessWidget {
     if (location.startsWith('/start')) return 1;
     if (location.startsWith('/loyalty')) return 2;
     if (location.startsWith('/settings')) return 3;
+    if (location.startsWith('/monthlyTransactionHistory')) return 3;
     return 0;
   }
 

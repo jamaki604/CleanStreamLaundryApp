@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
 import '../Logic/Theme/theme.dart';
-import '../Middleware/machine_communicator.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -26,9 +27,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return BasePage(
-      body: _buildScannerCamera()
+        body: _buildScannerCamera()
     );
   }
 
@@ -105,18 +105,44 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           _scannedCode = barcode.rawValue;
         });
 
-        //QrScannerParser qrScanner = QrScannerParser(_scannedCode!);
-        _processNayaxCode("1");
+        QrScannerParser qrScannerController = QrScannerParser(_scannedCode!);
+        _processNayaxCode(qrScannerController.getNayaxDeviceID());
         break;
       }
     }
   }
 
-  Future<void> _processNayaxCode(String code) async {
-    cameraController.stop();
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
 
-    final comm = MachineCommunicator();
-    final result = await comm.pingDevice(code);
+
+  Future<bool> pingDevice(String deviceId) async {
+    debugPrint("Pinging Device");
+    try {
+      final response = await _dio.post(
+        '/pingDevice',
+        data: {'deviceId': deviceId},
+        options: Options(headers: {
+          'Authorization': 'Bearer ${dotenv.env['ANON_KEY']}',
+          'Content-Type': 'application/json',
+        }),
+      );
+
+      final data = response.data;
+      print(response.toString() + "Hello world");
+      return data['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> _processNayaxCode(String? code) async {
+    final result = await pingDevice(code!);
     if (result) {
       debugPrint("Processing Nayax Code");
       context.go('/paymentPage?machineId=$code');
@@ -134,7 +160,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Center(
           child: Text(
-            "Machine Unavailable",
+            "" + message,
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -143,10 +169,10 @@ class _ScannerWidgetState extends State<ScannerWidget> {
           ),
         ),
         content: Text(
-          message,
+          "" + message,
           style: TextStyle(
             fontSize: 16,
-            color: Theme.of(context).colorScheme.fontPrimary,
+            color: Colors.black87,
           ),
           textAlign: TextAlign.center,
         ),

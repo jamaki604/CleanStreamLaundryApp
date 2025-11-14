@@ -1,13 +1,11 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:app_links/app_links.dart';
 
 class LoadingPage extends StatefulWidget {
-  final AuthSystem auth;
-
-  const LoadingPage({super.key, required this.auth});
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();
@@ -15,9 +13,10 @@ class LoadingPage extends StatefulWidget {
 
 class _LoadingPageState extends State<LoadingPage> {
   String? _error;
-
   double begin = 0.95;
   double end = 1.05;
+
+  final authService = GetIt.instance<AuthService>();
 
   @override
   void initState() {
@@ -44,7 +43,7 @@ class _LoadingPageState extends State<LoadingPage> {
     await Future.delayed(Duration.zero);
 
     try {
-      if (await widget.auth.isLoggedIn() == AuthenticationResponses.success) {
+      if (await authService.isLoggedIn() == AuthenticationResponses.success) {
         if (!mounted) return;
         context.go("/homePage");
       } else {

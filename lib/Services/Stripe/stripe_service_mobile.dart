@@ -1,10 +1,12 @@
-import 'package:clean_stream_laundry_app/Logic/Payment/Stripe/payment_processor.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get_it/get_it.dart';
 
-class StripeService implements PaymentProcessor{
-  StripeService._();
-  static final StripeService instance = StripeService._();
+class StripeService implements PaymentService{
+
+  StripeService();
+  final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
   Future<int> makePayment(double amount) async {
     try{
@@ -30,17 +32,17 @@ class StripeService implements PaymentProcessor{
 
   Future<String?> _createPaymentIntent(double amount, String currency) async {
     try {
-      final response = await Supabase.instance.client.functions.invoke(
-        'paymentIntent',
-        body: {
-          'amount': _calculateAmount(amount),
-          'currency': currency
-        },
+      final response = await edgeFunctionService.runEdgeFunction(
+          name: 'paymentIntent',
+          body: {
+            'amount': _calculateAmount(amount),
+            'currency': currency
+          }
       );
 
 
-      if (response.data != null && response.data['clientSecret'] != null) {
-        return response.data["clientSecret"];
+      if (response?.data != null && response?.data['clientSecret'] != null) {
+        return response?.data["clientSecret"];
       }
 
       return null;

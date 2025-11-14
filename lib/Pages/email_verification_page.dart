@@ -1,43 +1,38 @@
 import 'dart:async';
-
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:app_links/app_links.dart';
 import '../Logic/Theme/theme.dart';
 
 class EmailVerificationPage extends StatefulWidget {
-  late final AuthSystem _auth;
 
-  EmailVerificationPage({super.key,required AuthSystem auth}){
-    _auth = auth;
+
+  EmailVerificationPage({super.key}){
+
   }
+
 
   @override
   State<EmailVerificationPage> createState() => _EmailVerificationPageState();
 }
 
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
-  late final StreamSubscription? _authSubscription;
   late final StreamSubscription? _linkSub;
   final AppLinks _appLinks = AppLinks();
+  final authService = GetIt.instance<AuthService>();
+
 
   @override
   void initState() {
     super.initState();
 
     //Checks for if application has been updated
-    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((event) {
-      final User? user = event.session?.user;
-
-      if(user != null){
-        if(user.id == widget._auth.currentUserId) {
-          if (user.emailConfirmedAt != null) {
-            context.go("/scanner");
-          }
-        }
+    authService.onAuthChange.listen((isLoggedIn) {
+      if (isLoggedIn && authService.isEmailVerified()) {
+        context.go("/scanner");
       }
     });
 
@@ -54,7 +49,6 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
   @override
   void dispose() {
-    _authSubscription?.cancel();
     _linkSub?.cancel();
     super.dispose();
   }
@@ -100,7 +94,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                 onTap: () async {
                   if(resent == false) {
 
-                    final result = await widget._auth.resendVerification();
+                    final result = await authService.resendVerification();
 
                     setState(() {
                       if(result == AuthenticationResponses.success) {

@@ -264,6 +264,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.4"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      sha256: "5089fa71031d00d5bdae3ff52cf32640612c7b1dbe158d2306ef487d2d827f64"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.0.2"
   glob:
     dependency: transitive
     description:

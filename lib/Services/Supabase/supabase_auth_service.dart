@@ -1,15 +1,17 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class Authenticator implements AuthSystem{
+class SupabaseAuthService implements AuthService{
 
-  final SupabaseClient _client;
+  late final SupabaseClient _client;
 
-  Authenticator(this._client);
+  SupabaseAuthService({required SupabaseClient client}){
+    _client = client;
+  }
 
   @override
-  String? get currentUserId {
+  String? get getCurrentUserId {
     return _client.auth.currentUser?.id;
   }
 
@@ -139,4 +141,18 @@ class Authenticator implements AuthSystem{
 
     return output;
   }
+
+  @override
+  Stream<bool> get onAuthChange {
+    return _client.auth.onAuthStateChange.map((tuple) {
+      final session = tuple.session;
+      return session?. user != null;
+    });
+  }
+
+  @override
+  bool isEmailVerified() {
+    return _client.auth.currentUser?.emailConfirmedAt != null;
+  }
+
 }

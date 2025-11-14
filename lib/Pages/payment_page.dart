@@ -1,11 +1,15 @@
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/Components/payment_result.dart';
-import 'package:clean_stream_laundry_app/Middleware/machine_communicator.dart';
+import 'package:clean_stream_laundry_app/Logic/Parser/machine_formatter.dart';
 import '../Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
@@ -22,7 +26,12 @@ class _PaymentPageState extends State<PaymentPage> {
   String? _machineName;
   double? _userBalance;
   bool _isLoading = true;
-  final SupabaseClient _client = Supabase.instance.client;
+
+  final machineService = GetIt.instance<MachineService>();
+  final profileService = GetIt.instance<ProfileService>();
+  final authService = GetIt.instance<AuthService>();
+  final transactionService = GetIt.instance<TransactionService>();
+  final machineCommunicator = GetIt.instance<MachineCommunicationService>();
 
   @override
   void initState() {
@@ -32,13 +41,13 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Future<void> _fetchMachineInfo() async {
 
-    final data = await DatabaseService.instance.getMachineById(widget.machineId);
-    final userId = _client.auth.currentUser?.id;
+    final data = await machineService.getMachineById(widget.machineId);
+    final userId = authService.getCurrentUserId;
 
     if (userId == null) {
       return;
     }
-    final balance = await DatabaseService.instance.getUserBalanceById(userId);
+    final balance = await profileService.getUserBalanceById(userId);
 
 
     if (data != null && balance!= null) {
@@ -98,7 +107,6 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  // Amount due card
   Widget _buildAmountCard() {
     return Container(
       padding: const EdgeInsets.all(30),
@@ -143,18 +151,18 @@ class _PaymentPageState extends State<PaymentPage> {
             onPressed: (_isConfirmed || _price == null || _price == 0)
                 ? null
                 : () async {
-                  final success = await processPayment(context, _price!, "Machine");
+                  final success = await processPayment(context, _price!, MachineFormatter.formatMachineType(_machineName.toString()));
 
                   if (success) {
-                    final nayaxCommunicator = MachineCommunicator();
+
                     showDialog(
                       context: context,
                       barrierDismissible: false,
-                      builder: (_) => const Center(child: CircularProgressIndicator()),
+                      builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
                     );
-                    final deviceAuthorized = await nayaxCommunicator.wakeDevice(
+                    final deviceAuthorized = await machineCommunicator.wakeDevice(
                         widget.machineId);
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
 
                     if (deviceAuthorized) {
                       showPaymentResult(
@@ -239,18 +247,17 @@ class _PaymentPageState extends State<PaymentPage> {
 
   void _processLoyaltyPayment(BuildContext context) async {
     final updatedBalance = _userBalance! - _price!;
-    DatabaseService.instance.updateBalanceById(updatedBalance);
+    profileService.updateBalanceById(updatedBalance);
     setState(() {
       _userBalance = updatedBalance;
     });
-        final nayaxCommunicator = MachineCommunicator();
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator()),
+          builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
         );
-        final deviceAuthorized = await nayaxCommunicator.wakeDevice(widget.machineId);
-        Navigator.of(context).pop();
+        final deviceAuthorized = await machineCommunicator.wakeDevice(widget.machineId);
+        Navigator.of(context, rootNavigator: true).pop();
 
         if (deviceAuthorized) {
           showPaymentResult(
@@ -259,6 +266,7 @@ class _PaymentPageState extends State<PaymentPage> {
             message: "Machine $_machineName is now active.",
             isSuccess: true,
           );
+          await transactionService.recordTransaction(amount: _price!, description: "Loyalty Payment on ${MachineFormatter.formatMachineType(_machineName.toString())}", type: "laundry");
         } else {
           showPaymentResult(
             context,

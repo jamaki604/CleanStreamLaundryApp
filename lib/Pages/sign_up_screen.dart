@@ -1,16 +1,12 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authentication_response.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import '../Logic/Theme/theme.dart';
 
 class SignUpScreen extends StatefulWidget {
-  late final AuthSystem _auth;
-
-  SignUpScreen({super.key,required AuthSystem auth}){
-    _auth = auth;
-  }
 
   @override
   SignUpScreenState createState() => SignUpScreenState();
@@ -29,6 +25,8 @@ class SignUpScreenState extends State<SignUpScreen> {
   var borderColor = Colors.blue;
   var labelColor = Colors.blue;
   bool _isLoading = false;
+  final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
 
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -87,11 +85,11 @@ class SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final authResponse = await widget._auth.signUp( email, password);
+      final authResponse = await authService.signUp( email, password);
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
-        await DatabaseService.instance.createAccount(name: name);
-        context.go('/email-Verification');
+        await profileService.createAccount(name: name);
+        context.go('/email-verification');
       }else if(authResponse == AuthenticationResponses.noDigit){
         _changeColorsToRed('Please include a digit');
       }else if(authResponse == AuthenticationResponses.lessThanMinLength){

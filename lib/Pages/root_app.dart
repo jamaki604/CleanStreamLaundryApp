@@ -1,7 +1,6 @@
-import 'package:clean_stream_laundry_app/Logic/Authentication/auth_system.dart';
-import 'package:clean_stream_laundry_app/Logic/Authentication/authenticator.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
 
 class RootApp extends StatefulWidget {
@@ -13,13 +12,7 @@ class RootApp extends StatefulWidget {
 }
 
 class _RootAppState extends State<RootApp> {
-  late final AuthSystem _authenticator;
-
-  @override
-  void initState() {
-    super.initState();
-    _authenticator = Authenticator(Supabase.instance.client);
-  }
+  late final AuthService _authenticator = GetIt.instance<AuthService>();
 
   @override
   Widget build(BuildContext context) {

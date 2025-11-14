@@ -1,11 +1,13 @@
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
-import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
+import 'package:clean_stream_laundry_app/Logic/Parser/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/Components/credit_card.dart';
 
 class LoyaltyPage extends StatefulWidget {
@@ -21,8 +23,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   String? _userName;
   String? _errorMessage;
   List<String> _recentTransactions = [];
-  final userId = Supabase.instance.client.auth.currentUser?.id;
   bool _showPastTransactions = false;
+
+  final profileService = GetIt.instance<ProfileService>();
+  final transactionService = GetIt.instance<TransactionService>();
+  final authService = GetIt.instance<AuthService>();
 
   @override
   void initState() {
@@ -32,7 +37,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   Future<void> _fetchBalance() async {
-    final currentUserId = userId;
+    final currentUserId = authService.getCurrentUserId;
 
     if (currentUserId == null) {
       setState(() {
@@ -46,12 +51,12 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     try {
-      final data = await DatabaseService.instance.getUserBalanceById(currentUserId);
+      final data = await profileService.getUserBalanceById(currentUserId);
 
       if (data != null) {
         setState(() {
           _userBalance = (data['balance'] as num).toDouble();
-          _userName = (data['full_name'] );
+          _userName = (data['full_name']);
           _isLoading = false;
         });
       } else {
@@ -70,15 +75,16 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         _showErrorDialog(context, _errorMessage);
       });
     }
-
   }
 
   Future<void> _fetchTransactions() async {
     try {
-      final transactions = await DatabaseService.instance.getTransactionsForUser();
+      final transactions = await transactionService.getTransactionsForUser();
       final limit = _showPastTransactions ? 100 : 3;
       setState(() {
-        _recentTransactions = TransactionParser.formatTransactionsList(transactions.take(limit));
+        _recentTransactions = TransactionParser.formatTransactionsList(
+          transactions.take(limit),
+        );
         _recentTransactions.removeWhere((e) => e.isEmpty);
       });
     } catch (e) {
@@ -96,230 +102,254 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body:  _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              SizedBox(height:20),
-              CreditCard(username: _userName),
-              SizedBox(height: 50),
-              Text(
-                  'Current Balance: \$${_userBalance?.toStringAsFixed(2)?? '0.00'}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontSecondary,
-                  ),
-                ),
-              SizedBox(height: 25),
-              ElevatedButton(
-                  onPressed: () => _loadCard(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    disabledBackgroundColor: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                  ),
-                  child: Text(
-                    "Load card",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  SizedBox(height: 20),
+                  CreditCard(username: _userName),
+                  SizedBox(height: 50),
+                  Text(
+                    'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.fontSecondary,
                     ),
                   ),
-                ),
-              SizedBox(height: 40),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Transactions',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.fontSecondary,
-                            ),
-                          ),
-                          TextButton.icon(
-                            onPressed: _toggleTransactionView,
-                            icon: Icon(
-                              _showPastTransactions ? Icons.expand_less : Icons.expand_more,
-                              color: Colors.blue,
-                            ),
-                            label: Text(
-                              _showPastTransactions ? 'Show Less' : 'Show More',
-                              style: TextStyle(color: Colors.blue),
-                            ),
-                          ),
-                        ],
+                  SizedBox(height: 25),
+                  ElevatedButton(
+                    onPressed: () => _loadCard(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      disabledBackgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      SizedBox(height: 10),
-                      _recentTransactions.isEmpty
-                          ? Text(
-                        'No recent transactions',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      )
-                          : Column(
-                        children: _recentTransactions.map((transaction) {
-                          return Card(
-                            margin: EdgeInsets.only(bottom: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            elevation: 7,
-                            color: Theme.of(context).colorScheme.cardPrimary,
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.receipt_long,
-                                color: Color(0xFF2073A9),
+                      elevation: 2,
+                    ),
+                    child: Text(
+                      "Load card",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Transactions',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.fontSecondary,
                               ),
-                              title: Text(
-                                transaction.toString(),
+                            ),
+                            TextButton.icon(
+                              onPressed: _toggleTransactionView,
+                              icon: Icon(
+                                _showPastTransactions
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: Colors.blue,
+                              ),
+                              label: Text(
+                                _showPastTransactions
+                                    ? 'Show Less'
+                                    : 'Show More',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        _recentTransactions.isEmpty
+                            ? Text(
+                                'No recent transactions',
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                ),
+                              )
+                            : SizedBox(
+                                height: 220,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: _recentTransactions.map((
+                                      transaction,
+                                    ) {
+                                      return Card(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 8,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        elevation: 7,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.cardPrimary,
+                                        child: ListTile(
+                                          leading: const Icon(
+                                            Icons.receipt_long,
+                                            color: Color(0xFF2073A9),
+                                          ),
+                                          title: Text(
+                                            transaction.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              SizedBox(height: 20),
-            ],
-          ),
-        )
+                  SizedBox(height: 20),
+                ],
+              ),
+            ),
     );
   }
 
   void _showErrorDialog(BuildContext context, String? message) {
     showDialog(
-        context: context,
-        builder: (dialogContext) {
-          return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: const Text('Error'),
-              content: Text(message ?? ''),
-              icon: Icon(Icons.error),
-              actions: [
-                TextButton(onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  if (message == "Failed to fetch balance") {
-                    context.go("/scanner");
-                  } else {
-                    context.go("/login");
-                  }
-                }, child: const Text('OK'),
-                ),
-              ]
-          );
-        }
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Error'),
+          content: Text(message ?? ''),
+          icon: Icon(Icons.error),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                if (message == "Failed to fetch balance") {
+                  context.go("/scanner");
+                } else {
+                  context.go("/login");
+                }
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 
   void _loadCard() {
     TextEditingController amountController = TextEditingController();
     showDialog(
-        context: context,
-        builder: (BuildContext dialogContext) => AlertDialog(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Center(
-              child: Text(
-                "Enter load amount",
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900]
-                ),
-              ),
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Center(
+          child: Text(
+            "Enter load amount",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[900],
             ),
-            content: TextField(
-              controller: amountController,
-              autofocus: true,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                prefixText: '\$',
-                prefixStyle: TextStyle(
-                  color: Colors.blue[800],
-                  fontWeight: FontWeight.bold,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue[700]!),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue[300]!),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+          ),
+        ),
+        content: TextField(
+          controller: amountController,
+          autofocus: true,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            prefixText: '\$',
+            prefixStyle: TextStyle(
+              color: Colors.blue[800],
+              fontWeight: FontWeight.bold,
             ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
-                onPressed: () {
-                  Navigator.of(dialogContext).pop(null);
-                },
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue[700]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue[300]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
+            onPressed: () {
+              Navigator.of(dialogContext).pop(null);
+            },
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final amountText = amountController.text;
+              final amount = double.tryParse(amountText) ?? 0;
+
+              Navigator.of(dialogContext).pop();
+
+              if (amount > 0) {
+                bool result = await processPayment(
+                  context,
+                  amount,
+                  "Loyalty Card",
+                );
+                if (result) {
+                  final newBalance = _userBalance! + amount;
+                  profileService.updateBalanceById(newBalance);
+                  setState(() {
+                    _userBalance = newBalance;
+                  });
+                  _fetchTransactions();
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a valid amount')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final amountText = amountController.text;
-                  final amount = double.tryParse(amountText) ?? 0;
-
-                  Navigator.of(dialogContext).pop();
-
-                  if (amount > 0) {
-                    bool result = await processPayment(context, amount, "Loyalty Card");
-                    if (result) {
-                      final newBalance = _userBalance! + amount;
-                      DatabaseService.instance.updateBalanceById(newBalance);
-                      setState(() {
-                        _userBalance = newBalance;
-                      });
-                      _fetchTransactions();
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a valid amount')),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 3,
-                ),
-                child: const Text(
-                  'Pay',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-            ]
-        )
+              elevation: 3,
+            ),
+            child: const Text(
+              'Pay',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
