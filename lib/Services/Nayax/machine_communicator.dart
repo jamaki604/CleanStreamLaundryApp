@@ -43,7 +43,6 @@ class MachineCommunicator implements MachineCommunicationService {
         '/ping-device',
           data: {
             'deviceId': deviceId,
-            'status': 'idle',
           },
 
           options: Options(headers: {
@@ -69,7 +68,7 @@ class MachineCommunicator implements MachineCommunicationService {
       }
     } on DioError catch (e) {
     debugPrint("Dio error: ${e.response?.statusCode} ${e.response?.data}");
-    return "Dio Server Error";
+    return "Dio Server Error, maybe try again?";
     } catch (e) {
       debugPrint("Ping error: $e");
       return "Ping Server Error";
