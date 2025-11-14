@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
 import '../Logic/Theme/theme.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../Services/Nayax/machine_communicator.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -112,37 +111,9 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     }
   }
 
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    ),
-  );
-
-
-  Future<bool> pingDevice(String deviceId) async {
-    debugPrint("Pinging Device");
-    try {
-      final response = await _dio.post(
-        '/pingDevice',
-        data: {'deviceId': deviceId},
-        options: Options(headers: {
-          'Authorization': 'Bearer ${dotenv.env['ANON_KEY']}',
-          'Content-Type': 'application/json',
-        }),
-      );
-
-      final data = response.data;
-      print(response.toString() + "Hello world");
-      return data['success'] == true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   Future<void> _processNayaxCode(String? code) async {
-    final result = await pingDevice(code!);
+    MachineCommunicator comm = new MachineCommunicator();
+    final result = await comm.pingDevice(code!);
     if (result) {
       debugPrint("Processing Nayax Code");
       context.go('/paymentPage?machineId=$code');
