@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/Pages/email_verification_page.dart';
 import 'package:clean_stream_laundry_app/Pages/home_page.dart';
 import 'package:clean_stream_laundry_app/Pages/loading_page.dart';
@@ -131,7 +132,7 @@ GoRouter createRouter(AuthSystem authenticator) => GoRouter(
       path: '/refundPage',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: RefundPage(auth: authenticator),
+        child: RefundPage(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,
