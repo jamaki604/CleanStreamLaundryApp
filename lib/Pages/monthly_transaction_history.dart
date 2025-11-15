@@ -4,7 +4,6 @@ import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Transaction/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Middleware/database_service.dart';
 
 class MonthlyTransactionHistory extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
@@ -22,20 +21,6 @@ class MonthlyTransactionHistory extends StatelessWidget {
 
     return BasePage(
       body: Scaffold(
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () async {
-              final refund = await DatabaseService.instance.getRefundForUser();
-              context.go('/refund_page', extra: refund);
-            },
-            child: Text("Refund"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-          ),
-        ),
-
         appBar: AppBar(
           title: Text(
             'Monthly Transaction History',
@@ -43,7 +28,16 @@ class MonthlyTransactionHistory extends StatelessWidget {
               color: Theme.of(context).colorScheme.fontSecondary,
             ),
           ),
-          elevation: 2,
+          actions: [
+            TextButton.icon(
+              onPressed: () => context.go('/refundPage'),
+              icon: const Icon(Icons.restore, color: Colors.white),
+              label: const Text(
+                'Refund',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         ),
         body: ListView.builder(
           padding: const EdgeInsets.all(16),
