@@ -51,7 +51,7 @@ GoRouter createRouter(AuthService authenticator) => GoRouter(
       path: '/settings',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: Settings(auth:authenticator),
+        child: Settings(),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, _, _, child) => child,

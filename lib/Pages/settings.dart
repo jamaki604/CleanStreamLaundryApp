@@ -9,18 +9,13 @@ import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 
 class Settings extends StatefulWidget {
-  late final AuthService _auth;
-
-  Settings({super.key,required AuthService auth}){
-    _auth = auth;
-  }
-
   @override
   State<Settings> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
   final transactionService = GetIt.instance<TransactionService>();
+  final authService = GetIt.instance<AuthService>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +38,7 @@ class _SettingsState extends State<Settings> {
 
                 ElevatedButton(
                   onPressed: () {
-                    widget._auth.logout();
+                    authService.logout();
                     context.go('/login');
                   },
                   style: ElevatedButton.styleFrom(
