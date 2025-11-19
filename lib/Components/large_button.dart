@@ -4,14 +4,14 @@ class LargeButton extends StatelessWidget {
   final String headLineText;
   final String descripitionText;
   final IconData icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const LargeButton({
     super.key,
     required this.headLineText,
     required this.descripitionText,
     required this.icon,
-    required this.onPressed,
+    this.onPressed,
   });
 
   @override
@@ -60,7 +60,6 @@ class LargeButton extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Icon on the right
                 Icon(
                   icon,
                   size: 48,

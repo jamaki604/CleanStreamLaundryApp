@@ -144,7 +144,6 @@ class HomePageState extends State<HomePage> {
                       headLineText: "$totalMachine available",
                       descripitionText: "$totalMachine/$machineIdle washers",
                       icon: Icons.local_laundry_service,
-                      onPressed: () {},
                     );
                   },
                 ),
@@ -167,7 +166,6 @@ class HomePageState extends State<HomePage> {
                       headLineText: "$totalMachine available",
                       descripitionText: "$totalMachine/$machineIdle dryers",
                       icon: Icons.local_laundry_service,
-                      onPressed: () {},
                     );
                   },
                 ),
