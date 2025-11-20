@@ -63,4 +63,13 @@ class StripeService implements PaymentService{
     final calculatedAmount = (amount * 100).toInt();
     return calculatedAmount.toString();
   }
+
+  @override
+  Future<String> getTransactionResult(String sessionId) async {
+    final session = await edgeFunctionService.runEdgeFunction(
+        name: "checkPaymentResult", body: {"session_id":sessionId}
+    );
+
+    return session?.data["status"];
+  }
 }

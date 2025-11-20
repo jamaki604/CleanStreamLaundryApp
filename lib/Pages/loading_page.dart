@@ -21,22 +21,39 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    _automaticLogIn();
-    _coldStartRedirect();
+    _handleStartup();
+  }
+
+  Future<void> _handleStartup() async {
+    final deepLinkHandled = await _coldStartRedirect();
+    if (!deepLinkHandled) {
+      _automaticLogIn();
+    }
   }
 
 
-  Future<void>_coldStartRedirect() async {
+  Future<bool>_coldStartRedirect() async {
     try {
       final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
 
       if (initialUri != null && initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
         context.go("/homePage");
+        return true;
       }
+
+      if (initialUri!.pathSegments.isNotEmpty &&
+          initialUri?.pathSegments.first == 'paymentResultWeb' &&
+          initialUri!.queryParameters.containsKey('session_id')) {
+        final sessionId = initialUri?.queryParameters['session_id'];
+        context.go("/paymentResultWeb?session_id=$sessionId");
+        return true;
+      }
+
     } catch (e) {
 
     }
+    return false;
   }
 
   void _automaticLogIn() async {

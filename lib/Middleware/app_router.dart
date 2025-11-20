@@ -8,13 +8,14 @@ import 'package:clean_stream_laundry_app/Pages/login_page.dart';
 import 'package:clean_stream_laundry_app/Pages/not_found_page.dart';
 import 'package:clean_stream_laundry_app/Pages/settings.dart';
 import 'package:clean_stream_laundry_app/Pages/start_machine_page.dart';
+import 'package:clean_stream_laundry_app/Pages/web_confirmation_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
 import 'package:clean_stream_laundry_app/Pages/monthly_transaction_history.dart';
 
 GoRouter createRouter(AuthService authenticator) => GoRouter(
-  initialLocation: '/loading',
+  initialLocation: "/loading",
   routes: [
     GoRoute(
       path: '/login',
@@ -122,7 +123,21 @@ GoRouter createRouter(AuthService authenticator) => GoRouter(
           transitionsBuilder: (_, _, _, child) => child,
         );
       },
-    )
+    ),
+    GoRoute(
+      path: '/paymentResultWeb',
+      pageBuilder: (context, state) {
+        final sessionId = state.uri.queryParameters['session_id'];
+
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: PaymentResultPageWeb(sessionId: sessionId),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, __, ___, child) => child,
+        );
+      },
+    ),
   ],
   errorBuilder: (context, state) => const NotFoundScreen(),
 );
