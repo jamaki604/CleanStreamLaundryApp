@@ -53,7 +53,7 @@ class TransactionParser {
     for (int i = 1; i <= 12; i++) {
       final monthDate = DateTime(now.year, now.month - i, 1);
       final monthKey = DateFormat('MMM yyyy').format(monthDate);
-      result[monthKey] = {'washer': 0.0, 'dryer': 0.0, 'loyaltyCard': 0.0};
+      result[monthKey] = {'directWasher': 0.0, 'loyaltyWasher': 0.0,'directDryer': 0.0, 'loyaltyDryer': 0.0,'loyaltyCard': 0.0};
     }
 
 
@@ -71,10 +71,14 @@ class TransactionParser {
       final description = (transaction['description'] as String).toLowerCase();
       final monthKey = DateFormat('MMM yyyy').format(createdAt);
 
-      if (description.contains('washer')) {
-        result[monthKey]!['washer'] = result[monthKey]!['washer']! + amount;
+      if(description.contains('loyalty payment on washer')){
+        result[monthKey]!['loyaltyWasher'] = result[monthKey]!['loyaltyWasher']! + amount;
+      }else if(description.contains('loyalty payment on dryer')){
+        result[monthKey]!['loyaltyDryer'] = result[monthKey]!['loyaltyDryer']! + amount;
+      }else if (description.contains('washer')) {
+        result[monthKey]!['directWasher'] = result[monthKey]!['directWasher']! + amount;
       } else if (description.contains('dryer')) {
-        result[monthKey]!['dryer'] = result[monthKey]!['dryer']! + amount;
+        result[monthKey]!['directDryer'] = result[monthKey]!['directDryer']! + amount;
       } else if (description == 'loyalty card') {
         result[monthKey]!['loyaltyCard'] = result[monthKey]!['loyaltyCard']! + amount;
       }

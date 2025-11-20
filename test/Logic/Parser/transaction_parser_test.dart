@@ -41,7 +41,7 @@ void main(){
       ];
 
       final result = TransactionParser.getMonthlySums(data);
-      expect(result["Oct 2025"]?["washer"],0.0);
+      expect(result["Oct 2025"]?["directWasher"],0.0);
     });
 
   });

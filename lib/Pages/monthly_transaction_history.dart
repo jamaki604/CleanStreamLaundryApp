@@ -34,7 +34,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
             final month = sortedMonths[index];
             final data = monthlySums[month]!;
             final total =
-                data['washer']! + data['dryer']!;
+                data['directWasher']! + data['directDryer']!+data['loyaltyCard']!;
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
               elevation: 2,
@@ -67,15 +67,27 @@ class MonthlyTransactionHistory extends StatelessWidget {
                     ),
                     const Divider(height: 24),
                     _buildTransactionRow(
-                      'Washer Payments',
-                      data['washer']!,
+                      'Direct Washer Payments',
+                      data['directWasher']!,
                       Colors.black,
                     ),
                     const SizedBox(height: 8),
                     _buildTransactionRow(
-                      'Dryer Payments',
-                      data['dryer']!,
+                      'Loyalty Washer Payments',
+                      data['loyaltyWasher']!,
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildTransactionRow(
+                      'Direct Dryer Payments',
+                      data['directDryer']!,
                       Colors.black,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildTransactionRow(
+                      'Loyalty Dryer Payments',
+                      data['loyaltyDryer']!,
+                      Theme.of(context).colorScheme.primary,
                     ),
                     const SizedBox(height: 8),
                     _buildTransactionRow(
@@ -97,7 +109,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 12),
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 16))),
+        Expanded(child: Text(label, style: TextStyle(fontSize: 16, color: color))),
         Text(
           '\$${amount.toStringAsFixed(2)}',
           style: TextStyle(
