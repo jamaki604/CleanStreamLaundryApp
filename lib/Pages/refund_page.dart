@@ -130,19 +130,7 @@ class _RefundPageState extends State<RefundPage> {
                 child: ElevatedButton(
                   onPressed: selectedTransaction != null
                       ? () async {
-                    _showRefundDialog();
-                    String? amount = await transactionService.recordRefundRequest(transaction_id: getTransactionID(), description: descriptionController.text);
-                    String? username = await getUserName();
-                    String? userId = authService.getCurrentUserId;
-                    edgeFunctionService.runEdgeFunction(
-                        name: 'refund-email',
-                        body: {
-                          'username': username,
-                          'user_id': userId,
-                          'transaction_id': getTransactionID(),
-                          'amount': amount,
-                          'description': descriptionController.text
-                        });
+                    _handleRefund();
                     context.go("/homePage");
                   }
                       : null,
@@ -161,6 +149,37 @@ class _RefundPageState extends State<RefundPage> {
       ),
     );
   }
+
+  void _handleRefund() async {
+    final transactionId = getTransactionID();
+    final description = descriptionController.text;
+    final userId = authService.getCurrentUserId;
+
+    if (userId == null) {
+      print("Error: No user is logged in.");
+      return;
+    }
+
+    final username = await getUserName();
+    final amount = await transactionService.recordRefundRequest(
+      transaction_id: transactionId,
+      description: description,
+    );
+
+    await edgeFunctionService.runEdgeFunction(
+      name: 'refund-email',
+      body: {
+        'username': username,
+        'user_id': userId,
+        'transaction_id': transactionId,
+        'amount': amount,
+        'description': description,
+      },
+    );
+
+    _showRefundDialog();
+  }
+
 
   void _showRefundDialog() {
     statusDialog(
