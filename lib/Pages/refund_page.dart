@@ -1,4 +1,7 @@
 import 'package:clean_stream_laundry_app/Components/status_dialog_box.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Components/base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
@@ -21,6 +24,9 @@ class _RefundPageState extends State<RefundPage> {
   List<int> recentTransactionIDs = [];
   final descriptionController = TextEditingController();
   final transactionService = GetIt.instance<TransactionService>();
+  final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
+  final profileService = GetIt.instance<ProfileService>();
+  final authService = GetIt.instance<AuthService>();
 
   @override
   void initState() {
@@ -49,6 +55,11 @@ class _RefundPageState extends State<RefundPage> {
 
   String getTransactionID() {
     return recentTransactionIDs[selectedTransactionIndex!].toString();
+  }
+
+  Future<String?> getUserName() async {
+    String? userId = authService.getCurrentUserId;
+    return profileService.getUserNameById(userId!);
   }
 
   @override
@@ -120,7 +131,18 @@ class _RefundPageState extends State<RefundPage> {
                   onPressed: selectedTransaction != null
                       ? () async {
                     _showRefundDialog();
-                    transactionService.recordRefundRequest(transaction_id: getTransactionID(), description: descriptionController.text);
+                    String? amount = await transactionService.recordRefundRequest(transaction_id: getTransactionID(), description: descriptionController.text);
+                    String? username = await getUserName();
+                    String? userId = authService.getCurrentUserId;
+                    edgeFunctionService.runEdgeFunction(
+                        name: 'refund-email',
+                        body: {
+                          'username': username,
+                          'user_id': userId,
+                          'transaction_id': getTransactionID(),
+                          'amount': amount,
+                          'description': descriptionController.text
+                        });
                     context.go("/homePage");
                   }
                       : null,

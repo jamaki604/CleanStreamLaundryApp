@@ -43,13 +43,13 @@ class SupabaseTransactionService extends TransactionService{
   }
 
   @override
-  Future<void> recordRefundRequest({
+  Future<String?> recordRefundRequest({
     required String transaction_id,
     required String description,
   }) async {
     final user = _client.auth.currentUser;
     if (user == null) {
-      return;
+      return null;
     }
 
     final data = await _client
@@ -59,7 +59,6 @@ class SupabaseTransactionService extends TransactionService{
         .single();
 
     final amount = data['amount'].toString();
-    print(amount);
 
     await _client.from('Refunds').insert({
       'user_id': user.id,
@@ -67,6 +66,9 @@ class SupabaseTransactionService extends TransactionService{
       'description': description,
       'amount': amount
     });
+    return amount;
   }
+
+
 
 }

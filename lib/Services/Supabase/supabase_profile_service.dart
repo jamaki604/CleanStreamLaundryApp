@@ -56,6 +56,21 @@ class SupabaseProfileService extends ProfileService{
     } catch (e) {
       return;
     }
+  }
 
+  @override
+  Future<String?> getUserNameById(String userId) async {
+    try {
+      final response = await _client
+          .from('profiles')
+          .select("full_name")
+          .eq('id', userId)
+          .single();
+      return response["full_name"];
+    } on PostgrestException {
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 }
