@@ -19,6 +19,7 @@ class _RefundPageState extends State<RefundPage> {
   int? selectedTransactionIndex;
   List<String> recentTransactions = [];
   List<int> recentTransactionIDs = [];
+  final descriptionController = TextEditingController();
   final transactionService = GetIt.instance<TransactionService>();
 
   @override
@@ -46,12 +47,8 @@ class _RefundPageState extends State<RefundPage> {
     }
   }
 
-  int? getTransactionID() {
-    if (selectedTransactionIndex != null &&
-        selectedTransactionIndex! < recentTransactionIDs.length) {
-      return recentTransactionIDs[selectedTransactionIndex!];
-    }
-    return null;
+  String getTransactionID() {
+    return recentTransactionIDs[selectedTransactionIndex!].toString();
   }
 
   @override
@@ -105,6 +102,7 @@ class _RefundPageState extends State<RefundPage> {
               ),
               SizedBox(height: 20),
               TextField(
+                controller: descriptionController,
                 minLines: 3,
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
@@ -122,6 +120,7 @@ class _RefundPageState extends State<RefundPage> {
                   onPressed: selectedTransaction != null
                       ? () async {
                     _showRefundDialog();
+                    transactionService.recordRefundRequest(transaction_id: getTransactionID(), description: descriptionController.text);
                     context.go("/homePage");
                   }
                       : null,

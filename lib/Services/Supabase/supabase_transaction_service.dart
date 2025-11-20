@@ -52,10 +52,20 @@ class SupabaseTransactionService extends TransactionService{
       return;
     }
 
+    final data = await _client
+        .from('transactions')
+        .select('amount')
+        .eq('id', transaction_id)
+        .single();
+
+    final amount = data['amount'].toString();
+    print(amount);
+
     await _client.from('Refunds').insert({
       'user_id': user.id,
       'transaction_id': transaction_id,
-      'description': description
+      'description': description,
+      'amount': amount
     });
   }
 
