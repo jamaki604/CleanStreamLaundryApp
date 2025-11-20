@@ -131,7 +131,7 @@ class _RefundPageState extends State<RefundPage> {
                   onPressed: selectedTransaction != null
                       ? () async {
                     _handleRefund();
-                    context.go("/homePage");
+
                   }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -188,5 +188,6 @@ class _RefundPageState extends State<RefundPage> {
       message: 'Your refund request has been submitted',
       isSuccess: true,
     );
+    context.go("/homePage");
   }
 }
