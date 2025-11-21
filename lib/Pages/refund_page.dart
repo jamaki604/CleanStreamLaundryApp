@@ -32,6 +32,10 @@ class _RefundPageState extends State<RefundPage> {
   void initState() {
     super.initState();
     _fetchTransactions();
+
+    descriptionController.addListener(() {
+      setState(() {});
+    });
   }
 
   Future<void> _fetchTransactions() async {
@@ -60,6 +64,11 @@ class _RefundPageState extends State<RefundPage> {
   Future<String?> getUserName() async {
     String? userId = authService.getCurrentUserId;
     return profileService.getUserNameById(userId!);
+  }
+
+  bool isFormValid() {
+    return selectedTransaction != null &&
+        descriptionController.text.trim().isNotEmpty;
   }
 
   @override
@@ -128,7 +137,7 @@ class _RefundPageState extends State<RefundPage> {
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: selectedTransaction != null
+                  onPressed: isFormValid()
                       ? () async {
                     _handleRefund();
 
