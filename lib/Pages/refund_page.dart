@@ -41,7 +41,7 @@ class _RefundPageState extends State<RefundPage> {
 
   Future<void> _fetchTransactions() async {
     try {
-      final transactions = await transactionService.getTransactionsForUser();
+      final transactions = await transactionService.getRefundableTransactionsForUser();
       setState(() {
         recentTransactions = TransactionParser.formatTransactionsList(
           transactions.take(100),
