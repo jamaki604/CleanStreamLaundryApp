@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseTransactionService extends TransactionService{
@@ -57,6 +58,14 @@ class SupabaseTransactionService extends TransactionService{
         .select('amount')
         .eq('id', transaction_id)
         .single();
+
+    final updated = await _client
+        .from('transactions')
+        .update({'requested_refund': true})
+        .eq('id', transaction_id)
+        .select();
+
+    print(updated);
 
     final amount = data['amount'].toString();
 
