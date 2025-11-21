@@ -6,7 +6,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:get_it/get_it.dart';
-import 'package:clean_stream_laundry_app/Components/payment_result.dart';
+import 'package:clean_stream_laundry_app/Components/status_dialog_box.dart';
 import 'package:clean_stream_laundry_app/Logic/Parser/machine_formatter.dart';
 import '../Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
@@ -165,14 +165,14 @@ class _PaymentPageState extends State<PaymentPage> {
                     Navigator.of(context, rootNavigator: true).pop();
 
                     if (deviceAuthorized) {
-                      showPaymentResult(
+                      statusDialog(
                         context,
                         title: "Payment processed! Machine Ready!",
                         message: "Machine $_machineName is now active.",
                         isSuccess: true,
                       );
                     } else {
-                      showPaymentResult(
+                      statusDialog(
                         context,
                         title: "Machine Error",
                         message: "Payment succeeded but machine did not wake up.",
@@ -260,7 +260,7 @@ class _PaymentPageState extends State<PaymentPage> {
         Navigator.of(context, rootNavigator: true).pop();
 
         if (deviceAuthorized) {
-          showPaymentResult(
+          statusDialog(
             context,
             title: "Machine Ready!",
             message: "Machine $_machineName is now active.",
@@ -268,14 +268,14 @@ class _PaymentPageState extends State<PaymentPage> {
           );
           await transactionService.recordTransaction(amount: _price!, description: "Loyalty Payment on ${MachineFormatter.formatMachineType(_machineName.toString())}", type: "laundry");
         } else {
-          showPaymentResult(
+          statusDialog(
             context,
             title: "Machine Error",
             message: "Payment succeeded but machine did not wake up.",
             isSuccess: false,
           );
         }
-    showPaymentResult(context,
+    statusDialog(context,
         title: "Payment Successful!",
         message: "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
         isSuccess: true
