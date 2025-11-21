@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-void showPaymentResult(
+void statusDialog(
     BuildContext context, {
       required String title,
       required String message,
