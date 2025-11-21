@@ -149,7 +149,7 @@ class _RefundPageState extends State<RefundPage> {
                     disabledBackgroundColor: Colors.transparent,
                     disabledForegroundColor: Colors.transparent,
                   ),
-                  child: Text("Submit refund"),
+                  child: Text("Submit Refund"),
                 ),
               )
             ],
