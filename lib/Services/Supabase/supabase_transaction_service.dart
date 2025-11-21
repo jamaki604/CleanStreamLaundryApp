@@ -1,5 +1,4 @@
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseTransactionService extends TransactionService{
