@@ -66,6 +66,9 @@ class SupabaseTransactionService extends TransactionService{
       'description': description,
       'amount': amount
     });
+
+    await _client.rpc('increment_user_refund_attempts', params: {'uid': user.id});
+
     return amount;
   }
 

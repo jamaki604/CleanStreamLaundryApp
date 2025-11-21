@@ -28,6 +28,7 @@ class _RefundPageState extends State<RefundPage> {
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
 
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +65,11 @@ class _RefundPageState extends State<RefundPage> {
   Future<String?> getUserName() async {
     String? userId = authService.getCurrentUserId;
     return profileService.getUserNameById(userId!);
+  }
+
+  Future<String?> getUserAttempts() async {
+    String? userId = authService.getCurrentUserId;
+    return profileService.getUserRefundAttempts(userId!);
   }
 
   bool isFormValid() {
@@ -170,11 +176,11 @@ class _RefundPageState extends State<RefundPage> {
     }
 
     final username = await getUserName();
+    final userAttempts = await getUserAttempts();
     final amount = await transactionService.recordRefundRequest(
       transaction_id: transactionId,
       description: description,
     );
-
     await edgeFunctionService.runEdgeFunction(
       name: 'refund-email',
       body: {
@@ -183,6 +189,7 @@ class _RefundPageState extends State<RefundPage> {
         'transaction_id': transactionId,
         'amount': amount,
         'description': description,
+        'userAttempts': userAttempts,
       },
     );
 
