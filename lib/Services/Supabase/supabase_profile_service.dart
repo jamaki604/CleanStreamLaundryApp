@@ -73,4 +73,20 @@ class SupabaseProfileService extends ProfileService{
       return null;
     }
   }
+
+  @override
+  Future<String?> getUserRefundAttempts(String userId) async {
+    try {
+      final response = await _client
+          .from('profiles')
+          .select("refund_attempts")
+          .eq('id', userId)
+          .single();
+      return response["refund_attempts"].toString();
+    } on PostgrestException {
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }
