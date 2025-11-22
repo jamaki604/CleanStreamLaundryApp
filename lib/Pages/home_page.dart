@@ -160,10 +160,7 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$totalMachine available",
                                 style: TextStyle(
-                                  color: Theme
-                                      .of(context)
-                                      .colorScheme
-                                      .fontInverted,
+                                  color: Theme.of(context).colorScheme.fontInverted,
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -172,10 +169,7 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$totalMachine/$machineIdle washers",
                                 style: TextStyle(
-                                  color: Theme
-                                      .of(context)
-                                      .colorScheme
-                                      .fontInverted,
+                                  color: Theme.of(context).colorScheme.fontSecondary,
                                   fontSize: 14,
                                 ),
                               ),
@@ -192,6 +186,7 @@ class HomePageState extends State<HomePage> {
                     );
                   },
                 ),
+
               SizedBox(height: 20),
               if (locationSelected)
                 FutureBuilder(
@@ -227,10 +222,7 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$totalMachine available",
                                 style: TextStyle(
-                                  color: Theme
-                                      .of(context)
-                                      .colorScheme
-                                      .fontInverted,
+                                  color: Theme.of(context).colorScheme.fontInverted,
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -239,10 +231,7 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$totalMachine/$machineIdle dryers",
                                 style: TextStyle(
-                                  color: Theme
-                                      .of(context)
-                                      .colorScheme
-                                      .fontInverted,
+                                  color: Theme.of(context).colorScheme.fontSecondary,
                                   fontSize: 14,
                                 ),
                               ),
