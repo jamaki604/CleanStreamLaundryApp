@@ -285,9 +285,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           autofocus: true,
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            prefixText: '\$',
+            prefixText: '\$ ',
             prefixStyle: TextStyle(
-              color: Colors.blue[800],
+              color: Theme.of(context).colorScheme.fontInverted,
               fontWeight: FontWeight.bold,
             ),
             focusedBorder: OutlineInputBorder(
