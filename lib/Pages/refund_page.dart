@@ -79,7 +79,7 @@ class _RefundPageState extends State<RefundPage> {
           title: Text(
             'Refund Page',
             style: TextStyle(
-              color: Theme.of(context).colorScheme.fontSecondary,
+              color: Theme.of(context).colorScheme.fontInverted,
             ),
           ),
           elevation: 2,
@@ -90,13 +90,37 @@ class _RefundPageState extends State<RefundPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<int>(
-                initialValue: selectedTransactionIndex,
+                value: selectedTransactionIndex,
                 hint: Text('Select a Transaction'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
+                  hintStyle: TextStyle(
+                    color: Colors.white,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.fontInverted,
+                      width: 2,
+                    ),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.fontSecondary,
+                      width: 2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.fontInverted,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
@@ -106,52 +130,86 @@ class _RefundPageState extends State<RefundPage> {
                 items: List.generate(recentTransactions.length, (index) {
                   return DropdownMenuItem<int>(
                     value: index,
-                    child: Text(recentTransactions[index], style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),),
+                    child: Text(
+                      recentTransactions[index],
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.fontInverted,
+                      ),
+                    ),
                   );
                 }),
+
                 onChanged: (int? newIndex) {
                   setState(() {
                     selectedTransactionIndex = newIndex;
-                    if (newIndex != null) {
-                      selectedTransaction = recentTransactions[newIndex];
-                    } else {
-                      selectedTransaction = null;
-                    }
+                    selectedTransaction =
+                    newIndex != null ? recentTransactions[newIndex] : null;
                   });
                 },
               ),
-              SizedBox(height: 20),
+
+              const SizedBox(height: 20),
+
               TextField(
                 controller: descriptionController,
                 minLines: 3,
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Please explain your reason for the refund...',
                   hintStyle: TextStyle(
-                    color:  Theme.of(context).colorScheme.fontSecondary
+                    color: Theme.of(context).colorScheme.fontSecondary,
                   ),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.fontInverted,
+                      width: 2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.fontSecondary,
+                      width: 2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.fontInverted,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
-              SizedBox(height: 20),
+
+              const SizedBox(height: 20),
+
               Center(
                 child: ElevatedButton(
                   onPressed: isFormValid()
                       ? () async {
                     _handleRefund();
-
                   }
                       : null,
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.transparent,
                     disabledForegroundColor: Colors.transparent,
                   ),
-                  child: Text("Submit Refund"),
+                  child: const Text("Submit Refund"),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -170,6 +228,7 @@ class _RefundPageState extends State<RefundPage> {
     }
 
     final username = await getUserName();
+
     final amount = await transactionService.recordRefundRequest(
       transaction_id: transactionId,
       description: description,
@@ -188,7 +247,6 @@ class _RefundPageState extends State<RefundPage> {
 
     _showRefundDialog();
   }
-
 
   void _showRefundDialog() {
     statusDialog(
