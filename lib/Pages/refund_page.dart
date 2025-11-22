@@ -116,7 +116,7 @@ class _RefundPageState extends State<RefundPage> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.fontInverted,
+                      color: Colors.blue,
                       width: 2,
                     ),
                   ),
@@ -180,7 +180,7 @@ class _RefundPageState extends State<RefundPage> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.fontInverted,
+                      color: Colors.blue,
                       width: 2,
                     ),
                   ),
