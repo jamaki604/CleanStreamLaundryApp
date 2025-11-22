@@ -123,6 +123,9 @@ class SignUpScreenState extends State<SignUpScreen> {
               Image.asset("assets/Logo.png", height: 250, width: 250),
               TextField(
                 controller: _nameCtrl,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Name',
                   labelStyle: TextStyle(color: Colors.blue), // matches button color
@@ -144,6 +147,9 @@ class SignUpScreenState extends State<SignUpScreen> {
 
               TextField(
                 controller: _emailCtrl,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: const TextStyle(color: Colors.blue),
@@ -165,6 +171,9 @@ class SignUpScreenState extends State<SignUpScreen> {
 
               TextField(
                 controller: _passwordCtrl,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   labelText: passwordText,
                   labelStyle: TextStyle(color: labelColor), // matches button color
@@ -192,6 +201,9 @@ class SignUpScreenState extends State<SignUpScreen> {
 
               TextField(
                 controller: _passwordConfirmCtrl,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   labelText: confirmPasswordText,
                   labelStyle: TextStyle(color: labelColor), // matches button color
