@@ -40,7 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Authentication API goes here.
     _showMessage('Logging in as $email...');
     final authResponse = await authService.login(email, password);
     if (!mounted) return;
