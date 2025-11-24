@@ -23,7 +23,7 @@ class StartPage extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2),
+                    border: Border.all(color: Colors.blue, width: 3),
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.transparent,
                   ),
