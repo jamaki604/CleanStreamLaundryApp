@@ -8,7 +8,7 @@ class StripeService implements PaymentService{
 
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
-  final _stripeInstance = Stripe.instance;
+  final _stripeInstance = GetIt.instance<Stripe>();
 
   Future<int> makePayment(double amount) async {
     try{

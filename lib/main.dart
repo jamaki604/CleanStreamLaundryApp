@@ -73,6 +73,10 @@ Future<void> setupDependencies() async{
       () => StripeService()
   );
 
+  getIt.registerLazySingleton<Stripe>(
+      () => Stripe.instance
+  );
+
   getIt.registerLazySingleton<MachineCommunicationService>(
       () => MachineCommunicator()
   );
