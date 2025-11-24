@@ -29,6 +29,8 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   final transactionService = GetIt.instance<TransactionService>();
   final authService = GetIt.instance<AuthService>();
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -102,135 +104,137 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController _scrollController = ScrollController();
+
     return BasePage(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Center(
+          : Column(
+        children: [
+          const SizedBox(height: 20),
+          CreditCard(username: _userName),
+          const SizedBox(height: 50),
+          Text(
+            'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.fontSecondary,
+            ),
+          ),
+          const SizedBox(height: 25),
+          ElevatedButton(
+            onPressed: () => _loadCard(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              disabledBackgroundColor: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+            child: const Text(
+              "Load card",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
               child: Column(
-                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
-                  CreditCard(username: _userName),
-                  SizedBox(height: 50),
-                  Text(
-                    'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.fontSecondary,
-                    ),
-                  ),
-                  SizedBox(height: 25),
-                  ElevatedButton(
-                    onPressed: () => _loadCard(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      disabledBackgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: Text(
-                      "Load card",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Transactions',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.fontSecondary,
-                              ),
-                            ),
-                            TextButton.icon(
-                              onPressed: _toggleTransactionView,
-                              icon: Icon(
-                                _showPastTransactions
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                color: Colors.blue,
-                              ),
-                              label: Text(
-                                _showPastTransactions
-                                    ? 'Show Less'
-                                    : 'Show More',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
-                          ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Transactions',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.fontSecondary,
                         ),
-                        SizedBox(height: 10),
-                        _recentTransactions.isEmpty
-                            ? Text(
-                                'No recent transactions',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
+                      ),
+                      TextButton.icon(
+                        onPressed: _toggleTransactionView,
+                        icon: Icon(
+                          _showPastTransactions
+                              ? Icons.expand_less
+                              : Icons.expand_more,
+                          color: Colors.blue,
+                        ),
+                        label: Text(
+                          _showPastTransactions ? 'Show Less' : 'Show More',
+                          style: const TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _recentTransactions.isEmpty
+                      ? Text(
+                    'No recent transactions',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  )
+                      : Expanded(
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        scrollbarTheme: ScrollbarThemeData(
+                          thumbColor: MaterialStateProperty.all(Colors.blue),
+                          thickness: MaterialStateProperty.all(6),
+                          radius: const Radius.circular(4),
+                        ),
+                      ),
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: _recentTransactions.length,
+                          itemBuilder: (context, index) {
+                            final transaction = _recentTransactions[index];
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 7,
+                              color: Theme.of(context).colorScheme.cardPrimary,
+                              child: ListTile(
+                                leading: const Icon(
+                                  Icons.receipt_long,
+                                  color: Color(0xFF2073A9),
                                 ),
-                              )
-                            : SizedBox(
-                                height: 220,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: _recentTransactions.map((
-                                      transaction,
-                                    ) {
-                                      return Card(
-                                        margin: const EdgeInsets.only(
-                                          bottom: 8,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        elevation: 7,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.cardPrimary,
-                                        child: ListTile(
-                                          leading: const Icon(
-                                            Icons.receipt_long,
-                                            color: Color(0xFF2073A9),
-                                          ),
-                                          title: Text(
-                                            transaction.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
+                                title: Text(
+                                  transaction.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black87,
                                   ),
                                 ),
                               ),
-                      ],
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 20),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 
