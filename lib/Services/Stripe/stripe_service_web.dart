@@ -26,12 +26,25 @@ class StripeService implements PaymentService {
       final url = response?.data['url'];
       if (url == null) return 400;
 
-      html.window.open(url, '_blank');
+      final paymentPortal = html.window.open(url, '_blank');
+
+      late Timer closeCheckoutTimer;
+      closeCheckoutTimer = Timer.periodic(const Duration(milliseconds: 200), (_) {
+      if (paymentPortal == null || paymentPortal.closed!) {
+        closeCheckoutTimer.cancel();
+        if(!_paymentCompleter!.isCompleted) {
+          _paymentCompleter!.complete(400);
+        }
+      }
+      });
 
       return _paymentCompleter!.future.timeout(
-        const Duration(minutes: 5),
+        const Duration(minutes: 2),
         onTimeout: () => 400,
-      );
+      ).whenComplete(() {
+        paymentPortal.close();
+        closeCheckoutTimer.cancel();
+      });
     } catch (e) {
       return 400;
     }
