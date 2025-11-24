@@ -24,6 +24,21 @@ class SupabaseTransactionService extends TransactionService{
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getRefundableTransactionsForUser() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return [];
+
+    final response = await _client
+        .from('transactions')
+        .select('id, amount, description, created_at')
+        .eq('user_id', user.id)
+        .neq('requested_refund', true)
+        .order('created_at', ascending: false);
+
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  @override
   Future<void> recordTransaction({
     required double amount,
     required String description,
@@ -58,6 +73,12 @@ class SupabaseTransactionService extends TransactionService{
         .eq('id', transaction_id)
         .single();
 
+    await _client
+        .from('transactions')
+        .update({'requested_refund': true})
+        .eq('id', transaction_id)
+        .select();
+
     final amount = data['amount'].toString();
 
     await _client.from('Refunds').insert({
@@ -66,6 +87,9 @@ class SupabaseTransactionService extends TransactionService{
       'description': description,
       'amount': amount
     });
+
+    await _client.rpc('increment_user_refund_attempts', params: {'uid': user.id});
+
     return amount;
   }
 
