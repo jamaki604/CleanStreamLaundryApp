@@ -24,7 +24,7 @@ void main() {
     getIt.registerLazySingleton<EdgeFunctionService>(() => edgeFunctionMock);
 
     stripeMock = StripeMock();
-    stripeService = StripeService(instance: stripeMock);
+    stripeService = StripeService();
 
   });
 

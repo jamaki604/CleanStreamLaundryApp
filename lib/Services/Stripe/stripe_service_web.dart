@@ -3,18 +3,12 @@ import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'dart:html' as html show window;
 import 'package:get_it/get_it.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class StripeService implements PaymentService {
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
   Completer<int>? _paymentCompleter;
   bool _channelSubscribed = false;
-
-  late final Stripe _stripeInstance;
-  StripeService({required Stripe instance}) {
-    _stripeInstance = instance;
-  }
 
   @override
   Future<int> makePayment(double amount) async {

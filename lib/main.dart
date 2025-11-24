@@ -70,7 +70,7 @@ Future<void> setupDependencies() async{
   );
 
   getIt.registerLazySingleton<PaymentService>(
-      () => StripeService(instance: Stripe.instance)
+      () => StripeService()
   );
 
   getIt.registerLazySingleton<MachineCommunicationService>(
