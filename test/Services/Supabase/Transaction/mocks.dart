@@ -34,6 +34,12 @@ class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<Postgrest
   }
 
   @override
+  PostgrestFilterBuilder<PostgrestList> neq(String column, dynamic value) {
+    final filtered = fakeData.where((item) => item[column] != value).toList();
+    return FakeFilterBuilder(filtered);
+  }
+
+  @override
   PostgrestTransformBuilder<PostgrestMap> single() {
     return FakeSingleBuilder(fakeData.isNotEmpty ? fakeData.first : {});
   }
