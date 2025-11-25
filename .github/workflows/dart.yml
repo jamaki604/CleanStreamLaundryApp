@@ -46,3 +46,6 @@ jobs:
       # want to change this to 'flutter test'.
       - name: Run tests
         run: flutter test
+
+      - name: Show coverage
+        run: flutter pub run test_cov_console
