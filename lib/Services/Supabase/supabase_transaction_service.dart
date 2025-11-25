@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -93,6 +94,57 @@ class SupabaseTransactionService extends TransactionService{
     return amount;
   }
 
+  @override
+  Future<void> subscribeForPaymentConfirmation( bool channelSubscribed,Completer<int>? paymentCompleter ) async {
 
+    if (_client.auth.currentUser == null) {
+      final completer = Completer<void>();
+      late final StreamSubscription authSub;
+
+      authSub = _client.auth.onAuthStateChange.listen((data) {
+        if (_client.auth.currentUser != null) {
+          authSub.cancel();
+          completer.complete();
+        }
+      });
+
+      await completer.future;
+    }
+
+    if (!channelSubscribed) {
+      await _startPaymentChannel(paymentCompleter);
+      channelSubscribed = true;
+    }
+  }
+
+  Future<void> _startPaymentChannel(Completer<int>? paymentCompleter) async {
+    final completer = Completer<void>();
+
+    _client.channel('payments')
+        .onBroadcast(
+      event: 'payment_success',
+      callback: (payload) {
+        final nestedPayload = payload['payload'];
+        if (nestedPayload is Map) {
+          final uid = nestedPayload['user_id'];
+          if (uid == _client.auth.currentUser?.id) {
+            if (paymentCompleter != null && !paymentCompleter.isCompleted) {
+              paymentCompleter.complete(200);
+            }
+          }
+        }
+      },
+    )
+        .subscribe((status, [error]) {
+      if (status == RealtimeSubscribeStatus.subscribed) {
+        completer.complete();
+      } else if (status == RealtimeSubscribeStatus.closed ||
+          status == RealtimeSubscribeStatus.channelError) {
+        completer.completeError('Channel subscription failed');
+      }
+    });
+
+    await completer.future;
+  }
 
 }

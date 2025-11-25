@@ -10,7 +10,7 @@ import 'mocks.dart';
 
 void main() {
 
-  StripeService stripeService = StripeService(instance: StripeMock());
+  StripeService stripeService = StripeService();
 
   group("Stripe test", () {
 

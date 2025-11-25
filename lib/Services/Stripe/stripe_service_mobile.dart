@@ -7,11 +7,8 @@ import 'package:get_it/get_it.dart';
 class StripeService implements PaymentService{
 
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
-  late final _stripeInstance;
 
-  StripeService({required Stripe instance}){
-    _stripeInstance = instance;
-  }
+  final _stripeInstance = GetIt.instance<Stripe>();
 
   Future<int> makePayment(double amount) async {
     try{
