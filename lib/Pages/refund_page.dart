@@ -255,6 +255,6 @@ class _RefundPageState extends State<RefundPage> {
       message: 'Your refund request has been submitted',
       isSuccess: true,
     );
-    context.go("/homePage");
+    context.go("/settings");
   }
 }
