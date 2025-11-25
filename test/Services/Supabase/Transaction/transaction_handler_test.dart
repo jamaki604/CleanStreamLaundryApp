@@ -61,9 +61,20 @@ void main() {
     });
 
     test("Tests if logic is correct for recording refunds",() async {
-      await transactionHandler.recordRefundRequest(transaction_id: "3kl24jkl23", description: "Test refund");
+      final mockFilterBuilder = FakeFilterBuilder([]);
+
+      when(() => queryBuilderMock.update(any())).thenAnswer((_) => mockFilterBuilder);
+      when(() => supabaseMock.rpc(any(), params: any(named: 'params'))).thenAnswer((_) => mockFilterBuilder);
+
+      await transactionHandler.recordRefundRequest(
+          transaction_id: "3kl24jkl23",
+          description: "Test refund"
+      );
+
       verify(() => supabaseMock.auth.currentUser!);
       verify(() => supabaseMock.from("Refunds"));
+      verify(() => queryBuilderMock.update(any()));
+      verify(() => supabaseMock.rpc(any(), params: any(named: 'params')));
     });
 
   });
