@@ -143,7 +143,7 @@ class HomePageState extends State<HomePage> {
                     return Container(
                       width: 250,
                       height: 160,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
                         borderRadius: BorderRadius.circular(8),
@@ -205,7 +205,7 @@ class HomePageState extends State<HomePage> {
                     return Container(
                       width: 250,
                       height: 160,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
                         borderRadius: BorderRadius.circular(8),
