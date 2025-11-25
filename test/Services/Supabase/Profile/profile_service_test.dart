@@ -77,10 +77,40 @@ void main() {
     //Test will fail if exception was not caught
   });
 
-  test("Tests that updateBalanceID catches unkown exception",() async {
+  test("Tests that updateBalanceID catches unknown exception",() async {
     when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test execption"));
     await profileHandler.updateBalanceById(47.20);
     //Test will fail if exception was not caught
   });
+
+  test("Tests that getUserNameById catches Postgrest exception",() async {
+    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    await profileHandler.getUserNameById("1234");
+    //Test will fail if exception was not caught
+  });
+
+  test("Tests that getUserNameById catches unknown exception",() async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    await profileHandler.getUserNameById("1234");
+    //Test will fail if exception was not caught
+  });
+
+  test("Tests that getUserNameById runs successfully",() async {
+    var result = await profileHandler.getUserNameById("1234");
+    expect(result, "Nolan Meyer");
+  });
+
+  test("Tests that getUserRefundAttempts catches unknown exception",() async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    await profileHandler.getUserRefundAttempts("1234");
+    //Test will fail if exception was not caught
+  });
+
+  test("Tests that getUserRefundAttempts catches Postgrest exception",() async {
+    fakeFilterBuilder = FakeFilterBuilder({"refund_attempts":0});
+    var result = await profileHandler.getUserRefundAttempts("1234");
+    expect(result, "0");
+  });
+
 
 }
