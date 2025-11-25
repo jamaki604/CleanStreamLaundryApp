@@ -22,7 +22,6 @@ class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<Postgrest
   @override
   Future<U> then<U>(FutureOr<U> Function(PostgrestList) onValue, {Function? onError,}) {
     try {
-
       final result = onValue(fakeData);
       return Future.value(result);
     } catch (e) {
@@ -32,6 +31,17 @@ class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<Postgrest
       }
       return Future.error(e);
     }
+  }
+
+  @override
+  PostgrestFilterBuilder<PostgrestList> neq(String column, dynamic value) {
+    final filtered = fakeData.where((item) => item[column] != value).toList();
+    return FakeFilterBuilder(filtered);
+  }
+
+  @override
+  PostgrestTransformBuilder<PostgrestMap> single() {
+    return FakeSingleBuilder(fakeData.isNotEmpty ? fakeData.first : {});
   }
 
   @override
@@ -49,4 +59,35 @@ class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<Postgrest
     return this;
   }
 
+  // Add this method
+  @override
+  PostgrestFilterBuilder<PostgrestList> select([String columns = '*']) {
+    return this;
+  }
+}
+
+
+class FakeSingleBuilder extends Fake implements PostgrestTransformBuilder<PostgrestMap> {
+  final Map<String, dynamic> fakeData;
+
+  FakeSingleBuilder(this.fakeData);
+
+  @override
+  Future<U> then<U>(FutureOr<U> Function(PostgrestMap) onValue, {Function? onError}) {
+    try {
+      final result = onValue(fakeData);
+      return Future.value(result);
+    } catch (e) {
+      if (onError != null) {
+        onError(e);
+        return Future.error(e);
+      }
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<PostgrestMap> catchError(Function onError, {bool Function(Object)? test}) {
+    return Future.value(fakeData);
+  }
 }

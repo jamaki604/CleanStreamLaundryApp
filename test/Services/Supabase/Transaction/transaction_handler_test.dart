@@ -14,7 +14,7 @@ void main() {
   setUp(() {
     supabaseMock = SupabaseMock();
     queryBuilderMock = QueryBuilderMock();
-    fakeFilterBuilder = FakeFilterBuilder([{"amount": 2.75, "description": "Machine, created_at: 2025-11-02T16:24:51.685419+00:00"}, {"amount": 2.75, "description": "Machine, created_at: 2025-10-28T15:13:24.87605+00:00"}, {"amount": 2.75, "description": "Machine, created_at: 2025-10-28T14:27:54.429939+00:00"}, {"amount": 2.75, "description": "Machine, created_at: 2025-10-28T14:26:21.662999+00:00"}, {"amount": 2.75, "description": "Machine, created_at: 2025-10-27T18:06:40.987278+00:00"}, {"amount": 2.75, "description": "Machine, created_at: 2025-10-27T00:17:18.01511+00:00"}]);
+    fakeFilterBuilder = FakeFilterBuilder([{"amount": 2.75, "description": "Machine", "created_at": "2025-11-02T16:24:51.685419+00:00", "requested_refund": true}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-28T15:13:24.87605+00:00", "requested_refund": false}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-28T14:27:54.429939+00:00", "requested_refund": true}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-28T14:26:21.662999+00:00", "requested_refund": false}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-27T18:06:40.987278+00:00", "requested_refund": false}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-27T00:17:18.01511+00:00", "requested_refund": false}]);
     transactionHandler = SupabaseTransactionService(client: supabaseMock);
     supabaseAuth = GoTrueMock();
 
@@ -49,6 +49,11 @@ void main() {
       expect(result.length, 6);
     });
 
+    test("Get refundable transaction history data",() async {
+      final result = await transactionHandler.getRefundableTransactionsForUser();
+      expect(result.length, 4);
+    });
+
     test("Tests if the user is null",() async{
       when(() => supabaseAuth.currentUser).thenReturn(null);
       final result = await transactionHandler.getTransactionsForUser();
@@ -61,9 +66,20 @@ void main() {
     });
 
     test("Tests if logic is correct for recording refunds",() async {
-      await transactionHandler.recordRefundRequest(transaction_id: "3kl24jkl23", description: "Test refund");
+      final mockFilterBuilder = FakeFilterBuilder([]);
+
+      when(() => queryBuilderMock.update(any())).thenAnswer((_) => mockFilterBuilder);
+      when(() => supabaseMock.rpc(any(), params: any(named: 'params'))).thenAnswer((_) => mockFilterBuilder);
+
+      await transactionHandler.recordRefundRequest(
+          transaction_id: "3kl24jkl23",
+          description: "Test refund"
+      );
+
       verify(() => supabaseMock.auth.currentUser!);
       verify(() => supabaseMock.from("Refunds"));
+      verify(() => queryBuilderMock.update(any()));
+      verify(() => supabaseMock.rpc(any(), params: any(named: 'params')));
     });
 
   });
