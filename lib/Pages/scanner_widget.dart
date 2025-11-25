@@ -119,7 +119,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     if (result == "pass") {
       context.go('/paymentPage?machineId=$code');
     } else {
-      statusDialog(context, title: "Machine Unavailable", message: "", isSuccess: false);
+      statusDialog(context, title: "Machine Unavailable", message: result, isSuccess: false);
       cameraController.start();
     }
   }
