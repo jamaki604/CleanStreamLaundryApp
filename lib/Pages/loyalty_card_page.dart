@@ -146,7 +146,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           const SizedBox(height: 20),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -203,11 +203,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                           itemBuilder: (context, index) {
                             final transaction = _recentTransactions[index];
                             return Card(
-                              margin: const EdgeInsets.only(bottom: 8),
+                              margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              elevation: 7,
+                              elevation: 4,
                               color: Theme.of(context).colorScheme.cardPrimary,
                               child: ListTile(
                                 leading: const Icon(
