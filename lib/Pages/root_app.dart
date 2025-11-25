@@ -13,6 +13,7 @@ class RootApp extends StatefulWidget {
 
 class _RootAppState extends State<RootApp> {
   late final AuthService _authenticator = GetIt.instance<AuthService>();
+  late final RouterService _routerService = GetIt.instance<RouterService>();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class _RootAppState extends State<RootApp> {
       debugShowCheckedModeBanner: false,
       title: 'Clean Stream Laundry Solutions',
       theme: widget.theme,
-      routerConfig: createRouter(_authenticator),
+      routerConfig: _routerService.createRouter(_authenticator),
     );
   }
 }

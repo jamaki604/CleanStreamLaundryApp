@@ -5,6 +5,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_se
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
 import 'package:clean_stream_laundry_app/Services/Nayax/machine_communicator.dart';
 import 'package:clean_stream_laundry_app/Services/Stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
@@ -75,6 +76,10 @@ Future<void> setupDependencies() async{
 
   getIt.registerLazySingleton<MachineCommunicationService>(
       () => MachineCommunicator()
+  );
+
+  getIt.registerLazySingleton<RouterService>(
+      () => RouterService()
   );
 }
 
