@@ -25,7 +25,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
         appBar: AppBar(
           title: Text(
             'Monthly Transaction History',
-            style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
           ),
           elevation: 2,
         ),
