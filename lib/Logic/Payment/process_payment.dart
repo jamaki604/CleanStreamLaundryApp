@@ -13,9 +13,9 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   );
 
   final paymentService = GetIt.instance<PaymentService>();
+  final transactionService = GetIt.instance<TransactionService>();
 
   final int status = await paymentService.makePayment(amount);
-  final transactionService = GetIt.instance<TransactionService>();
 
   Navigator.of(context, rootNavigator: true).pop();
 

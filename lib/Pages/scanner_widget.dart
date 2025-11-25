@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
-import '../Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/Components/status_dialog_box.dart';
 
 class ScannerWidget extends StatefulWidget {
   const ScannerWidget({super.key});
@@ -119,59 +119,8 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     if (result == "pass") {
       context.go('/paymentPage?machineId=$code');
     } else {
-      showError(result);
+      statusDialog(context, title: "Machine Unavailable", message: "", isSuccess: false);
       cameraController.start();
     }
-  }
-
-  void showError(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Center(
-          child: Text(
-            "Machine Unavailable",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue[900],
-            ),
-          ),
-        ),
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).colorScheme.fontInverted,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        actions: <Widget>[
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 3,
-            ),
-            child: const Text(
-              'OK',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          )
-        ],
-      ),
-    );
   }
 }
