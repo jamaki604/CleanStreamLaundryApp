@@ -1,138 +1,284 @@
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/Services/Stripe/stripe_service_mobile.dart';
-import 'package:clean_stream_laundry_app/main.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:get_it/get_it.dart';
 import 'mocks.dart';
 
 void main() {
-  late StripeMock stripeMock;
-  late EdgeFunctionMock edgeFunctionMock;
+  late MockStripe mockStripe;
+  late MockEdgeFunctionService mockEdgeFunctionService;
   late StripeService stripeService;
+  final getIt = GetIt.instance;
 
   setUpAll(() {
-    registerFallbackValue(SetupPaymentSheetParametersFake());
+    TestWidgetsFlutterBinding.ensureInitialized();
+
+    // Register fallback values
+    registerFallbackValue(FakeSetupPaymentSheetParameters());
   });
 
   setUp(() {
+    // Reset GetIt before each test
     getIt.reset();
 
-    edgeFunctionMock = EdgeFunctionMock();
-    getIt.registerLazySingleton<EdgeFunctionService>(() => edgeFunctionMock);
+    // Create mocks
+    mockEdgeFunctionService = MockEdgeFunctionService();
+    mockStripe = MockStripe();
 
-    stripeMock = StripeMock();
-    stripeService = StripeService(instance: stripeMock);
+    // Register mock in GetIt
+    getIt.registerSingleton<EdgeFunctionService>(mockEdgeFunctionService);
+    getIt.registerSingleton<Stripe>(mockStripe);
 
+    // Create service instance
+    stripeService = StripeService();
   });
 
-  group("Stripe test for mobile", () {
+  tearDown(() {
+    getIt.reset();
+  });
 
-    test("Will return 400 if no client secret is found", () async {
+  group("StripeService Tests", () {
+    group("makePayment", () {
+      test("returns 400 when no client secret is found", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer((_) async => null);
 
-      when(() => stripeMock.initPaymentSheet(
-        paymentSheetParameters: any(named: "paymentSheetParameters"),
-      )).thenAnswer((_) async => null);
+        // Act
+        final result = await stripeService.makePayment(2.60);
 
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenAnswer((_) async => null);
+        // Assert
+        expect(result, 400);
+        verify(() => mockEdgeFunctionService.runEdgeFunction(
+          name: 'paymentIntent',
+          body: {'amount': '260', 'currency': 'usd'},
+        )).called(1);
+      });
 
-      when(() => stripeMock.presentPaymentSheet())
-          .thenAnswer((_) async => null);
+      test("returns 200 when payment succeeds", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(
+            status: 200,
+            data: {"clientSecret": "testSecret"},
+          ),
+        );
 
-      final result = await stripeService.makePayment(2.60);
+        when(() => mockStripe.initPaymentSheet(
+          paymentSheetParameters: any(named: "paymentSheetParameters"),
+        )).thenAnswer((_) async => null);
 
-      expect(result, 400);
+        when(() => mockStripe.presentPaymentSheet())
+            .thenAnswer((_) async => null);
 
+        // Act
+        final result = await stripeService.makePayment(2.60);
+
+        // Assert
+        expect(result, 200);
+        verify(() => mockStripe.initPaymentSheet(
+          paymentSheetParameters: any(named: "paymentSheetParameters"),
+        )).called(1);
+        verify(() => mockStripe.presentPaymentSheet()).called(1);
+      });
+
+      test("returns 401 when StripeException is thrown", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(
+            status: 200,
+            data: {"clientSecret": "testSecret"},
+          ),
+        );
+
+        when(() => mockStripe.initPaymentSheet(
+          paymentSheetParameters: any(named: "paymentSheetParameters"),
+        )).thenThrow(
+          StripeException(
+            error: LocalizedErrorMessage(code: FailureCode.Unknown),
+          ),
+        );
+
+        // Act
+        final result = await stripeService.makePayment(2.60);
+
+        // Assert
+        expect(result, 401);
+      });
+
+      test("returns 400 when generic exception is thrown", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(
+            status: 200,
+            data: {"clientSecret": "testSecret"},
+          ),
+        );
+
+        when(() => mockStripe.initPaymentSheet(
+          paymentSheetParameters: any(named: "paymentSheetParameters"),
+        )).thenThrow(Exception("Generic error"));
+
+        // Act
+        final result = await stripeService.makePayment(2.60);
+
+        // Assert
+        expect(result, 400);
+      });
+
+      test("returns 400 when presentPaymentSheet throws exception", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(
+            status: 200,
+            data: {"clientSecret": "testSecret"},
+          ),
+        );
+
+        when(() => mockStripe.initPaymentSheet(
+          paymentSheetParameters: any(named: "paymentSheetParameters"),
+        )).thenAnswer((_) async => null);
+
+        when(() => mockStripe.presentPaymentSheet())
+            .thenThrow(Exception("Payment sheet error"));
+
+        // Act
+        final result = await stripeService.makePayment(2.60);
+
+        // Assert
+        expect(result, 400);
+      });
     });
 
-    test("Will return 200 if everything runs okay", () async {
+    group("createPaymentIntent", () {
+      test("returns client secret when successful", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(
+            status: 200,
+            data: {"clientSecret": "testSecret123"},
+          ),
+        );
 
-      when(() => stripeMock.initPaymentSheet(
-        paymentSheetParameters: any(named: "paymentSheetParameters"),
-      )).thenAnswer((_) async => null);
+        // Act
+        final result = await stripeService.createPaymentIntent(25.70, "usd");
 
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenAnswer((_) async => FunctionResponse(status: 200,data: {"clientSecret": "testSecret"}));
+        // Assert
+        expect(result, "testSecret123");
+        verify(() => mockEdgeFunctionService.runEdgeFunction(
+          name: 'paymentIntent',
+          body: {'amount': '2570', 'currency': 'usd'},
+        )).called(1);
+      });
 
-      when(() => stripeMock.presentPaymentSheet())
-          .thenAnswer((_) async => null);
+      test("returns null when response is null", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer((_) async => null);
 
-      final result = await stripeService.makePayment(2.60);
+        // Act
+        final result = await stripeService.createPaymentIntent(25.70, "usd");
 
-      expect(result, 200);
+        // Assert
+        expect(result, null);
+      });
+
+      test("returns null when response data is null", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(status: 200, data: null),
+        );
+
+        // Act
+        final result = await stripeService.createPaymentIntent(25.70, "usd");
+
+        // Assert
+        expect(result, null);
+      });
+
+      test("returns null when clientSecret is not in response", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenAnswer(
+              (_) async => FunctionResponse(
+            status: 200,
+            data: {"someOtherField": "value"},
+          ),
+        );
+
+        // Act
+        final result = await stripeService.createPaymentIntent(25.70, "usd");
+
+        // Assert
+        expect(result, null);
+      });
+
+      test("returns null when exception is thrown", () async {
+        // Arrange
+        when(() => mockEdgeFunctionService.runEdgeFunction(
+          name: any(named: "name"),
+          body: any(named: "body"),
+        )).thenThrow(Exception("Network error"));
+
+        // Act
+        final result = await stripeService.createPaymentIntent(25.70, "usd");
+
+        // Assert
+        expect(result, null);
+      });
     });
 
-    test("Will return 401 if Stripe exception is thrown", () async {
+    group("convertDollarsToCents", () {
+      test("converts dollars to cents correctly", () {
+        expect(stripeService.convertDollarsToCents(2.75), "275");
+      });
 
-      when(() => stripeMock.initPaymentSheet(
-        paymentSheetParameters: any(named: "paymentSheetParameters"),
-      )).thenThrow(StripeException(error: LocalizedErrorMessage(code: FailureCode.Unknown)));
+      test("handles zero amount", () {
+        expect(stripeService.convertDollarsToCents(0), "0");
+      });
 
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenAnswer((_) async => FunctionResponse(status: 200,data: {"clientSecret": "testSecret"}));
+      test("handles whole dollar amounts", () {
+        expect(stripeService.convertDollarsToCents(10.00), "1000");
+      });
 
-      when(() => stripeMock.presentPaymentSheet())
-          .thenAnswer((_) async => null);
+      test("handles large amounts", () {
+        expect(stripeService.convertDollarsToCents(1234.56), "123456");
+      });
 
-      final result = await stripeService.makePayment(2.60);
+      test("handles small decimal amounts", () {
+        expect(stripeService.convertDollarsToCents(0.01), "1");
+      });
 
-      expect(result, 401);
+      test("rounds down fractional cents", () {
+        expect(stripeService.convertDollarsToCents(1.999), "199");
+      });
     });
-
-    test("Will return 400 if any other exception is thrown", () async {
-
-      when(() => stripeMock.initPaymentSheet(
-        paymentSheetParameters: any(named: "paymentSheetParameters"),
-      )).thenThrow(StripeException(error: LocalizedErrorMessage(code: FailureCode.Unknown)));
-
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenAnswer((_) async => FunctionResponse(status: 200,data: {"clientSecret": "testSecret"}));
-
-      when(() => stripeMock.presentPaymentSheet())
-          .thenAnswer((_) async => null);
-
-      final result = await stripeService.makePayment(2.60);
-
-      expect(result, 401);
-    });
-
-    test("Tests if createPayment intent returns testSecret", () async {
-
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenAnswer((_) async => FunctionResponse(status: 200,data: {"clientSecret": "testSecret"}));
-
-      final result = await stripeService.createPaymentIntent(25.70,"usd");
-
-      expect(result, "testSecret");
-    });
-
-    test("Tests if createPayment intent returns null if data is null", () async {
-
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenAnswer((_) async => null);
-
-      final result = await stripeService.createPaymentIntent(25.70,"usd");
-
-      expect(result, null);
-    });
-
-    test("Tests if createPayment intent returns null if exception is thrown", () async {
-
-      when(() => edgeFunctionMock.runEdgeFunction(name: any(named:"name"), body: any(named:"body")))
-          .thenThrow(Exception("Test exception"));
-
-      final result = await stripeService.createPaymentIntent(25.70,"usd");
-
-      expect(result, null);
-    });
-
-    test("Tests that the correct amount is calculated",(){
-      final result = stripeService.convertDollarsToCents(2.75);
-      expect(result, "275");
-    });
-    
   });
 }
