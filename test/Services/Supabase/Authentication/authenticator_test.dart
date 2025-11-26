@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -595,7 +597,7 @@ void main(){
       expect(response,AuthenticationResponses.emailNotVerified);
     });
 
-    test("Resend verfication email unsuccesfully",() async{
+    test("Resend verification email unsuccessfully",() async{
 
       when(() => supabaseAuth.resend(
           type: OtpType.signup,
@@ -667,7 +669,7 @@ void main(){
       when(() => supabaseAuth.signInWithPassword(
         email: any(named: 'email'),
         password: any(named: 'password'),
-      )).thenThrow(Exception("Unkown exception"));
+      )).thenThrow(Exception("Unknown exception"));
 
       final result = await authenticator.login("testEmail","testPassword");
       expect(result, AuthenticationResponses.failure);
@@ -682,6 +684,147 @@ void main(){
       when(() => supabaseAuth.currentUser).thenReturn(null);
       final result = authenticator.getCurrentUserId;
       expect(result, null);
+    });
+
+    test("Tests if the email is verified",(){
+
+      final testUser = User(
+        id: '11111111-1111-1111-1111-111111111111',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'example@email.com',
+        emailConfirmedAt: '2024-01-01T00:00:00Z',
+        phone: '',
+        lastSignInAt: '2024-01-01T00:00:00Z',
+        appMetadata: {
+          'provider': 'email',
+          'providers': ['email']
+        },
+        userMetadata: {},
+        identities: [
+          UserIdentity(
+            identityId: '22222222-2222-2222-2222-222222222222',
+            id: '11111111-1111-1111-1111-111111111111',
+            userId: '11111111-1111-1111-1111-111111111111',
+            identityData: {
+              'email': 'example@email.com',
+              'email_verified': false,
+              'phone_verified': false,
+              'sub': '11111111-1111-1111-1111-111111111111'
+            },
+            provider: 'email',
+            lastSignInAt: '2024-01-01T00:00:00Z',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+          ),
+        ],
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      );
+
+
+      when(() => supabaseAuth.currentUser).thenReturn(testUser);
+      var result = authenticator.isEmailVerified();
+      expect(result, true);
+    });
+
+    test("Tests if the email is not verified",(){
+
+      final testUser = User(
+        id: '11111111-1111-1111-1111-111111111111',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'example@email.com',
+        emailConfirmedAt: null,
+        phone: '',
+        lastSignInAt: '2024-01-01T00:00:00Z',
+        appMetadata: {
+          'provider': 'email',
+          'providers': ['email']
+        },
+        userMetadata: {},
+        identities: [
+          UserIdentity(
+            identityId: '22222222-2222-2222-2222-222222222222',
+            id: '11111111-1111-1111-1111-111111111111',
+            userId: '11111111-1111-1111-1111-111111111111',
+            identityData: {
+              'email': 'example@email.com',
+              'email_verified': false,
+              'phone_verified': false,
+              'sub': '11111111-1111-1111-1111-111111111111'
+            },
+            provider: 'email',
+            lastSignInAt: '2024-01-01T00:00:00Z',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+          ),
+        ],
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      );
+
+
+      when(() => supabaseAuth.currentUser).thenReturn(testUser);
+      var result = authenticator.isEmailVerified();
+      expect(result, false);
+    });
+
+    test("onAuthChange emits true when a user exists", () async {
+      final client = SupabaseMock();
+      final auth = GoTrueMock();
+
+      final controller = StreamController<AuthState>();
+
+      when(() => supabaseAuth.onAuthStateChange)
+          .thenAnswer((_) => Stream.value(AuthState(
+        AuthChangeEvent.signedIn,
+        Session(
+          accessToken: '',
+          tokenType: 'bearer',
+          expiresIn: 3600,
+          refreshToken: '',
+          user: supabaseAuth.currentUser!,
+        ),
+      )));
+
+      when(() => auth.onAuthStateChange).thenAnswer((_) => controller.stream);
+
+      final fakeUser = User(
+        id: "123",
+        aud: "",
+        role: "",
+        email: "",
+        phone: "",
+        createdAt: "",
+        updatedAt: "",
+        appMetadata: {},
+        userMetadata: {},
+        identities: [],
+      );
+
+      final fakeSession = Session(
+        accessToken: "",
+        tokenType: "",
+        user: fakeUser,
+        expiresIn: 3600,
+      );
+
+
+      expectLater(authenticator.onAuthChange, emits(true));
+
+      controller.add(AuthState(AuthChangeEvent.signedIn, fakeSession));
+    });
+
+    test("onAuthChange emits false when a user doesn't exist", () async {
+
+      final controller = StreamController<AuthState>();
+      when(() => supabaseAuth.onAuthStateChange).thenAnswer((_) => controller.stream);
+
+      expectLater(authenticator.onAuthChange, emits(false));
+
+      controller.add(AuthState(AuthChangeEvent.signedOut, null));
+
     });
 
   });
