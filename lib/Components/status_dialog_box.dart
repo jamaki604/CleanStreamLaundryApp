@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,6 +34,7 @@ void statusDialog(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
+              color: Theme.of(context).colorScheme.fontInverted,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
@@ -43,7 +45,7 @@ void statusDialog(
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.fontInverted,
             ),
           ),
           const SizedBox(height: 24),

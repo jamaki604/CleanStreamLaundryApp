@@ -140,14 +140,53 @@ class HomePageState extends State<HomePage> {
                     final machineIdle = snapshot.data![0];
                     final totalMachine = snapshot.data![0];
 
-                    return LargeButton(
-                      headLineText: "$totalMachine available",
-                      descripitionText: "$totalMachine/$machineIdle washers",
-                      icon: Icons.local_laundry_service,
-                      onPressed: () {},
+                    return Container(
+                      width: 250,
+                      height: 160,
+                      padding: const EdgeInsets.all(30),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue, width: 3),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.transparent,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "$totalMachine available",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.fontInverted,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              Text(
+                                "$totalMachine/$machineIdle washers",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.fontSecondary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Icon(
+                            Icons.local_laundry_service,
+                            color: Colors.blue,
+                            size: 40,
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
+
               SizedBox(height: 20),
               if (locationSelected)
                 FutureBuilder(
@@ -163,11 +202,48 @@ class HomePageState extends State<HomePage> {
                     final machineIdle = snapshot.data![0];
                     final totalMachine = snapshot.data![0];
 
-                    return LargeButton(
-                      headLineText: "$totalMachine available",
-                      descripitionText: "$totalMachine/$machineIdle dryers",
-                      icon: Icons.local_laundry_service,
-                      onPressed: () {},
+                    return Container(
+                      width: 250,
+                      height: 160,
+                      padding: const EdgeInsets.all(30),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue, width: 3),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.transparent,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "$totalMachine available",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.fontInverted,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              Text(
+                                "$totalMachine/$machineIdle dryers",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.fontSecondary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Icon(
+                            Icons.local_laundry_service,
+                            color: Colors.blue,
+                            size: 40,
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
