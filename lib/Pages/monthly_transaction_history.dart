@@ -18,88 +18,105 @@ class MonthlyTransactionHistory extends StatelessWidget {
         return dateB.compareTo(dateA);
       });
 
+    final ScrollController _scrollController = ScrollController();
+
     return BasePage(
       body: Scaffold(
         appBar: AppBar(
           title: Text(
             'Monthly Transaction History',
-            style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
+            style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
           ),
           elevation: 2,
         ),
-        body: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: sortedMonths.length,
-          itemBuilder: (context, index) {
-            final month = sortedMonths[index];
-            final data = monthlySums[month]!;
-            final total =
-                data['directWasher']! + data['directDryer']!+data['loyaltyCard']!;
-            return Card(
-              margin: const EdgeInsets.only(bottom: 16),
-              elevation: 2,
-              color: Theme.of(context).colorScheme.cardPrimary,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Theme(
+          data: Theme.of(context).copyWith(
+            scrollbarTheme: ScrollbarThemeData(
+              thumbColor: MaterialStateProperty.all(Colors.lightBlue),
+              trackColor: MaterialStateProperty.all(Colors.transparent),
+              thickness: MaterialStateProperty.all(8),
+              radius: const Radius.circular(4),
+            ),
+          ),
+          child: Scrollbar(
+            controller: _scrollController,
+            thumbVisibility: true,
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(16),
+              itemCount: sortedMonths.length,
+              itemBuilder: (context, index) {
+                final month = sortedMonths[index];
+                final data = monthlySums[month]!;
+                final total =
+                    data['directWasher']! + data['directDryer']! + data['loyaltyCard']!;
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  elevation: 2,
+                  color: Theme.of(context).colorScheme.cardPrimary,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          month,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              month,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              '\$${total.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '\$${total.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                        const Divider(height: 24),
+                        _buildTransactionRow(
+                          'Direct Washer Payments',
+                          data['directWasher']!,
+                          Colors.black,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Loyalty Washer Payments',
+                          data['loyaltyWasher']!,
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Direct Dryer Payments',
+                          data['directDryer']!,
+                          Colors.black,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Loyalty Dryer Payments',
+                          data['loyaltyDryer']!,
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Loyalty Card Loads',
+                          data['loyaltyCard']!,
+                          Colors.black,
                         ),
                       ],
                     ),
-                    const Divider(height: 24),
-                    _buildTransactionRow(
-                      'Direct Washer Payments',
-                      data['directWasher']!,
-                      Colors.black,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildTransactionRow(
-                      'Loyalty Washer Payments',
-                      data['loyaltyWasher']!,
-                      Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildTransactionRow(
-                      'Direct Dryer Payments',
-                      data['directDryer']!,
-                      Colors.black,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildTransactionRow(
-                      'Loyalty Dryer Payments',
-                      data['loyaltyDryer']!,
-                      Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildTransactionRow(
-                      'Loyalty Card Loads',
-                      data['loyaltyCard']!,
-                      Colors.black,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

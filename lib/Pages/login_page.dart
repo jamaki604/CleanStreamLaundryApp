@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -84,14 +85,17 @@ class _LoginScreenState extends State<LoginScreen> {
               Image.asset("assets/Logo.png", height: 250, width: 250,),
               TextField(
                 controller: _emailCtrl,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   labelText: emailText,
-                  labelStyle: TextStyle(color: labelColor), // matches button color
+                  labelStyle: TextStyle(color: labelColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color:focusedBorderColor, width: 2.0),
+                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
@@ -101,13 +105,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixIcon: Icon(Icons.email, color: iconColor),
                 ),
               ),
+
               const SizedBox(height: 16),
 
               TextField(
                 controller: _passwordCtrl,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
                 decoration: InputDecoration(
                   labelText: passwordText,
-                  labelStyle: TextStyle(color: labelColor), // matches button color
+                  labelStyle: TextStyle(color: labelColor),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -121,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
-                  obscureText: true
+                obscureText: true,
               ),
               const SizedBox(height: 24),
 
