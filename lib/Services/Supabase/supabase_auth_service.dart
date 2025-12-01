@@ -1,10 +1,14 @@
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get_it/get_it.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 
 class SupabaseAuthService implements AuthService{
 
   late final SupabaseClient _client;
+  final profileService = GetIt.instance<ProfileService>();
+
 
   SupabaseAuthService({required SupabaseClient client}){
     _client = client;
@@ -65,11 +69,13 @@ class SupabaseAuthService implements AuthService{
   }
 
   @override
-  Future<AuthenticationResponses> signUp(String email, String password) async{
+  Future<AuthenticationResponses> signUp(String email, String password, String name) async{
     AuthenticationResponses output = AuthenticationResponses.failure;
     AuthenticationResponses validatePasswordResponse = _validatePassword(password);
 
     if(validatePasswordResponse == AuthenticationResponses.success) {
+      await profileService.createAccount(name: name);
+
       final AuthResponse response = await _client.auth.signUp(
           email: email,
           password: password,

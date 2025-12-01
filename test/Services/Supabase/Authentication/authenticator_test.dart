@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,14 +13,20 @@ void main(){
   late SupabaseAuthService authenticator;
   late SupabaseMock client;
   late GoTrueMock supabaseAuth;
+  late ProfileServiceMock mockProfileService;
+  final getIt = GetIt.instance;
 
   group("Authentication Tests", (){
 
     setUp((){
+      getIt.reset();
       client = SupabaseMock();
       supabaseAuth = GoTrueMock();
       when(() => client.auth).thenReturn(supabaseAuth);
-
+      mockProfileService = ProfileServiceMock();
+      getIt.registerSingleton<ProfileService>(mockProfileService);
+      when(() => mockProfileService.createAccount(name: any(named: 'name')))
+          .thenAnswer((_) async {});
       authenticator = SupabaseAuthService(client: client);
 
       final mockUser = User(
@@ -212,7 +219,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123G@");
+      final response = await authenticator.signUp("testemail", "testpassword123G@", "testname");
 
       expect(response,AuthenticationResponses.success);
     });
@@ -300,7 +307,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpasswordG");
+      final response = await authenticator.signUp("testemail", "testpasswordG", "testname");
 
       expect(response,AuthenticationResponses.noDigit);
     });
@@ -388,7 +395,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123G");
+      final response = await authenticator.signUp("testemail", "testpassword123G", "testname");
 
       expect(response,AuthenticationResponses.noSpecialCharacter);
     });
@@ -476,7 +483,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123@");
+      final response = await authenticator.signUp("testemail", "testpassword123@", "testname");
 
       expect(response,AuthenticationResponses.noUppercase);
     });
@@ -564,7 +571,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "test");
+      final response = await authenticator.signUp("testemail", "test", "testname");
 
       expect(response,AuthenticationResponses.lessThanMinLength);
     });
@@ -771,7 +778,6 @@ void main(){
     });
 
     test("onAuthChange emits true when a user exists", () async {
-      final client = SupabaseMock();
       final auth = GoTrueMock();
 
       final controller = StreamController<AuthState>();

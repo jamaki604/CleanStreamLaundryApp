@@ -2,7 +2,7 @@ import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enu
 
 abstract class AuthService{
   Future<AuthenticationResponses> login(String email, String password);
-  Future<AuthenticationResponses> signUp(String email, String password);
+  Future<AuthenticationResponses> signUp(String email, String password, String name);
   Future<void> logout();
   Future<AuthenticationResponses> isLoggedIn();
   String? get getCurrentUserId;
