@@ -114,13 +114,12 @@ class SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset("assets/Logo.png", height: 250, width: 250),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset("assets/Logo.png", height: 250, width: 250),
               TextField(
                 controller: _nameCtrl,
                 style: TextStyle(
@@ -261,7 +260,6 @@ class SignUpScreenState extends State<SignUpScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
