@@ -87,8 +87,9 @@ class SignUpScreenState extends State<SignUpScreen> {
     try {
       final authResponse = await authService.signUp( email, password);
       if (authResponse == AuthenticationResponses.success) {
+        final userId = authService.getLastSignedUpUserId();
         _showMessage('Account created successfully.');
-        await profileService.createAccount(name: name);
+        await profileService.createAccount(id: userId, name: name);
         context.go('/email-verification');
       }else if(authResponse == AuthenticationResponses.noDigit){
         _changeColorsToRed('Please include a digit');

@@ -10,14 +10,10 @@ class SupabaseProfileService extends ProfileService{
   }
 
   @override
-  Future<void> createAccount({required String name}) async {
-    final user = _client.auth.currentUser;
-    if (user == null) {
-      return;
-    }
+  Future<void> createAccount({required String id, required String name}) async {
 
     await _client.from('profiles').insert({
-      'id': user.id,
+      'id': id,
       'full_name': name,
     });
 

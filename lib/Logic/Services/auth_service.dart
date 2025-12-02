@@ -6,6 +6,7 @@ abstract class AuthService{
   Future<void> logout();
   Future<AuthenticationResponses> isLoggedIn();
   String? get getCurrentUserId;
+  String getLastSignedUpUserId();
   Future<AuthenticationResponses> resendVerification();
   Stream<bool> get onAuthChange;
   bool isEmailVerified();
