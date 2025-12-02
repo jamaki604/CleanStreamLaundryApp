@@ -5,6 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseAuthService implements AuthService{
 
   late final SupabaseClient _client;
+  String? lastSignedUpUserId;
+
+
 
   SupabaseAuthService({required SupabaseClient client}){
     _client = client;
@@ -13,6 +16,11 @@ class SupabaseAuthService implements AuthService{
   @override
   String? get getCurrentUserId {
     return _client.auth.currentUser?.id;
+  }
+
+  @override
+  String getLastSignedUpUserId() {
+    return lastSignedUpUserId!;
   }
 
   @override
@@ -77,6 +85,7 @@ class SupabaseAuthService implements AuthService{
       );
 
       if (response.user != null) {
+        lastSignedUpUserId = response.user!.id;
         output = AuthenticationResponses.success;
       }
     }else{
