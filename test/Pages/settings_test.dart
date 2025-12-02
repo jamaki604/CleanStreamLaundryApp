@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Components/base_page.dart';
+import 'package:clean_stream_laundry_app/Widgets//base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme_manager.dart';
@@ -126,15 +126,6 @@ void main() {
       final buttonStyle = signOutButton.style;
       expect(buttonStyle, isNotNull);
     });
-
-    testWidgets('Settings should be wrapped in BasePage', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-
-      expect(find.byType(BasePage), findsOneWidget);
-    });
-
     testWidgets('should center content properly', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 

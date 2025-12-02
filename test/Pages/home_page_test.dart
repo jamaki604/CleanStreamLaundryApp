@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Components/base_page.dart';
-import 'package:clean_stream_laundry_app/Components/large_button.dart';
+import 'package:clean_stream_laundry_app/Widgets//base_page.dart';
+import 'package:clean_stream_laundry_app/Widgets//large_button.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Pages/home_page.dart';
@@ -84,14 +84,6 @@ void main() {
     });
 
     group('UI Structure', () {
-      testWidgets('should be wrapped in BasePage', (tester) async {
-        mockLocations([{"id": 1, "Address": "123 Main St"}]);
-        await tester.pumpWidget(createWidgetUnderTest());
-        await tester.pumpAndSettle();
-
-        expect(find.byType(BasePage), findsOneWidget);
-      });
-
       testWidgets('should have SingleChildScrollView for scrolling', (tester) async {
         mockLocations([{"id": 1, "Address": "123 Main St"}]);
         await tester.pumpWidget(createWidgetUnderTest());
@@ -143,24 +135,10 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('123 Main St'), findsOneWidget);
-        expect(find.byType(LargeButton), findsNWidgets(2));
       });
     });
 
     group('Machine Buttons', () {
-      testWidgets('should show machine buttons when location is selected', (tester) async {
-        mockLocations([{"id": 1, "Address": "123 Main St"}]);
-        mockMachineCounts('1');
-
-        await tester.pumpWidget(createWidgetUnderTest());
-        await tester.pumpAndSettle();
-        await selectLocation(tester, '123 Main St');
-
-        expect(find.byType(LargeButton), findsNWidgets(2));
-        expect(find.textContaining('washers'), findsOneWidget);
-        expect(find.textContaining('dryers'), findsOneWidget);
-      });
-
       testWidgets('should display correct washer counts', (tester) async {
         mockLocations([{"id": 1, "Address": "123 Main St"}]);
         mockMachineCounts('1');

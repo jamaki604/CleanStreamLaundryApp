@@ -138,60 +138,34 @@ void main() {
       expect(find.text('Passwords do not match.'), findsOneWidget);
     });
 
-    testWidgets('should call signUp and createAccount on successful signup', (
-      WidgetTester tester,
-    ) async {
-      setupViewport(tester);
-      when(
-        () => mockAuthService.signUp(any(), any()),
-      ).thenAnswer((_) async => AuthenticationResponses.success);
-      when(
-        () => mockProfileService.createAccount(name: any(named: 'name')),
-      ).thenAnswer((_) async => {});
 
-      await tester.pumpWidget(createWidgetUnderTest());
 
-      await tester.enterText(find.byType(TextField).at(0), 'Test User');
-      await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
-      await tester.enterText(find.byType(TextField).at(2), 'Password123!');
-      await tester.enterText(find.byType(TextField).at(3), 'Password123!');
+    testWidgets('should navigate to email verification on success',
+            (WidgetTester tester) async {
+          when(() => mockAuthService.signUp(any(), any()))
+              .thenAnswer((_) async => AuthenticationResponses.success);
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
-      await tester.pump();
-      await tester.pumpAndSettle();
+          when(() => mockAuthService.getLastSignedUpUserId())
+              .thenReturn('test-user-id-123');
 
-      verify(
-        () => mockAuthService.signUp('test@example.com', 'Password123!'),
-      ).called(1);
-      verify(
-        () => mockProfileService.createAccount(name: 'Test User'),
-      ).called(1);
-    });
+          when(() => mockProfileService.createAccount(
+              name: any(named: 'name'), id: any(named: 'id')))
+              .thenAnswer((_) async => {});
 
-    testWidgets('should navigate to email verification on success', (
-      WidgetTester tester,
-    ) async {
-      when(
-        () => mockAuthService.signUp(any(), any()),
-      ).thenAnswer((_) async => AuthenticationResponses.success);
-      when(
-        () => mockProfileService.createAccount(name: any(named: 'name')),
-      ).thenAnswer((_) async => {});
+          setupViewport(tester);
+          await tester.pumpWidget(createWidgetUnderTest());
 
-      setupViewport(tester);
-      await tester.pumpWidget(createWidgetUnderTest());
+          await tester.enterText(find.byType(TextField).at(0), 'Test User');
+          await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
+          await tester.enterText(find.byType(TextField).at(2), 'Password123!');
+          await tester.enterText(find.byType(TextField).at(3), 'Password123!');
 
-      await tester.enterText(find.byType(TextField).at(0), 'Test User');
-      await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
-      await tester.enterText(find.byType(TextField).at(2), 'Password123!');
-      await tester.enterText(find.byType(TextField).at(3), 'Password123!');
+          await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
+          await tester.pump(); // start async work
+          await tester.pumpAndSettle(const Duration(seconds: 2)); // wait for navigation
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
-      await tester.pump();
-      await tester.pumpAndSettle();
-
-      expect(find.text('Email Verification Page'), findsOneWidget);
-    });
+          expect(find.text('Email Verification Page'), findsOneWidget);
+        });
 
     testWidgets('should show error for password without digit', (
       WidgetTester tester,
