@@ -2,10 +2,12 @@ import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enu
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Pages/loading_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+
 import 'mocks.dart';
 
 void main() {
@@ -190,6 +192,100 @@ void main() {
     });
   });
 
+  group('Deep Link Tests', () {
+    testWidgets('navigates to home page on email verification deep link', (WidgetTester tester) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+            (MethodCall methodCall) async {
+          if (methodCall.method == 'getInitialAppLink') {
+            return 'clean-stream://email-verification';
+          }
+          return null;
+        },
+      );
+
+      when(() => mockAuthService.isLoggedIn())
+          .thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(LoadingPage()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('handles null initial app link', (WidgetTester tester) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+            (MethodCall methodCall) async {
+          if (methodCall.method == 'getInitialAppLink') {
+            return null;
+          }
+          return null;
+        },
+      );
+
+      when(() => mockAuthService.isLoggedIn())
+          .thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(LoadingPage()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('ignores deep link with wrong scheme', (WidgetTester tester) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+            (MethodCall methodCall) async {
+          if (methodCall.method == 'getInitialAppLink') {
+            return 'https://email-verification';
+          }
+          return null;
+        },
+      );
+
+      when(() => mockAuthService.isLoggedIn())
+          .thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(LoadingPage()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('ignores deep link with wrong host', (WidgetTester tester) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+            (MethodCall methodCall) async {
+          if (methodCall.method == 'getInitialAppLink') {
+            return 'clean-stream://wrong-host';
+          }
+          return null;
+        },
+      );
+
+      when(() => mockAuthService.isLoggedIn())
+          .thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(LoadingPage()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+        null,
+      );
+    });
+  });
+
   group('State Management Tests', () {
     testWidgets('does not navigate if widget is unmounted', (WidgetTester tester) async {
       when(() => mockAuthService.isLoggedIn())
@@ -202,7 +298,6 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
     });
-
   });
 
   group('UI Element Tests', () {
