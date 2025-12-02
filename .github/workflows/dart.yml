@@ -47,7 +47,7 @@ jobs:
           flutter test \
             --machine \
             --coverage \
-            > test_output.json
+            | tee test_output.json
 
       - name: Install junitreport converter
         run: dart pub global activate junitreport
