@@ -17,6 +17,7 @@ class SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
+  final ScrollController _scrollCtrl = ScrollController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   var passwordText = "Password";
@@ -35,7 +36,7 @@ class SignUpScreenState extends State<SignUpScreen> {
         SnackBar(content: Text(text)));
   }
 
-  void _changeColorsToRed(String reason){
+  void _changeColorsToRed(String reason) {
     setState(() {
       passwordText = reason;
       confirmPasswordText = reason;
@@ -47,7 +48,7 @@ class SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  void _changeColorsToDefault(){
+  void _changeColorsToDefault() {
     setState(() {
       passwordText = "Password";
       confirmPasswordText = "Confirm Password";
@@ -64,6 +65,7 @@ class SignUpScreenState extends State<SignUpScreen> {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _passwordConfirmCtrl.dispose();
+    _scrollCtrl.dispose();
     super.dispose();
   }
 
@@ -87,22 +89,23 @@ class SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final authResponse = await authService.signUp( email, password);
+      final authResponse = await authService.signUp(email, password);
       if (authResponse == AuthenticationResponses.success) {
         _showMessage('Account created successfully.');
         await profileService.createAccount(name: name);
         context.go('/email-verification');
-      }else if(authResponse == AuthenticationResponses.noDigit){
+      } else if (authResponse == AuthenticationResponses.noDigit) {
         _changeColorsToRed('Please include a digit');
-      }else if(authResponse == AuthenticationResponses.lessThanMinLength){
+      } else if (authResponse == AuthenticationResponses.lessThanMinLength) {
         _changeColorsToRed("Password length is too short");
-      }else if(authResponse == AuthenticationResponses.noSpecialCharacter){
+      } else if (authResponse == AuthenticationResponses.noSpecialCharacter) {
         _changeColorsToRed("Please include a special character");
-      }else if(authResponse == AuthenticationResponses.noUppercase){
+      } else if (authResponse == AuthenticationResponses.noUppercase) {
         _changeColorsToRed("Please include an uppercase letter");
-      }else if(authResponse == AuthenticationResponses.invalidSpecialCharacter){
+      } else
+      if (authResponse == AuthenticationResponses.invalidSpecialCharacter) {
         _changeColorsToRed("Please use a different special character");
-      }else {
+      } else {
         _showMessage('Sign-up failed. Try again.');
       }
     } catch (e) {
@@ -115,174 +118,219 @@ class SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset("assets/Logo.png", height: 250, width: 250),
-              TextField(
-                controller: _nameCtrl,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontInverted,
+      backgroundColor: Theme
+          .of(context)
+          .colorScheme
+          .surface,
+      body: ScrollbarTheme(
+        data: ScrollbarThemeData(
+          thumbColor: MaterialStateProperty.all(Colors.blue),
+        ),
+        child: Scrollbar(
+          controller: _scrollCtrl,
+          thumbVisibility: true,
+          interactive: true,
+          child: SingleChildScrollView(
+            controller: _scrollCtrl,
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset("assets/Logo.png", height: 250, width: 250),
+                TextField(
+                  controller: _nameCtrl,
+                  style: TextStyle(
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .fontInverted,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    labelStyle: TextStyle(color: Colors.blue),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme
+                          .of(context)
+                          .colorScheme
+                          .fontSecondary),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: Icon(Icons.person, color: Colors.blue),
+                  ),
                 ),
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  labelStyle: TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: Icon(Icons.person, color: Colors.blue),
-                ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              TextField(
-                controller: _emailCtrl,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontInverted,
+                TextField(
+                  controller: _emailCtrl,
+                  style: TextStyle(
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .fontInverted,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    labelStyle: const TextStyle(color: Colors.blue),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme
+                          .of(context)
+                          .colorScheme
+                          .fontSecondary),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.email, color: Colors.blue),
+                  ),
                 ),
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.blue),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: const Icon(Icons.email, color: Colors.blue),
-                ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-            TextField(
-              controller: _passwordCtrl,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.fontInverted,
-              ),
-              decoration: InputDecoration(
-                labelText: passwordText,
-                labelStyle: TextStyle(color: labelColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: Icon(Icons.lock, color: iconColor),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.blue,
+                TextField(
+                  controller: _passwordCtrl,
+                  style: TextStyle(
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .fontInverted,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
+                  decoration: InputDecoration(
+                    labelText: passwordText,
+                    labelStyle: TextStyle(color: labelColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme
+                          .of(context)
+                          .colorScheme
+                          .fontSecondary),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: Icon(Icons.lock, color: iconColor),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons
+                            .visibility,
+                        color: Colors.blue,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: _obscurePassword,
+                  onChanged: (_) {
+                    if (iconColor == Colors.red) {
+                      _changeColorsToDefault();
+                    }
                   },
                 ),
-              ),
-              obscureText: _obscurePassword,
-              onChanged: (_) {
-                if (iconColor == Colors.red) {
-                  _changeColorsToDefault();
-                }
-              },
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            TextField(
-              controller: _passwordConfirmCtrl,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.fontInverted,
-              ),
-              decoration: InputDecoration(
-                labelText: confirmPasswordText,
-                labelStyle: TextStyle(color: labelColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: Icon(Icons.lock, color: iconColor),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.blue,
+                TextField(
+                  controller: _passwordConfirmCtrl,
+                  style: TextStyle(
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .fontInverted,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureConfirmPassword = !_obscureConfirmPassword;
-                    });
+                  decoration: InputDecoration(
+                    labelText: confirmPasswordText,
+                    labelStyle: TextStyle(color: labelColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          color: Colors.blue, width: 2.0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme
+                          .of(context)
+                          .colorScheme
+                          .fontSecondary),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: Icon(Icons.lock, color: iconColor),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword ? Icons.visibility_off : Icons
+                            .visibility,
+                        color: Colors.blue,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: _obscureConfirmPassword,
+                  onChanged: (value) {
+                    if ((_passwordCtrl.text.trim() !=
+                        _passwordConfirmCtrl.text.trim())) {
+                      if (iconColor != Colors.red) {
+                        _changeColorsToRed("Passwords don't match");
+                      }
+                    } else {
+                      _changeColorsToDefault();
+                    }
                   },
                 ),
-              ),
-              obscureText: _obscureConfirmPassword,
-              onChanged: (value) {
-                if ((_passwordCtrl.text.trim() != _passwordConfirmCtrl.text.trim())) {
-                  if (iconColor != Colors.red) {
-                    _changeColorsToRed("Passwords don't match");
-                  }
-                } else {
-                  _changeColorsToDefault();
-                }
+                const SizedBox(height: 24),
 
-                },
-              ),
-              const SizedBox(height: 24),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSignUp,
-                  style: ElevatedButton.styleFrom(backgroundColor:Colors.blue,foregroundColor:Colors.white),
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Create Account'),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleSignUp,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white),
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text('Create Account'),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 25.0),
-                child: InkWell(
-                  onTap: () => context.go("/login"),
-                  child: const Text(
-                    'Already have an account? Login',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
+                Padding(
+                  padding: const EdgeInsets.only(top: 25.0),
+                  child: InkWell(
+                    onTap: () => context.go("/login"),
+                    child: const Text(
+                      'Already have an account? Login',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
