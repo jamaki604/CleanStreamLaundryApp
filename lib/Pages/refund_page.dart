@@ -90,7 +90,7 @@ class _RefundPageState extends State<RefundPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<int>(
-                value: selectedTransactionIndex,
+                initialValue: selectedTransactionIndex,
                 hint: Text('Select a Transaction'),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.fontInverted,
