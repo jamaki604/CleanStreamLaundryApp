@@ -146,7 +146,7 @@ void main() {
         () => mockAuthService.signUp(any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.success);
       when(
-        () => mockProfileService.createAccount(name: any(named: 'name')),
+        () => mockProfileService.createAccount(name: any(named: 'name'), id:"test"),
       ).thenAnswer((_) async => {});
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -164,7 +164,7 @@ void main() {
         () => mockAuthService.signUp('test@example.com', 'Password123!'),
       ).called(1);
       verify(
-        () => mockProfileService.createAccount(name: 'Test User'),
+        () => mockProfileService.createAccount(name: 'Test User', id:"test"),
       ).called(1);
     });
 
@@ -175,7 +175,7 @@ void main() {
         () => mockAuthService.signUp(any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.success);
       when(
-        () => mockProfileService.createAccount(name: any(named: 'name')),
+        () => mockProfileService.createAccount(name: any(named: 'name'), id:"test"),
       ).thenAnswer((_) async => {});
 
       setupViewport(tester);
