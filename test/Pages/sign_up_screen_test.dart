@@ -142,31 +142,28 @@ void main() {
 
     testWidgets('should navigate to email verification on success',
             (WidgetTester tester) async {
-          // 1️⃣ Mock AuthService → success
           when(() => mockAuthService.signUp(any(), any()))
               .thenAnswer((_) async => AuthenticationResponses.success);
 
-          // 2️⃣ Mock ProfileService → accept any args
+          when(() => mockAuthService.getLastSignedUpUserId())
+              .thenReturn('test-user-id-123');
+
           when(() => mockProfileService.createAccount(
               name: any(named: 'name'), id: any(named: 'id')))
               .thenAnswer((_) async => {});
 
-          // 3️⃣ Build the widget
           setupViewport(tester);
           await tester.pumpWidget(createWidgetUnderTest());
 
-          // 4️⃣ Fill the form
           await tester.enterText(find.byType(TextField).at(0), 'Test User');
           await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
           await tester.enterText(find.byType(TextField).at(2), 'Password123!');
           await tester.enterText(find.byType(TextField).at(3), 'Password123!');
 
-          // 5️⃣ Submit
           await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
           await tester.pump(); // start async work
           await tester.pumpAndSettle(const Duration(seconds: 2)); // wait for navigation
 
-          // 6️⃣ Verify navigation
           expect(find.text('Email Verification Page'), findsOneWidget);
         });
 
