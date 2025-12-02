@@ -29,17 +29,17 @@ class CreditCard extends StatelessWidget {
                 Positioned(
                   top: -30,
                   left: 10,
-                  child: Image.asset("assets/Slogan.png", width: 200, height: 135),
+                  child: Image.asset("assets/Slogan.png", width: 200, height: 135,key: Key("slogan")),
                 ),
                 Positioned(
                   top: -10,
                   right: 0,
-                  child: Image.asset("assets/Icon.png", height: 85, width: 85),
+                  child: Image.asset("assets/Icon.png", height: 85, width: 85,key: Key("icon")),
                 ),
                 Positioned(
                   left: 15,
                   top: 65,
-                  child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45),
+                  child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45,key: Key("cardChip")),
                 ),
                 Positioned(
                     left: -4,
@@ -80,6 +80,7 @@ class CreditCard extends StatelessWidget {
                         "assets/Mastercard.png",
                         width: 60,
                         height: 35,
+                          key: Key("mastercard")
                       ),
                     ],
                   ),
