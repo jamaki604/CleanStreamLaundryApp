@@ -87,20 +87,22 @@ class HomePageState extends State<HomePage> {
                             child: DropdownButton<String>(
                               isExpanded: true,
                               value: selectedName,
-                              hint: Text(
-                                "Select Location",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Theme.of(context).colorScheme.fontInverted,
+                              hint: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Select Location",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Theme.of(context).colorScheme.fontInverted,
+                                  ),
                                 ),
                               ),
                               onChanged: (String? newValue) {
-
                                 if (newValue != null) {
                                   storage.setValue("lastSelectedLocation", newValue);
                                 }
-
-                                setState((){
+                                setState(() {
                                   selectedName = newValue;
                                   locationSelected = true;
                                   locationIDSelected = locationID[newValue];
@@ -109,11 +111,16 @@ class HomePageState extends State<HomePage> {
                               items: locationID.entries.map((entry) {
                                 return DropdownMenuItem<String>(
                                   value: entry.key,
-                                  child: Text(
-                                    entry.key,
-                                    style: TextStyle(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      entry.key,
+                                      style: TextStyle(
                                         fontSize: 18,
-                                        color: Theme.of(context).colorScheme.fontInverted),
+                                        color: Theme.of(context).colorScheme.fontInverted,
+                                      ),
+                                    ),
                                   ),
                                 );
                               }).toList(),
