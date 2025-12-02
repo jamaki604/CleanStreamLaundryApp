@@ -17,6 +17,8 @@ class SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _passwordConfirmCtrl = TextEditingController();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   var passwordText = "Password";
   var confirmPasswordText = "Confirm Password";
   var iconColor = Colors.blue;
@@ -127,7 +129,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 ),
                 decoration: InputDecoration(
                   labelText: 'Name',
-                  labelStyle: TextStyle(color: Colors.blue), // matches button color
+                  labelStyle: TextStyle(color: Colors.blue),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -168,67 +170,88 @@ class SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 16),
 
-              TextField(
-                controller: _passwordCtrl,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontInverted,
-                ),
-                decoration: InputDecoration(
-                  labelText: passwordText,
-                  labelStyle: TextStyle(color: labelColor), // matches button color
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: enabledBorderColor),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: Icon(Icons.lock, color: iconColor),
-                ),
-                obscureText: true,
-                onChanged: (_){
-                  if (iconColor == Colors.red) {
-                    _changeColorsToDefault();
-                  }
-                },
+            TextField(
+              controller: _passwordCtrl,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontInverted,
               ),
-              const SizedBox(height: 24),
-
-              TextField(
-                controller: _passwordConfirmCtrl,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontInverted,
+              decoration: InputDecoration(
+                labelText: passwordText,
+                labelStyle: TextStyle(color: labelColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                decoration: InputDecoration(
-                  labelText: confirmPasswordText,
-                  labelStyle: TextStyle(color: labelColor), // matches button color
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: enabledBorderColor),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: Icon(Icons.lock, color: iconColor),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                obscureText: true,
-                onChanged: (value){
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: Icon(Icons.lock, color: iconColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.blue,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
+              obscureText: _obscurePassword,
+              onChanged: (_) {
+                if (iconColor == Colors.red) {
+                  _changeColorsToDefault();
+                }
+              },
+            ),
+            const SizedBox(height: 24),
 
-                  if((_passwordCtrl.text.trim() != _passwordConfirmCtrl.text.trim())){
-                    if(iconColor != Colors.red) {
-                      _changeColorsToRed("Passwords don't match");
-                    }
-                  }else{
-                    _changeColorsToDefault();
+            TextField(
+              controller: _passwordConfirmCtrl,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontInverted,
+              ),
+              decoration: InputDecoration(
+                labelText: confirmPasswordText,
+                labelStyle: TextStyle(color: labelColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Theme.of(context).colorScheme.fontSecondary),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: Icon(Icons.lock, color: iconColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.blue,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                    });
+                  },
+                ),
+              ),
+              obscureText: _obscureConfirmPassword,
+              onChanged: (value) {
+                if ((_passwordCtrl.text.trim() != _passwordConfirmCtrl.text.trim())) {
+                  if (iconColor != Colors.red) {
+                    _changeColorsToRed("Passwords don't match");
                   }
+                } else {
+                  _changeColorsToDefault();
+                }
 
                 },
               ),
