@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Components/base_page.dart';
+import 'package:clean_stream_laundry_app/Widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
@@ -6,7 +6,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import 'package:get_it/get_it.dart';
-import 'package:clean_stream_laundry_app/Components/status_dialog_box.dart';
+import 'package:clean_stream_laundry_app/Widgets/status_dialog_box.dart';
 import 'package:clean_stream_laundry_app/Logic/Parser/machine_formatter.dart';
 import '../Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
