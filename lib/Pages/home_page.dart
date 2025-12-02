@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Components/base_page.dart';
-import 'package:clean_stream_laundry_app/Components/large_button.dart';
+import 'package:clean_stream_laundry_app/Widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/Widgets/large_button.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
