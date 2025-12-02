@@ -60,8 +60,7 @@ void main() {
   });
 
   test("Tests that the logic was called correctly to create an account",() async {
-    await profileHandler.createAccount(name: "Bill");
-    verify(() => supabaseMock.auth.currentUser!);
+    await profileHandler.createAccount(name: "Bill", id: "1");
     verify(() => supabaseMock.from("profiles"));
   });
 
