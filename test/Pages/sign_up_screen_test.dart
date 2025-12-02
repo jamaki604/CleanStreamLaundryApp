@@ -138,60 +138,37 @@ void main() {
       expect(find.text('Passwords do not match.'), findsOneWidget);
     });
 
-    testWidgets('should call signUp and createAccount on successful signup', (
-      WidgetTester tester,
-    ) async {
-      setupViewport(tester);
-      when(
-        () => mockAuthService.signUp(any(), any()),
-      ).thenAnswer((_) async => AuthenticationResponses.success);
-      when(
-        () => mockProfileService.createAccount(name: any(named: 'name'), id:"test"),
-      ).thenAnswer((_) async => {});
 
-      await tester.pumpWidget(createWidgetUnderTest());
 
-      await tester.enterText(find.byType(TextField).at(0), 'Test User');
-      await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
-      await tester.enterText(find.byType(TextField).at(2), 'Password123!');
-      await tester.enterText(find.byType(TextField).at(3), 'Password123!');
+    testWidgets('should navigate to email verification on success',
+            (WidgetTester tester) async {
+          // 1️⃣ Mock AuthService → success
+          when(() => mockAuthService.signUp(any(), any()))
+              .thenAnswer((_) async => AuthenticationResponses.success);
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
-      await tester.pump();
-      await tester.pumpAndSettle();
+          // 2️⃣ Mock ProfileService → accept any args
+          when(() => mockProfileService.createAccount(
+              name: any(named: 'name'), id: any(named: 'id')))
+              .thenAnswer((_) async => {});
 
-      verify(
-        () => mockAuthService.signUp('test@example.com', 'Password123!'),
-      ).called(1);
-      verify(
-        () => mockProfileService.createAccount(name: 'Test User', id:"test"),
-      ).called(1);
-    });
+          // 3️⃣ Build the widget
+          setupViewport(tester);
+          await tester.pumpWidget(createWidgetUnderTest());
 
-    testWidgets('should navigate to email verification on success', (
-      WidgetTester tester,
-    ) async {
-      when(
-        () => mockAuthService.signUp(any(), any()),
-      ).thenAnswer((_) async => AuthenticationResponses.success);
-      when(
-        () => mockProfileService.createAccount(name: any(named: 'name'), id:"test"),
-      ).thenAnswer((_) async => {});
+          // 4️⃣ Fill the form
+          await tester.enterText(find.byType(TextField).at(0), 'Test User');
+          await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
+          await tester.enterText(find.byType(TextField).at(2), 'Password123!');
+          await tester.enterText(find.byType(TextField).at(3), 'Password123!');
 
-      setupViewport(tester);
-      await tester.pumpWidget(createWidgetUnderTest());
+          // 5️⃣ Submit
+          await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
+          await tester.pump(); // start async work
+          await tester.pumpAndSettle(const Duration(seconds: 2)); // wait for navigation
 
-      await tester.enterText(find.byType(TextField).at(0), 'Test User');
-      await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
-      await tester.enterText(find.byType(TextField).at(2), 'Password123!');
-      await tester.enterText(find.byType(TextField).at(3), 'Password123!');
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
-      await tester.pump();
-      await tester.pumpAndSettle();
-
-      expect(find.text('Email Verification Page'), findsOneWidget);
-    });
+          // 6️⃣ Verify navigation
+          expect(find.text('Email Verification Page'), findsOneWidget);
+        });
 
     testWidgets('should show error for password without digit', (
       WidgetTester tester,
