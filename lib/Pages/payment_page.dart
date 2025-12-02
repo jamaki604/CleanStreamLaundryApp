@@ -73,11 +73,11 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget build(BuildContext context) {
     return BasePage(
       body: _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Column(
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: [
           Expanded(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

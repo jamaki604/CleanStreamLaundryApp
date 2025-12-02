@@ -6,6 +6,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart
 import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme_manager.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
 
 class MockAuthService extends Mock implements AuthService {}
 
@@ -20,3 +21,7 @@ class MockThemeManager extends Mock implements ThemeManager {}
 class MockProfileService extends Mock implements ProfileService {}
 
 class MockRouterService extends Mock implements RouterService {}
+
+class MockMachineCommunicationService extends Mock implements MachineCommunicationService {}
+
+class FakeAuthService extends Fake implements AuthService {}
