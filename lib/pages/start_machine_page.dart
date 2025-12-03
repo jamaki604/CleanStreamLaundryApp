@@ -1,8 +1,8 @@
 import 'package:clean_stream_laundry_app/widgets/large_button.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
-import '../Widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});

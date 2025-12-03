@@ -1,12 +1,12 @@
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../Logic/Services/auth_service.dart';
-import '../Logic/Theme/theme.dart';
-import '../Logic/Theme/theme_manager.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 
 class Settings extends StatefulWidget {
   @override

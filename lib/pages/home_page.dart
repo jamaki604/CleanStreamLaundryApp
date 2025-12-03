@@ -1,9 +1,8 @@
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/widgets/large_button.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
-import 'package:clean_stream_laundry_app/Middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 

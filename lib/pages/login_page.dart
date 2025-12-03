@@ -1,11 +1,13 @@
-import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -79,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: ScrollbarTheme(
         data: ScrollbarThemeData(
-          thumbColor: MaterialStateProperty.all(Colors.blue),
+          thumbColor: WidgetStateProperty.all(Colors.blue),
         ),
         child: Scrollbar(
           controller: _scrollCtrl,

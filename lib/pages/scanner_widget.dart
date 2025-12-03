@@ -1,10 +1,10 @@
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:clean_stream_laundry_app/Logic/parsing/qr_parser.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/qr_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 
 class ScannerWidget extends StatefulWidget {

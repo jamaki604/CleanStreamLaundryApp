@@ -1,8 +1,8 @@
-import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import '../Logic/Services/auth_service.dart';
+import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 
 class NotFoundScreen extends StatelessWidget {
   const NotFoundScreen({super.key});

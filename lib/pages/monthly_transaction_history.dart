@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/Logic/parsing/transaction_parser.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
 class MonthlyTransactionHistory extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
