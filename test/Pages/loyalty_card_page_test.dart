@@ -1,7 +1,6 @@
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme_manager.dart';
 import 'package:clean_stream_laundry_app/Pages/loyalty_card_page.dart';
 import 'package:clean_stream_laundry_app/Widgets/credit_card.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +13,11 @@ import 'package:provider/provider.dart';
 class MockAuthService extends Mock implements AuthService {}
 class MockTransactionService extends Mock implements TransactionService {}
 class MockProfileService extends Mock implements ProfileService {}
-class MockThemeManager extends Mock implements ThemeManager {}
 
 void main() {
   late MockAuthService mockAuthService;
   late MockTransactionService mockTransactionService;
   late MockProfileService mockProfileService;
-  late MockThemeManager mockThemeManager;
   late GoRouter router;
 
   final List<Map<String, dynamic>> fiveMockRawTransactions = List.generate(
@@ -38,7 +35,6 @@ void main() {
     mockAuthService = MockAuthService();
     mockTransactionService = MockTransactionService();
     mockProfileService = MockProfileService();
-    mockThemeManager = MockThemeManager();
 
     final getIt = GetIt.instance;
     if (getIt.isRegistered<AuthService>()) {
@@ -73,10 +69,7 @@ void main() {
   });
 
   Widget createTestWidget() {
-    return ChangeNotifierProvider<ThemeManager>.value(
-      value: mockThemeManager,
-      child: MaterialApp.router(routerConfig: router),
-    );
+    return MaterialApp.router(routerConfig: router);
   }
 
 
