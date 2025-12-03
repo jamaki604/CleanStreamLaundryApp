@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 
 abstract class AuthService{
   Future<AuthenticationResponses> login(String email, String password);

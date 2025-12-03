@@ -1,3 +1,3 @@
 abstract class PaymentService{
-  Future<int> makePayment(double amounnt);
+  Future<int> makePayment(double amount);
 }

@@ -1,6 +1,6 @@
-import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:get_it/get_it.dart';
 

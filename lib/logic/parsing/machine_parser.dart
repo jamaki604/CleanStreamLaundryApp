@@ -3,7 +3,7 @@ class MachineFormatter{
     if (machineName == null || machineName.isEmpty) return "Unknown";
 
     final index = machineName.indexOf(" ");
-    if (index == -1) return machineName; // No space → return whole name
+    if (index == -1) return machineName;
 
     return machineName.substring(0, index);
   }
