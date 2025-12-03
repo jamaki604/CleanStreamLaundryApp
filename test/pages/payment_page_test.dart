@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
+import 'package:clean_stream_laundry_app/pages/payment_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
@@ -103,7 +103,7 @@ void main() {
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
-      expect(find.text('machine Washer01'), findsOneWidget);
+      expect(find.text('Machine Washer01'), findsOneWidget);
       expect(find.text('\$3.50'), findsOneWidget);
       expect(find.text('Amount Due'), findsOneWidget);
     });
@@ -132,7 +132,7 @@ void main() {
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
-      expect(find.text('machine Unknown'), findsOneWidget);
+      expect(find.text('Machine Unknown'), findsOneWidget);
       expect(find.text('\$0.00'), findsOneWidget);
     });
   });
@@ -247,7 +247,7 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      expect(find.text('machine Error'), findsWidgets);
+      expect(find.text('Machine Error'), findsWidgets);
       verifyNever(() => mockTransactionService.recordTransaction(
         amount: any(named: 'amount'),
         description: any(named: 'description'),
@@ -286,7 +286,7 @@ void main() {
       await tester.pumpWidget(createTestWidget('machine456'));
       await tester.pumpAndSettle();
 
-      expect(find.text('machine Dryer05'), findsOneWidget);
+      expect(find.text('Machine Dryer05'), findsOneWidget);
       expect(find.text('\$2.75'), findsOneWidget);
       expect(find.text('Pay \$2.75'), findsOneWidget);
     });

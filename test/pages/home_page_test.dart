@@ -1,8 +1,6 @@
-import 'package:clean_stream_laundry_app/widgets//base_page.dart';
-import 'package:clean_stream_laundry_app/widgets//large_button.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
-import 'package:clean_stream_laundry_app/Pages/home_page.dart';
+import 'package:clean_stream_laundry_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -108,7 +106,7 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        expect(find.text('Select location'), findsOneWidget);
+        expect(find.text('Select Location'), findsOneWidget);
         expect(find.byIcon(Icons.location_on), findsOneWidget);
       });
 

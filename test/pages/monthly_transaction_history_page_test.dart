@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/Pages/monthly_transaction_history.dart';
+import 'package:clean_stream_laundry_app/pages/monthly_transaction_history.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -50,7 +50,7 @@ void main() {
           await tester.pumpWidget(createTestWidget());
           await tester.pumpAndSettle();
 
-          expect(find.text('Monthly transaction History'), findsOneWidget);
+          expect(find.text('Monthly Transaction History'), findsOneWidget);
           expect(find.byType(Card), findsNWidgets(2));
         });
 

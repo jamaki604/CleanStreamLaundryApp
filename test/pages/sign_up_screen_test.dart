@@ -1,7 +1,7 @@
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
-import 'package:clean_stream_laundry_app/Pages/sign_up_screen.dart';
+import 'package:clean_stream_laundry_app/pages/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';

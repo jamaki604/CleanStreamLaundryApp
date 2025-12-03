@@ -1,7 +1,7 @@
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/Pages/loyalty_card_page.dart';
+import 'package:clean_stream_laundry_app/pages/loyalty_card_page.dart';
 import 'package:clean_stream_laundry_app/widgets/credit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

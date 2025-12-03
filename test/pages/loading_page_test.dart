@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
-import 'package:clean_stream_laundry_app/Pages/loading_page.dart';
+import 'package:clean_stream_laundry_app/pages/loading_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -78,7 +78,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
-      expect(find.text('authentication Failed'), findsOneWidget);
+      expect(find.text('Authentication Failed'), findsOneWidget);
       expect(find.text('Exception: Network error'), findsOneWidget);
       expect(find.text('Return to Login'), findsOneWidget);
     });
@@ -127,7 +127,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(LoadingPage()));
       await tester.pumpAndSettle();
 
-      expect(find.text('authentication Failed'), findsOneWidget);
+      expect(find.text('Authentication Failed'), findsOneWidget);
       expect(find.text('Exception: Service unavailable'), findsOneWidget);
     });
   });
@@ -333,7 +333,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(LoadingPage()));
       await tester.pumpAndSettle();
 
-      expect(find.text('authentication Failed'), findsOneWidget);
+      expect(find.text('Authentication Failed'), findsOneWidget);
       expect(find.text('Exception: Test error'), findsOneWidget);
       expect(find.text('Return to Login'), findsOneWidget);
     });

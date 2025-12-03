@@ -1,7 +1,7 @@
 import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/Pages/root_app.dart';
+import 'package:clean_stream_laundry_app/pages/root_app.dart';
 import 'package:go_router/go_router.dart';
 import 'mocks.dart';
 import 'package:clean_stream_laundry_app/main.dart';

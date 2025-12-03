@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:clean_stream_laundry_app/Pages/email_verification_page.dart';
+import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
 import 'package:flutter/material.dart';
