@@ -97,7 +97,7 @@ void main() {
     });
   });
 
-  group('authentication Logic Tests', () {
+  group('authentication logic Tests', () {
     testWidgets('navigates to home page when user is logged in', (WidgetTester tester) async {
       when(() => mockAuthService.isLoggedIn())
           .thenAnswer((_) async => AuthenticationResponses.success);

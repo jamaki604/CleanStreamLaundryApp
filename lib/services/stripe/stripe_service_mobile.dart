@@ -27,7 +27,7 @@ class StripeService implements PaymentService{
     } on StripeException {
       return 401;
     } catch (e) {
-      print("Payment error: $e");
+      print("payment error: $e");
       return 400;
     }
   }

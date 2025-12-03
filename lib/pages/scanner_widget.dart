@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
+import 'package:clean_stream_laundry_app/Logic/parsing/qr_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 
 class ScannerWidget extends StatefulWidget {
@@ -95,7 +95,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
     );
   }
 
-  //---------- QR Logic ----------//
+  //---------- QR logic ----------//
 
   void _handleQRCode(BarcodeCapture capture) {
     final List<Barcode> barcodes = capture.barcodes;

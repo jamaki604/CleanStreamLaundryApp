@@ -22,7 +22,7 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   if(status == 200) {
     if (description != "Machine") {
       statusDialog(context,
-          title: "Payment Successful!",
+          title: "payment Successful!",
           message: "Thank you! Your payment was processed successfully.",
           isSuccess: true
       );
@@ -31,21 +31,21 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
     return true;
   } else if (status == 401) {
     statusDialog(context,
-        title: "Payment Failed!",
+        title: "payment Failed!",
         message: "The payment was canceled or declined.",
         isSuccess: false
     );
     return false;
   }else if (status == 403) {
     statusDialog(context,
-        title: "Payment Failed!",
+        title: "payment Failed!",
         message: "stripe service is not available on this platform.",
         isSuccess: false
     );
     return false;
   }  else {
     statusDialog(context,
-        title: "Payment Failed!",
+        title: "payment Failed!",
         message: "An unexpected error occurred.",
         isSuccess: false
     );

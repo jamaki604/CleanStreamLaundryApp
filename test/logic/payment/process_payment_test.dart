@@ -81,7 +81,7 @@ void main() {
             type: 'Laundry',
           )).called(1);
 
-          expect(find.text('Payment Successful!'), findsOneWidget);
+          expect(find.text('payment Successful!'), findsOneWidget);
           expect(find.text('Thank you! Your payment was processed successfully.'),
               findsOneWidget);
         });
@@ -119,7 +119,7 @@ void main() {
             type: any(named: 'type'),
           ));
 
-          expect(find.text('Payment Failed!'), findsOneWidget);
+          expect(find.text('payment Failed!'), findsOneWidget);
           expect(find.text('The payment was canceled or declined.'), findsOneWidget);
         });
 
@@ -156,7 +156,7 @@ void main() {
             type: any(named: 'type'),
           ));
 
-          expect(find.text('Payment Failed!'), findsOneWidget);
+          expect(find.text('payment Failed!'), findsOneWidget);
           expect(find.text('stripe service is not available on this platform.'),
               findsOneWidget);
         });
@@ -194,7 +194,7 @@ void main() {
             type: any(named: 'type'),
           ));
 
-          expect(find.text('Payment Failed!'), findsOneWidget);
+          expect(find.text('payment Failed!'), findsOneWidget);
           expect(find.text('An unexpected error occurred.'), findsOneWidget);
         });
 
@@ -237,7 +237,7 @@ void main() {
 
           expect(find.byType(CircularProgressIndicator), findsNothing);
 
-          expect(find.text('Payment Successful!'), findsOneWidget);
+          expect(find.text('payment Successful!'), findsOneWidget);
         });
   });
 }

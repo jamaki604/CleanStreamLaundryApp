@@ -157,7 +157,7 @@ void main() {
         )).thenAnswer((_) async => null);
 
         when(() => mockStripe.presentPaymentSheet())
-            .thenThrow(Exception("Payment sheet error"));
+            .thenThrow(Exception("payment sheet error"));
 
         // Act
         final result = await stripeService.makePayment(2.60);

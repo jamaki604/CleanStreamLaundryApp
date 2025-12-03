@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
-import 'package:clean_stream_laundry_app/Logic/QrScanner/qr_parser.dart';
+import 'package:clean_stream_laundry_app/Logic/parsing/qr_parser.dart';
 
 void main(){
 
-  group("QrScanner.parseURL",(){
+  group("qr_scanner.parseURL",(){
 
     test("Returns the valid NayaxDeviceID",(){
       QrScannerParser qrScannerController = QrScannerParser("https://payment.nayax.com/device?id=12345678");

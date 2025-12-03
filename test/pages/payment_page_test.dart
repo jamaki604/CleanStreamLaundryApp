@@ -137,7 +137,7 @@ void main() {
     });
   });
 
-  group('Payment Buttons', () {
+  group('payment Buttons', () {
     testWidgets('displays both payment buttons', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
@@ -194,7 +194,7 @@ void main() {
     });
   });
 
-  group('Loyalty Payment Processing', () {
+  group('Loyalty payment Processing', () {
     testWidgets('processes loyalty payment successfully', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {

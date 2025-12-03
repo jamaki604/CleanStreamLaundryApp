@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Parser/transaction_parser.dart';
+import 'package:clean_stream_laundry_app/Logic/parsing/transaction_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
