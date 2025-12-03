@@ -14,10 +14,10 @@ class RefundPage extends StatefulWidget {
   const RefundPage({super.key});
 
   @override
-  State<RefundPage> createState() => _RefundPageState();
+  State<RefundPage> createState() => RefundPageState();
 }
 
-class _RefundPageState extends State<RefundPage> {
+class RefundPageState extends State<RefundPage> {
   String? selectedTransaction;
   int? selectedTransactionIndex;
   List<String> recentTransactions = [];
