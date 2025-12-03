@@ -1,18 +1,19 @@
-import 'package:clean_stream_laundry_app/Pages/email_verification_page.dart';
-import 'package:clean_stream_laundry_app/Pages/home_page.dart';
-import 'package:clean_stream_laundry_app/Pages/loading_page.dart';
-import 'package:clean_stream_laundry_app/Pages/loyalty_card_page.dart';
-import 'package:clean_stream_laundry_app/Pages/scanner_widget.dart';
-import 'package:clean_stream_laundry_app/Pages/sign_up_screen.dart';
-import 'package:clean_stream_laundry_app/Pages/login_page.dart';
-import 'package:clean_stream_laundry_app/Pages/not_found_page.dart';
-import 'package:clean_stream_laundry_app/Pages/settings.dart';
-import 'package:clean_stream_laundry_app/Pages/start_machine_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
-import 'package:clean_stream_laundry_app/Pages/payment_page.dart';
-import 'package:clean_stream_laundry_app/Pages/monthly_transaction_history.dart';
-import 'package:clean_stream_laundry_app/Pages/refund_page.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
+import 'package:clean_stream_laundry_app/pages/home_page.dart';
+import 'package:clean_stream_laundry_app/pages/loading_page.dart';
+import 'package:clean_stream_laundry_app/pages/loyalty_card_page.dart';
+import 'package:clean_stream_laundry_app/pages/scanner_widget.dart';
+import 'package:clean_stream_laundry_app/pages/sign_up_screen.dart';
+import 'package:clean_stream_laundry_app/pages/login_page.dart';
+import 'package:clean_stream_laundry_app/pages/not_found_page.dart';
+import 'package:clean_stream_laundry_app/pages/settings.dart';
+import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
+import 'package:clean_stream_laundry_app/pages/payment_page.dart';
+import 'package:clean_stream_laundry_app/pages/monthly_transaction_history.dart';
+import 'package:clean_stream_laundry_app/pages/refund_page.dart';
+
 class RouterService {
   GoRouter createRouter(AuthService authenticator) =>
       GoRouter(
