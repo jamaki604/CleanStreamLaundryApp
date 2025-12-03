@@ -7,7 +7,7 @@ import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
 import 'package:clean_stream_laundry_app/Services/Nayax/machine_communicator.dart';
-import 'package:clean_stream_laundry_app/Services/Stripe/stripe_service.dart';
+import 'package:clean_stream_laundry_app/Services/stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/Services/supabase/supabase_auth_service.dart';
 import 'package:clean_stream_laundry_app/Services/supabase/supabase_edge_function_service.dart';
 import 'package:clean_stream_laundry_app/Services/supabase/supabase_location_service.dart';
@@ -22,7 +22,7 @@ import 'package:get_it/get_it.dart';
 import 'Logic/Theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/Services/Supabase/supabase_transaction_service.dart';
+import 'package:clean_stream_laundry_app/Services/supabase/supabase_transaction_service.dart';
 
 final getIt = GetIt.instance;
 

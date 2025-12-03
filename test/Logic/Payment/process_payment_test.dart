@@ -123,7 +123,7 @@ void main() {
           expect(find.text('The payment was canceled or declined.'), findsOneWidget);
         });
 
-    testWidgets('should return false and show error dialog when Stripe is unavailable (status 403)',
+    testWidgets('should return false and show error dialog when stripe is unavailable (status 403)',
             (WidgetTester tester) async {
           const amount = 75.0;
           const description = 'Test payment';
@@ -157,7 +157,7 @@ void main() {
           ));
 
           expect(find.text('Payment Failed!'), findsOneWidget);
-          expect(find.text('Stripe service is not available on this platform.'),
+          expect(find.text('stripe service is not available on this platform.'),
               findsOneWidget);
         });
 

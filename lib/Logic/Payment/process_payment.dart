@@ -39,7 +39,7 @@ Future<bool> processPayment(BuildContext context, double amount, description) as
   }else if (status == 403) {
     statusDialog(context,
         title: "Payment Failed!",
-        message: "Stripe service is not available on this platform.",
+        message: "stripe service is not available on this platform.",
         isSuccess: false
     );
     return false;
