@@ -29,8 +29,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   final transactionService = GetIt.instance<TransactionService>();
   final authService = GetIt.instance<AuthService>();
 
-  final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
@@ -58,7 +56,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       if (data != null) {
         setState(() {
           _userBalance = (data['balance'] as num).toDouble();
-          _userName = (data['full_name'] );
+          _userName = (data['full_name']);
           _isLoading = false;
         });
       } else {
@@ -77,7 +75,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         _showErrorDialog(context, _errorMessage);
       });
     }
-
   }
 
   Future<void> _fetchTransactions() async {
@@ -86,7 +83,8 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       final limit = _showPastTransactions ? 100 : 3;
       setState(() {
         _recentTransactions = TransactionParser.formatTransactionsList(
-          transactions.take(limit), "transactionHistory"
+          transactions.take(limit),
+          "transactionHistory",
         );
         _recentTransactions.removeWhere((e) => e.isEmpty);
       });
@@ -104,49 +102,48 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ScrollController _scrollController = ScrollController();
-
     return BasePage(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          const SizedBox(height: 20),
-          CreditCard(username: _userName),
-          const SizedBox(height: 50),
-          Text(
-            'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.fontSecondary,
-            ),
-          ),
-          const SizedBox(height: 25),
-          ElevatedButton(
-            onPressed: () => _loadCard(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              disabledBackgroundColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              "Load card",
+          : SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            CreditCard(username: _userName),
+            const SizedBox(height: 50),
+            Text(
+              'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                fontSize: 26,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.fontSecondary,
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            const SizedBox(height: 25),
+            ElevatedButton(
+              onPressed: () => _loadCard(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                disabledBackgroundColor: Colors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+              child: const Text(
+                "Load card",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0, vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,7 +161,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       TextButton.icon(
                         onPressed: _toggleTransactionView,
                         icon: Icon(
-                          _showPastTransactions ? Icons.expand_less : Icons.expand_more,
+                          _showPastTransactions
+                              ? Icons.expand_less
+                              : Icons.expand_more,
                           color: Colors.blue,
                         ),
                         label: Text(
@@ -184,55 +183,43 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       ),
                     )
                   else
-                    Expanded(
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                          scrollbarTheme: ScrollbarThemeData(
-                            thumbColor: MaterialStateProperty.all(Colors.blue),
-                            thickness: MaterialStateProperty.all(6),
-                            radius: const Radius.circular(4),
+                    ListView.builder(
+                      physics:
+                      const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: _recentTransactions.length,
+                      itemBuilder: (context, index) {
+                        final transaction = _recentTransactions[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 4.0, vertical: 6.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        child: Scrollbar(
-                          controller: _scrollController,
-                          thumbVisibility: true,
-                          child: ListView.builder(
-                            controller: _scrollController,
-                            itemCount: _recentTransactions.length,
-                            itemBuilder: (context, index) {
-                              final transaction = _recentTransactions[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                elevation: 4,
-                                color: Theme.of(context).colorScheme.cardPrimary,
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.receipt_long,
-                                    color: Color(0xFF2073A9),
-                                  ),
-                                  title: Text(
-                                    transaction.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
+                          elevation: 4,
+                          color: Theme.of(context).colorScheme.cardPrimary,
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.receipt_long,
+                              color: Color(0xFF2073A9),
+                            ),
+                            title: Text(
+                              transaction.toString(),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -286,7 +273,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         content: TextField(
           controller: amountController,
           autofocus: true,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
             prefixText: '\$ ',
             prefixStyle: TextStyle(
@@ -316,43 +303,43 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               final amountText = amountController.text;
               final amount = double.tryParse(amountText) ?? 0;
 
-                  Navigator.of(dialogContext).pop();
+              Navigator.of(dialogContext).pop();
 
-                  if (amount > 0) {
-                    bool result = await processPayment(context, amount, "Loyalty Card");
-                    if (result) {
-                      final newBalance = _userBalance! + amount;
-                      profileService.updateBalanceById(newBalance);
-                      setState(() {
-                        _userBalance = newBalance;
-                      });
-                      _fetchTransactions();
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter a valid amount')),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 3,
-                ),
-                child: const Text(
-                  'Pay',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-            ]
-        )
+              if (amount > 0) {
+                bool result = await processPayment(context, amount, "Loyalty Card");
+                if (result) {
+                  final newBalance = _userBalance! + amount;
+                  profileService.updateBalanceById(newBalance);
+                  setState(() {
+                    _userBalance = newBalance;
+                  });
+                  _fetchTransactions();
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a valid amount')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+            ),
+            child: const Text(
+              'Pay',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
