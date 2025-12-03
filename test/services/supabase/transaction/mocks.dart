@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+
 class SupabaseMock extends Mock implements SupabaseClient {}
 class GoTrueMock extends Mock implements GoTrueClient {}
+class RealtimeChannelMock extends Mock implements RealtimeChannel {}
 
 class QueryBuilderMock extends Mock implements SupabaseQueryBuilder {
 
