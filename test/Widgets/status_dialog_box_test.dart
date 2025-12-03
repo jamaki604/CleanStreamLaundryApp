@@ -1,4 +1,3 @@
-import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/Widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
