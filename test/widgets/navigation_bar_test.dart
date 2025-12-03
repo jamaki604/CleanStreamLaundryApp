@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/Widgets/navigation_bar.dart';
+import 'package:clean_stream_laundry_app/widgets/navigation_bar.dart';
 
 void main() {
   Widget wrapWithRouter(String initialLocation) {

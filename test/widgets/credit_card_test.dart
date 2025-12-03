@@ -1,7 +1,4 @@
-import 'package:clean_stream_laundry_app/Widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/Widgets/credit_card.dart';
-import 'package:clean_stream_laundry_app/Widgets/custom_app_bar.dart';
-import 'package:clean_stream_laundry_app/Widgets/navigation_bar.dart';
+import 'package:clean_stream_laundry_app/widgets/credit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';

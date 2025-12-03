@@ -2,13 +2,13 @@ import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/Logic/Parser/transaction_parser.dart';
-import 'package:clean_stream_laundry_app/Widgets/credit_card.dart';
+import 'package:clean_stream_laundry_app/widgets/credit_card.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});

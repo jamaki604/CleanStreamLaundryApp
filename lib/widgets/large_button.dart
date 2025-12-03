@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class LargeButton extends StatelessWidget {
   final String headLineText;
-  final String descripitionText;
+  final String descriptionText;
   final IconData icon;
   final VoidCallback? onPressed;
 
   const LargeButton({
     super.key,
     required this.headLineText,
-    required this.descripitionText,
+    required this.descriptionText,
     required this.icon,
     this.onPressed,
   });
@@ -51,7 +51,7 @@ class LargeButton extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        descripitionText,
+                        descriptionText,
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white70,

@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Widgets/large_button.dart';
+import 'package:clean_stream_laundry_app/widgets/large_button.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:go_router/go_router.dart';
@@ -66,7 +66,7 @@ class StartPage extends StatelessWidget {
                   height: 160,
                   child: LargeButton(
                     headLineText: "Scan QR code",
-                    descripitionText: "Scan QR code on the machine",
+                    descriptionText: "Scan QR code on the machine",
                     icon: Icons.qr_code_scanner,
                     onPressed: () {
                       context.go("/scanner");

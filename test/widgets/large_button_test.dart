@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Widgets/large_button.dart';
+import 'package:clean_stream_laundry_app/widgets/large_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,7 +8,7 @@ void main() {
     test('Large Button instantiates correctly', () {
       const largeButton = LargeButton(
         headLineText: "Test Headline",
-        descripitionText: "Test Description",
+        descriptionText: "Test Description",
         icon: Icons.shield,
       );
       expect(largeButton, isA<LargeButton>());
@@ -19,7 +19,7 @@ void main() {
         const MaterialApp(
           home: LargeButton(
             headLineText: "Test Headline",
-            descripitionText: "Test Description",
+            descriptionText: "Test Description",
             icon: Icons.shield,
           ),
         ),
@@ -33,7 +33,7 @@ void main() {
         const MaterialApp(
           home: LargeButton(
             headLineText: "Test Headline",
-            descripitionText: "Test Description",
+            descriptionText: "Test Description",
             icon: Icons.shield,
           ),
         ),
@@ -47,7 +47,7 @@ void main() {
         const MaterialApp(
           home: LargeButton(
             headLineText: "Test Headline",
-            descripitionText: "Test Description",
+            descriptionText: "Test Description",
             icon: Icons.shield,
           ),
         ),

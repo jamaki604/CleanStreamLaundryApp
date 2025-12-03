@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Widgets//base_page.dart';
+import 'package:clean_stream_laundry_app/widgets//base_page.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/Logic/Theme/theme_manager.dart';
