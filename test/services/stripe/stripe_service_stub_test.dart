@@ -1,7 +1,6 @@
-import 'package:clean_stream_laundry_app/Services/stripe/stripe_service_stub.dart';
+import 'package:clean_stream_laundry_app/services/stripe/stripe_service_stub.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'mocks.dart';
 
 void main() {
 

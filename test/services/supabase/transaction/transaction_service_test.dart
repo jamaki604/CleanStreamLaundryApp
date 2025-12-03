@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Services/supabase/supabase_transaction_service.dart';
+import 'package:clean_stream_laundry_app/services/supabase/supabase_transaction_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

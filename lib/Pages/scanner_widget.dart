@@ -52,7 +52,7 @@ class _ScannerWidgetState extends State<ScannerWidget> {
             color: Colors.black54,
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Point camera at Nayax QR code',
+              'Point camera at nayax QR code',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 18,

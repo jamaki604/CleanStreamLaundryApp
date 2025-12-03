@@ -1,5 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
-import 'package:clean_stream_laundry_app/Services/stripe/stripe_service_mobile.dart';
+import 'package:clean_stream_laundry_app/services/stripe/stripe_service_mobile.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';

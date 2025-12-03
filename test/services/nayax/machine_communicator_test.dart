@@ -1,6 +1,5 @@
 import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
-import 'package:clean_stream_laundry_app/Services/Nayax/machine_communicator.dart';
-import 'package:clean_stream_laundry_app/Services/Supabase/supabase_edge_function_service.dart';
+import 'package:clean_stream_laundry_app/services/nayax/machine_communicator.dart';
 import 'package:clean_stream_laundry_app/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -112,7 +111,7 @@ void main() {
               }));
 
       final result = await machineCommunicator.checkAvailability('10000001');
-      expect(result, equals('machine is in use right now.'));
+      expect(result, equals('Machine is in use right now.'));
     });
 
     test('Check offline availability', () async {
@@ -130,7 +129,7 @@ void main() {
               }));
 
       final result = await machineCommunicator.checkAvailability('10000002');
-      expect(result, equals('machine is offline right now.'));
+      expect(result, equals('Machine is offline right now.'));
     });
 
     test('Check nonsense message', () async {
@@ -148,7 +147,7 @@ void main() {
               }));
 
       final result = await machineCommunicator.checkAvailability('10000002');
-      expect(result, equals('machine is offline right now.'));
+      expect(result, equals('Machine is offline right now.'));
     });
 
     test('Check success failure', () async {

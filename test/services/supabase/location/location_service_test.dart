@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:clean_stream_laundry_app/Services/supabase/supabase_location_service.dart';
+import 'package:clean_stream_laundry_app/services/supabase/supabase_location_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'mocks.dart';
 
