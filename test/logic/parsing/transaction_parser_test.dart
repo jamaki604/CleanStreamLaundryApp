@@ -43,6 +43,88 @@ void main(){
       expect(result["Oct 2025"]?["directWasher"],0.0);
     });
 
+    test("getMonthlySums correctly adds loyaltyWasher sums", () {
+      // Use a date from LAST month so it is included.
+      final lastMonth = DateTime.now().subtract(const Duration(days: 30));
+
+      final data = [
+        {
+          "amount": 5.0,
+          "description": "Loyalty Payment on Washer",
+          "created_at": lastMonth.toIso8601String(),
+        }
+      ];
+
+      final result = TransactionParser.getMonthlySums(data);
+
+      final monthKey = DateFormat('MMM yyyy').format(lastMonth);
+
+      expect(result[monthKey]!['loyaltyWasher'], 5.0);
+      expect(result[monthKey]!['loyaltyDryer'], 0.0);
+    });
+
+    test("getMonthlySums correctly adds loyaltyDryer sums", () {
+      final lastMonth = DateTime.now().subtract(const Duration(days: 30));
+
+      final data = [
+        {
+          "amount": 7.5,
+          "description": "Loyalty Payment on Dryer",
+          "created_at": lastMonth.toIso8601String(),
+        }
+      ];
+
+      final result = TransactionParser.getMonthlySums(data);
+
+      final monthKey = DateFormat('MMM yyyy').format(lastMonth);
+
+      expect(result[monthKey]!['loyaltyDryer'], 7.5);
+      expect(result[monthKey]!['loyaltyWasher'], 0.0);
+    });
+
+
+  });
+
+
+  test("getTransactionIDs returns ID for recent transactions", () {
+    final recentDate = DateTime.now().subtract(const Duration(days: 1)).toIso8601String();
+
+    final transaction = {
+      "id": 42,
+      "created_at": recentDate,
+    };
+
+    final id = TransactionParser.getTransactionIDs(transaction);
+
+    expect(id, 42);
+  });
+
+  test("getTransactionIDs returns -1 for transactions older than 2 weeks", () {
+    final oldDate = DateTime.now().subtract(const Duration(days: 20)).toIso8601String();
+
+    final transaction = {
+      "id": 7,
+      "created_at": oldDate,
+    };
+
+    final id = TransactionParser.getTransactionIDs(transaction);
+
+    expect(id, -1);
+  });
+
+  test("createTransactionIDList returns list of correct IDs", () {
+    final recentDate = DateTime.now().subtract(const Duration(days: 2)).toIso8601String();
+    final oldDate = DateTime.now().subtract(const Duration(days: 25)).toIso8601String();
+
+    final data = [
+      {"id": 1, "created_at": recentDate},
+      {"id": 2, "created_at": oldDate},
+      {"id": 3, "created_at": recentDate},
+    ];
+
+    final result = TransactionParser.createTransactionIDList(data);
+
+    expect(result, [1, -1, 3]);
   });
 
 }

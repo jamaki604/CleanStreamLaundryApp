@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
-
-import '../../Middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:get_it/get_it.dart';
+import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
 
 class ThemeManager with ChangeNotifier{
-  StorageService storage = StorageService();
+  final storage = GetIt.instance<StorageService>();
   ThemeData _themeData = lightMode;
 
   ThemeManager() {
