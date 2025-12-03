@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'dart:html' as html show window;
 import 'package:get_it/get_it.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 
 class StripeService implements PaymentService {
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
@@ -30,7 +30,7 @@ class StripeService implements PaymentService {
 
       late Timer closeCheckoutTimer;
       closeCheckoutTimer = Timer.periodic(const Duration(milliseconds: 200), (_) {
-      if (paymentPortal == null || paymentPortal.closed!) {
+      if (paymentPortal.closed!) {
         closeCheckoutTimer.cancel();
         if(!_paymentCompleter!.isCompleted) {
           _paymentCompleter!.complete(400);

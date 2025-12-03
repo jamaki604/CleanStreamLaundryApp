@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseProfileService extends ProfileService{
