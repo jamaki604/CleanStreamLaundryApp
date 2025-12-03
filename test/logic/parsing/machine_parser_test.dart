@@ -1,5 +1,4 @@
-
-import 'package:clean_stream_laundry_app/Logic/parsing/machine_parser.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/machine_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main(){

@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/pages/monthly_transaction_history.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:clean_stream_laundry_app/Logic/parsing/qr_parser.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/qr_parser.dart';
 
 void main(){
 

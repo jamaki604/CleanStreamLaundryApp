@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/services/nayax/machine_communicator.dart';
 import 'package:clean_stream_laundry_app/main.dart';
 import 'package:flutter_test/flutter_test.dart';

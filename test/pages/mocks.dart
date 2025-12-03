@@ -1,12 +1,12 @@
-import 'package:clean_stream_laundry_app/Logic/Services/auth_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/profile_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/Middleware/app_router.dart';
-import 'package:clean_stream_laundry_app/Logic/Theme/theme_manager.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/middleware/app_router.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
 
 class MockAuthService extends Mock implements AuthService {}
 

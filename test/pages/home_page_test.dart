@@ -1,5 +1,5 @@
-import 'package:clean_stream_laundry_app/Logic/Services/location_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/machine_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

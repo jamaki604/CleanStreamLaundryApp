@@ -1,10 +1,10 @@
-import 'package:clean_stream_laundry_app/Logic/Services/payment_service.dart';
-import 'package:clean_stream_laundry_app/Logic/Services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:clean_stream_laundry_app/Logic/Payment/process_payment.dart';
+import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 
 class MockPaymentService extends Mock implements PaymentService {}
 class MockTransactionService extends Mock implements TransactionService {}

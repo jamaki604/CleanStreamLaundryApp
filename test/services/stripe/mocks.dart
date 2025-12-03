@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Logic/Services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mocktail/mocktail.dart';
 
