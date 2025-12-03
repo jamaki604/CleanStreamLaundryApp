@@ -50,7 +50,7 @@ void main() {
           await tester.pumpWidget(createTestWidget());
           await tester.pumpAndSettle();
 
-          expect(find.text('Monthly Transaction History'), findsOneWidget);
+          expect(find.text('Monthly transaction History'), findsOneWidget);
           expect(find.byType(Card), findsNWidgets(2));
         });
 

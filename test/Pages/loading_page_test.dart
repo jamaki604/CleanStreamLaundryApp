@@ -65,7 +65,7 @@ void main() {
       expect(find.byType(Image), findsOneWidget);
       expect(find.byType(TweenAnimationBuilder<double>), findsOneWidget);
       expect(find.byIcon(Icons.error_outline), findsNothing);
-      expect(find.text('Authentication Failed'), findsNothing);
+      expect(find.text('authentication Failed'), findsNothing);
 
       await tester.pumpAndSettle();
     });
@@ -78,7 +78,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
-      expect(find.text('Authentication Failed'), findsOneWidget);
+      expect(find.text('authentication Failed'), findsOneWidget);
       expect(find.text('Exception: Network error'), findsOneWidget);
       expect(find.text('Return to Login'), findsOneWidget);
     });
@@ -97,7 +97,7 @@ void main() {
     });
   });
 
-  group('Authentication Logic Tests', () {
+  group('authentication Logic Tests', () {
     testWidgets('navigates to home page when user is logged in', (WidgetTester tester) async {
       when(() => mockAuthService.isLoggedIn())
           .thenAnswer((_) async => AuthenticationResponses.success);
@@ -127,7 +127,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(LoadingPage()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Authentication Failed'), findsOneWidget);
+      expect(find.text('authentication Failed'), findsOneWidget);
       expect(find.text('Exception: Service unavailable'), findsOneWidget);
     });
   });
@@ -333,7 +333,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(LoadingPage()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Authentication Failed'), findsOneWidget);
+      expect(find.text('authentication Failed'), findsOneWidget);
       expect(find.text('Exception: Test error'), findsOneWidget);
       expect(find.text('Return to Login'), findsOneWidget);
     });

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:clean_stream_laundry_app/Logic/Enums/authentication_response_enum.dart';
-import 'package:clean_stream_laundry_app/Services/Supabase/supabase_auth_service.dart';
+import 'package:clean_stream_laundry_app/Services/supabase/supabase_auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mocktail/mocktail.dart';
@@ -13,7 +13,7 @@ void main(){
   late SupabaseMock client;
   late GoTrueMock supabaseAuth;
 
-  group("Authentication Tests", (){
+  group("authentication Tests", (){
 
     setUp((){
       client = SupabaseMock();
@@ -771,7 +771,6 @@ void main(){
     });
 
     test("onAuthChange emits true when a user exists", () async {
-      final client = SupabaseMock();
       final auth = GoTrueMock();
 
       final controller = StreamController<AuthState>();

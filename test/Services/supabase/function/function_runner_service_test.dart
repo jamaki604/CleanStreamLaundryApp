@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Services/Supabase/supabase_edge_function_service.dart';
+import 'package:clean_stream_laundry_app/Services/supabase/supabase_edge_function_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,7 +24,7 @@ void main() {
         .thenAnswer((_) async => FunctionResponse(status: 200));
   });
 
-  group("Function Runner tests", () {
+  group("function Runner tests", () {
     test("Tests that the function response was returned correctly", () async {
       final result = await functionRunner.runEdgeFunction(
         name: "test",
@@ -36,7 +36,7 @@ void main() {
 
     test("Tests that exception is caught and null returned", () async {
       when(() => functionClient.invoke(any(), body: any(named: 'body')))
-          .thenThrow(PostgrestException(message: 'Function failed'));
+          .thenThrow(PostgrestException(message: 'function failed'));
 
       final result = await functionRunner.runEdgeFunction(
         name: "errorFunc",

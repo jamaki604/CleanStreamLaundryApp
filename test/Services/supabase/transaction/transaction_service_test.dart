@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Services//Supabase/supabase_transaction_service.dart';
+import 'package:clean_stream_laundry_app/Services/supabase/supabase_transaction_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,7 +14,7 @@ void main() {
   setUp(() {
     supabaseMock = SupabaseMock();
     queryBuilderMock = QueryBuilderMock();
-    fakeFilterBuilder = FakeFilterBuilder([{"amount": 2.75, "description": "Machine", "created_at": "2025-11-02T16:24:51.685419+00:00", "requested_refund": true}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-28T15:13:24.87605+00:00", "requested_refund": false}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-28T14:27:54.429939+00:00", "requested_refund": true}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-28T14:26:21.662999+00:00", "requested_refund": false}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-27T18:06:40.987278+00:00", "requested_refund": false}, {"amount": 2.75, "description": "Machine", "created_at": "2025-10-27T00:17:18.01511+00:00", "requested_refund": false}]);
+    fakeFilterBuilder = FakeFilterBuilder([{"amount": 2.75, "description": "machine", "created_at": "2025-11-02T16:24:51.685419+00:00", "requested_refund": true}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-28T15:13:24.87605+00:00", "requested_refund": false}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-28T14:27:54.429939+00:00", "requested_refund": true}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-28T14:26:21.662999+00:00", "requested_refund": false}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-27T18:06:40.987278+00:00", "requested_refund": false}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-27T00:17:18.01511+00:00", "requested_refund": false}]);
     transactionHandler = SupabaseTransactionService(client: supabaseMock);
     supabaseAuth = GoTrueMock();
 
@@ -42,7 +42,7 @@ void main() {
 
   });
 
-  group('Transaction Tests',(){
+  group('transaction Tests',(){
 
     test("Get transaction history data",() async {
       final result = await transactionHandler.getTransactionsForUser();

@@ -11,7 +11,7 @@ void main() {
   late MachineCommunicator machineCommunicator;
   late EdgeFunctionMock edgeFunctionMock;
 
-  group("Awake Machine Tests", () {
+  group("Awake machine Tests", () {
     setUp(() {
       getIt.reset();
       edgeFunctionMock = EdgeFunctionMock();
@@ -22,7 +22,7 @@ void main() {
       machineCommunicator = MachineCommunicator();
     });
 
-    test("Machine successfully wakes up", () async {
+    test("machine successfully wakes up", () async {
       when(() =>
           edgeFunctionMock.runEdgeFunction(
               name: any(named: 'name'), body: any(named: 'body'))).thenAnswer((
@@ -39,7 +39,7 @@ void main() {
       expect(result, true);
     });
 
-    test("Machine fails to wake up", () async {
+    test("machine fails to wake up", () async {
       when(() =>
           edgeFunctionMock.runEdgeFunction(
               name: any(named: 'name'), body: any(named: 'body'))).thenAnswer((
@@ -112,7 +112,7 @@ void main() {
               }));
 
       final result = await machineCommunicator.checkAvailability('10000001');
-      expect(result, equals('Machine is in use right now.'));
+      expect(result, equals('machine is in use right now.'));
     });
 
     test('Check offline availability', () async {
@@ -130,7 +130,7 @@ void main() {
               }));
 
       final result = await machineCommunicator.checkAvailability('10000002');
-      expect(result, equals('Machine is offline right now.'));
+      expect(result, equals('machine is offline right now.'));
     });
 
     test('Check nonsense message', () async {
@@ -148,7 +148,7 @@ void main() {
               }));
 
       final result = await machineCommunicator.checkAvailability('10000002');
-      expect(result, equals('Machine is offline right now.'));
+      expect(result, equals('machine is offline right now.'));
     });
 
     test('Check success failure', () async {

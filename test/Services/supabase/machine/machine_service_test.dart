@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:clean_stream_laundry_app/Services/Supabase/supabase_machine_service.dart';
+import 'package:clean_stream_laundry_app/Services/supabase/supabase_machine_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'mocks.dart';
 
@@ -96,14 +96,12 @@ void main() {
   });
 
   test('getMachineByIdTest error is Postgres error is thrown',() async {
-    FakeFilterBuilderMap fakeFilterBuilderMap = FakeFilterBuilderMap({"Name": "Dryer 1", "Price": 2.75});
     when(() => queryBuilderMock.select(any())).thenThrow(PostgrestException(message: "Test Exception"));
     final result = await machineHandler.getMachineById("1");
     expect(result,null);
   });
 
   test('getMachineByIdTest error is an unknown error',() async {
-    FakeFilterBuilderMap fakeFilterBuilderMap = FakeFilterBuilderMap({"Name": "Dryer 1", "Price": 2.75});
     when(() => queryBuilderMock.select(any())).thenThrow(Exception("Test exception"));
     final result = await machineHandler.getMachineById("1");
     expect(result,null);

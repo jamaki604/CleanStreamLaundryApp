@@ -102,13 +102,13 @@ void main() {
       });
     });
 
-    group('Location Dropdown', () {
+    group('location Dropdown', () {
       testWidgets('should display location dropdown', (tester) async {
         mockLocations();
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        expect(find.text('Select Location'), findsOneWidget);
+        expect(find.text('Select location'), findsOneWidget);
         expect(find.byIcon(Icons.location_on), findsOneWidget);
       });
 
@@ -138,7 +138,7 @@ void main() {
       });
     });
 
-    group('Machine Buttons', () {
+    group('machine Buttons', () {
       testWidgets('should display correct washer counts', (tester) async {
         mockLocations([{"id": 1, "Address": "123 Main St"}]);
         mockMachineCounts('1');
