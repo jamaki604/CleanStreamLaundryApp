@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/Middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
