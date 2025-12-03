@@ -67,13 +67,16 @@ class CreditCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        (username == null || username!.isEmpty) ? 'John Doe' : username!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
+                      Expanded(
+                        child: Text(
+                          (username == null || username!.isEmpty) ? 'John Doe' : username!,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                       Image.asset(

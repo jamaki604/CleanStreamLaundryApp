@@ -164,9 +164,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       TextButton.icon(
                         onPressed: _toggleTransactionView,
                         icon: Icon(
-                          _showPastTransactions
-                              ? Icons.expand_less
-                              : Icons.expand_more,
+                          _showPastTransactions ? Icons.expand_less : Icons.expand_more,
                           color: Colors.blue,
                         ),
                         label: Text(
@@ -177,57 +175,58 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  _recentTransactions.isEmpty
-                      ? Text(
-                    'No recent transactions',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  )
-                      : Expanded(
-                    child: Theme(
-                      data: Theme.of(context).copyWith(
-                        scrollbarTheme: ScrollbarThemeData(
-                          thumbColor: MaterialStateProperty.all(Colors.blue),
-                          thickness: MaterialStateProperty.all(6),
-                          radius: const Radius.circular(4),
-                        ),
+                  if (_recentTransactions.isEmpty)
+                    Text(
+                      'No recent transactions',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
                       ),
-                      child: Scrollbar(
-                        controller: _scrollController,
-                        thumbVisibility: true,
-                        child: ListView.builder(
+                    )
+                  else
+                    Expanded(
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          scrollbarTheme: ScrollbarThemeData(
+                            thumbColor: MaterialStateProperty.all(Colors.blue),
+                            thickness: MaterialStateProperty.all(6),
+                            radius: const Radius.circular(4),
+                          ),
+                        ),
+                        child: Scrollbar(
                           controller: _scrollController,
-                          itemCount: _recentTransactions.length,
-                          itemBuilder: (context, index) {
-                            final transaction = _recentTransactions[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              elevation: 4,
-                              color: Theme.of(context).colorScheme.cardPrimary,
-                              child: ListTile(
-                                leading: const Icon(
-                                  Icons.receipt_long,
-                                  color: Color(0xFF2073A9),
+                          thumbVisibility: true,
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: _recentTransactions.length,
+                            itemBuilder: (context, index) {
+                              final transaction = _recentTransactions[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                title: Text(
-                                  transaction.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black87,
+                                elevation: 4,
+                                color: Theme.of(context).colorScheme.cardPrimary,
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.receipt_long,
+                                    color: Color(0xFF2073A9),
+                                  ),
+                                  title: Text(
+                                    transaction.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
