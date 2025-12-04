@@ -1,0 +1,32 @@
+import 'dart:async';
+import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class SupabaseMock extends Mock implements SupabaseClient {}
+class QueryBuilderMock extends Mock implements SupabaseQueryBuilder {}
+
+class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<PostgrestList> {
+  final List<Map<String, dynamic>> fakeData;
+
+  FakeFilterBuilder(this.fakeData);
+
+  @override
+  Future<U> then<U>(FutureOr<U> Function(PostgrestList) onValue, {Function? onError,}) {
+    try {
+
+      final result = onValue(fakeData);
+      return Future.value(result);
+    } catch (e) {
+      if (onError != null) {
+        onError(e);
+        return Future.error(e);
+      }
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<PostgrestList> catchError(Function onError, {bool Function(Object)? test}) {
+    return Future.value(fakeData);
+  }
+}

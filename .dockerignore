@@ -1,0 +1,32 @@
+# Ignore version control and build outputs
+.git
+.gitignore
+
+# Flutter build outputs
+build/
+.ios/
+.android/
+.web/
+.windows/
+.linux/
+.macos/
+
+# Flutter metadata
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# Environment and logs
+.env
+*.log
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Node or other tooling
+node_modules/

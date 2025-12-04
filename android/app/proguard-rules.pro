@@ -6,5 +6,5 @@
 -dontwarn kotlinx.parcelize.Parceler$DefaultImpls
 -dontwarn kotlinx.parcelize.Parceler
 -dontwarn kotlinx.parcelize.Parcelize
-# Keep Stripe classes
+# Keep stripe classes
 -keep class com.stripe.** { *; }

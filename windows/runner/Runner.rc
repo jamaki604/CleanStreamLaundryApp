@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.cleanstreamlaundrysolutions" "\0"
-            VALUE "FileDescription", "clena_stream_laundry_app" "\0"
+            VALUE "FileDescription", "clean_stream_laundry_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "clena_stream_laundry_app" "\0"
+            VALUE "InternalName", "clean_stream_laundry_app" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.cleanstreamlaundrysolutions. All rights reserved." "\0"
-            VALUE "OriginalFilename", "clena_stream_laundry_app.exe" "\0"
-            VALUE "ProductName", "clena_stream_laundry_app" "\0"
+            VALUE "OriginalFilename", "clean_stream_laundry_app.exe" "\0"
+            VALUE "ProductName", "clean_stream_laundry_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
