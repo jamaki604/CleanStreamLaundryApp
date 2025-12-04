@@ -1,0 +1,98 @@
+import 'package:flutter/material.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+class CreditCard extends StatelessWidget {
+
+  final String? username;
+
+  const CreditCard({
+    super.key,
+    required this.username,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 400, maxHeight: 230),
+      child: Card(
+        color: Theme.of(context).colorScheme.cardPrimary,
+        elevation: 10,
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 10),
+          child: SizedBox(
+            height: 225,
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -30,
+                  left: 10,
+                  child: Image.asset("assets/Slogan.png", width: 200, height: 135,key: Key("slogan")),
+                ),
+                Positioned(
+                  top: -10,
+                  right: 0,
+                  child: Image.asset("assets/Icon.png", height: 85, width: 85,key: Key("icon")),
+                ),
+                Positioned(
+                  left: 15,
+                  top: 65,
+                  child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45,key: Key("cardChip")),
+                ),
+                Positioned(
+                    left: -4,
+                    right: 0,
+                    top: 120,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      color: Theme.of(context).colorScheme.cardSecondary,
+                      child: Text(
+                        "1234   5678   9012   3456",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w400,
+                          color: Theme.of(context).colorScheme.fontInverted,
+                        ),
+                      ),
+                    )
+                ),
+                Positioned(
+                  left: 15,
+                  right: 15,
+                  top: 170,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          (username == null || username!.isEmpty) ? 'John Doe' : username!,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      Image.asset(
+                        "assets/Mastercard.png",
+                        width: 60,
+                        height: 35,
+                          key: Key("mastercard")
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+}
+}

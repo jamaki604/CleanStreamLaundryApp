@@ -7,9 +7,9 @@ name: Dart
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   workflow_dispatch:
 
 jobs:
@@ -42,11 +42,33 @@ jobs:
           EOF
 
 
-      # Your project will need to have tests in test/ and a dependency on
-      # package:test for this step to succeed. Note that Flutter projects will
-      # want to change this to 'flutter test'.
-      - name: Run tests
-        run: flutter test
+      - name: Run tests with coverage and machine output (printed + saved)
+        run: |
+          flutter test \
+            --machine \
+            --coverage \
+            | tee test_output.json
 
-      - name: Show coverage
-        run: flutter pub run test_cov_console
+      - name: Install junitreport converter
+        run: dart pub global activate junitreport
+
+      - name: Convert machine output to JUnit XML
+        run: |
+          cat test_output.json | tojunit --output test_report.xml
+
+      - name: Generate HTML coverage report
+        run: |
+          sudo apt-get install -y lcov
+          genhtml coverage/lcov.info --output-directory coverage/html
+
+      - name: Upload JUnit Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-report
+          path: test_report.xml
+
+      - name: Upload HTML Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-coverage-report
+          path: coverage/html/
