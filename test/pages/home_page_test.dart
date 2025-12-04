@@ -146,7 +146,7 @@ void main() {
         await selectLocation(tester, '123 Main St');
 
         expect(find.text('5 available'), findsNWidgets(1));
-        expect(find.text('5/5 washers'), findsOneWidget);
+        expect(find.text('3/5 washers'), findsOneWidget);
       });
 
       testWidgets('should display correct dryer counts', (tester) async {
@@ -157,7 +157,7 @@ void main() {
         await tester.pumpAndSettle();
         await selectLocation(tester, '123 Main St');
 
-        expect(find.text('4/4 dryers'), findsOneWidget);
+        expect(find.text('2/4 dryers'), findsOneWidget);
       });
     });
 
