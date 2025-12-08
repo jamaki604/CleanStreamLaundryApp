@@ -276,7 +276,7 @@ class _PaymentPageState extends State<PaymentPage> {
           );
         }
     statusDialog(context,
-        title: "payment Successful!",
+        title: "Payment Successful!",
         message: "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
         isSuccess: true
     );
