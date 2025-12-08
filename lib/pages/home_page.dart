@@ -164,7 +164,7 @@ class HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "$totalMachine available",
+                                "$machineIdle available",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.fontInverted,
                                   fontSize: 28,
@@ -226,7 +226,7 @@ class HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "$totalMachine available",
+                                "$machineIdle available",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.fontInverted,
                                   fontSize: 28,
