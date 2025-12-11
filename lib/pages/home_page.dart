@@ -143,8 +143,8 @@ class HomePageState extends State<HomePage> {
                       return const CircularProgressIndicator();
                     }
 
-                    final machineIdle = snapshot.data![0];
                     final totalMachine = snapshot.data![0];
+                    final machineIdle = snapshot.data![1];
 
                     return Container(
                       width: 250,
@@ -173,7 +173,7 @@ class HomePageState extends State<HomePage> {
                               ),
 
                               Text(
-                                "$totalMachine/$machineIdle washers",
+                                "$machineIdle/$totalMachine washers",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.fontSecondary,
                                   fontSize: 14,
@@ -205,8 +205,8 @@ class HomePageState extends State<HomePage> {
                       return const CircularProgressIndicator();
                     }
 
-                    final machineIdle = snapshot.data![0];
                     final totalMachine = snapshot.data![0];
+                    final machineIdle = snapshot.data![1];
 
                     return Container(
                       width: 250,
@@ -235,7 +235,7 @@ class HomePageState extends State<HomePage> {
                               ),
 
                               Text(
-                                "$totalMachine/$machineIdle dryers",
+                                "$machineIdle/$totalMachine dryers",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.fontSecondary,
                                   fontSize: 14,
