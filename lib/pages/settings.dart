@@ -47,21 +47,6 @@ class _SettingsState extends State<Settings> {
                     },
                   ),
                   SizedBox(height: 16),
-                  // ElevatedButton(
-                  //   onPressed: () async {
-                  //     final transactions = await transactionService
-                  //         .getTransactionsForUser();
-                  //     context.go(
-                  //       '/monthlyTransactionHistory',
-                  //       extra: transactions,
-                  //     );
-                  //   },
-                  //   style: ElevatedButton.styleFrom(
-                  //     backgroundColor: Colors.blue,
-                  //     foregroundColor: Colors.white,
-                  //   ),
-                  //   child: Text("Monthly Report"),
-                  // ),
                   SettingsCard(
                     icon: Icons.money,
                     title: "Monthly Report",
@@ -75,15 +60,12 @@ class _SettingsState extends State<Settings> {
                     },
                   ),
                   SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
+                  SettingsCard(
+                    icon: Icons.request_page,
+                    title: "Request Refund",
+                    onTap: () {
                       context.go('/refundPage');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text("Request Refund"),
                   ),
                 ],
               ),
