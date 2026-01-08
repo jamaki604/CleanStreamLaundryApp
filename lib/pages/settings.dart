@@ -30,14 +30,6 @@ class _SettingsState extends State<Settings> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset('assets/Logo.png', width: 230, height: 230),
-                  SettingsCard(
-                    icon: Icons.logout,
-                    title: "Sign Out",
-                    onTap: () {
-                      authService.logout();
-                      context.go('/login');
-                    },
-                  ),
                   SizedBox(height: 16),
                   SettingsCard(
                     icon: Icons.lightbulb,
@@ -65,6 +57,14 @@ class _SettingsState extends State<Settings> {
                     title: "Request Refund",
                     onTap: () {
                       context.go('/refundPage');
+                    },
+                  ),
+                  SettingsCard(
+                    icon: Icons.logout,
+                    title: "Sign Out",
+                    onTap: () {
+                      authService.logout();
+                      context.go('/login');
                     },
                   ),
                 ],
