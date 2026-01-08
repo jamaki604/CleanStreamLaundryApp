@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'mocks.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
 void main() {
   late MockAuthService mockAuthService;
@@ -69,7 +70,6 @@ void main() {
 
       expect(find.text('Sign Out'), findsOneWidget);
       expect(find.text('Monthly Report'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Sign Out'), findsOneWidget);
       expect(
         find.widgetWithText(ElevatedButton, 'Monthly Report'),
         findsOneWidget,
@@ -95,7 +95,12 @@ void main() {
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      final themeButton = find.byType(ElevatedButton).at(1);
+      final themeButton = find.widgetWithText(
+        ElevatedButton,
+        Theme.of(
+          tester.element(find.byType(ElevatedButton)),
+        ).colorScheme.modeChangerText,
+      );
       await tester.tap(themeButton);
       await tester.pumpAndSettle();
 

@@ -23,62 +23,68 @@ class _SettingsState extends State<Settings> {
     return Consumer<ThemeManager>(
       builder: (context, themeManager, child) {
         return BasePage(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset('assets/Logo.png', width: 230, height: 230),
-
-                ElevatedButton(
-                  onPressed: () {
-                    authService.logout();
-                    context.go('/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/Logo.png', width: 230, height: 230),
+                  SettingsCard(
+                    icon: Icons.logout,
+                    title: "Sign Out",
+                    onTap: () {
+                      authService.logout();
+                      context.go('/login');
+                    },
                   ),
-                  child: Text("Sign Out"),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    themeManager.toggleTheme();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  SizedBox(height: 16),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     themeManager.toggleTheme();
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: Colors.blue,
+                  //     foregroundColor: Colors.white,
+                  //   ),
+                  //   child: Text(Theme.of(context).colorScheme.modeChangerText),
+                  // ),
+                  SettingsCard(
+                    icon: Icons.lightbulb,
+                    title: Theme.of(context).colorScheme.modeChangerText,
+                    onTap: () {
+                      themeManager.toggleTheme();
+                    },
                   ),
-                  child: Text(Theme.of(context).colorScheme.modeChangerText),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final transactions = await transactionService
-                        .getTransactionsForUser();
-                    context.go(
-                      '/monthlyTransactionHistory',
-                      extra: transactions,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final transactions = await transactionService
+                          .getTransactionsForUser();
+                      context.go(
+                        '/monthlyTransactionHistory',
+                        extra: transactions,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text("Monthly Report"),
                   ),
-                  child: Text("Monthly Report"),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    context.go('/refundPage');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      context.go('/refundPage');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text("Request Refund"),
                   ),
-                  child: Text("Request Refund"),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

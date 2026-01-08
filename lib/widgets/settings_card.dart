@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class SettingsCard extends StatelessWidget {
@@ -21,9 +22,7 @@ class SettingsCard extends StatelessWidget {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
@@ -39,10 +38,7 @@ class SettingsCard extends StatelessWidget {
                   color: theme.colorScheme.primary.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icon,
-                  color: theme.colorScheme.primary,
-                ),
+                child: Icon(icon, color: theme.colorScheme.primary),
               ),
 
               const SizedBox(width: 16),
@@ -54,8 +50,9 @@ class SettingsCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.fontSecondary,
                       ),
                     ),
                     if (subtitle != null) ...[
@@ -71,10 +68,7 @@ class SettingsCard extends StatelessWidget {
                 ),
               ),
 
-              const Icon(
-                Icons.chevron_right,
-                color: Colors.grey,
-              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
         ),
