@@ -10,4 +10,5 @@ abstract class AuthService{
   Future<AuthenticationResponses> resendVerification();
   Stream<bool> get onAuthChange;
   bool isEmailVerified();
+  Future<AuthenticationResponses> appleSignIn();
 }

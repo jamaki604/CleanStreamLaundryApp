@@ -164,4 +164,18 @@ class SupabaseAuthService implements AuthService{
     return _client.auth.currentUser?.emailConfirmedAt != null;
   }
 
+  @override
+  Future<AuthenticationResponses> appleSignIn() async{
+    AuthenticationResponses output = AuthenticationResponses.success;
+    try{
+      await _client.auth.signInWithOAuth(OAuthProvider.apple);
+    }catch(e){
+      output = AuthenticationResponses.failure;
+    }
+
+    return output;
+  }
+
+
+
 }
