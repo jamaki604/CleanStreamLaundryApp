@@ -242,6 +242,14 @@ void main() {
 
         verify(() => mockAuthService.login('test@example.com', any())).called(1);
       });
+
+      testWidgets('should have Apple Sign In button', (tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        expect(find.widgetWithText(ElevatedButton, 'Sign in with Apple'), findsOneWidget);
+      });
+
     });
 
     group('Navigation', () {
