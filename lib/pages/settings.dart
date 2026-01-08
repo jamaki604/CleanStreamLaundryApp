@@ -7,6 +7,7 @@ import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -26,15 +27,6 @@ class _SettingsState extends State<Settings> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Text(
-                //   "Settings \n",
-                //   style: TextStyle(
-                //     fontSize: 48,
-                //     fontWeight: FontWeight.w500,
-                //     color: Theme.of(context).colorScheme.fontSecondary,
-                //   ),
-                //   textAlign: TextAlign.center,
-                // ),
                 Image.asset('assets/Logo.png', width: 230, height: 230),
 
                 ElevatedButton(
