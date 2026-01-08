@@ -39,16 +39,6 @@ class _SettingsState extends State<Settings> {
                     },
                   ),
                   SizedBox(height: 16),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     themeManager.toggleTheme();
-                  //   },
-                  //   style: ElevatedButton.styleFrom(
-                  //     backgroundColor: Colors.blue,
-                  //     foregroundColor: Colors.white,
-                  //   ),
-                  //   child: Text(Theme.of(context).colorScheme.modeChangerText),
-                  // ),
                   SettingsCard(
                     icon: Icons.lightbulb,
                     title: Theme.of(context).colorScheme.modeChangerText,
@@ -57,8 +47,25 @@ class _SettingsState extends State<Settings> {
                     },
                   ),
                   SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
+                  // ElevatedButton(
+                  //   onPressed: () async {
+                  //     final transactions = await transactionService
+                  //         .getTransactionsForUser();
+                  //     context.go(
+                  //       '/monthlyTransactionHistory',
+                  //       extra: transactions,
+                  //     );
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: Colors.blue,
+                  //     foregroundColor: Colors.white,
+                  //   ),
+                  //   child: Text("Monthly Report"),
+                  // ),
+                  SettingsCard(
+                    icon: Icons.money,
+                    title: "Monthly Report",
+                    onTap: () async {
                       final transactions = await transactionService
                           .getTransactionsForUser();
                       context.go(
@@ -66,11 +73,6 @@ class _SettingsState extends State<Settings> {
                         extra: transactions,
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text("Monthly Report"),
                   ),
                   SizedBox(height: 16),
                   ElevatedButton(

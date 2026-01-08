@@ -20,7 +20,7 @@ class SettingsCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
-      elevation: 2,
+      elevation: 5,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: InkWell(
