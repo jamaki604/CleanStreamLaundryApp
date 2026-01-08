@@ -26,15 +26,16 @@ class _SettingsState extends State<Settings> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  "Settings \n",
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                // Text(
+                //   "Settings \n",
+                //   style: TextStyle(
+                //     fontSize: 48,
+                //     fontWeight: FontWeight.w500,
+                //     color: Theme.of(context).colorScheme.fontSecondary,
+                //   ),
+                //   textAlign: TextAlign.center,
+                // ),
+                Image.asset('assets/Logo.png', width: 230, height: 230),
 
                 ElevatedButton(
                   onPressed: () {
@@ -61,8 +62,12 @@ class _SettingsState extends State<Settings> {
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
-                    final transactions = await transactionService.getTransactionsForUser();
-                    context.go('/monthlyTransactionHistory', extra: transactions);
+                    final transactions = await transactionService
+                        .getTransactionsForUser();
+                    context.go(
+                      '/monthlyTransactionHistory',
+                      extra: transactions,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,

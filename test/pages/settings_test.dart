@@ -51,7 +51,15 @@ void main() {
     testWidgets('should display Settings title', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.text('Settings \n'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Image &&
+              widget.image is AssetImage &&
+              (widget.image as AssetImage).assetName == 'assets/Logo.png',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should display all three buttons', (
