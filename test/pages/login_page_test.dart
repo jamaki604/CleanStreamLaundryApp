@@ -75,7 +75,7 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        final imageFinder = find.byType(Image);
+        final imageFinder = find.byKey(const Key('app_logo'));
         expect(imageFinder, findsOneWidget);
 
         final image = tester.widget<Image>(imageFinder);
@@ -248,6 +248,13 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.widgetWithText(ElevatedButton, 'Sign in with Apple'), findsOneWidget);
+      });
+
+      testWidgets('should have Google Sign In button', (tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        expect(find.widgetWithText(ElevatedButton, 'Sign in with Google'), findsOneWidget);
       });
 
     });

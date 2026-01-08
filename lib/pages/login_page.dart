@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/Logo.png", height: 250, width: 250),
+                Image.asset("assets/Logo.png", height: 250, width: 250,key: const Key('app_logo'),),
                 TextField(
                   controller: _emailCtrl,
                   style: TextStyle(
@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset("assets/Google.png",width: 16,height: 16),
+                          Image.asset("assets/Google.png",width: 16,height: 16,key: const Key('google_logo')),
                           SizedBox(width: 8),
                           Flexible(
                             child: Text(
