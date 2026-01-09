@@ -176,6 +176,18 @@ class SupabaseAuthService implements AuthService{
     return output;
   }
 
+  @override
+  Future<AuthenticationResponses> googleSignIn() async{
+    AuthenticationResponses output = AuthenticationResponses.success;
+    try{
+      await _client.auth.signInWithOAuth(OAuthProvider.google);
+    }catch(e){
+      output = AuthenticationResponses.failure;
+    }
+
+    return output;
+  }
+
 
 
 }

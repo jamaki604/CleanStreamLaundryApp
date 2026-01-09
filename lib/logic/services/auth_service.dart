@@ -11,4 +11,5 @@ abstract class AuthService{
   Stream<bool> get onAuthChange;
   bool isEmailVerified();
   Future<AuthenticationResponses> appleSignIn();
+  Future<AuthenticationResponses> googleSignIn();
 }
