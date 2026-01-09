@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'mocks.dart';
 
 void main() {
@@ -74,12 +75,13 @@ void main() {
          (WidgetTester tester) async {
           await tester.pumpWidget(createTestWidget());
           await tester.pumpAndSettle();
-
+          DateTime currentDate = DateTime.now();
+          DateTime lastMonth = DateTime(currentDate.year, currentDate.month - 1);
           expect(find.byType(Card), findsNWidgets(2));
 
           final firstCardFinder = find.byType(Card).first;
           expect(find.descendant(
-              of: firstCardFinder, matching: find.text('Nov 2025')),
+              of: firstCardFinder, matching: find.text(DateFormat('MMM yyyy').format(lastMonth).toString())),
               findsOneWidget);
         });
   });
