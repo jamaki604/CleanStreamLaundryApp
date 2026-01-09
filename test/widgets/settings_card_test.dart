@@ -97,7 +97,7 @@ void main() {
 
       final card = tester.widget<Card>(find.byType(Card));
 
-      expect(card.elevation, 2);
+      expect(card.elevation, 5);
       expect(
         card.margin,
         const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
