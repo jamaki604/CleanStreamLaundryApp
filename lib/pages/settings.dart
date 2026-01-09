@@ -38,7 +38,7 @@ class _SettingsState extends State<Settings> {
                       themeManager.toggleTheme();
                     },
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.money,
                     title: "Monthly Report",
@@ -51,7 +51,7 @@ class _SettingsState extends State<Settings> {
                       );
                     },
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.request_page,
                     title: "Request Refund",
@@ -59,6 +59,7 @@ class _SettingsState extends State<Settings> {
                       context.go('/refundPage');
                     },
                   ),
+                  SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.logout,
                     title: "Sign Out",
