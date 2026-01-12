@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else if (authResponse == AuthenticationResponses.emailNotVerified) {
       context.go("/email-Verification");
     } else {
-      _changeColors();
+      _showMessage("Apple login was unsuccessful!");
     }
   }
 
