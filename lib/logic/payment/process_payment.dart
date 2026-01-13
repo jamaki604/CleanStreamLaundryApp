@@ -4,52 +4,54 @@ import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:get_it/get_it.dart';
 
-
-Future<bool> processPayment(BuildContext context, double amount, description) async {
-  showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => const Center(child: CircularProgressIndicator())
-  );
-
+Future<bool> processPayment(
+  BuildContext context,
+  double amount,
+  description,
+) async {
   final paymentService = GetIt.instance<PaymentService>();
   final transactionService = GetIt.instance<TransactionService>();
 
   final int status = await paymentService.makePayment(amount);
 
-  Navigator.of(context, rootNavigator: true).pop();
-
-  if(status == 200) {
+  if (status == 200) {
     if (description != "Machine") {
-      statusDialog(context,
-          title: "payment Successful!",
-          message: "Thank you! Your payment was processed successfully.",
-          isSuccess: true
+      statusDialog(
+        context,
+        title: "Payment Successful!",
+        message: "Thank you! Your payment was processed successfully.",
+        isSuccess: true,
       );
     }
-    transactionService.recordTransaction(amount: amount, description: description, type: "Laundry");
+    transactionService.recordTransaction(
+      amount: amount,
+      description: description,
+      type: "Laundry",
+    );
     return true;
   } else if (status == 401) {
-    statusDialog(context,
-        title: "payment Failed!",
-        message: "The payment was canceled or declined.",
-        isSuccess: false
+    statusDialog(
+      context,
+      title: "Payment Failed!",
+      message: "The payment was canceled or declined.",
+      isSuccess: false,
     );
     return false;
-  }else if (status == 403) {
-    statusDialog(context,
-        title: "payment Failed!",
-        message: "stripe service is not available on this platform.",
-        isSuccess: false
+  } else if (status == 403) {
+    statusDialog(
+      context,
+      title: "Payment Failed!",
+      message: "Stripe service is not available on this platform.",
+      isSuccess: false,
     );
     return false;
-  }  else {
-    statusDialog(context,
-        title: "payment Failed!",
-        message: "An unexpected error occurred.",
-        isSuccess: false
+  } else {
+    statusDialog(
+      context,
+      title: "Payment Failed!",
+      message: "An unexpected error occurred.",
+      isSuccess: false,
     );
     return false;
   }
 }
-

@@ -106,121 +106,130 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            CreditCard(username: _userName),
-            const SizedBox(height: 50),
-            Text(
-              'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.fontSecondary,
-              ),
-            ),
-            const SizedBox(height: 25),
-            ElevatedButton(
-              onPressed: () => _loadCard(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                disabledBackgroundColor: Colors.grey,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
-              child: const Text(
-                "Load card",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0, vertical: 8.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Transactions',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.fontSecondary,
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: _toggleTransactionView,
-                        icon: Icon(
-                          _showPastTransactions
-                              ? Icons.expand_less
-                              : Icons.expand_more,
-                          color: Colors.blue,
-                        ),
-                        label: Text(
-                          _showPastTransactions ? 'Show Less' : 'Show More',
-                          style: const TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 20),
+                  CreditCard(username: _userName),
+                  const SizedBox(height: 50),
+                  Text(
+                    'Current Balance: \$${_userBalance?.toStringAsFixed(2) ?? '0.00'}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.fontSecondary,
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  if (_recentTransactions.isEmpty)
-                    Text(
-                      'No recent transactions',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    onPressed: () => _loadCard(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      disabledBackgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    )
-                  else
-                    ListView.builder(
-                      physics:
-                      const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: _recentTransactions.length,
-                      itemBuilder: (context, index) {
-                        final transaction = _recentTransactions[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 4.0, vertical: 6.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 4,
-                          color: Theme.of(context).colorScheme.cardPrimary,
-                          child: ListTile(
-                            leading: const Icon(
-                              Icons.receipt_long,
-                              color: Color(0xFF2073A9),
-                            ),
-                            title: Text(
-                              transaction.toString(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      "Load card",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Transactions',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.fontSecondary,
                               ),
                             ),
+                            TextButton.icon(
+                              onPressed: _toggleTransactionView,
+                              icon: Icon(
+                                _showPastTransactions
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: Colors.blue,
+                              ),
+                              label: Text(
+                                _showPastTransactions
+                                    ? 'Show Less'
+                                    : 'Show More',
+                                style: const TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (_recentTransactions.isEmpty)
+                          Text(
+                            'No recent transactions',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          )
+                        else
+                          ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _recentTransactions.length,
+                            itemBuilder: (context, index) {
+                              final transaction = _recentTransactions[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                  vertical: 6.0,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 4,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.cardPrimary,
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.receipt_long,
+                                    color: Color(0xFF2073A9),
+                                  ),
+                                  title: Text(
+                                    transaction.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                      ],
                     ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
     );
   }
 
@@ -254,92 +263,144 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   void _loadCard() {
-    TextEditingController amountController = TextEditingController();
+    double selectedAmount = 10;
+
     showDialog(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Center(
-          child: Text(
-            "Enter load amount",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue[900],
-            ),
-          ),
-        ),
-        content: TextField(
-          controller: amountController,
-          autofocus: true,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            prefixText: '\$ ',
-            prefixStyle: TextStyle(
-              color: Theme.of(context).colorScheme.fontInverted,
-              fontWeight: FontWeight.bold,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue[700]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue[300]!),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel', style: TextStyle(color: Colors.blue[700])),
-            onPressed: () {
-              Navigator.of(dialogContext).pop(null);
-            },
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final amountText = amountController.text;
-              final amount = double.tryParse(amountText) ?? 0;
-
-              Navigator.of(dialogContext).pop();
-
-              if (amount > 0) {
-                bool result = await processPayment(context, amount, "Loyalty Card");
-                if (result) {
-                  final newBalance = _userBalance! + amount;
-                  profileService.updateBalanceById(newBalance);
-                  setState(() {
-                    _userBalance = newBalance;
-                  });
-                  _fetchTransactions();
-                }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter a valid amount')),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
-              elevation: 3,
-            ),
-            child: const Text(
-              'Pay',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              title: Center(
+                child: Text(
+                  "Load Loyalty Card",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[900],
+                  ),
+                ),
               ),
-            ),
-          )
-        ],
-      ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "\$${selectedAmount.toStringAsFixed(0)}",
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.fontInverted,
+                    ),
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: [25, 50, 75].map((amount) {
+                      return ChoiceChip(
+                        label: Text("\$$amount"),
+                        selected: selectedAmount == amount.toDouble(),
+                        onSelected: (_) {
+                          setDialogState(() {
+                            selectedAmount = amount.toDouble();
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackHeight: 6,
+                      activeTrackColor: Colors.blue,
+                      inactiveTrackColor: Colors.blue.withOpacity(0.3),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 12,
+                      ),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 24,
+                      ),
+                      tickMarkShape: const RoundSliderTickMarkShape(
+                        tickMarkRadius: 0,
+                      ),
+                    ),
+                    child: Slider(
+                      value: selectedAmount,
+                      min: 10,
+                      max: 100,
+                      onChanged: (value) {
+                        setDialogState(() {
+                          selectedAmount = (value / 5).round() * 5.0;
+                        });
+                      },
+                    ),
+                  ),
+                  Text(
+                    "Select an amount to add to your card.",
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.fontInverted.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                  },
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.blue[700]),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(dialogContext).pop();
+
+                    final amount = selectedAmount;
+
+                    bool result = await processPayment(
+                      context,
+                      amount,
+                      "Loyalty Card",
+                    );
+
+                    if (result) {
+                      final newBalance = _userBalance! + amount;
+                      await profileService.updateBalanceById(newBalance);
+
+                      setState(() {
+                        _userBalance = newBalance;
+                      });
+
+                      _fetchTransactions();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Pay",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
