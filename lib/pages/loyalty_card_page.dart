@@ -9,6 +9,8 @@ import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 import '../Logic/Theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/credit_card.dart';
+import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
+import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 
 class LoyaltyPage extends StatefulWidget {
   const LoyaltyPage({super.key});
@@ -263,7 +265,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   void _loadCard() {
-    double selectedAmount = 10;
+    double selectedAmount = 10.0;
 
     showDialog(
       context: context,
@@ -361,16 +363,26 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   onPressed: () async {
                     Navigator.of(dialogContext).pop();
 
-                    final amount = selectedAmount;
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) =>
+                          const Center(child: CircularProgressIndicator()),
+                    );
 
-                    bool result = await processPayment(
-                      context,
-                      amount,
+                    final result = await processPayment(
+                      selectedAmount,
                       "Loyalty Card",
                     );
 
-                    if (result) {
-                      final newBalance = _userBalance! + amount;
+                    if (!context.mounted) return;
+
+                    if (Navigator.of(context, rootNavigator: true).canPop()) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                    }
+
+                    if (result == PaymentResult.success) {
+                      final newBalance = _userBalance! + selectedAmount;
                       await profileService.updateBalanceById(newBalance);
 
                       setState(() {
@@ -378,6 +390,29 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       });
 
                       _fetchTransactions();
+
+                      statusDialog(
+                        context,
+                        title: "Payment Successful!",
+                        message:
+                            "Thank you! Your payment was processed successfully.",
+                        isSuccess: true,
+                      );
+                    } else if (result == PaymentResult.canceled) {
+                      statusDialog(
+                        context,
+                        title: "Payment Canceled",
+                        message: "Payment was canceled.",
+                        isSuccess: false,
+                      );
+                    } else {
+                      statusDialog(
+                        context,
+                        title: "Payment Failed",
+                        message:
+                            "An error occurred while processing your payment. Please try again.",
+                        isSuccess: false,
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
