@@ -265,7 +265,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   void _loadCard() {
-    double selectedAmount = 10.0;
+    double selectedAmount = 1.0;
 
     showDialog(
       context: context,
@@ -283,7 +283,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
+                    color: Colors.blue,
                   ),
                 ),
               ),
@@ -300,9 +300,18 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                   ),
                   Wrap(
                     spacing: 8,
-                    children: [25, 50, 75].map((amount) {
+                    children: [10, 15, 25].map((amount) {
                       return ChoiceChip(
                         label: Text("\$$amount"),
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.fontInverted,
+                        ),
+                        shape: StadiumBorder(
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 1.5,
+                          ),
+                        ),
                         selected: selectedAmount == amount.toDouble(),
                         onSelected: (_) {
                           setDialogState(() {
@@ -317,7 +326,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     data: SliderTheme.of(context).copyWith(
                       trackHeight: 6,
                       activeTrackColor: Colors.blue,
-                      inactiveTrackColor: Colors.blue.withOpacity(0.3),
+                      inactiveTrackColor: Colors.blue.withAlpha(3),
                       thumbShape: const RoundSliderThumbShape(
                         enabledThumbRadius: 12,
                       ),
@@ -330,11 +339,12 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     ),
                     child: Slider(
                       value: selectedAmount,
-                      min: 10,
-                      max: 100,
+                      min: 1,
+                      max: 50,
                       onChanged: (value) {
                         setDialogState(() {
-                          selectedAmount = (value / 5).round() * 5.0;
+                          final rounded = (value / 5).round() * 5.0;
+                          selectedAmount = rounded.clamp(1.0, 50.0);
                         });
                       },
                     ),
