@@ -362,58 +362,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                 ElevatedButton(
                   onPressed: () async {
                     Navigator.of(dialogContext).pop();
-
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (_) =>
-                          const Center(child: CircularProgressIndicator()),
-                    );
-
-                    final result = await processPayment(
-                      selectedAmount,
-                      "Loyalty Card",
-                    );
-
-                    if (!context.mounted) return;
-
-                    if (Navigator.of(context, rootNavigator: true).canPop()) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    }
-
-                    if (result == PaymentResult.success) {
-                      final newBalance = _userBalance! + selectedAmount;
-                      await profileService.updateBalanceById(newBalance);
-
-                      setState(() {
-                        _userBalance = newBalance;
-                      });
-
-                      _fetchTransactions();
-
-                      statusDialog(
-                        context,
-                        title: "Payment Successful!",
-                        message:
-                            "Thank you! Your payment was processed successfully.",
-                        isSuccess: true,
-                      );
-                    } else if (result == PaymentResult.canceled) {
-                      statusDialog(
-                        context,
-                        title: "Payment Canceled",
-                        message: "Payment was canceled.",
-                        isSuccess: false,
-                      );
-                    } else {
-                      statusDialog(
-                        context,
-                        title: "Payment Failed",
-                        message:
-                            "An error occurred while processing your payment. Please try again.",
-                        isSuccess: false,
-                      );
-                    }
+                    _handlePayment(selectedAmount);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
@@ -437,5 +386,46 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         );
       },
     );
+  }
+
+  void _handlePayment(double amount) async {
+    final result = await processPayment(amount, "Loyalty Card");
+
+    if (!mounted) {
+      return;
+    }
+
+    if (result == PaymentResult.success) {
+      final newBalance = _userBalance! + amount;
+      await profileService.updateBalanceById(newBalance);
+
+      setState(() {
+        _userBalance = newBalance;
+      });
+
+      _fetchTransactions();
+
+      statusDialog(
+        context,
+        title: "Payment Successful!",
+        message: "Thank you! Your payment was processed successfully.",
+        isSuccess: true,
+      );
+    } else if (result == PaymentResult.canceled) {
+      statusDialog(
+        context,
+        title: "Payment Canceled",
+        message: "Payment was canceled.",
+        isSuccess: false,
+      );
+    } else {
+      statusDialog(
+        context,
+        title: "Payment Failed",
+        message:
+            "An error occurred while processing your payment. Please try again.",
+        isSuccess: false,
+      );
+    }
   }
 }

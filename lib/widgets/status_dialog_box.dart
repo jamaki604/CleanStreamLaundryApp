@@ -1,19 +1,16 @@
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 void statusDialog(
-    BuildContext context, {
-      required String title,
-      required String message,
-      required bool isSuccess
-    }){
+  BuildContext context, {
+  required String title,
+  required String message,
+  required bool isSuccess,
+}) {
   showDialog(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -54,9 +51,6 @@ void statusDialog(
             child: ElevatedButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop();
-                if(isSuccess) {
-                  context.go("/homePage");
-                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[700],
@@ -65,11 +59,12 @@ void statusDialog(
                 ),
               ),
               child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-              )),
+                'Done',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
