@@ -170,7 +170,7 @@ class SupabaseAuthService implements AuthService{
 
     if(!kIsWeb) {
       try {
-        await _client.auth.signInWithOAuth(OAuthProvider.apple);
+        await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "clean-stream://oauth");
       } catch (e) {
 
       }
