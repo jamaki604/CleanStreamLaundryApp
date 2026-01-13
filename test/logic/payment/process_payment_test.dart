@@ -37,7 +37,7 @@ void main() {
 
   group('processPayment', () {
     testWidgets(
-      'should show loading dialog and return true on successful payment (status 200)',
+      'should be a complete payment and record transaction on success',
       (WidgetTester tester) async {
         const amount = 100.0;
         const description = 'Test payment';
@@ -61,7 +61,7 @@ void main() {
               builder: (context) {
                 return ElevatedButton(
                   onPressed: () async {
-                    await processPayment(context, amount, description);
+                    await processPayment(amount, description);
                   },
                   child: const Text('Pay'),
                 );
@@ -72,8 +72,6 @@ void main() {
 
         await tester.tap(find.text('Pay'));
         await tester.pump();
-
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
         await tester.pumpAndSettle();
 
@@ -86,17 +84,11 @@ void main() {
             type: 'Laundry',
           ),
         ).called(1);
-
-        expect(find.text('Payment Successful!'), findsOneWidget);
-        expect(
-          find.text('Thank you! Your payment was processed successfully.'),
-          findsOneWidget,
-        );
       },
     );
 
     testWidgets(
-      'should return false and show error dialog when payment is canceled (status 401)',
+      'should throw an error and not record transaction on StripeException with canceled code',
       (WidgetTester tester) async {
         const amount = 50.0;
         const description = 'Test payment';
@@ -112,7 +104,7 @@ void main() {
               builder: (context) {
                 return ElevatedButton(
                   onPressed: () async {
-                    await processPayment(context, amount, description);
+                    await processPayment(amount, description);
                   },
                   child: const Text('Pay'),
                 );
@@ -133,17 +125,11 @@ void main() {
             type: any(named: 'type'),
           ),
         );
-
-        expect(find.text('Payment Failed!'), findsOneWidget);
-        expect(
-          find.text('The payment was canceled or declined.'),
-          findsOneWidget,
-        );
       },
     );
 
     testWidgets(
-      'should return false and show error dialog when stripe is unavailable (status 403)',
+      'should throw an error and not record transaction on PlatformException',
       (WidgetTester tester) async {
         const amount = 75.0;
         const description = 'Test payment';
@@ -157,7 +143,7 @@ void main() {
               builder: (context) {
                 return ElevatedButton(
                   onPressed: () async {
-                    await processPayment(context, amount, description);
+                    await processPayment(amount, description);
                   },
                   child: const Text('Pay'),
                 );
@@ -178,17 +164,11 @@ void main() {
             type: any(named: 'type'),
           ),
         );
-
-        expect(find.text('Payment Failed!'), findsOneWidget);
-        expect(
-          find.text('Platform is not supported for payments.'),
-          findsOneWidget,
-        );
       },
     );
 
     testWidgets(
-      'should return false and show generic error dialog for unexpected status codes',
+      'should return false and not record transaction on unexpected error',
       (WidgetTester tester) async {
         const amount = 25.0;
         const description = 'Test payment';
@@ -202,7 +182,7 @@ void main() {
               builder: (context) {
                 return ElevatedButton(
                   onPressed: () async {
-                    await processPayment(context, amount, description);
+                    await processPayment(amount, description);
                   },
                   child: const Text('Pay'),
                 );
@@ -223,54 +203,7 @@ void main() {
             type: any(named: 'type'),
           ),
         );
-
-        expect(find.text('Payment Failed!'), findsOneWidget);
-        expect(find.text('An unexpected error occurred.'), findsOneWidget);
       },
     );
-
-    testWidgets('should dismiss loading dialog before showing result dialog', (
-      WidgetTester tester,
-    ) async {
-      const amount = 100.0;
-      const description = 'Test payment';
-      when(() => mockPaymentService.makePayment(amount)).thenAnswer((_) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-        return;
-      });
-      when(
-        () => mockTransactionService.recordTransaction(
-          amount: amount,
-          description: description,
-          type: 'Laundry',
-        ),
-      ).thenAnswer((_) async => {});
-
-      await tester.pumpWidget(
-        createTestWidget(
-          Builder(
-            builder: (context) {
-              return ElevatedButton(
-                onPressed: () async {
-                  await processPayment(context, amount, description);
-                },
-                child: const Text('Pay'),
-              );
-            },
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Pay'));
-      await tester.pump();
-
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-      await tester.pumpAndSettle();
-
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-
-      expect(find.text('Payment Successful!'), findsOneWidget);
-    });
   });
 }
