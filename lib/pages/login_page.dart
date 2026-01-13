@@ -59,29 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleSocialLogin(Future<AuthenticationResponses> Function() loginMethod) async {
-    final email = _emailCtrl.text.trim();
-    final password = _passwordCtrl.text;
-
-    if (email.isEmpty || password.isEmpty) {
-      _showMessage('Please fill in both fields.');
-      return;
-    }
-
-    _showMessage('Logging in as $email...');
-    final authResponse = await loginMethod();
-    if (!mounted) return;
-
-    if (authResponse == AuthenticationResponses.success) {
-      _showMessage('Logged in as $email');
-      context.go("/homePage");
-    } else if (authResponse == AuthenticationResponses.emailNotVerified) {
-      context.go("/email-Verification");
-    } else {
-      _showMessage("Apple login was unsuccessful!");
-    }
-  }
-
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
@@ -195,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 160,
                     height: 30,
                     child: ElevatedButton(
-                      onPressed: () => _handleSocialLogin(() => authService.appleSignIn()),
+                      onPressed: () => authService.appleSignIn(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,

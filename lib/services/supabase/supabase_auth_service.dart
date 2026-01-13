@@ -166,27 +166,20 @@ class SupabaseAuthService implements AuthService{
   }
 
   @override
-  Future<AuthenticationResponses> appleSignIn() async{
-    AuthenticationResponses output = AuthenticationResponses.success;
-    late final bool response;
+  Future<void> appleSignIn() async{
 
     if(!kIsWeb) {
       try {
-        response = await _client.auth.signInWithOAuth(OAuthProvider.apple);
+        await _client.auth.signInWithOAuth(OAuthProvider.apple);
       } catch (e) {
-        output = AuthenticationResponses.failure;
-      }
 
-      if (!response) {
-        output = AuthenticationResponses.failure;
       }
 
     }else{
       //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
-      response = await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "http://localhost:8080/loading");
+     await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "http://localhost:8080/loading");
     }
 
-    return output;
   }
 
 
