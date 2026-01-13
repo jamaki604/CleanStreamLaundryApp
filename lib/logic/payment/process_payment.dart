@@ -1,7 +1,10 @@
+import 'package:clean_stream_laundry_app/logic/exceptions/null_url_exception.dart';
+import 'package:clean_stream_laundry_app/logic/exceptions/platform_exception.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
 
 Future<bool> processPayment(
@@ -9,12 +12,19 @@ Future<bool> processPayment(
   double amount,
   description,
 ) async {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (dialogContext) =>
+        const Center(child: CircularProgressIndicator()),
+  );
+
   final paymentService = GetIt.instance<PaymentService>();
   final transactionService = GetIt.instance<TransactionService>();
 
-  final int status = await paymentService.makePayment(amount);
-
-  if (status == 200) {
+  try {
+    await paymentService.makePayment(amount);
+    Navigator.of(context, rootNavigator: true).pop();
     if (description != "Machine") {
       statusDialog(
         context,
@@ -29,7 +39,35 @@ Future<bool> processPayment(
       type: "Laundry",
     );
     return true;
-  } else if (status == 401) {
+  } on NullUrlException {
+    Navigator.of(context, rootNavigator: true).pop();
+    statusDialog(
+      context,
+      title: "Payment Failed!",
+      message: "Internal error occured.",
+      isSuccess: false,
+    );
+    return false;
+  } on StripeConfigException {
+    Navigator.of(context, rootNavigator: true).pop();
+    statusDialog(
+      context,
+      title: "Payment Failed!",
+      message: "Internal error occured.",
+      isSuccess: false,
+    );
+    return false;
+  } on PlatformException {
+    Navigator.of(context, rootNavigator: true).pop();
+    statusDialog(
+      context,
+      title: "Payment Failed!",
+      message: "Platform is not supported for payments.",
+      isSuccess: false,
+    );
+    return false;
+  } on StripeException {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
@@ -37,15 +75,8 @@ Future<bool> processPayment(
       isSuccess: false,
     );
     return false;
-  } else if (status == 403) {
-    statusDialog(
-      context,
-      title: "Payment Failed!",
-      message: "Stripe service is not available on this platform.",
-      isSuccess: false,
-    );
-    return false;
-  } else {
+  } catch (e) {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
