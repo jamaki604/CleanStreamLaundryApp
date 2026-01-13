@@ -11,6 +11,7 @@ import 'package:clean_stream_laundry_app/logic/parsing/machine_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
+import 'package:go_router/go_router.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
@@ -23,6 +24,7 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   final bool _isConfirmed = false;
+  bool _paymentCompleted = false;
   double? _price;
   String? _machineName;
   double? _userBalance;
@@ -98,7 +100,11 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(24.0),
-                  child: _buildPaymentButtons(context),
+                  child: _paymentCompleted
+                      ? _buildBackToHomeButton(
+                          context,
+                        ) // Show this when payment is complete
+                      : _buildPaymentButtons(context), // Show this otherwise
                 ),
               ],
             ),
@@ -117,7 +123,7 @@ class _PaymentPageState extends State<PaymentPage> {
           Icon(Icons.local_laundry_service, size: 80, color: Color(0xFF2073A9)),
           const SizedBox(height: 20),
           Text(
-            'Amount Due',
+            _paymentCompleted ? 'Payment Complete' : 'Amount Due',
             style: TextStyle(fontSize: 16, color: Colors.black87),
           ),
           const SizedBox(height: 10),
@@ -130,6 +136,33 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBackToHomeButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          context.go('/homePage');
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue[700],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        child: const Text(
+          'Back to Home',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -162,6 +195,9 @@ class _PaymentPageState extends State<PaymentPage> {
                       Navigator.of(context, rootNavigator: true).pop();
 
                       if (deviceAuthorized) {
+                        setState(() {
+                          _paymentCompleted = true;
+                        });
                         statusDialog(
                           context,
                           title: "Payment processed! Machine Ready!",
@@ -271,6 +307,9 @@ class _PaymentPageState extends State<PaymentPage> {
     Navigator.of(context, rootNavigator: true).pop();
 
     if (deviceAuthorized) {
+      setState(() {
+        _paymentCompleted = true;
+      });
       statusDialog(
         context,
         title: "Machine Ready!",
