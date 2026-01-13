@@ -290,14 +290,78 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    "\$${selectedAmount.toStringAsFixed(0)}",
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.fontInverted,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      OutlinedButton(
+                        onPressed: selectedAmount > 1.0
+                            ? () {
+                                setDialogState(() {
+                                  selectedAmount = (selectedAmount - 0.25).clamp(1.0, 50.0);
+                                });
+                              }
+                            : null,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: selectedAmount > 1.0 ? Colors.blue : Colors.grey,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "-25¢",
+                          style: TextStyle(
+                            color: selectedAmount > 1.0 ? Colors.blue : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "\$${selectedAmount.toStringAsFixed(2)}",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.fontInverted,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      OutlinedButton(
+                        onPressed: selectedAmount < 50.0
+                            ? () {
+                                setDialogState(() {
+                                  selectedAmount = (selectedAmount + 0.25).clamp(1.0, 50.0);
+                                });
+                              }
+                            : null,
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: selectedAmount < 50.0 ? Colors.blue : Colors.grey,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "+25¢",
+                          style: TextStyle(
+                            color: selectedAmount < 50.0 ? Colors.blue : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     children: [10, 15, 25].map((amount) {
