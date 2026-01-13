@@ -24,6 +24,7 @@ Future<bool> processPayment(
 
   try {
     await paymentService.makePayment(amount);
+    Navigator.of(context, rootNavigator: true).pop();
     if (description != "Machine") {
       statusDialog(
         context,
@@ -39,6 +40,7 @@ Future<bool> processPayment(
     );
     return true;
   } on NullUrlException {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
@@ -47,6 +49,7 @@ Future<bool> processPayment(
     );
     return false;
   } on StripeConfigException {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
@@ -55,6 +58,7 @@ Future<bool> processPayment(
     );
     return false;
   } on PlatformException {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
@@ -63,6 +67,7 @@ Future<bool> processPayment(
     );
     return false;
   } on StripeException {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
@@ -71,10 +76,11 @@ Future<bool> processPayment(
     );
     return false;
   } catch (e) {
+    Navigator.of(context, rootNavigator: true).pop();
     statusDialog(
       context,
       title: "Payment Failed!",
-      message: "An unexpected error occurred: $e",
+      message: "An unexpected error occurred.",
       isSuccess: false,
     );
     return false;
