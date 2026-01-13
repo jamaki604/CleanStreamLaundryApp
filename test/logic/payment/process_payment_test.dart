@@ -5,9 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:clean_stream_laundry_app/logic/exceptions/platform_exception.dart';
 
 class MockPaymentService extends Mock implements PaymentService {}
+
 class MockTransactionService extends Mock implements TransactionService {}
+
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
@@ -28,216 +32,245 @@ void main() {
   });
 
   Widget createTestWidget(Widget child) {
-    return MaterialApp(
-      home: Scaffold(
-        body: child,
-      ),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   group('processPayment', () {
-    testWidgets('should show loading dialog and return true on successful payment (status 200)',
-            (WidgetTester tester) async {
-          const amount = 100.0;
-          const description = 'Test payment';
-          when(() => mockPaymentService.makePayment(amount))
-              .thenAnswer((_) async {
-            await Future.delayed(const Duration(milliseconds: 100));
-            return 200;
-          });
-          when(() => mockTransactionService.recordTransaction(
+    testWidgets(
+      'should show loading dialog and return true on successful payment (status 200)',
+      (WidgetTester tester) async {
+        const amount = 100.0;
+        const description = 'Test payment';
+        when(() => mockPaymentService.makePayment(amount)).thenAnswer((
+          _,
+        ) async {
+          await Future.delayed(const Duration(milliseconds: 100));
+          return;
+        });
+        when(
+          () => mockTransactionService.recordTransaction(
             amount: amount,
             description: description,
             type: 'Laundry',
-          )).thenAnswer((_) async => {});
+          ),
+        ).thenAnswer((_) async => {});
 
-          await tester.pumpWidget(
-            createTestWidget(
-              Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      await processPayment(context, amount, description);
-                    },
-                    child: const Text('Pay'),
-                  );
-                },
-              ),
+        await tester.pumpWidget(
+          createTestWidget(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    await processPayment(context, amount, description);
+                  },
+                  child: const Text('Pay'),
+                );
+              },
             ),
-          );
+          ),
+        );
 
-          await tester.tap(find.text('Pay'));
-          await tester.pump();
+        await tester.tap(find.text('Pay'));
+        await tester.pump();
 
-          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-          await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-          verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
 
-          verify(() => mockTransactionService.recordTransaction(
+        verify(
+          () => mockTransactionService.recordTransaction(
             amount: amount,
             description: description,
             type: 'Laundry',
-          )).called(1);
+          ),
+        ).called(1);
 
-          expect(find.text('payment Successful!'), findsOneWidget);
-          expect(find.text('Thank you! Your payment was processed successfully.'),
-              findsOneWidget);
-        });
+        expect(find.text('Payment Successful!'), findsOneWidget);
+        expect(
+          find.text('Thank you! Your payment was processed successfully.'),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('should return false and show error dialog when payment is canceled (status 401)',
-            (WidgetTester tester) async {
-          const amount = 50.0;
-          const description = 'Test payment';
-          when(() => mockPaymentService.makePayment(amount))
-              .thenAnswer((_) async => 401);
+    testWidgets(
+      'should return false and show error dialog when payment is canceled (status 401)',
+      (WidgetTester tester) async {
+        const amount = 50.0;
+        const description = 'Test payment';
+        when(() => mockPaymentService.makePayment(amount)).thenAnswer(
+          (_) async => throw StripeException(
+            error: LocalizedErrorMessage(code: FailureCode.Canceled),
+          ),
+        );
 
-          await tester.pumpWidget(
-            createTestWidget(
-              Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      await processPayment(context, amount, description);
-                    },
-                    child: const Text('Pay'),
-                  );
-                },
-              ),
+        await tester.pumpWidget(
+          createTestWidget(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    await processPayment(context, amount, description);
+                  },
+                  child: const Text('Pay'),
+                );
+              },
             ),
-          );
+          ),
+        );
 
-          await tester.tap(find.text('Pay'));
-          await tester.pump();
-          await tester.pumpAndSettle();
+        await tester.tap(find.text('Pay'));
+        await tester.pump();
+        await tester.pumpAndSettle();
 
-          verify(() => mockPaymentService.makePayment(amount)).called(1);
-          verifyNever(() => mockTransactionService.recordTransaction(
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
             amount: any(named: 'amount'),
             description: any(named: 'description'),
             type: any(named: 'type'),
-          ));
+          ),
+        );
 
-          expect(find.text('payment Failed!'), findsOneWidget);
-          expect(find.text('The payment was canceled or declined.'), findsOneWidget);
-        });
+        expect(find.text('Payment Failed!'), findsOneWidget);
+        expect(
+          find.text('The payment was canceled or declined.'),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('should return false and show error dialog when stripe is unavailable (status 403)',
-            (WidgetTester tester) async {
-          const amount = 75.0;
-          const description = 'Test payment';
-          when(() => mockPaymentService.makePayment(amount))
-              .thenAnswer((_) async => 403);
+    testWidgets(
+      'should return false and show error dialog when stripe is unavailable (status 403)',
+      (WidgetTester tester) async {
+        const amount = 75.0;
+        const description = 'Test payment';
+        when(() => mockPaymentService.makePayment(amount)).thenAnswer(
+          (_) async => throw PlatformException('Platform not supported'),
+        );
 
-          await tester.pumpWidget(
-            createTestWidget(
-              Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      await processPayment(context, amount, description);
-                    },
-                    child: const Text('Pay'),
-                  );
-                },
-              ),
+        await tester.pumpWidget(
+          createTestWidget(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    await processPayment(context, amount, description);
+                  },
+                  child: const Text('Pay'),
+                );
+              },
             ),
-          );
+          ),
+        );
 
-          await tester.tap(find.text('Pay'));
-          await tester.pump();
-          await tester.pumpAndSettle();
+        await tester.tap(find.text('Pay'));
+        await tester.pump();
+        await tester.pumpAndSettle();
 
-          verify(() => mockPaymentService.makePayment(amount)).called(1);
-          verifyNever(() => mockTransactionService.recordTransaction(
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
             amount: any(named: 'amount'),
             description: any(named: 'description'),
             type: any(named: 'type'),
-          ));
+          ),
+        );
 
-          expect(find.text('payment Failed!'), findsOneWidget);
-          expect(find.text('stripe service is not available on this platform.'),
-              findsOneWidget);
-        });
+        expect(find.text('Payment Failed!'), findsOneWidget);
+        expect(
+          find.text('Platform is not supported for payments.'),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('should return false and show generic error dialog for unexpected status codes',
-            (WidgetTester tester) async {
-          const amount = 25.0;
-          const description = 'Test payment';
-          when(() => mockPaymentService.makePayment(amount))
-              .thenAnswer((_) async => 500);
+    testWidgets(
+      'should return false and show generic error dialog for unexpected status codes',
+      (WidgetTester tester) async {
+        const amount = 25.0;
+        const description = 'Test payment';
+        when(
+          () => mockPaymentService.makePayment(amount),
+        ).thenAnswer((_) async => throw Exception('Unexpected error'));
 
-          await tester.pumpWidget(
-            createTestWidget(
-              Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      await processPayment(context, amount, description);
-                    },
-                    child: const Text('Pay'),
-                  );
-                },
-              ),
+        await tester.pumpWidget(
+          createTestWidget(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    await processPayment(context, amount, description);
+                  },
+                  child: const Text('Pay'),
+                );
+              },
             ),
-          );
+          ),
+        );
 
-          await tester.tap(find.text('Pay'));
-          await tester.pump();
-          await tester.pumpAndSettle();
+        await tester.tap(find.text('Pay'));
+        await tester.pump();
+        await tester.pumpAndSettle();
 
-          verify(() => mockPaymentService.makePayment(amount)).called(1);
-          verifyNever(() => mockTransactionService.recordTransaction(
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
             amount: any(named: 'amount'),
             description: any(named: 'description'),
             type: any(named: 'type'),
-          ));
+          ),
+        );
 
-          expect(find.text('payment Failed!'), findsOneWidget);
-          expect(find.text('An unexpected error occurred.'), findsOneWidget);
-        });
+        expect(find.text('Payment Failed!'), findsOneWidget);
+        expect(find.text('An unexpected error occurred.'), findsOneWidget);
+      },
+    );
 
-    testWidgets('should dismiss loading dialog before showing result dialog',
-            (WidgetTester tester) async {
-          const amount = 100.0;
-          const description = 'Test payment';
-          when(() => mockPaymentService.makePayment(amount))
-              .thenAnswer((_) async {
-            await Future.delayed(const Duration(milliseconds: 100));
-            return 200;
-          });
-          when(() => mockTransactionService.recordTransaction(
-            amount: amount,
-            description: description,
-            type: 'Laundry',
-          )).thenAnswer((_) async => {});
+    testWidgets('should dismiss loading dialog before showing result dialog', (
+      WidgetTester tester,
+    ) async {
+      const amount = 100.0;
+      const description = 'Test payment';
+      when(() => mockPaymentService.makePayment(amount)).thenAnswer((_) async {
+        await Future.delayed(const Duration(milliseconds: 100));
+        return;
+      });
+      when(
+        () => mockTransactionService.recordTransaction(
+          amount: amount,
+          description: description,
+          type: 'Laundry',
+        ),
+      ).thenAnswer((_) async => {});
 
-          await tester.pumpWidget(
-            createTestWidget(
-              Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () async {
-                      await processPayment(context, amount, description);
-                    },
-                    child: const Text('Pay'),
-                  );
+      await tester.pumpWidget(
+        createTestWidget(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () async {
+                  await processPayment(context, amount, description);
                 },
-              ),
-            ),
-          );
+                child: const Text('Pay'),
+              );
+            },
+          ),
+        ),
+      );
 
-          await tester.tap(find.text('Pay'));
-          await tester.pump();
+      await tester.tap(find.text('Pay'));
+      await tester.pump();
 
-          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-          await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-          expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
 
-          expect(find.text('payment Successful!'), findsOneWidget);
-        });
+      expect(find.text('Payment Successful!'), findsOneWidget);
+    });
   });
 }
