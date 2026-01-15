@@ -181,14 +181,14 @@ class SupabaseAuthService implements AuthService{
   Future<void> googleSignIn() async{
     if(!kIsWeb) {
       try {
-        await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "clean-stream://oauth");
+        await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "clean-stream://oauth");
       } catch (e) {
 
       }
 
     }else{
       //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
-      await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "http://localhost:8080/loading");
+      await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "http://localhost:8080/loading");
     }
   }
 
@@ -197,6 +197,8 @@ class SupabaseAuthService implements AuthService{
     await _client.auth.getSessionFromUrl(uri);
   }
 
-
+  User? getCurrentUser() {
+    return _client.auth.currentUser;
+  }
 
 }

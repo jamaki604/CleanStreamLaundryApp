@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -30,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
   late final StreamSubscription<Uri?> _listener;
 
   @override
@@ -46,6 +48,15 @@ class _LoginScreenState extends State<LoginScreen> {
         await authService.handleOAuthRedirect(uri);
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
           if (!mounted) return;
+          final currentUser = authService.getCurrentUser();
+          if (currentUser != null) {
+            final userId = currentUser.id;
+            final name = currentUser.userMetadata?['full_name'] ??
+                currentUser.userMetadata?['name'] ??
+                currentUser.userMetadata?['given_name'];
+
+            await profileService.createAccount(id: userId, name: name);
+          }
           context.go("/homePage");
         } else {
           if (!mounted) return;

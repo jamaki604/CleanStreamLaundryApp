@@ -12,10 +12,18 @@ class SupabaseProfileService extends ProfileService{
   @override
   Future<void> createAccount({required String id, required String name}) async {
 
-    await _client.from('profiles').insert({
-      'id': id,
-      'full_name': name,
-    });
+    final existingProfile = await _client
+        .from('profiles')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+
+    if(existingProfile == null) {
+      await _client.from('profiles').upsert({
+        'id': id,
+        'full_name': name,
+      }, onConflict: 'id',ignoreDuplicates: true);
+    }
 
   }
 
