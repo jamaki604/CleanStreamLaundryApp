@@ -824,6 +824,26 @@ void main(){
 
     });
 
+    test("googleSignIn calls signInWithOAuth", () async {
+      when(() => client.auth.signInWithOAuth(
+        any(),
+        redirectTo: any(named: 'redirectTo'),
+      )).thenAnswer((_) async => true);
+
+      await authenticator.googleSignIn();
+
+      verify(() => client.auth.signInWithOAuth(
+        any(),
+        redirectTo: any(named: 'redirectTo'),
+      )).called(1);
+    });
+
+    test("Tests that all errors are properly handled",() async{
+      when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
+      await authenticator.googleSignIn();
+      //If test reaches here it passed because nothing failed
+    });
+
   });
 
 }
