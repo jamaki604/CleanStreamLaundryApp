@@ -11,6 +11,11 @@ void main(){
   late SupabaseMock client;
   late GoTrueMock supabaseAuth;
 
+  setUpAll(() {
+    registerFallbackValue(Uri());
+    registerFallbackValue(OAuthProvider.google);
+  });
+
   group("authentication Tests", (){
 
     setUp((){
@@ -842,6 +847,36 @@ void main(){
       when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
       await authenticator.googleSignIn();
       //If test reaches here it passed because nothing failed
+    });
+
+    test("Tests to see that the redirect was called", () async {
+
+      when(() => supabaseAuth.getSessionFromUrl(any())).thenAnswer(
+            (_) async => AuthSessionUrlResponse(
+          session: Session(
+            accessToken: "test_token",
+            tokenType: "bearer",
+            user: User(
+              id: 'test-user-id',
+              appMetadata: {},
+              userMetadata: {},
+              aud: 'authenticated',
+              createdAt: '2024-01-01T00:00:00Z',
+            ),
+          ),
+          redirectType: "signup",
+        ),
+      );
+
+      final testUri = Uri.parse('https://example.com/callback?code=test123');
+      await authenticator.handleOAuthRedirect(testUri);
+
+      verify(() => supabaseAuth.getSessionFromUrl(testUri)).called(1);
+    });
+
+    test("Tests that the user was grabbed correctly",() async{
+      await authenticator.getCurrentUser();
+      verify(() => client.auth.currentUser);
     });
 
   });

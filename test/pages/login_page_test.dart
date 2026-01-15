@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,16 +11,23 @@ import 'mocks.dart';
 
 void main() {
   late MockAuthService mockAuthService;
+  late MockProfileService mockProfileService;
 
   setUp(() {
     mockAuthService = MockAuthService();
+    mockProfileService = MockProfileService();
 
     final getIt = GetIt.instance;
     if (getIt.isRegistered<AuthService>()) {
       getIt.unregister<AuthService>();
     }
 
+    if (getIt.isRegistered<ProfileService>()) {
+      getIt.unregister<ProfileService>();
+    }
+
     getIt.registerSingleton<AuthService>(mockAuthService);
+    getIt.registerSingleton<ProfileService>(mockProfileService);
   });
 
   tearDown(() => GetIt.instance.reset());
