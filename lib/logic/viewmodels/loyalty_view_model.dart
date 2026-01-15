@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import '../services/transaction_service.dart';
 import '../parsing/transaction_parser.dart';
-import '../payment/process_payment.dart';
 import '../enums/payment_result_enum.dart';
+import '../payment/process_payment.dart';
 
 class LoyaltyViewModel extends ChangeNotifier {
   final _authService = GetIt.instance<AuthService>();
   final _profileService = GetIt.instance<ProfileService>();
   final _transactionService = GetIt.instance<TransactionService>();
+  final _paymentProcessor = GetIt.instance<PaymentProcessor>();
 
   double? userBalance;
   String? userName;
@@ -67,7 +67,10 @@ class LoyaltyViewModel extends ChangeNotifier {
   }
 
   Future<PaymentResult> loadCard(double amount) async {
-    final result = await processPayment(amount, "Loyalty Card");
+    final result = await _paymentProcessor.processPayment(
+      amount,
+      "Loyalty Card",
+    );
 
     if (result == PaymentResult.success) {
       final newBalance = (userBalance ?? 0) + amount;

@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
@@ -87,6 +88,10 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<RouterService>(() => RouterService());
 
   getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
+
+  getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor(
+        paymentService: getIt<PaymentService>(),
+        transactionService: getIt<TransactionService>(),));
 }
 
 class MyApp extends StatelessWidget {
