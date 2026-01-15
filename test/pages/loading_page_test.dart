@@ -8,12 +8,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'mocks.dart';
 
 void main() {
   late MockAuthService mockAuthService;
   late MockProfileService mockProfileService;
+
+  setUpAll(() {
+    registerFallbackValue(Uri.parse('clean-stream://fallback'));
+  });
 
   setUp(() {
     mockAuthService = MockAuthService();
@@ -216,6 +221,38 @@ void main() {
 
       when(() => mockAuthService.isLoggedIn())
           .thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(LoadingPage()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('navigates to home page on oauth deep link', (WidgetTester tester) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+            (MethodCall methodCall) async {
+          if (methodCall.method == 'getInitialAppLink') {
+            return 'clean-stream://oauth';
+          }
+          return null;
+        },
+      );
+
+      when(() => mockAuthService.isLoggedIn())
+          .thenAnswer((_) async => AuthenticationResponses.success);
+
+      when(() => mockAuthService.getCurrentUser())
+          .thenReturn(User(id: '', appMetadata: {}, userMetadata: {'full_name':"Test Name"}, aud: '', createdAt: ''));
+
+      when(() => mockProfileService.createAccount(
+        id: any(named: 'id'),
+        name: any(named: 'name'),
+      )).thenAnswer((_) async {});
+
+      when(() => mockAuthService.handleOAuthRedirect(any()))
+          .thenAnswer((_) async {});
 
       await tester.pumpWidget(createTestWidget(LoadingPage()));
       await tester.pumpAndSettle();
