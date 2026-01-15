@@ -146,7 +146,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     border: Border.all(color: Colors.blue),
                   ),
                   child: Text(
-                    "Enter your info to create your account.\nAfter submitting, you will receive a confirmation email.",
+                    "Enter your info to create your account.\n After submitting, you will receive a confirmation email.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -213,6 +213,24 @@ class SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: Text(
+                    "Your password needs to be 8 characters long and include a number, special character, and an uppercase letter",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
 
                 TextField(
                   controller: _passwordCtrl,
