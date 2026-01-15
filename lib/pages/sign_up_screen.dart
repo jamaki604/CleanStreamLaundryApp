@@ -138,13 +138,28 @@ class SignUpScreenState extends State<SignUpScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset("assets/Logo.png", height: 250, width: 250),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.blue),
+                  ),
+                  child: Text(
+                    "Enter your info to create your account.\nAfter submitting, you will receive a confirmation email.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _nameCtrl,
                   style: TextStyle(
-                    color: Theme
-                        .of(context)
-                        .colorScheme
-                        .fontInverted,
+                    color: Theme.of(context).colorScheme.fontInverted,
                   ),
                   decoration: InputDecoration(
                     labelText: 'Name',
