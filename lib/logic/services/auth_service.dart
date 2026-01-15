@@ -12,4 +12,5 @@ abstract class AuthService{
   bool isEmailVerified();
   Future<AuthenticationResponses> appleSignIn();
   Future<AuthenticationResponses> googleSignIn();
+  Future<void> handleOAuthRedirect(Uri uri);
 }

@@ -180,12 +180,17 @@ class SupabaseAuthService implements AuthService{
   Future<AuthenticationResponses> googleSignIn() async{
     AuthenticationResponses output = AuthenticationResponses.success;
     try{
-      await _client.auth.signInWithOAuth(OAuthProvider.google);
+      await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "clean-stream://oauth");
     }catch(e){
       output = AuthenticationResponses.failure;
     }
 
     return output;
+  }
+
+  @override
+  Future<void> handleOAuthRedirect(Uri uri) async {
+    await _client.auth.getSessionFromUrl(uri);
   }
 
 

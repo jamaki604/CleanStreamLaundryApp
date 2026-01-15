@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
@@ -27,9 +30,34 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   final authService = GetIt.instance<AuthService>();
+  late final StreamSubscription<Uri?> _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    //Sets up a listener for when the app is already running
+    final appLinks = AppLinks();
+    _listener = appLinks.uriLinkStream.listen((Uri? uri) async {
+      if (uri == null) return;
+
+      if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
+        context.go("/homePage");
+      }else if (uri.scheme == 'clean-stream' && uri.host == 'oauth') {
+        await authService.handleOAuthRedirect(uri);
+        if (await authService.isLoggedIn() == AuthenticationResponses.success) {
+          if (!mounted) return;
+          context.go("/homePage");
+        } else {
+          if (!mounted) return;
+          context.go("/login");
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _listener.cancel();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _scrollCtrl.dispose();
@@ -172,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 160,
                     height: 30,
                     child: ElevatedButton(
-                      onPressed:() {},
+                      onPressed:() => authService.googleSignIn(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.grey,
