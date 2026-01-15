@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseAuthService implements AuthService{
@@ -177,15 +178,18 @@ class SupabaseAuthService implements AuthService{
   }
 
   @override
-  Future<AuthenticationResponses> googleSignIn() async{
-    AuthenticationResponses output = AuthenticationResponses.success;
-    try{
-      await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "clean-stream://oauth");
-    }catch(e){
-      output = AuthenticationResponses.failure;
-    }
+  Future<void> googleSignIn() async{
+    if(!kIsWeb) {
+      try {
+        await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "clean-stream://oauth");
+      } catch (e) {
 
-    return output;
+      }
+
+    }else{
+      //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
+      await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "http://localhost:8080/loading");
+    }
   }
 
   @override

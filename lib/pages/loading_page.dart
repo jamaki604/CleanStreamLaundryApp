@@ -32,9 +32,19 @@ class _LoadingPageState extends State<LoadingPage> {
     try {
       final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
+      if (initialUri == null) return;
 
-      if (initialUri != null && initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
+      if (initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
         context.go("/homePage");
+      }else if (initialUri.scheme == 'clean-stream' && initialUri.host == 'oauth') {
+        await authService.handleOAuthRedirect(initialUri);
+        if (await authService.isLoggedIn() == AuthenticationResponses.success) {
+          if (!mounted) return;
+          context.go("/homePage");
+        } else {
+          if (!mounted) return;
+          context.go("/login");
+        }
       }
     } catch (e) {
 
