@@ -5,7 +5,6 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
-
 class SignUpScreen extends StatefulWidget {
 
   @override
@@ -60,6 +59,33 @@ class SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
+  String? _processPasssword(String value) {
+    final List<String> missing = [];
+
+    if (value.length < 8) {
+      missing.add("• Have 8 character length");
+    }
+
+    final specialRegex = RegExp(r'[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:"\\|,.<>\/?]');
+    if (!specialRegex.hasMatch(value)) {
+      missing.add("• Include special character");
+    }
+
+    final digitRegex = RegExp(r'\d');
+    if (!digitRegex.hasMatch(value)) {
+      missing.add("• Include a digit");
+    }
+
+    final uppercaseRegex = RegExp(r'[A-Z]');
+    if (!uppercaseRegex.hasMatch(value)) {
+      missing.add("• Include an uppercase letter");
+    }
+
+    if (missing.isEmpty) return null;
+
+    return "Password must contain the following:\n${missing.join("\n")}";
+  }
+
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -76,7 +102,6 @@ class SignUpScreenState extends State<SignUpScreen> {
     final confirm = _passwordConfirmCtrl.text;
 
 
-    // Local validation first
     if (name.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
       _showMessage('Please fill in all fields.');
       return;
@@ -214,23 +239,45 @@ class SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Text(
-                    "Your password needs to be 8 characters long and include a number, special character, and an uppercase letter",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey,
-                    ),
-                  ),
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _passwordCtrl,
+                  builder: (context, value, _) {
+                    final requirementText = _processPasssword(value.text);
+
+                    if (requirementText == null) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 600),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: Text(
+                              requirementText,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    );
+                  },
                 ),
+
+
 
                 TextField(
                   controller: _passwordCtrl,
