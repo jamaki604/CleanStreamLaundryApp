@@ -136,9 +136,13 @@ class SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/Logo.png", height: 250, width: 250),
+                Image.asset("assets/Slogan.png", height: 150, width: 250),
+
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -148,13 +152,13 @@ class SignUpScreenState extends State<SignUpScreen> {
                     "Enter your info to create your account.\n After submitting, you will receive a confirmation email.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.blue,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _nameCtrl,
                   style: TextStyle(
@@ -163,6 +167,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                   decoration: InputDecoration(
                     labelText: 'Name',
                     labelStyle: TextStyle(color: Colors.blue),
+
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 16,
+                    ),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -180,7 +190,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     prefixIcon: Icon(Icons.person, color: Colors.blue),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
 
                 TextField(
                   controller: _emailCtrl,
@@ -193,6 +203,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     labelStyle: const TextStyle(color: Colors.blue),
+
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 16,
+                    ),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -211,40 +227,46 @@ class SignUpScreenState extends State<SignUpScreen> {
                     prefixIcon: const Icon(Icons.email, color: Colors.blue),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 ValueListenableBuilder<TextEditingValue>(
                   valueListenable: _passwordCtrl,
                   builder: (context, value, _) {
                     final requirementText = PasswordParser.process(value.text);
+
                     if (requirementText == null) {
                       return const SizedBox.shrink();
                     }
 
                     return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 600),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey),
-                            ),
-                            child: Text(
-                              requirementText,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey,
-                              ),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Text(
+                            requirementText,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                      ),
+
+                      const SizedBox(height: 10),
                       ],
                     );
                   },
@@ -263,6 +285,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                   decoration: InputDecoration(
                     labelText: passwordText,
                     labelStyle: TextStyle(color: labelColor),
+
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 16,
+                    ),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -299,7 +327,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     }
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 10),
 
                 TextField(
                   controller: _passwordConfirmCtrl,
@@ -312,6 +340,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                   decoration: InputDecoration(
                     labelText: confirmPasswordText,
                     labelStyle: TextStyle(color: labelColor),
+
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 16,
+                    ),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -368,7 +402,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 25.0),
+                  padding: const EdgeInsets.only(top: 15.0),
                   child: InkWell(
                     onTap: () => context.go("/login"),
                     child: const Text(
