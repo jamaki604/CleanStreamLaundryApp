@@ -63,6 +63,7 @@ class LoyaltyViewModel extends ChangeNotifier {
 
   Future<void> toggleTransactionView() async {
     showPastTransactions = !showPastTransactions;
+    notifyListeners();
     await _fetchTransactions();
   }
 
