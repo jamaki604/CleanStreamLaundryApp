@@ -332,26 +332,28 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       trackHeight: 6,
                       activeTrackColor: Colors.blue,
                       inactiveTrackColor: Colors.blue.withAlpha(3),
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 12,
-                      ),
-                      overlayShape: const RoundSliderOverlayShape(
-                        overlayRadius: 24,
-                      ),
-                      tickMarkShape: const RoundSliderTickMarkShape(
-                        tickMarkRadius: 0,
-                      ),
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
+                      tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 0),
                     ),
-                    child: Slider(
-                      value: selectedAmount,
-                      min: 1,
-                      max: 50,
-                      onChanged: (value) {
-                        setDialogState(() {
-                          final rounded = (value / 5).round() * 5.0;
-                          selectedAmount = rounded.clamp(1.0, 50.0);
-                        });
-                      },
+                    child: SizedBox(
+                      width: 650,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: selectedAmount,
+                              min: 1,
+                              max: 50,
+                              onChanged: (value) {
+                                setDialogState(() {
+                                  selectedAmount = value.roundToDouble();
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Text(
