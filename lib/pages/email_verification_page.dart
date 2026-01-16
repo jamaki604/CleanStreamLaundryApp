@@ -81,7 +81,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                 'Please verify your email address',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18,
-                  color: Theme.of(context).colorScheme.fontPrimary),
+                  color: Theme.of(context).colorScheme.fontInverted),
               ),
               const SizedBox(height: 16),
               Text(
