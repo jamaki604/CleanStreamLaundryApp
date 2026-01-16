@@ -35,6 +35,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final authService = GetIt.instance<AuthService>();
   final transactionService = GetIt.instance<TransactionService>();
   final machineCommunicator = GetIt.instance<MachineCommunicationService>();
+  final paymentProcessor = GetIt.instance<PaymentProcessor>();
 
   @override
   void initState() {
@@ -176,7 +177,7 @@ class _PaymentPageState extends State<PaymentPage> {
             onPressed: (_isConfirmed || _price == null || _price == 0)
                 ? null
                 : () async {
-                    final success = await processPayment(
+                    final success = await paymentProcessor.processPayment(
                       _price!,
                       MachineFormatter.formatMachineType(
                         _machineName.toString(),
