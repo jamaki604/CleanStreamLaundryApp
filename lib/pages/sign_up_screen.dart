@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/password_parser.dart';
 class SignUpScreen extends StatefulWidget {
 
   @override
@@ -57,33 +58,6 @@ class SignUpScreenState extends State<SignUpScreen> {
       borderColor = Colors.blue;
       labelColor = Colors.blue;
     });
-  }
-
-  String? _processPasssword(String value) {
-    final List<String> missing = [];
-
-    if (value.length < 8) {
-      missing.add("• Have 8 character length");
-    }
-
-    final specialRegex = RegExp(r'[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:"\\|,.<>\/?]');
-    if (!specialRegex.hasMatch(value)) {
-      missing.add("• Include special character");
-    }
-
-    final digitRegex = RegExp(r'\d');
-    if (!digitRegex.hasMatch(value)) {
-      missing.add("• Include a digit");
-    }
-
-    final uppercaseRegex = RegExp(r'[A-Z]');
-    if (!uppercaseRegex.hasMatch(value)) {
-      missing.add("• Include an uppercase letter");
-    }
-
-    if (missing.isEmpty) return null;
-
-    return "Password must contain the following:\n${missing.join("\n")}";
   }
 
   @override
@@ -242,8 +216,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 ValueListenableBuilder<TextEditingValue>(
                   valueListenable: _passwordCtrl,
                   builder: (context, value, _) {
-                    final requirementText = _processPasssword(value.text);
-
+                    final requirementText = PasswordParser.process(value.text);
                     if (requirementText == null) {
                       return const SizedBox.shrink();
                     }
