@@ -1,5 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 
 class NotificationService {
@@ -34,8 +33,6 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
-
-    print("NOTIFICATION SERVICE INITIALIZED");
   }
 
   Future<void> scheduleNotification({
@@ -44,8 +41,6 @@ class NotificationService {
     required String body,
     required Duration delay,
   }) async {
-    print("NOTIFICATION MADE");
-
     Future.delayed(delay, () async {
       await flutterLocalNotificationsPlugin.show(
         id,
@@ -60,8 +55,6 @@ class NotificationService {
           ),
         ),
       );
-
-      print("NOTIFICATION SENT"); // <--- Scheduled successfully);
     });
   }
 }

@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
-import 'package:clean_stream_laundry_app/logic/services/notification_service.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -60,22 +59,6 @@ class _SettingsState extends State<Settings> {
                       context.go('/refundPage');
                     },
                   ),
-
-              SizedBox(height: 14),
-              SettingsCard(
-                icon: Icons.request_page,
-                title: "Send Notification",
-                onTap: () async{
-                    print("Button pressed — scheduling notification");
-
-                    await NotificationService().scheduleNotification(
-                      id: 1,
-                      title: "Test Notification",
-                      body: "This should appear after 5 seconds",
-                      delay: const Duration(seconds: 5),
-                    );
-                },
-              ),
                   SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.logout,

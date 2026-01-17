@@ -10,6 +10,7 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/machine_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/notification_service.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
@@ -165,7 +166,20 @@ class _PaymentPageState extends State<PaymentPage> {
                     Navigator.of(context, rootNavigator: true).pop();
 
                     if (deviceAuthorized) {
+                      await NotificationService().scheduleNotification(
+                        id: 1,
+                        title: "Machine Finished",
+                        body: "This is a placeholder, to notify you your machine is about to be done",
+                        delay: const Duration(seconds: 5),
+                      );
+
                       statusDialog(
+                        context,
+                        title: "Payment processed! Machine Ready!",
+                        message: "Machine $_machineName is now active.",
+                        isSuccess: true,
+                      );
+                    statusDialog(
                         context,
                         title: "payment processed! Machine Ready!",
                         message: "Machine $_machineName is now active.",
