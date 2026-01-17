@@ -13,14 +13,29 @@ class NotificationService {
   Future<void> _init() async {
     tz.initializeTimeZones();
 
-    final androidSettings =
+    const androidSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final initSettings = InitializationSettings(
+    const initSettings = InitializationSettings(
       android: androidSettings,
     );
 
     await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+    // Create channel
+    const channel = AndroidNotificationChannel(
+      'your_channel_id',
+      'Your Channel',
+      description: 'General notifications',
+      importance: Importance.high,
+    );
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    print("NOTIFICATION SERVICE INITIALIZED");
   }
 
   Future<void> scheduleNotification({
@@ -29,22 +44,24 @@ class NotificationService {
     required String body,
     required Duration delay,
   }) async {
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.now(tz.local).add(delay),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'your_channel_id',
-          'Your Channel',
-          importance: Importance.high,
-          priority: Priority.high,
+    print("NOTIFICATION MADE");
+
+    Future.delayed(delay, () async {
+      await flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'your_channel_id',
+            'Your Channel',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
         ),
-      ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation:
-      UILocalNotificationDateInterpretation.absoluteTime,
-    );
+      );
+
+      print("NOTIFICATION SENT"); // <--- Scheduled successfully);
+    });
   }
 }
