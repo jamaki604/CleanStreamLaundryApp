@@ -45,11 +45,16 @@ class _LoginScreenState extends State<LoginScreen> {
       if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
         context.go("/homePage");
       }else if (uri.scheme == 'clean-stream' && uri.host == 'oauth') {
+
         await authService.handleOAuthRedirect(uri);
+
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
+
           if (!mounted) return;
           final currentUser = authService.getCurrentUser();
+
           if (currentUser != null) {
+
             final userId = currentUser.id;
             final name = currentUser.userMetadata?['full_name'] ??
                 currentUser.userMetadata?['name'] ??
