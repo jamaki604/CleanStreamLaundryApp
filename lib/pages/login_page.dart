@@ -250,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 160,
                     height: 30,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => authService.appleSignIn(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
