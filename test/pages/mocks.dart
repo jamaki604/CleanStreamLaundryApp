@@ -8,6 +8,7 @@ import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/notification_service.dart';
 
 class MockAuthService extends Mock implements AuthService {}
 
@@ -28,3 +29,5 @@ class MockMachineCommunicationService extends Mock implements MachineCommunicati
 class FakeAuthService extends Fake implements AuthService {}
 
 class MockEdgeFunctionService extends Mock implements EdgeFunctionService {}
+
+class MockNotificationService extends Mock implements NotificationService {}

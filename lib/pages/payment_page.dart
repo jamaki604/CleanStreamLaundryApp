@@ -33,6 +33,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final authService = GetIt.instance<AuthService>();
   final transactionService = GetIt.instance<TransactionService>();
   final machineCommunicator = GetIt.instance<MachineCommunicationService>();
+  final notificationService = GetIt.instance<NotificationService>();
 
   @override
   void initState() {
@@ -166,13 +167,6 @@ class _PaymentPageState extends State<PaymentPage> {
                     Navigator.of(context, rootNavigator: true).pop();
 
                     if (deviceAuthorized) {
-                      await NotificationService().scheduleNotification(
-                        id: 1,
-                        title: "Machine Finished",
-                        body: "This is a placeholder, to notify you your machine is about to be done",
-                        delay: const Duration(seconds: 5),
-                      );
-
                       statusDialog(
                         context,
                         title: "Payment processed! Machine Ready!",
@@ -262,37 +256,59 @@ class _PaymentPageState extends State<PaymentPage> {
   void _processLoyaltyPayment(BuildContext context) async {
     final updatedBalance = _userBalance! - _price!;
     profileService.updateBalanceById(updatedBalance);
+
     setState(() {
       _userBalance = updatedBalance;
     });
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext dialogContext) => const Center(child: CircularProgressIndicator()),
-        );
-        final deviceAuthorized = await machineCommunicator.wakeDevice(widget.machineId);
-        Navigator.of(context, rootNavigator: true).pop();
 
-        if (deviceAuthorized) {
-          statusDialog(
-            context,
-            title: "Machine Ready!",
-            message: "Machine $_machineName is now active.",
-            isSuccess: true,
-          );
-          await transactionService.recordTransaction(amount: _price!, description: "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}", type: "laundry");
-        } else {
-          statusDialog(
-            context,
-            title: "Machine Error",
-            message: "payment succeeded but machine did not wake up.",
-            isSuccess: false,
-          );
-        }
-    statusDialog(context,
-        title: "payment Successful!",
-        message: "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
-        isSuccess: true
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) =>
+      const Center(child: CircularProgressIndicator()),
+    );
+
+    final deviceAuthorized =
+    await machineCommunicator.wakeDevice(widget.machineId);
+
+    Navigator.of(context, rootNavigator: true).pop();
+
+    if (deviceAuthorized) {
+      await notificationService.scheduleNotification(
+        id: 1,
+        title: "Machine Finished",
+        body: "This is a placeholder, your machine is done",
+        delay: const Duration(seconds: 5),
+      );
+
+      statusDialog(
+        context,
+        title: "Machine Ready!",
+        message: "Machine $_machineName is now active.",
+        isSuccess: true,
+      );
+
+      await transactionService.recordTransaction(
+        amount: _price!,
+        description:
+        "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
+        type: "laundry",
+      );
+    } else {
+      statusDialog(
+        context,
+        title: "Machine Error",
+        message: "payment succeeded but machine did not wake up.",
+        isSuccess: false,
+      );
+    }
+
+    statusDialog(
+      context,
+      title: "payment Successful!",
+      message:
+      "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
+      isSuccess: true,
     );
   }
 }

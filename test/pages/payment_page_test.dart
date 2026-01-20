@@ -4,6 +4,7 @@ import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -19,22 +20,23 @@ void main() {
   late MockTransactionService mockTransactionService;
   late MockMachineCommunicationService mockMachineCommunicator;
   late MockRouterService mockRouterService;
+  late MockNotificationService mockNotificationService;
 
   setUpAll(() {
     // Register fallback values for mocktail
     registerFallbackValue(FakeAuthService());
+    registerFallbackValue(const Duration(seconds: 1));
   });
 
   setUp(() {
-    // Initialize mocks
     mockAuthService = MockAuthService();
     mockMachineService = MockMachineService();
     mockProfileService = MockProfileService();
     mockTransactionService = MockTransactionService();
     mockMachineCommunicator = MockMachineCommunicationService();
     mockRouterService = MockRouterService();
+    mockNotificationService = MockNotificationService();
 
-    // Register mocks with GetIt
     final getIt = GetIt.instance;
     getIt.registerSingleton<AuthService>(mockAuthService);
     getIt.registerSingleton<MachineService>(mockMachineService);
@@ -42,6 +44,14 @@ void main() {
     getIt.registerSingleton<TransactionService>(mockTransactionService);
     getIt.registerSingleton<MachineCommunicationService>(mockMachineCommunicator);
     getIt.registerSingleton<RouterService>(mockRouterService);
+    getIt.registerSingleton<NotificationService>(mockNotificationService);
+
+    when(() => mockNotificationService.scheduleNotification(
+      id: any(named: 'id'),
+      title: any(named: 'title'),
+      body: any(named: 'body'),
+      delay: any(named: 'delay'),
+    )).thenAnswer((_) async {});
   });
 
   tearDown(() {
@@ -289,6 +299,49 @@ void main() {
       expect(find.text('Machine Dryer05'), findsOneWidget);
       expect(find.text('\$2.75'), findsOneWidget);
       expect(find.text('Pay \$2.75'), findsOneWidget);
+    });
+
+    testWidgets('sends notification after successful loyalty payment', (tester) async {
+      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+
+      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
+        'Name': 'Washer01',
+        'Price': 3.50,
+      });
+
+      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
+        'balance': 10.0,
+      });
+
+      when(() => mockProfileService.updateBalanceById(any())).thenAnswer((_) async {});
+      when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
+
+      when(() => mockTransactionService.recordTransaction(
+        amount: any(named: 'amount'),
+        description: any(named: 'description'),
+        type: any(named: 'type'),
+      )).thenAnswer((_) async {});
+
+      when(() => mockNotificationService.scheduleNotification(
+        id: any(named: 'id'),
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        delay: any(named: 'delay'),
+      )).thenAnswer((_) async {});
+
+      await tester.pumpWidget(createTestWidget('machine123'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Pay with Loyalty'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      verify(() => mockNotificationService.scheduleNotification(
+        id: 1,
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        delay: any(named: 'delay'),
+      )).called(1);
     });
   });
 }
