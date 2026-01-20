@@ -62,12 +62,17 @@ class _LoadingPageState extends State<LoadingPage> {
 
         final currentUser = authService.getCurrentUser();
         if (currentUser != null) {
-          final userId = currentUser.id;
-          final name = currentUser.userMetadata?['full_name'] ??
-              currentUser.userMetadata?['name'] ??
-              currentUser.userMetadata?['given_name'];
 
-          await profileService.createAccount(id: userId, name: name);
+          final userId = currentUser.id;
+
+          final name =
+              currentUser.userMetadata?['full_name'] ??
+                  currentUser.userMetadata?['name'] ??
+                  currentUser.userMetadata?['given_name'];
+
+          if(name != null && name.isNotEmpty) {
+            await profileService.createAccount(id: userId, name: name);
+          }
         }
 
         context.go("/homePage");

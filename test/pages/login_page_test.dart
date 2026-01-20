@@ -280,6 +280,8 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
+        final createAccountFinder = find.text('Create Account');
+        await tester.ensureVisible(createAccountFinder);
         await tester.tap(find.text('Create Account'));
         await tester.pumpAndSettle();
 
