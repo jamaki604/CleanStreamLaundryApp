@@ -28,6 +28,10 @@ class MockProfileService extends Mock implements ProfileService {}
 
 class MockRouterService extends Mock implements RouterService {}
 
+class MockLoyaltyViewModel extends Mock implements LoyaltyViewModel {}
+
+class MockPaymentProcessor extends Mock implements PaymentProcessor {}
+
 class MockMachineCommunicationService extends Mock
     implements MachineCommunicationService {}
 
