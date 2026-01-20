@@ -343,5 +343,47 @@ void main() {
       expect(passwordField.obscureText, true);
       expect(confirmPasswordField.obscureText, true);
     });
+
+    testWidgets('Ensure proper display with completely improper password', (tester) async {
+      setupViewport(tester);
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      await tester.enterText(find.byType(TextField).at(2), "abc");
+
+      await tester.pump();
+
+      expect(find.textContaining("Have 8 character length"), findsOneWidget);
+      expect(find.textContaining("Include special character"), findsOneWidget);
+      expect(find.textContaining("Include a digit"), findsOneWidget);
+      expect(find.textContaining("Include an uppercase letter"), findsOneWidget);
+    });
+
+    testWidgets('Ensure proper display with partially improper password', (tester) async {
+      setupViewport(tester);
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      await tester.enterText(find.byType(TextField).at(2), "Abcdefgh");
+
+      await tester.pump();
+
+      expect(find.textContaining("Have 8 character length"), findsNothing);
+      expect(find.textContaining("Include special character"), findsOneWidget);
+      expect(find.textContaining("Include a digit"), findsOneWidget);
+      expect(find.textContaining("Include an uppercase letter"), findsNothing);
+    });
+
+    testWidgets('Ensure no display with proper password', (tester) async {
+      setupViewport(tester);
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      await tester.enterText(find.byType(TextField).at(2), "Abc1234!");
+
+      await tester.pump();
+
+      expect(find.textContaining("Have 8 character length"), findsNothing);
+      expect(find.textContaining("Include special character"), findsNothing);
+      expect(find.textContaining("Include a digit"), findsNothing);
+      expect(find.textContaining("Include an uppercase letter"), findsNothing);
+    });
   });
 }
