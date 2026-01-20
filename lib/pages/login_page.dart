@@ -216,10 +216,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SizedBox(
-                    width: 160,
-                    height: 30,
+                    width: double.infinity,
+                    height: 36,
                     child: ElevatedButton(
-                      onPressed:() => authService.googleSignIn(),
+                      onPressed: () => authService.googleSignIn(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.grey,
@@ -229,19 +229,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset("assets/Google.png",width: 16,height: 16,key: const Key('google_logo')),
-                          SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              "Sign in with Google",
-                              style: TextStyle(fontSize: 12),
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                            ),
-                          ),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          Image.asset("assets/Google.png", width: 16, height: 16, key: const Key('google_logo')),
+                      const SizedBox(width: 8),
+                      const Text("Sign in with Google", style: TextStyle(fontSize: 14)),
                         ],
                       ),
                     ),
@@ -250,8 +242,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SizedBox(
-                    width: 160,
-                    height: 30,
+                    width: double.infinity,
+                    height: 36,
                     child: ElevatedButton(
                       onPressed: () => authService.appleSignIn(),
                       style: ElevatedButton.styleFrom(
@@ -263,19 +255,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.apple, size: 16),
-                          SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              "Sign in with Apple",
-                              style: TextStyle(fontSize: 12),
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                            ),
-                          ),
+                        Icon(Icons.apple, size: 16),
+                        SizedBox(width: 8),
+                        Text("Sign in with Apple", style: TextStyle(fontSize: 14)),
                         ],
                       ),
                     ),
