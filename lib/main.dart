@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
@@ -23,6 +24,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/viewmodels/loyalty_view_model.dart';
 
 final getIt = GetIt.instance;
 
@@ -38,59 +40,58 @@ void main() async {
   pageRouter = routerService.createRouter(authService);
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeManager(),
-      child: const MyApp(),
-    ),
+    ChangeNotifierProvider(create: (_) => ThemeManager(), child: const MyApp()),
   );
 }
 
-
-Future<void> setupDependencies() async{
-  await Supabase.initialize(url: '${dotenv.env['SUPABASE_URL']}', anonKey: '${dotenv.env['ANON_KEY']}');
+Future<void> setupDependencies() async {
+  await Supabase.initialize(
+    url: '${dotenv.env['SUPABASE_URL']}',
+    anonKey: '${dotenv.env['ANON_KEY']}',
+  );
   final supabase = Supabase.instance.client;
 
   Stripe.publishableKey = "${dotenv.env['STRIPE_PUBLISHABLE_KEY']}";
 
   getIt.registerLazySingleton<TransactionService>(
-      () => SupabaseTransactionService(client: supabase)
+    () => SupabaseTransactionService(client: supabase),
   );
 
   getIt.registerLazySingleton<ProfileService>(
-          () => SupabaseProfileService(client: supabase)
+    () => SupabaseProfileService(client: supabase),
   );
 
   getIt.registerLazySingleton<MachineService>(
-          () => SupabaseMachineService(client: supabase)
+    () => SupabaseMachineService(client: supabase),
   );
 
   getIt.registerLazySingleton<LocationService>(
-          () => SupabaseLocationHandler(client: supabase)
+    () => SupabaseLocationHandler(client: supabase),
   );
 
   getIt.registerLazySingleton<EdgeFunctionService>(
-          () => SupabaseEdgeFunctionService(client: supabase)
+    () => SupabaseEdgeFunctionService(client: supabase),
   );
 
   getIt.registerLazySingleton<AuthService>(
-          () => SupabaseAuthService(client: supabase)
+    () => SupabaseAuthService(client: supabase),
   );
 
-  getIt.registerLazySingleton<PaymentService>(
-      () => StripeService()
-  );
+  getIt.registerLazySingleton<PaymentService>(() => StripeService());
 
-  getIt.registerLazySingleton<Stripe>(
-      () => Stripe.instance
-  );
+  getIt.registerLazySingleton<Stripe>(() => Stripe.instance);
 
   getIt.registerLazySingleton<MachineCommunicationService>(
-      () => MachineCommunicator()
+    () => MachineCommunicator(),
   );
 
-  getIt.registerLazySingleton<RouterService>(
-      () => RouterService()
-  );
+  getIt.registerLazySingleton<RouterService>(() => RouterService());
+
+  getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
+
+  getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor(
+        paymentService: getIt<PaymentService>(),
+        transactionService: getIt<TransactionService>(),));
 }
 
 class MyApp extends StatelessWidget {
