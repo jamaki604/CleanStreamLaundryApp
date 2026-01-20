@@ -10,7 +10,10 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+  final AppLinks appLinks;
+
+  const LoginScreen({super.key,required this.appLinks});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -38,8 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     //Sets up a listener for when the app is already running
-    final appLinks = AppLinks();
-    _listener = appLinks.uriLinkStream.listen((Uri? uri) async {
+    //final appLinks = AppLinks();
+    _listener = widget.appLinks.uriLinkStream.listen((Uri? uri) async {
       if (uri == null) return;
 
       if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {

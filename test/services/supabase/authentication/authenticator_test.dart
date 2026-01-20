@@ -863,9 +863,15 @@ void main(){
       )).called(1);
     });
 
-    test("Tests that all errors are properly handled",() async{
+    test("Tests that all errors are properly handled with apple sign in",() async{
       when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
       await authenticator.appleSignIn();
+      //If test reaches here it passed because nothing failed
+    });
+
+    test("Tests that all errors are properly handled with google sign in",() async{
+      when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
+      await authenticator.googleSignIn();
       //If test reaches here it passed because nothing failed
     });
 

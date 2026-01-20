@@ -1,3 +1,4 @@
+import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
@@ -38,7 +39,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) => LoginScreen(),
+          builder: (context, state) => LoginScreen(appLinks: AppLinks()),
         ),
         GoRoute(
           path: '/homePage',
