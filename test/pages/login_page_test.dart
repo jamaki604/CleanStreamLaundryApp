@@ -1,4 +1,3 @@
-import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
@@ -54,11 +53,13 @@ void main() {
         ),
         GoRoute(
           path: '/email-Verification',
-          builder: (context, state) => const Scaffold(body: Text('Email Verification')),
+          builder: (context, state) =>
+              const Scaffold(body: Text('Email Verification')),
         ),
         GoRoute(
           path: '/signup',
-          builder: (context, state) => const Scaffold(body: Text('Sign Up Page')),
+          builder: (context, state) =>
+              const Scaffold(body: Text('Sign Up Page')),
         ),
       ],
     );
@@ -66,19 +67,17 @@ void main() {
   }
 
   void mockLoginResponse(AuthenticationResponses response) {
-    when(() => mockAuthService.login(any(), any()))
-        .thenAnswer((_) async => response);
+    when(
+      () => mockAuthService.login(any(), any()),
+    ).thenAnswer((_) async => response);
   }
 
   Future<void> enterCredentials(
-      WidgetTester tester, {
-        String email = 'test@example.com',
-        String password = 'password123',
-      }) async {
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Email'),
-      email,
-    );
+    WidgetTester tester, {
+    String email = 'test@example.com',
+    String password = 'password123',
+  }) async {
+    await tester.enterText(find.widgetWithText(TextField, 'Email'), email);
     await tester.enterText(
       find.widgetWithText(TextField, 'Password'),
       password,
@@ -198,7 +197,9 @@ void main() {
         expect(find.text('Logging in as test@example.com...'), findsOneWidget);
       });
 
-      testWidgets('should navigate to email verification on unverified email', (tester) async {
+      testWidgets('should navigate to email verification on unverified email', (
+        tester,
+      ) async {
         mockLoginResponse(AuthenticationResponses.emailNotVerified);
 
         await tester.pumpWidget(createWidgetUnderTest());
@@ -211,7 +212,9 @@ void main() {
         expect(find.text('Email Verification'), findsOneWidget);
       });
 
-      testWidgets('should change colors to red on failed login', (tester) async {
+      testWidgets('should change colors to red on failed login', (
+        tester,
+      ) async {
         mockLoginResponse(AuthenticationResponses.failure);
 
         await tester.pumpWidget(createWidgetUnderTest());
@@ -230,7 +233,9 @@ void main() {
         expect(lockIcon.color, Colors.red);
       });
 
-      testWidgets('should call auth service with correct credentials', (tester) async {
+      testWidgets('should call auth service with correct credentials', (
+        tester,
+      ) async {
         mockLoginResponse(AuthenticationResponses.success);
 
         await tester.pumpWidget(createWidgetUnderTest());
@@ -256,37 +261,47 @@ void main() {
         await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
         await tester.pumpAndSettle();
 
-        verify(() => mockAuthService.login('test@example.com', any())).called(1);
+        verify(
+          () => mockAuthService.login('test@example.com', any()),
+        ).called(1);
       });
 
       testWidgets('should have Apple Sign In button', (tester) async {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        expect(find.widgetWithText(ElevatedButton, 'Sign in with Apple'), findsOneWidget);
+        expect(
+          find.widgetWithText(ElevatedButton, 'Sign in with Apple'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('should have Google Sign In button', (tester) async {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        expect(find.widgetWithText(ElevatedButton, 'Sign in with Google'), findsOneWidget);
+        expect(
+          find.widgetWithText(ElevatedButton, 'Sign in with Google'),
+          findsOneWidget,
+        );
       });
-
     });
 
     group('Navigation', () {
-      testWidgets('should navigate to signup page when create account is tapped', (tester) async {
-        await tester.pumpWidget(createWidgetUnderTest());
-        await tester.pumpAndSettle();
+      testWidgets(
+        'should navigate to signup page when create account is tapped',
+        (tester) async {
+          await tester.pumpWidget(createWidgetUnderTest());
+          await tester.pumpAndSettle();
 
-        final createAccountFinder = find.text('Create Account');
-        await tester.ensureVisible(createAccountFinder);
-        await tester.tap(find.text('Create Account'));
-        await tester.pumpAndSettle();
+          final createAccountFinder = find.text('Create Account');
+          await tester.ensureVisible(createAccountFinder);
+          await tester.tap(find.text('Create Account'));
+          await tester.pumpAndSettle();
 
-        expect(find.text('Sign Up Page'), findsOneWidget);
-      });
+          expect(find.text('Sign Up Page'), findsOneWidget);
+        },
+      );
     });
 
     group('Styling', () {
@@ -299,14 +314,8 @@ void main() {
         );
         final buttonStyle = button.style;
 
-        expect(
-          buttonStyle?.backgroundColor?.resolve({}),
-          Colors.blue,
-        );
-        expect(
-          buttonStyle?.foregroundColor?.resolve({}),
-          Colors.white,
-        );
+        expect(buttonStyle?.backgroundColor?.resolve({}), Colors.blue);
+        expect(buttonStyle?.foregroundColor?.resolve({}), Colors.white);
       });
 
       testWidgets('should have underlined create account text', (tester) async {
@@ -333,7 +342,9 @@ void main() {
     });
 
     group('Error State Persistence', () {
-      testWidgets('should maintain error colors after failed login', (tester) async {
+      testWidgets('should maintain error colors after failed login', (
+        tester,
+      ) async {
         mockLoginResponse(AuthenticationResponses.failure);
 
         await tester.pumpWidget(createWidgetUnderTest());
@@ -360,7 +371,9 @@ void main() {
     });
 
     group('LoginScreen Deep Link Tests', () {
-      testWidgets('navigates to /homePage on email-verification link', (tester) async {
+      testWidgets('navigates to /homePage on email-verification link', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
@@ -374,14 +387,27 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        when(() => mockAuthService.handleOAuthRedirect(any())).thenAnswer((_) async {});
-        when(() => mockAuthService.isLoggedIn())
-            .thenAnswer((_) async => AuthenticationResponses.success);
+        when(
+          () => mockAuthService.handleOAuthRedirect(any()),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockAuthService.isLoggedIn(),
+        ).thenAnswer((_) async => AuthenticationResponses.success);
         when(() => mockAuthService.getCurrentUser()).thenReturn(
-          User(id: 'testId', appMetadata: {}, userMetadata: {'full_name': 'Test User'}, aud: '', createdAt: ''),
+          User(
+            id: 'testId',
+            appMetadata: {},
+            userMetadata: {'full_name': 'Test User'},
+            aud: '',
+            createdAt: '',
+          ),
         );
-        when(() => mockProfileService.createAccount(id: any(named: 'id'), name: any(named: 'name')))
-            .thenAnswer((_) async {});
+        when(
+          () => mockProfileService.createAccount(
+            id: any(named: 'id'),
+            name: any(named: 'name'),
+          ),
+        ).thenAnswer((_) async {});
 
         fakeAppLinks.emit(Uri.parse('clean-stream://oauth'));
         await tester.pumpAndSettle();
@@ -390,7 +416,10 @@ void main() {
         verify(() => mockAuthService.handleOAuthRedirect(any())).called(1);
         verify(() => mockAuthService.isLoggedIn()).called(1);
         verify(() => mockAuthService.getCurrentUser()).called(1);
-        verify(() => mockProfileService.createAccount(id: 'testId', name: 'Test User')).called(1);
+        verify(
+          () =>
+              mockProfileService.createAccount(id: 'testId', name: 'Test User'),
+        ).called(1);
       });
     });
   });
