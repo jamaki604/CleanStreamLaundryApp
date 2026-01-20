@@ -1,3 +1,4 @@
+import 'package:app_links/app_links.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
@@ -24,7 +25,7 @@ class RouterService {
             pageBuilder: (context, state) =>
                 CustomTransitionPage(
                   key: state.pageKey,
-                  child: LoginScreen(),
+                  child: LoginScreen(appLinks: AppLinks()),
                   transitionDuration: Duration.zero,
                   reverseTransitionDuration: Duration.zero,
                   transitionsBuilder: (_, _, _, child) => child,

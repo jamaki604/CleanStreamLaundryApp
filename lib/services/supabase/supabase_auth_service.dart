@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseAuthService implements AuthService{
@@ -162,6 +163,47 @@ class SupabaseAuthService implements AuthService{
   @override
   bool isEmailVerified() {
     return _client.auth.currentUser?.emailConfirmedAt != null;
+  }
+
+  @override
+  Future<void> appleSignIn() async{
+
+    if(!kIsWeb) {
+    try {
+      await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "clean-stream://oauth");
+    } catch (e) {
+
+    }
+
+  }else{
+    //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
+    await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "http://localhost:8080/loading");
+  }
+
+  }
+
+  @override
+  Future<void> googleSignIn() async{
+    if(!kIsWeb) {
+      try {
+        await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "clean-stream://oauth");
+      } catch (e) {
+
+      }
+
+    }else{
+      //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
+      await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "http://localhost:8080/loading");
+    }
+  }
+
+  @override
+  Future<void> handleOAuthRedirect(Uri uri) async {
+    await _client.auth.getSessionFromUrl(uri);
+  }
+
+  User? getCurrentUser() {
+    return _client.auth.currentUser;
   }
 
 }

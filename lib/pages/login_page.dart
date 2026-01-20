@@ -1,12 +1,19 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+  final AppLinks appLinks;
+
+  const LoginScreen({super.key,required this.appLinks});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -27,9 +34,49 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
+  late final StreamSubscription<Uri?> _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    //Sets up a listener for when the app is already running
+    //final appLinks = AppLinks();
+    _listener = widget.appLinks.uriLinkStream.listen((Uri? uri) async {
+      if (uri == null) return;
+
+      if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
+        context.go("/homePage");
+      }else if (uri.scheme == 'clean-stream' && uri.host == 'oauth') {
+
+        await authService.handleOAuthRedirect(uri);
+
+        if (await authService.isLoggedIn() == AuthenticationResponses.success) {
+
+          if (!mounted) return;
+          final currentUser = authService.getCurrentUser();
+
+          if (currentUser != null) {
+
+            final userId = currentUser.id;
+            final name = currentUser.userMetadata?['full_name'] ??
+                currentUser.userMetadata?['name'] ??
+                currentUser.userMetadata?['given_name'];
+
+            await profileService.createAccount(id: userId, name: name);
+          }
+          context.go("/homePage");
+        } else {
+          if (!mounted) return;
+          context.go("/login");
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _listener.cancel();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _scrollCtrl.dispose();
@@ -94,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset("assets/Logo.png", height: 250, width: 250),
+                Image.asset("assets/Logo.png", height: 250, width: 250,key: const Key('app_logo'),),
                 TextField(
                   controller: _emailCtrl,
                   style: TextStyle(
@@ -164,6 +211,58 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue, foregroundColor: Colors.white),
                     child: const Text('Log In'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 36,
+                    child: ElevatedButton(
+                      onPressed: () => authService.googleSignIn(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.grey,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          Image.asset("assets/Google.png", width: 16, height: 16, key: const Key('google_logo')),
+                      const SizedBox(width: 8),
+                      const Text("Sign in with Google", style: TextStyle(fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 36,
+                    child: ElevatedButton(
+                      onPressed: () => authService.appleSignIn(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                        Icon(Icons.apple, size: 16),
+                        SizedBox(width: 8),
+                        Text("Sign in with Apple", style: TextStyle(fontSize: 14)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Padding(
