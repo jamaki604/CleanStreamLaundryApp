@@ -8,15 +8,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'mocks.dart';
 
 void main() {
   late MockAuthService mockAuthService;
   late MockProfileService mockProfileService;
+  late FakeAppLinks fakeAppLinks;
+
+  setUpAll(() {
+    registerFallbackValue(FakeUri());
+  });
 
   setUp(() {
     mockAuthService = MockAuthService();
     mockProfileService = MockProfileService();
+    fakeAppLinks = FakeAppLinks();
 
     final getIt = GetIt.instance;
     if (getIt.isRegistered<AuthService>()) {
@@ -39,7 +46,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) => LoginScreen(appLinks: AppLinks()),
+          builder: (context, state) => LoginScreen(appLinks: fakeAppLinks),
         ),
         GoRoute(
           path: '/homePage',
@@ -347,6 +354,41 @@ void main() {
 
         final emailIconAfter = tester.widget<Icon>(find.byIcon(Icons.email));
         expect(emailIconAfter.color, Colors.red);
+      });
+    });
+
+    group('LoginScreen Deep Link Tests', () {
+      testWidgets('navigates to /homePage on email-verification link', (tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        fakeAppLinks.emit(Uri.parse('clean-stream://email-verification'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Home Page'), findsOneWidget);
+      });
+
+      testWidgets('handles oauth link and successful login', (tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        when(() => mockAuthService.handleOAuthRedirect(any())).thenAnswer((_) async {});
+        when(() => mockAuthService.isLoggedIn())
+            .thenAnswer((_) async => AuthenticationResponses.success);
+        when(() => mockAuthService.getCurrentUser()).thenReturn(
+          User(id: 'testId', appMetadata: {}, userMetadata: {'full_name': 'Test User'}, aud: '', createdAt: ''),
+        );
+        when(() => mockProfileService.createAccount(id: any(named: 'id'), name: any(named: 'name')))
+            .thenAnswer((_) async {});
+
+        fakeAppLinks.emit(Uri.parse('clean-stream://oauth'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Home Page'), findsOneWidget);
+        verify(() => mockAuthService.handleOAuthRedirect(any())).called(1);
+        verify(() => mockAuthService.isLoggedIn()).called(1);
+        verify(() => mockAuthService.getCurrentUser()).called(1);
+        verify(() => mockProfileService.createAccount(id: 'testId', name: 'Test User')).called(1);
       });
     });
   });
