@@ -53,8 +53,15 @@ class LoyaltyViewModel extends ChangeNotifier {
     final transactions = await _transactionService.getTransactionsForUser();
     final limit = showPastTransactions ? 100 : 3;
 
+    final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+
+    final filtered = transactions.where((t) {
+      final createdAt = DateTime.parse(t['created_at'] as String);
+      return createdAt.isAfter(thirtyDaysAgo);
+    });
+
     recentTransactions = TransactionParser.formatTransactionsList(
-      transactions.take(limit),
+      filtered.take(limit),
       "transactionHistory",
     )..removeWhere((e) => e.isEmpty);
 

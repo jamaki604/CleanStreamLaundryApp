@@ -10,14 +10,12 @@ class TransactionParser {
     final createdAt = DateTime.parse(transaction['created_at'] as String);
     final formattedDate = DateFormat('MMM dd, yyyy').format(createdAt);
     final formattedAmount = '\$${amount.toStringAsFixed(2)}';
-    int currentMonth = DateTime.now().month;
     final twoWeeksAgo = DateTime.now().subtract(Duration(days: 14));
+    final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
 
-    if (DateFormat('M').format(createdAt) != currentMonth.toString() &&
-        type == "transactionHistory") {
+    if (createdAt.isBefore(thirtyDaysAgo) && type == "transactionHistory") {
       return "";
     }
-
     if (createdAt.isBefore(twoWeeksAgo) && type == "refundHistory") {
       return "";
     }
