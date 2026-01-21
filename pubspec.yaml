@@ -117,6 +117,11 @@ flutter:
 
 flutter_native_splash:
   color: "#ffffff"
-  image: assets/Logo.png
+  image: assets/splash-logo.png
+  android_12:
+    color: "#ffffff"
+    image: assets/splash-logo.png
   android: true
   ios: true
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
