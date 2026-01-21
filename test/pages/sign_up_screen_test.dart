@@ -3,6 +3,7 @@ import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/pages/sign_up_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -38,7 +39,7 @@ void main() {
         GoRoute(
           path: '/email-verification',
           builder: (context, state) =>
-              const Scaffold(body: Text('Email Verification Page')),
+          const Scaffold(body: Text('Email Verification Page')),
         ),
       ],
     );
@@ -77,9 +78,8 @@ void main() {
       expect(find.text('Confirm Password'), findsOneWidget);
     });
 
-    testWidgets('should display Create Account button', (
-      WidgetTester tester,
-    ) async {
+    testWidgets(
+        'should display Create Account button', (WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -98,8 +98,7 @@ void main() {
     });
 
     testWidgets('should navigate to login when login link is tapped', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -110,8 +109,7 @@ void main() {
     });
 
     testWidgets('should show error when fields are empty', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -122,8 +120,7 @@ void main() {
     });
 
     testWidgets('should show error when passwords do not match', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -139,7 +136,6 @@ void main() {
     });
 
 
-
     testWidgets('should navigate to email verification on success',
             (WidgetTester tester) async {
           when(() => mockAuthService.signUp(any(), any()))
@@ -148,31 +144,34 @@ void main() {
           when(() => mockAuthService.getLastSignedUpUserId())
               .thenReturn('test-user-id-123');
 
-          when(() => mockProfileService.createAccount(
-              name: any(named: 'name'), id: any(named: 'id')))
+          when(() =>
+              mockProfileService.createAccount(
+                  name: any(named: 'name'), id: any(named: 'id')))
               .thenAnswer((_) async => {});
 
           setupViewport(tester);
           await tester.pumpWidget(createWidgetUnderTest());
 
           await tester.enterText(find.byType(TextField).at(0), 'Test User');
-          await tester.enterText(find.byType(TextField).at(1), 'test@example.com');
+          await tester.enterText(
+              find.byType(TextField).at(1), 'test@example.com');
           await tester.enterText(find.byType(TextField).at(2), 'Password123!');
           await tester.enterText(find.byType(TextField).at(3), 'Password123!');
 
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
+          await tester.tap(
+              find.widgetWithText(ElevatedButton, 'Create Account'));
           await tester.pump(); // start async work
-          await tester.pumpAndSettle(const Duration(seconds: 2)); // wait for navigation
+          await tester.pumpAndSettle(
+              const Duration(seconds: 2)); // wait for navigation
 
           expect(find.text('Email Verification Page'), findsOneWidget);
         });
 
     testWidgets('should show error for password without digit', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       when(
-        () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.noDigit);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -189,11 +188,10 @@ void main() {
     });
 
     testWidgets('should show error for password too short', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       when(
-        () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.lessThanMinLength);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -213,11 +211,10 @@ void main() {
     });
 
     testWidgets('should show error for password without special character', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       when(
-        () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.noSpecialCharacter);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -237,11 +234,10 @@ void main() {
     });
 
     testWidgets('should show error for password without uppercase', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       when(
-        () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.noUppercase);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -261,11 +257,10 @@ void main() {
     });
 
     testWidgets('should show error for invalid special character', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       when(() => mockAuthService.signUp(any(), any())).thenAnswer(
-        (_) async => AuthenticationResponses.invalidSpecialCharacter,
+            (_) async => AuthenticationResponses.invalidSpecialCharacter,
       );
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -284,9 +279,8 @@ void main() {
       );
     });
 
-    testWidgets('should have correct button styles', (
-      WidgetTester tester,
-    ) async {
+    testWidgets(
+        'should have correct button styles', (WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -298,8 +292,7 @@ void main() {
     });
 
     testWidgets('should have all text fields with proper icons', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -327,9 +320,8 @@ void main() {
       );
     });
 
-    testWidgets('password fields should be obscured', (
-      WidgetTester tester,
-    ) async {
+    testWidgets(
+        'password fields should be obscured', (WidgetTester tester,) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -344,7 +336,8 @@ void main() {
       expect(confirmPasswordField.obscureText, true);
     });
 
-    testWidgets('Ensure proper display with completely improper password', (tester) async {
+    testWidgets('Ensure proper display with completely improper password', (
+        tester) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -355,10 +348,12 @@ void main() {
       expect(find.textContaining("Have 8 character length"), findsOneWidget);
       expect(find.textContaining("Include special character"), findsOneWidget);
       expect(find.textContaining("Include a digit"), findsOneWidget);
-      expect(find.textContaining("Include an uppercase letter"), findsOneWidget);
+      expect(
+          find.textContaining("Include an uppercase letter"), findsOneWidget);
     });
 
-    testWidgets('Ensure proper display with partially improper password', (tester) async {
+    testWidgets('Ensure proper display with partially improper password', (
+        tester) async {
       setupViewport(tester);
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -384,6 +379,30 @@ void main() {
       expect(find.textContaining("Include special character"), findsNothing);
       expect(find.textContaining("Include a digit"), findsNothing);
       expect(find.textContaining("Include an uppercase letter"), findsNothing);
+    });
+
+    testWidgets('Handle sign up is run when enter is clicked', (tester) async {
+      setupViewport(tester);
+
+      // Pump the widget
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Find the KeyboardListener and grab its FocusNode
+      final keyboardListener = tester.widget<KeyboardListener>(
+        find.byType(KeyboardListener),
+      );
+      final focusNode = keyboardListener.focusNode;
+
+      // Request focus
+      focusNode.requestFocus();
+      await tester.pump();
+
+      // Send Enter key
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // Verify the SnackBar appears
+      expect(find.text('Please fill in all fields.'), findsOneWidget);
     });
   });
 }
