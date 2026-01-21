@@ -45,7 +45,7 @@ class _SettingsState extends State<Settings> {
                     onTap: () async {
                       final transactions = await transactionService
                           .getTransactionsForUser();
-                      context.go(
+                      context.push(
                         '/monthlyTransactionHistory',
                         extra: transactions,
                       );
