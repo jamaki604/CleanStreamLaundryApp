@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   String? selectedName;
-  late final Map<String,int> locationID = {};
+  late final Map<String, int> locationID = {};
   bool locationSelected = false;
   late int? locationIDSelected;
   late StorageService storage;
@@ -37,12 +38,12 @@ class HomePageState extends State<HomePage> {
       selectedName = lastVal;
     });
   }
+
   final machineService = GetIt.instance<MachineService>();
   final locationService = GetIt.instance<LocationService>();
 
   @override
   Widget build(BuildContext context) {
-
     return BasePage(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -65,9 +66,11 @@ class HomePageState extends State<HomePage> {
                       child: FutureBuilder(
                         future: Future.wait([locationService.getLocations()]),
                         builder: (context, snapshot) {
-
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
                           }
 
                           final data = snapshot.data![0];
@@ -75,7 +78,9 @@ class HomePageState extends State<HomePage> {
                             locationID[item["Address"]] = item["id"];
                           }
 
-                          if (selectedName != null && locationID.containsKey(selectedName!) && !locationSelected) {
+                          if (selectedName != null &&
+                              locationID.containsKey(selectedName!) &&
+                              !locationSelected) {
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               setState(() {
                                 locationSelected = true;
@@ -95,13 +100,18 @@ class HomePageState extends State<HomePage> {
                                   "Select Location",
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Theme.of(context).colorScheme.fontInverted,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.fontInverted,
                                   ),
                                 ),
                               ),
                               onChanged: (String? newValue) {
                                 if (newValue != null) {
-                                  storage.setValue("lastSelectedLocation", newValue);
+                                  storage.setValue(
+                                    "lastSelectedLocation",
+                                    newValue,
+                                  );
                                 }
                                 setState(() {
                                   selectedName = newValue;
@@ -119,7 +129,9 @@ class HomePageState extends State<HomePage> {
                                       entry.key,
                                       style: TextStyle(
                                         fontSize: 18,
-                                        color: Theme.of(context).colorScheme.fontInverted,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.fontInverted,
                                       ),
                                     ),
                                   ),
@@ -137,8 +149,12 @@ class HomePageState extends State<HomePage> {
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
-                    machineService.getWasherCountByLocation(locationIDSelected.toString()),
-                    machineService.getIdleWasherCountByLocation(locationIDSelected.toString())
+                    machineService.getWasherCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
+                    machineService.getIdleWasherCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
                   ]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -168,7 +184,9 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$machineIdle available",
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontInverted,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.fontInverted,
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -177,7 +195,9 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$machineIdle/$totalMachine washers",
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontSecondary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.fontSecondary,
                                   fontSize: 14,
                                 ),
                               ),
@@ -199,8 +219,12 @@ class HomePageState extends State<HomePage> {
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
-                    machineService.getDryerCountByLocation(locationIDSelected.toString()),
-                    machineService.getIdleDryerCountByLocation(locationIDSelected.toString())
+                    machineService.getDryerCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
+                    machineService.getIdleDryerCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
                   ]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -230,7 +254,9 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$totalMachine available",
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontInverted,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.fontInverted,
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -239,7 +265,9 @@ class HomePageState extends State<HomePage> {
                               Text(
                                 "$machineIdle/$totalMachine dryers",
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontSecondary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.fontSecondary,
                                   fontSize: 14,
                                 ),
                               ),
@@ -252,33 +280,56 @@ class HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-
                     );
                   },
                 ),
-              Container(
-                height: 500,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade400, width: 1),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: FlutterMap(
-                  mapController: MapController(),
-                  options: MapOptions(
-                    initialCenter: LatLng(40.273502, -86.126976),
-                    initialZoom: 7.2,
-                    keepAlive: true
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.app',
-                      tileProvider: NetworkTileProvider(
+              FutureBuilder(
+                future: locationService.getLocations(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      height: 500,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.shade400,
+                          width: 1,
+                        ),
                       ),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  final locations = snapshot.data ?? [];
+                  final markers = LocationParser.parseLocations(locations);
+
+                  return Container(
+                    margin: const EdgeInsets.only(top: 20.0),
+                    height: 500,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade400, width: 1),
                     ),
-                  ],
-                ),
+                    clipBehavior: Clip.antiAlias,
+                    child: FlutterMap(
+                      mapController: MapController(),
+                      options: MapOptions(
+                        initialCenter: LatLng(40.273502, -86.126976),
+                        initialZoom: 7.2,
+                        keepAlive: true,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.example.app',
+                          tileProvider: NetworkTileProvider(),
+                        ),
+                        MarkerLayer(markers: markers),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
