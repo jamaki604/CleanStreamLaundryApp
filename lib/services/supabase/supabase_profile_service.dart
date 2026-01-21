@@ -48,7 +48,7 @@ class SupabaseProfileService extends ProfileService {
     final userId = _client.auth.currentUser?.id;
 
     if (userId == null) {
-      return;
+      throw Exception('No user logged in');
     }
 
     try {
@@ -56,10 +56,8 @@ class SupabaseProfileService extends ProfileService {
           .from('profiles')
           .update({"full_name": name})
           .eq('id', userId);
-    } on PostgrestException {
-      return null;
     } catch (e) {
-      return null;
+      throw Exception('Failed to update name: $e');
     }
   }
 
