@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:permission_handler/permission_handler.dart';
+
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -8,6 +9,17 @@ class NotificationService {
 
   NotificationService() {
     _init();
+  }
+
+  Future<bool> _requestPermission() async {
+    final status = await Permission.notification.status;
+
+    if (status.isGranted) {
+      return true;
+    }
+
+    final result = await Permission.notification.request();
+    return result.isGranted;
   }
 
   Future<void> _init() async {
@@ -41,6 +53,11 @@ class NotificationService {
     required String body,
     required Duration delay,
   }) async {
+    final allowed = await _requestPermission();
+    if (!allowed) {
+      return;
+    }
+
     Future.delayed(delay, () async {
       await flutterLocalNotificationsPlugin.show(
         id,
