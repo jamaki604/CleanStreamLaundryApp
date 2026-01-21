@@ -4,7 +4,6 @@ import 'package:clean_stream_laundry_app/logic/services/edge_function_service.da
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:flutter/services.dart';
@@ -83,24 +82,32 @@ class RefundPageState extends State<RefundPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage(
-      body: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Refund Page',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.fontInverted,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.fontPrimary,
           ),
-          elevation: 2,
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          "Request Refund",
+          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
+        ),
+        centerTitle: true,
+      ),
+      body: Scaffold(
         body: KeyboardListener(
-        focusNode: _focusNode,
-        autofocus: kIsWeb,
-        onKeyEvent: (keyEvent) {
-          if(keyEvent is KeyDownEvent && keyEvent.logicalKey == LogicalKeyboardKey.enter){
-            _handleRefund();
-          }},
+          focusNode: _focusNode,
+          autofocus: kIsWeb,
+          onKeyEvent: (keyEvent) {
+            if (keyEvent is KeyDownEvent &&
+                keyEvent.logicalKey == LogicalKeyboardKey.enter) {
+              _handleRefund();
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -113,9 +120,7 @@ class RefundPageState extends State<RefundPage> {
                     color: Theme.of(context).colorScheme.fontInverted,
                   ),
                   decoration: InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
+                    hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
@@ -132,10 +137,7 @@ class RefundPageState extends State<RefundPage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
+                      borderSide: BorderSide(color: Colors.blue, width: 2),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -159,8 +161,9 @@ class RefundPageState extends State<RefundPage> {
                   onChanged: (int? newIndex) {
                     setState(() {
                       selectedTransactionIndex = newIndex;
-                      selectedTransaction =
-                      newIndex != null ? recentTransactions[newIndex] : null;
+                      selectedTransaction = newIndex != null
+                          ? recentTransactions[newIndex]
+                          : null;
                     });
                   },
                 ),
@@ -196,10 +199,7 @@ class RefundPageState extends State<RefundPage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
+                      borderSide: BorderSide(color: Colors.blue, width: 2),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -214,8 +214,8 @@ class RefundPageState extends State<RefundPage> {
                   child: ElevatedButton(
                     onPressed: isFormValid()
                         ? () async {
-                      _handleRefund();
-                    }
+                            _handleRefund();
+                          }
                         : null,
 
                     style: ElevatedButton.styleFrom(
@@ -229,9 +229,9 @@ class RefundPageState extends State<RefundPage> {
                 ),
               ],
             ),
-          )
-        )
-      )
+          ),
+        ),
+      ),
     );
   }
 
