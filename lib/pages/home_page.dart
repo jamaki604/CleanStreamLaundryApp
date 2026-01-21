@@ -51,6 +51,56 @@ class HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              FutureBuilder(
+                future: locationService.getLocations(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      height: 500,
+                      width: 400,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.shade400,
+                          width: 1,
+                        ),
+                      ),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  final locations = snapshot.data ?? [];
+                  final markers = LocationParser.parseLocations(locations);
+
+                  return Container(
+                    margin: const EdgeInsets.only(top: 20.0),
+                    height: 500,
+                    width: 400,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade400, width: 1),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: FlutterMap(
+                      mapController: MapController(),
+                      options: MapOptions(
+                        initialCenter: LatLng(40.273502, -86.126976),
+                        initialZoom: 7.2,
+                        keepAlive: true,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'https://cleanstreamlaundry.com/',
+                          tileProvider: NetworkTileProvider(),
+                        ),
+                        MarkerLayer(markers: markers),
+                      ],
+                    ),
+                  );
+                },
+              ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
@@ -63,6 +113,7 @@ class HomePageState extends State<HomePage> {
                     Icon(Icons.location_on, color: Colors.blue, size: 28),
                     SizedBox(width: 8),
                     Expanded(
+
                       child: FutureBuilder(
                         future: Future.wait([locationService.getLocations()]),
                         builder: (context, snapshot) {
@@ -252,7 +303,7 @@ class HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "$totalMachine available",
+                                "$machineIdle available",
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
@@ -283,54 +334,6 @@ class HomePageState extends State<HomePage> {
                     );
                   },
                 ),
-              FutureBuilder(
-                future: locationService.getLocations(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container(
-                      height: 500,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.grey.shade400,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-
-                  final locations = snapshot.data ?? [];
-                  final markers = LocationParser.parseLocations(locations);
-
-                  return Container(
-                    margin: const EdgeInsets.only(top: 20.0),
-                    height: 500,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade400, width: 1),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: FlutterMap(
-                      mapController: MapController(),
-                      options: MapOptions(
-                        initialCenter: LatLng(40.273502, -86.126976),
-                        initialZoom: 7.2,
-                        keepAlive: true,
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.app',
-                          tileProvider: NetworkTileProvider(),
-                        ),
-                        MarkerLayer(markers: markers),
-                      ],
-                    ),
-                  );
-                },
-              ),
             ],
           ),
         ),
