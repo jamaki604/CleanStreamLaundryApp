@@ -113,6 +113,7 @@ class RefundPageState extends State<RefundPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: 24),
                 DropdownButtonFormField<int>(
                   initialValue: selectedTransactionIndex,
                   hint: Text('Select a Transaction'),
