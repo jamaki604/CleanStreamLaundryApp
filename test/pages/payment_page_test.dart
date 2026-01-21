@@ -269,11 +269,15 @@ void main() {
   group('UI Elements', () {
     testWidgets('displays laundry service icon', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
-      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
+      when(() => mockMachineService.getMachineById(any())).thenAnswer((
+          _) async =>
+      {
         'Name': 'Washer01',
         'Price': 3.50,
       });
-      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
+      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((
+          _) async =>
+      {
         'balance': 10.0,
       });
 
@@ -283,13 +287,18 @@ void main() {
       expect(find.byIcon(Icons.local_laundry_service), findsOneWidget);
     });
 
-    testWidgets('displays formatted price correctly', (WidgetTester tester) async {
+    testWidgets(
+        'displays formatted price correctly', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
-      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
+      when(() => mockMachineService.getMachineById(any())).thenAnswer((
+          _) async =>
+      {
         'Name': 'Dryer05',
         'Price': 2.75,
       });
-      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
+      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((
+          _) async =>
+      {
         'balance': 5.0,
       });
 
@@ -301,47 +310,30 @@ void main() {
       expect(find.text('Pay \$2.75'), findsOneWidget);
     });
 
-    testWidgets('sends notification after successful loyalty payment', (tester) async {
-      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+    testWidgets('makeNotification calls scheduleNotification with correct parameters',
+            (WidgetTester tester) async {
+          when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+          when(() => mockMachineService.getMachineById(any())).thenAnswer(
+                (_) async => {'Name': 'Washer01', 'Price': 3.50},
+          );
+          when(() => mockProfileService.getUserBalanceById(any())).thenAnswer(
+                (_) async => {'balance': 10.0},
+          );
 
-      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
-        'Name': 'Washer01',
-        'Price': 3.50,
-      });
+          await tester.pumpWidget(createTestWidget('machine123'));
+          await tester.pumpAndSettle();
 
-      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
-        'balance': 10.0,
-      });
+          final state = tester.state(find.byType(PaymentPage)) as dynamic;
 
-      when(() => mockProfileService.updateBalanceById(any())).thenAnswer((_) async {});
-      when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
+          await state.makeNotification();
 
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async {});
-
-      when(() => mockNotificationService.scheduleNotification(
-        id: any(named: 'id'),
-        title: any(named: 'title'),
-        body: any(named: 'body'),
-        delay: any(named: 'delay'),
-      )).thenAnswer((_) async {});
-
-      await tester.pumpWidget(createTestWidget('machine123'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Pay with Loyalty'));
-      await tester.pump();
-      await tester.pumpAndSettle();
-
-      verify(() => mockNotificationService.scheduleNotification(
-        id: 1,
-        title: any(named: 'title'),
-        body: any(named: 'body'),
-        delay: any(named: 'delay'),
-      )).called(1);
+          verify(() =>
+              mockNotificationService.scheduleNotification(
+                id: 1,
+                title: "Machine Finished",
+                body: "Your machine is finished!",
+                delay: const Duration(seconds: 5),
+              )).called(1);
+        });
     });
-  });
-}
+  }

@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 
 class NotificationService {
@@ -21,7 +22,6 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(initSettings);
 
-    // Create channel
     const channel = AndroidNotificationChannel(
       'your_channel_id',
       'Your Channel',

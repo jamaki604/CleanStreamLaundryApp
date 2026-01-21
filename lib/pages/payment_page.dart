@@ -71,6 +71,16 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
+  Future<void> makeNotification() async {
+    final notificationService = GetIt.instance<NotificationService>();
+    await notificationService.scheduleNotification(
+      id: 1,
+      title: "Machine Finished",
+      body: "Your machine is finished!",
+      delay: const Duration(seconds: 5),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BasePage(
@@ -167,15 +177,11 @@ class _PaymentPageState extends State<PaymentPage> {
                     Navigator.of(context, rootNavigator: true).pop();
 
                     if (deviceAuthorized) {
+                      makeNotification();
+
                       statusDialog(
                         context,
-                        title: "Payment processed! Machine Ready!",
-                        message: "Machine $_machineName is now active.",
-                        isSuccess: true,
-                      );
-                    statusDialog(
-                        context,
-                        title: "payment processed! Machine Ready!",
+                        title: "Payment Processed! Machine Ready!",
                         message: "Machine $_machineName is now active.",
                         isSuccess: true,
                       );
@@ -274,12 +280,7 @@ class _PaymentPageState extends State<PaymentPage> {
     Navigator.of(context, rootNavigator: true).pop();
 
     if (deviceAuthorized) {
-      await notificationService.scheduleNotification(
-        id: 1,
-        title: "Machine Finished",
-        body: "This is a placeholder, your machine is done",
-        delay: const Duration(seconds: 5),
-      );
+      makeNotification();
 
       statusDialog(
         context,
@@ -305,7 +306,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
     statusDialog(
       context,
-      title: "payment Successful!",
+      title: "Payment Successful!",
       message:
       "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
       isSuccess: true,
