@@ -24,7 +24,9 @@ class RefundPageState extends State<RefundPage> {
   int? selectedTransactionIndex;
   List<String> recentTransactions = [];
   List<int> recentTransactionIDs = [];
+
   final descriptionController = TextEditingController();
+
   final transactionService = GetIt.instance<TransactionService>();
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
   final profileService = GetIt.instance<ProfileService>();
@@ -44,8 +46,9 @@ class RefundPageState extends State<RefundPage> {
 
   @override
   void dispose() {
-    super.dispose();
     _focusNode.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchTransactions() async {
@@ -55,15 +58,14 @@ class RefundPageState extends State<RefundPage> {
         recentTransactions = TransactionParser.formatTransactionsList(
           transactions.take(100),
           "refundHistory",
-        );
-        recentTransactions.removeWhere((e) => e.isEmpty);
+        )..removeWhere((e) => e.isEmpty);
+
         recentTransactionIDs = TransactionParser.createTransactionIDList(
           transactions.take(100),
-        );
-        recentTransactionIDs.removeWhere((e) => e.isNegative);
+        )..removeWhere((e) => e.isNegative);
       });
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
     }
   }
 
@@ -72,7 +74,7 @@ class RefundPageState extends State<RefundPage> {
   }
 
   Future<String?> getUserName() async {
-    String? userId = authService.getCurrentUserId;
+    final userId = authService.getCurrentUserId;
     return profileService.getUserNameById(userId!);
   }
 
@@ -87,7 +89,7 @@ class RefundPageState extends State<RefundPage> {
       body: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Refund Page',
+            'Request Refund',
             style: TextStyle(
               color: Theme.of(context).colorScheme.fontInverted,
             ),
@@ -95,143 +97,148 @@ class RefundPageState extends State<RefundPage> {
           elevation: 2,
         ),
         body: KeyboardListener(
-        focusNode: _focusNode,
-        autofocus: kIsWeb,
-        onKeyEvent: (keyEvent) {
-          if(keyEvent is KeyDownEvent && keyEvent.logicalKey == LogicalKeyboardKey.enter){
-            _handleRefund();
-          }},
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DropdownButtonFormField<int>(
-                  initialValue: selectedTransactionIndex,
-                  hint: Text('Select a Transaction'),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.fontInverted,
-                  ),
-                  decoration: InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
+          focusNode: _focusNode,
+          autofocus: kIsWeb,
+          onKeyEvent: (event) {
+            if (event is KeyDownEvent &&
+                event.logicalKey == LogicalKeyboardKey.enter) {
+              _handleRefund();
+            }
+          },
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    DropdownButtonFormField<int>(
+                      initialValue: selectedTransactionIndex,
+                      hint: const Text('Select a Transaction'),
+                      style: TextStyle(
                         color: Theme.of(context).colorScheme.fontInverted,
-                        width: 2,
                       ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.fontSecondary,
-                        width: 2,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                  isExpanded: true,
-                  menuMaxHeight: 250,
-                  items: List.generate(recentTransactions.length, (index) {
-                    return DropdownMenuItem<int>(
-                      value: index,
-                      child: Text(
-                        recentTransactions[index],
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.fontInverted,
+                      decoration: InputDecoration(
+                        hintStyle: const TextStyle(color: Colors.white),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color:
+                            Theme.of(context).colorScheme.fontInverted,
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color:
+                            Theme.of(context).colorScheme.fontSecondary,
+                            width: 2,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
                       ),
-                    );
-                  }),
-
-                  onChanged: (int? newIndex) {
-                    setState(() {
-                      selectedTransactionIndex = newIndex;
-                      selectedTransaction =
-                      newIndex != null ? recentTransactions[newIndex] : null;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                TextField(
-                  controller: descriptionController,
-                  minLines: 3,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.fontInverted,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Please explain your reason for the refund...',
-                    hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.fontSecondary,
+                      isExpanded: true,
+                      menuMaxHeight: 250,
+                      items: List.generate(recentTransactions.length, (index) {
+                        return DropdownMenuItem<int>(
+                          value: index,
+                          child: Text(
+                            recentTransactions[index],
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .fontInverted,
+                            ),
+                          ),
+                        );
+                      }),
+                      onChanged: (int? newIndex) {
+                        setState(() {
+                          selectedTransactionIndex = newIndex;
+                          selectedTransaction = newIndex != null
+                              ? recentTransactions[newIndex]
+                              : null;
+                        });
+                      },
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: descriptionController,
+                      minLines: 3,
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      style: TextStyle(
                         color: Theme.of(context).colorScheme.fontInverted,
-                        width: 2,
+                      ),
+                      decoration: InputDecoration(
+                        hintText:
+                        'Please explain your reason for the refund...',
+                        hintStyle: TextStyle(
+                          color:
+                          Theme.of(context).colorScheme.fontSecondary,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color:
+                            Theme.of(context).colorScheme.fontInverted,
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color:
+                            Theme.of(context).colorScheme.fontSecondary,
+                            width: 2,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.fontSecondary,
-                        width: 2,
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: isFormValid() ? _handleRefund : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: Colors.transparent,
+                          disabledForegroundColor: Colors.transparent,
+                        ),
+                        child: const Text("Submit Refund"),
                       ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
+                  ],
                 ),
-
-                const SizedBox(height: 20),
-
-                Center(
-                  child: ElevatedButton(
-                    onPressed: isFormValid()
-                        ? () async {
-                      _handleRefund();
-                    }
-                        : null,
-
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.transparent,
-                      disabledForegroundColor: Colors.transparent,
-                    ),
-                    child: const Text("Submit Refund"),
-                  ),
-                ),
-              ],
+              ),
             ),
-          )
-        )
-      )
+          ),
+        ),
+      ),
     );
   }
 
@@ -240,10 +247,7 @@ class RefundPageState extends State<RefundPage> {
     final description = descriptionController.text;
     final userId = authService.getCurrentUserId;
 
-    if (userId == null) {
-      print("Error: No user is logged in.");
-      return;
-    }
+    if (userId == null) return;
 
     final username = await getUserName();
 

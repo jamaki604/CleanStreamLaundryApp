@@ -66,7 +66,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      expect(find.text('Refund Page'), findsOneWidget);
+      expect(find.text("Request Refund"), findsOneWidget);
       expect(find.text('Select a Transaction'), findsOneWidget);
       expect(
           find.text('Please explain your reason for the refund...'),
@@ -203,7 +203,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      expect(find.text('Refund Page'), findsOneWidget);
+      expect(find.text('Request Refund'), findsOneWidget);
     });
   });
 
@@ -319,7 +319,7 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 
-    expect(find.text('Refund Page'), findsOneWidget);
+    expect(find.text('Request Refund'), findsOneWidget);
 
     verifyNever(() => mockProfileService.getUserNameById(any()));
     verifyNever(() => mockTransactionService.recordRefundRequest(
@@ -384,7 +384,7 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 
-    expect(find.text('Refund Page'), findsOneWidget);
+    expect(find.text('Request Refund'), findsOneWidget);
     expect(find.text('Submit Refund'), findsOneWidget);
 
   });
