@@ -44,6 +44,26 @@ class SupabaseProfileService extends ProfileService {
   }
 
   @override
+  Future<void> updateName(String name) async {
+    final userId = _client.auth.currentUser?.id;
+
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      await _client
+          .from('profiles')
+          .update({"full_name": name})
+          .eq('id', userId);
+    } on PostgrestException {
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
   Future<void> updateBalanceById(double balance) async {
     final userId = _client.auth.currentUser?.id;
 

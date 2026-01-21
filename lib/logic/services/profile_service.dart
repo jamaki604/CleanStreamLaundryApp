@@ -4,4 +4,5 @@ abstract class ProfileService {
   Future<void> updateBalanceById(double balance);
   Future<String?> getUserNameById(String userId);
   Future<String?> getUserRefundAttempts(String userId);
+  Future<void> updateName(String name);
 }

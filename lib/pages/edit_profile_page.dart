@@ -52,11 +52,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  void _onSavePressed() {
-    final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
+  void _onSavePressed() async {
+    final confirmed = await _confirmationWindow();
+    if (!confirmed) return;
 
-    print('Saving: $name, $email');
+    if (_formKey.currentState!.validate()) {
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+
+      authService.updateEmail(email);
+      profileService.updateName(name);
+    } else {
+      return;
+    }
   }
 
   @override
@@ -93,6 +101,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
               TextFormField(
                 controller: _nameController,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontSecondary,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Full Name',
                   labelStyle: TextStyle(
@@ -147,6 +158,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
               TextFormField(
                 controller: _emailController,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontSecondary,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(
@@ -182,6 +196,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   if (value == null || value.trim().isEmpty) {
                     return 'Email cannot be empty';
                   }
+                  if (!value.trim().contains("@")) {
+                    return 'Please enter a valid email';
+                  }
                   return null;
                 },
               ),
@@ -207,5 +224,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
+  }
+
+  Future<bool> _confirmationWindow() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Confirm Changes',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontSecondary,
+              ),
+            ),
+            content: Text(
+              'Are you sure you want to change your information?',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontSecondary,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false), // Cancel
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true), // Confirm
+                child: const Text('Yes, Save'),
+              ),
+            ],
+          ),
+        ) ??
+        false; // In case the dialog is dismissed without pressing a button
   }
 }

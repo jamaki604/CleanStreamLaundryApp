@@ -232,4 +232,9 @@ class SupabaseAuthService implements AuthService {
   String? getCurrentUserEmail() {
     return _client.auth.currentUser?.email;
   }
+
+  @override
+  void updateEmail(String email) async {
+    await _client.auth.updateUser(UserAttributes(email: email));
+  }
 }
