@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/pages/refund_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -561,4 +562,70 @@ void main() {
       expect(state.selectedTransaction, equals(state.recentTransactions[0]));
     }
   });
+
+  testWidgets('can click enter for form resubmit', (tester) async {
+    final mockTransactions = [
+      {
+        'id': 123,
+        'amount': 10.0,
+        'created_at': '2024-01-01',
+        'description': 'Test Transaction',
+        'type': 'debit'
+      },
+    ];
+
+    when(() => mockTransactionService.getTransactionsForUser())
+        .thenAnswer((_) async => mockTransactions);
+    when(() => mockProfileService.getUserNameById('test-user-id'))
+        .thenAnswer((_) async => 'Test User');
+    when(() => mockTransactionService.recordRefundRequest(
+      transaction_id: any(named: 'transaction_id'),
+      description: any(named: 'description'),
+    )).thenAnswer((_) async => "10.0");
+    when(() => mockEdgeFunctionService.runEdgeFunction(
+      name: any(named: 'name'),
+      body: any(named: 'body'),
+    )).thenAnswer((_) async => null);
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pumpAndSettle();
+
+    // Grab the state
+    final RefundPageState state = tester.state(find.byType(RefundPage));
+
+    // **Manually populate recentTransactions and recentTransactionIDs**
+    state.setState(() {
+      state.recentTransactions = ['2024-01-01 - \$10.0'];
+      state.recentTransactionIDs = [123];
+      state.selectedTransactionIndex = 0;
+      state.selectedTransaction = state.recentTransactions[0];
+      state.descriptionController.text = 'Test refund reason';
+    });
+    await tester.pumpAndSettle();
+
+    // Focus the KeyboardListener and send Enter
+    final keyboardListener = tester.widget<KeyboardListener>(
+      find.byType(KeyboardListener),
+    );
+    final focusNode = keyboardListener.focusNode;
+    focusNode.requestFocus();
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+
+    verify(() => mockEdgeFunctionService.runEdgeFunction(
+      name: 'refund-email',
+      body: {
+        'username': 'Test User',
+        'user_id': 'test-user-id',
+        'transaction_id': '123',
+        'amount': '10.0',
+        'description': 'Test refund reason',
+      },
+    )).called(1);
+  });
+
+
 }

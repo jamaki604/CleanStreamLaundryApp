@@ -3,6 +3,7 @@ import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -421,6 +422,31 @@ void main() {
               mockProfileService.createAccount(id: 'testId', name: 'Test User'),
         ).called(1);
       });
+    });
+
+    group("Test for enter keystroke",() {
+
+      testWidgets("Tests that handle_login was called when enter is clicked", (tester) async {
+
+        when(() => mockAuthService.login(any(), any())).thenAnswer((_) async => AuthenticationResponses.success);
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField).first, 'test@example.com');
+        await tester.enterText(find.byType(TextField).last, 'password123');
+
+        await tester.pump();
+
+        // Simulate pressing Enter
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('Logging in as test@example.com'), findsOneWidget);
+
+      });
+
     });
   });
 }
