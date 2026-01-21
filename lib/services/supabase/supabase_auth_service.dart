@@ -3,14 +3,11 @@ import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enu
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SupabaseAuthService implements AuthService{
-
+class SupabaseAuthService implements AuthService {
   late final SupabaseClient _client;
   String? lastSignedUpUserId;
 
-
-
-  SupabaseAuthService({required SupabaseClient client}){
+  SupabaseAuthService({required SupabaseClient client}) {
     _client = client;
   }
 
@@ -29,12 +26,10 @@ class SupabaseAuthService implements AuthService{
     AuthenticationResponses output = AuthenticationResponses.failure;
     try {
       await _client.auth.refreshSession();
-      if(_client.auth.currentUser != null){
+      if (_client.auth.currentUser != null) {
         output = AuthenticationResponses.success;
       }
-    } catch (e) {
-
-    }
+    } catch (e) {}
     return output;
   }
 
@@ -54,14 +49,13 @@ class SupabaseAuthService implements AuthService{
       } else {
         output = AuthenticationResponses.success;
       }
-
-    }on AuthApiException catch (e) {
+    } on AuthApiException catch (e) {
       if (e.code == 'email_not_confirmed') {
         output = AuthenticationResponses.emailNotVerified;
       } else {
         print(e.message);
       }
-    }catch(e){
+    } catch (e) {
       print(e);
     }
 
@@ -69,27 +63,29 @@ class SupabaseAuthService implements AuthService{
   }
 
   @override
-  Future<void> logout() async{
+  Future<void> logout() async {
     await _client.auth.signOut();
   }
 
   @override
-  Future<AuthenticationResponses> signUp(String email, String password) async{
+  Future<AuthenticationResponses> signUp(String email, String password) async {
     AuthenticationResponses output = AuthenticationResponses.failure;
-    AuthenticationResponses validatePasswordResponse = _validatePassword(password);
+    AuthenticationResponses validatePasswordResponse = _validatePassword(
+      password,
+    );
 
-    if(validatePasswordResponse == AuthenticationResponses.success) {
+    if (validatePasswordResponse == AuthenticationResponses.success) {
       final AuthResponse response = await _client.auth.signUp(
-          email: email,
-          password: password,
-          emailRedirectTo: 'clean-stream://email-verification'
+        email: email,
+        password: password,
+        emailRedirectTo: 'clean-stream://email-verification',
       );
 
       if (response.user != null) {
         lastSignedUpUserId = response.user!.id;
         output = AuthenticationResponses.success;
       }
-    }else{
+    } else {
       output = validatePasswordResponse;
     }
 
@@ -103,7 +99,33 @@ class SupabaseAuthService implements AuthService{
     bool hasUpper = false;
     bool hasSpecialCharacter = false;
 
-    var validSpecialCharacters = ['!', '@', '#', r'$', '%', '^', '&', '*', '(', ')', '_', '+', '-', '=', '[', ']', '{', '}', ';', ':', "'", ',', '.', '?', '/'];
+    var validSpecialCharacters = [
+      '!',
+      '@',
+      '#',
+      r'$',
+      '%',
+      '^',
+      '&',
+      '*',
+      '(',
+      ')',
+      '_',
+      '+',
+      '-',
+      '=',
+      '[',
+      ']',
+      '{',
+      '}',
+      ';',
+      ':',
+      "'",
+      ',',
+      '.',
+      '?',
+      '/',
+    ];
 
     if (password.length >= 8) {
       for (String ch in password.split('')) {
@@ -130,7 +152,6 @@ class SupabaseAuthService implements AuthService{
     return output;
   }
 
-
   Future<AuthenticationResponses> resendVerification() async {
     AuthenticationResponses output = AuthenticationResponses.success;
 
@@ -138,14 +159,11 @@ class SupabaseAuthService implements AuthService{
 
     try {
       if (userEmail != null) {
-        await _client.auth.resend(
-          type: OtpType.signup,
-          email: userEmail,
-        );
-      }else{
+        await _client.auth.resend(type: OtpType.signup, email: userEmail);
+      } else {
         output = AuthenticationResponses.failure;
       }
-    }catch(e){
+    } catch (e) {
       output = AuthenticationResponses.failure;
     }
 
@@ -156,7 +174,7 @@ class SupabaseAuthService implements AuthService{
   Stream<bool> get onAuthChange {
     return _client.auth.onAuthStateChange.map((tuple) {
       final session = tuple.session;
-      return session?. user != null;
+      return session?.user != null;
     });
   }
 
@@ -166,34 +184,38 @@ class SupabaseAuthService implements AuthService{
   }
 
   @override
-  Future<void> appleSignIn() async{
-
-    if(!kIsWeb) {
-    try {
-      await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "clean-stream://oauth");
-    } catch (e) {
-
+  Future<void> appleSignIn() async {
+    if (!kIsWeb) {
+      try {
+        await _client.auth.signInWithOAuth(
+          OAuthProvider.apple,
+          redirectTo: "clean-stream://oauth",
+        );
+      } catch (e) {}
+    } else {
+      //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: "http://localhost:8080/loading",
+      );
     }
-
-  }else{
-    //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
-    await _client.auth.signInWithOAuth(OAuthProvider.apple,redirectTo: "http://localhost:8080/loading");
-  }
-
   }
 
   @override
-  Future<void> googleSignIn() async{
-    if(!kIsWeb) {
+  Future<void> googleSignIn() async {
+    if (!kIsWeb) {
       try {
-        await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "clean-stream://oauth");
-      } catch (e) {
-
-      }
-
-    }else{
+        await _client.auth.signInWithOAuth(
+          OAuthProvider.google,
+          redirectTo: "clean-stream://oauth",
+        );
+      } catch (e) {}
+    } else {
       //We don't have to worry about return type because it will navigate away during web and navigate back and login page will detect session or not
-      await _client.auth.signInWithOAuth(OAuthProvider.google,redirectTo: "http://localhost:8080/loading");
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: "http://localhost:8080/loading",
+      );
     }
   }
 
@@ -206,4 +228,8 @@ class SupabaseAuthService implements AuthService{
     return _client.auth.currentUser;
   }
 
+  @override
+  String? getCurrentUserEmail() {
+    return _client.auth.currentUser?.email;
+  }
 }

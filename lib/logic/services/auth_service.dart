@@ -1,7 +1,7 @@
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-abstract class AuthService{
+abstract class AuthService {
   Future<AuthenticationResponses> login(String email, String password);
   Future<AuthenticationResponses> signUp(String email, String password);
   Future<void> logout();
@@ -15,4 +15,5 @@ abstract class AuthService{
   Future<void> googleSignIn();
   Future<void> handleOAuthRedirect(Uri uri);
   User? getCurrentUser();
+  String? getCurrentUserEmail();
 }

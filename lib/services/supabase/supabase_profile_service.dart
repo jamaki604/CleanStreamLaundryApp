@@ -1,30 +1,30 @@
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SupabaseProfileService extends ProfileService{
-
+class SupabaseProfileService extends ProfileService {
   late final SupabaseClient _client;
 
-  SupabaseProfileService({required SupabaseClient client}){
+  SupabaseProfileService({required SupabaseClient client}) {
     _client = client;
   }
 
   @override
   Future<void> createAccount({required String id, required String name}) async {
-
     final existingProfile = await _client
         .from('profiles')
         .select('id')
         .eq('id', id)
         .maybeSingle();
 
-    if(existingProfile == null) {
-      await _client.from('profiles').upsert({
-        'id': id,
-        'full_name': name,
-      }, onConflict: 'id',ignoreDuplicates: true);
+    if (existingProfile == null) {
+      await _client
+          .from('profiles')
+          .upsert(
+            {'id': id, 'full_name': name},
+            onConflict: 'id',
+            ignoreDuplicates: true,
+          );
     }
-
   }
 
   @override

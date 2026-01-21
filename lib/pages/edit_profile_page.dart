@@ -1,5 +1,8 @@
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -16,6 +19,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _emailController = TextEditingController(
     text: '',
   );
+  final profileService = GetIt.instance<ProfileService>();
+  final authService = GetIt.instance<AuthService>();
+
+  // Placeholder variables for current name and email
+  String currentName = '';
+  String currentEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    final userId = await authService.getCurrentUserId;
+    final username = await profileService.getUserNameById(userId!);
+    final email = await authService.getCurrentUserEmail();
+
+    setState(() {
+      currentName = username!; // placeholder
+      currentEmail = email!; // placeholder
+      _nameController.text = currentName;
+      _emailController.text = currentEmail;
+    });
+  }
 
   @override
   void dispose() {
@@ -27,6 +55,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void _onSavePressed() {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
+
+    print('Saving: $name, $email');
   }
 
   @override
@@ -46,8 +76,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
+
+              // Current Name Display
+              if (currentName.isNotEmpty)
+                Text(
+                  'Current Name: $currentName',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.fontSecondary,
+                  ),
+                ),
+              const SizedBox(height: 8),
+
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -88,7 +131,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   return null;
                 },
               ),
+
               const SizedBox(height: 16),
+
+              // Current Email Display
+              if (currentEmail.isNotEmpty)
+                Text(
+                  'Current Email: $currentEmail',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.fontSecondary,
+                  ),
+                ),
+              const SizedBox(height: 8),
+
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -129,19 +185,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   return null;
                 },
               ),
-              SizedBox(height: 34),
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                  ),
-                  onPressed: () {
-                    _onSavePressed();
-                  },
-                  child: Text(
-                    'Save Changes',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+
+              const SizedBox(height: 34),
+              Center(
+                child: SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: _onSavePressed,
+                    child: const Text(
+                      'Save Changes',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
                 ),
               ),
