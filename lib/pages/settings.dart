@@ -61,6 +61,14 @@ class _SettingsState extends State<Settings> {
                   ),
                   SizedBox(height: 14),
                   SettingsCard(
+                    icon: Icons.person,
+                    title: "Edit Profile",
+                    onTap: () {
+                      context.go('/editProfile');
+                    },
+                  ),
+                  SizedBox(height: 14),
+                  SettingsCard(
                     icon: Icons.logout,
                     title: "Sign Out",
                     onTap: () {
