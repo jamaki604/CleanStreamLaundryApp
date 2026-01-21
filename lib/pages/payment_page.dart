@@ -10,7 +10,7 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/machine_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/notification_service.dart';
+import 'package:clean_stream_laundry_app/services/notification_service.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
