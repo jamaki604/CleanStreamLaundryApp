@@ -605,7 +605,9 @@ void main() {
 
       expect(find.text('Payment Successful!'), findsOneWidget);
       expect(
-        find.text('Thank you! Your payment was processed successfully.'),
+        find.text(
+          'Thank you! Your payment of \$1.00 was processed successfully.',
+        ),
         findsOneWidget,
       );
       expect(find.byIcon(Icons.check_circle), findsOneWidget);
@@ -648,7 +650,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Payment Canceled'), findsOneWidget);
-      expect(find.text('Payment was canceled.'), findsOneWidget);
+      expect(find.text('Payment of \$1.00 was canceled.'), findsOneWidget);
       expect(find.byIcon(Icons.error), findsOneWidget);
     });
 

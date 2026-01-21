@@ -327,13 +327,13 @@ class _PaymentPageState extends State<PaymentPage> {
       statusDialog(
         context,
         title: "Machine Error",
-        message: "payment succeeded but machine did not wake up.",
+        message: "Payment succeeded but machine did not wake up.",
         isSuccess: false,
       );
     }
     statusDialog(
       context,
-      title: "payment Successful!",
+      title: "Payment Successful!",
       message:
           "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
       isSuccess: true,

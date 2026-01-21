@@ -332,9 +332,15 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       trackHeight: 6,
                       activeTrackColor: Colors.blue,
                       inactiveTrackColor: Colors.blue.withAlpha(3),
-                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
-                      tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 0),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 12,
+                      ),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 24,
+                      ),
+                      tickMarkShape: const RoundSliderTickMarkShape(
+                        tickMarkRadius: 0,
+                      ),
                     ),
                     child: SizedBox(
                       width: 650,
@@ -424,14 +430,15 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
       statusDialog(
         context,
         title: "Payment Successful!",
-        message: "Thank you! Your payment was processed successfully.",
+        message:
+            "Thank you! Your payment of \$${amount.toStringAsFixed(2)} was processed successfully.",
         isSuccess: true,
       );
     } else if (result == PaymentResult.canceled) {
       statusDialog(
         context,
         title: "Payment Canceled",
-        message: "Payment was canceled.",
+        message: "Payment of \$${amount.toStringAsFixed(2)} was canceled.",
         isSuccess: false,
       );
     } else {
