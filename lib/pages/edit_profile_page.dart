@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -62,6 +63,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       authService.updateEmail(email);
       profileService.updateName(name);
+      statusDialog(
+        context,
+        title: "Information Updated",
+        message: "Your information has successfully been updated.",
+        isSuccess: true,
+      );
     } else {
       return;
     }
