@@ -28,7 +28,7 @@ class RefundPageState extends State<RefundPage> {
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
-
+  bool _attemptedSubmit = false;
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -212,21 +212,35 @@ class RefundPageState extends State<RefundPage> {
 
                 Center(
                   child: ElevatedButton(
-                    onPressed: isFormValid()
-                        ? () async {
-                            _handleRefund();
-                          }
-                        : null,
+                    onPressed: () {
+                      setState(() {
+                        _attemptedSubmit = true;
+                      });
 
+                      if (!isFormValid()) return;
+
+                      _handleRefund();
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: isFormValid()
+                          ? Colors.blue
+                          : Colors.grey,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.transparent,
-                      disabledForegroundColor: Colors.transparent,
                     ),
                     child: const Text("Submit Refund"),
                   ),
                 ),
+                if (_attemptedSubmit && !isFormValid())
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Center(
+                      child: Text(
+                        'Please fill in all fields',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.red, fontSize: 14),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
