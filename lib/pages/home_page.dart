@@ -5,6 +5,8 @@ import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -164,7 +166,7 @@ class HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "$totalMachine available",
+                                "$machineIdle available",
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.fontInverted,
                                   fontSize: 28,
@@ -250,9 +252,34 @@ class HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
+
                     );
                   },
                 ),
+              Container(
+                height: 500,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade400, width: 1),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: FlutterMap(
+                  mapController: MapController(),
+                  options: MapOptions(
+                    initialCenter: LatLng(40.273502, -86.126976),
+                    initialZoom: 7.2,
+                    keepAlive: true
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.example.app',
+                      tileProvider: NetworkTileProvider(
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
