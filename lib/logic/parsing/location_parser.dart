@@ -15,8 +15,8 @@ class LocationParser {
               location['Latitude'].toDouble(),
               location['Longitude'].toDouble(),
             ),
-            width: 15,
-            height: 15,
+            width: 50,
+            height: 50,
             child: MapMarker(),
           ),
         );

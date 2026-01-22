@@ -56,7 +56,7 @@ class HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
-                      height: 500,
+                      height: 400,
                       width: 400,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
@@ -73,8 +73,7 @@ class HomePageState extends State<HomePage> {
                   final markers = LocationParser.parseLocations(locations);
 
                   return Container(
-                    margin: const EdgeInsets.only(top: 20.0),
-                    height: 500,
+                    height: 400,
                     width: 400,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -102,6 +101,7 @@ class HomePageState extends State<HomePage> {
                 },
               ),
               Container(
+                margin: EdgeInsets.only(top: 20),
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
@@ -113,7 +113,6 @@ class HomePageState extends State<HomePage> {
                     Icon(Icons.location_on, color: Colors.blue, size: 28),
                     SizedBox(width: 8),
                     Expanded(
-
                       child: FutureBuilder(
                         future: Future.wait([locationService.getLocations()]),
                         builder: (context, snapshot) {
@@ -196,7 +195,7 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 10),
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
@@ -206,70 +205,6 @@ class HomePageState extends State<HomePage> {
                     machineService.getIdleWasherCountByLocation(
                       locationIDSelected.toString(),
                     ),
-                  ]),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-
-                    final totalMachine = snapshot.data![0];
-                    final machineIdle = snapshot.data![1];
-
-                    return Container(
-                      width: 250,
-                      height: 160,
-                      padding: const EdgeInsets.all(30),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue, width: 3),
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.transparent,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "$machineIdle available",
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.fontInverted,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              Text(
-                                "$machineIdle/$totalMachine washers",
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.fontSecondary,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Icon(
-                            Icons.local_laundry_service,
-                            color: Colors.blue,
-                            size: 40,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-
-              SizedBox(height: 20),
-              if (locationSelected)
-                FutureBuilder(
-                  future: Future.wait([
                     machineService.getDryerCountByLocation(
                       locationIDSelected.toString(),
                     ),
@@ -282,12 +217,13 @@ class HomePageState extends State<HomePage> {
                       return const CircularProgressIndicator();
                     }
 
-                    final totalMachine = snapshot.data![0];
-                    final machineIdle = snapshot.data![1];
+                    final totalWashers = snapshot.data![0];
+                    final idleWashers = snapshot.data![1];
+                    final totalDryers = snapshot.data![2];
+                    final idleDryers = snapshot.data![3];
 
                     return Container(
-                      width: 250,
-                      height: 160,
+                      width: 520,
                       padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
@@ -295,45 +231,88 @@ class HomePageState extends State<HomePage> {
                         color: Colors.transparent,
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "$machineIdle available",
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.fontInverted,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "$idleWashers available",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.fontInverted,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "$idleWashers/$totalWashers washers",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.fontSecondary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-
-                              Text(
-                                "$machineIdle/$totalMachine dryers",
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.fontSecondary,
-                                  fontSize: 14,
+                                const SizedBox(width: 15),
+                                Icon(
+                                  Icons.local_laundry_service,
+                                  color: Colors.blue,
+                                  size: 40,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Icon(
-                            Icons.local_laundry_service,
+
+                          Container(
+                            width: 2,
+                            height: 80,
                             color: Colors.blue,
-                            size: 40,
+                          ),
+
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "$idleDryers available",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.fontInverted,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "$idleDryers/$totalDryers dryers",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.fontSecondary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 15),
+                                Icon(
+                                  Icons.local_laundry_service,
+                                  color: Colors.blue,
+                                  size: 40,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     );
                   },
-                ),
+                )
             ],
           ),
         ),

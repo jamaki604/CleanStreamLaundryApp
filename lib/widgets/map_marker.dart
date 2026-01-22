@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
+
+
 class MapMarker extends StatelessWidget{
   const MapMarker({super.key});
 
@@ -8,8 +10,9 @@ class MapMarker extends StatelessWidget{
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
-        color: CupertinoColors.activeBlue,
+        color: CupertinoColors.transparent,
       ),
+      child: Image.asset("assets/Icon.png", height: 20, width: 20,key: const Key('app_Icon'),),
     );
   }
 }
