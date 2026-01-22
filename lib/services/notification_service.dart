@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
@@ -12,8 +14,22 @@ class NotificationService {
   }
 
   Future<bool> _requestPermission() async {
-    final status = await Permission.notification.status;
 
+    // iOS permission
+    if (Platform.isIOS) {
+      final ios = flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      final result = await ios?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      return result ?? false;
+    }
+
+    //Android permission
+    final status = await Permission.notification.status;
     if (status.isGranted) {
       return true;
     }
@@ -28,8 +44,16 @@ class NotificationService {
     const androidSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      defaultPresentAlert: true
+    );
+
     const initSettings = InitializationSettings(
       android: androidSettings,
+      iOS: iosSettings
     );
 
     await flutterLocalNotificationsPlugin.initialize(initSettings);
@@ -70,6 +94,11 @@ class NotificationService {
             importance: Importance.high,
             priority: Priority.high,
           ),
+           iOS: DarwinNotificationDetails(
+             presentAlert: true,
+             presentBadge: true,
+             presentSound: true,
+            )
         ),
       );
     });
