@@ -56,7 +56,7 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.request_page,
                     title: "Request Refund",
                     onTap: () {
-                      context.go('/refundPage');
+                      context.push('/refundPage');
                     },
                   ),
                   SizedBox(height: 14),
