@@ -85,7 +85,7 @@ class HomePageState extends State<HomePage> {
                           return DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              value: selectedName,
+                              value: locationID.containsKey(selectedName) ? selectedName : null,
                               hint: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
