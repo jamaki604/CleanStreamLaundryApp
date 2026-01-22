@@ -19,14 +19,23 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   String? selectedName;
   late final Map<String, int> locationID = {};
+  late final Map<String, LatLng> locationCoordinates = {};
   bool locationSelected = false;
   late int? locationIDSelected;
   late StorageService storage;
+  late final MapController _mapController;
 
   @override
   void initState() {
     super.initState();
+    _mapController = MapController();
     _initStorage();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   Future<void> _initStorage() async {
@@ -37,6 +46,13 @@ class HomePageState extends State<HomePage> {
     setState(() {
       selectedName = lastVal;
     });
+  }
+
+  void _zoomToLocation(String locationName) {
+    if (locationCoordinates.containsKey(locationName)) {
+      final coords = locationCoordinates[locationName]!;
+      _mapController.move(coords, 15.0);
+    }
   }
 
   final machineService = GetIt.instance<MachineService>();
@@ -72,6 +88,18 @@ class HomePageState extends State<HomePage> {
                   final locations = snapshot.data ?? [];
                   final markers = LocationParser.parseLocations(locations);
 
+                  for (var location in locations) {
+                    if (location["Address"] != null &&
+                        location["Latitude"] != null &&
+                        location["Longitude"] != null) {
+                      locationCoordinates[location["Address"]] =
+                          LatLng(location["Latitude"], location["Longitude"]);
+                    }
+                  }
+
+                  LatLng initialCenter = LatLng(40.273502, -86.126976);
+                  double initialZoom = 7.2;
+
                   return Container(
                     height: 400,
                     width: 400,
@@ -81,10 +109,10 @@ class HomePageState extends State<HomePage> {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: FlutterMap(
-                      mapController: MapController(),
+                      mapController: _mapController,
                       options: MapOptions(
-                        initialCenter: LatLng(40.273502, -86.126976),
-                        initialZoom: 7.2,
+                        initialCenter: initialCenter,
+                        initialZoom: initialZoom,
                         keepAlive: true,
                       ),
                       children: [
@@ -136,6 +164,7 @@ class HomePageState extends State<HomePage> {
                                 locationSelected = true;
                                 locationIDSelected = locationID[selectedName!];
                               });
+                              _zoomToLocation(selectedName!);
                             });
                           }
 
@@ -162,6 +191,7 @@ class HomePageState extends State<HomePage> {
                                     "lastSelectedLocation",
                                     newValue,
                                   );
+                                  _zoomToLocation(newValue);
                                 }
                                 setState(() {
                                   selectedName = newValue;
