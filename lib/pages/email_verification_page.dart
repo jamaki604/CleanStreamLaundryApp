@@ -31,36 +31,21 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   void initState() {
     super.initState();
 
-    // authService.onAuthChange.listen((isLoggedIn) {
-    //   if (isLoggedIn && authService.isEmailVerified()) {
-    //     context.go("/homePage");
-    //   }
-    // });
+    authService.onAuthChange.listen((isLoggedIn) {
+      if (isLoggedIn && authService.isEmailVerified()) {
+        context.go("/homePage");
+      }
+    });
 
     _isOldEmailStep = !authService.isEmailVerified();
 
-    //_handleInitialLink();
 
-    // Listen for deep links while app is running
     _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
       if (uri == null) return;
 
-      print("📧 Deep link received: ${uri.toString()}");
       _handleDeepLink(uri);
     });
 
-  }
-
-  Future<void> _handleInitialLink() async {
-    try {
-      final uri = await _appLinks.getInitialAppLink();
-      if (uri != null) {
-        print("📧 Initial link on app start: ${uri.toString()}");
-        _handleDeepLink(uri);
-      }
-    } catch (e) {
-      print("Error getting initial link: $e");
-    }
   }
 
   void _handleDeepLink(Uri uri) {
@@ -68,25 +53,20 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
     final fragment = uri.fragment;
 
-    print("🔍 Checking fragment: $fragment");
 
-    // ONLY handle the SECOND email (with access token)
     if (uri.host == 'change-email' &&
         fragment.contains('access_token') &&
         fragment.contains('type=email_change')) {
-      print("✅ Second email confirmed, navigating to home");
 
       Future.delayed(const Duration(milliseconds: 1000), () {
         if (mounted) {
           context.go("/homePage");
         }
       });
-      return; // Important: return here
+      return;
     }
 
-    // Handle regular email verification (signup flow)
     if (uri.host == 'email-verification') {
-      print("✅ Regular email verification, navigating to home");
       Future.delayed(const Duration(milliseconds: 1000), () {
         if (mounted) {
           context.go("/homePage");
