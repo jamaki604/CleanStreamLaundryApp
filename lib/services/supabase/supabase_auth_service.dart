@@ -68,7 +68,11 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
-  Future<AuthenticationResponses> signUp(String email, String password) async {
+  Future<AuthenticationResponses> signUp(
+    String email,
+    String password,
+    String name,
+  ) async {
     AuthenticationResponses output = AuthenticationResponses.failure;
     AuthenticationResponses validatePasswordResponse = _validatePassword(
       password,
@@ -79,6 +83,7 @@ class SupabaseAuthService implements AuthService {
         email: email,
         password: password,
         emailRedirectTo: 'clean-stream://email-verification',
+        data: {"full_name": name},
       );
 
       if (response.user != null) {

@@ -3,7 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthService {
   Future<AuthenticationResponses> login(String email, String password);
-  Future<AuthenticationResponses> signUp(String email, String password);
+  Future<AuthenticationResponses> signUp(
+    String email,
+    String password,
+    String name,
+  );
   Future<void> logout();
   Future<AuthenticationResponses> isLoggedIn();
   String? get getCurrentUserId;
