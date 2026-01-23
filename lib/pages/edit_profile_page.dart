@@ -22,7 +22,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _emailController = TextEditingController(
     text: '',
   );
-  late final StreamSubscription? _linkSub;
+  StreamSubscription? _linkSub;
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
   final AppLinks _appLinks = AppLinks();
@@ -39,6 +39,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (uri == null) return;
 
       if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {
+        await _linkSub?.cancel();
+        _linkSub = null;
         try {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go("/email-verification");

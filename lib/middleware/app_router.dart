@@ -149,5 +149,20 @@ class RouterService {
       ),
     ],
     errorBuilder: (context, state) => const NotFoundScreen(),
+    redirect: (context, state) {
+      final uri = state.uri;
+
+      // Handle clean-stream://change-email deep links
+      if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {
+        // Optional: check type query param
+        final type = uri.queryParameters['type'];
+        if (type == 'email_change' || type == null) {
+          return '/homePage';
+        }
+      }
+
+      // Otherwise, no redirect
+      return null;
+    },
   );
 }

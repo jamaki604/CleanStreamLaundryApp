@@ -37,23 +37,62 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     //   }
     // });
 
+    _isOldEmailStep = !authService.isEmailVerified();
+
+    //_handleInitialLink();
+
+    // Listen for deep links while app is running
     _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
       if (uri == null) return;
 
-      if (uri.scheme == 'clean-stream' &&
-          (uri.host == 'email-verification' ||
-              uri.host == 'email-verification')) {
-        try {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go("/homePage");
-          });
-        } catch (e) {
-          print("Deep link handling error: $e");
-        }
-      }
+      print("📧 Deep link received: ${uri.toString()}");
+      _handleDeepLink(uri);
     });
 
-    _isOldEmailStep = !authService.isEmailVerified();
+  }
+
+  Future<void> _handleInitialLink() async {
+    try {
+      final uri = await _appLinks.getInitialAppLink();
+      if (uri != null) {
+        print("📧 Initial link on app start: ${uri.toString()}");
+        _handleDeepLink(uri);
+      }
+    } catch (e) {
+      print("Error getting initial link: $e");
+    }
+  }
+
+  void _handleDeepLink(Uri uri) {
+    if (uri.scheme != 'clean-stream') return;
+
+    final fragment = uri.fragment;
+
+    print("🔍 Checking fragment: $fragment");
+
+    // ONLY handle the SECOND email (with access token)
+    if (uri.host == 'change-email' &&
+        fragment.contains('access_token') &&
+        fragment.contains('type=email_change')) {
+      print("✅ Second email confirmed, navigating to home");
+
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (mounted) {
+          context.go("/homePage");
+        }
+      });
+      return; // Important: return here
+    }
+
+    // Handle regular email verification (signup flow)
+    if (uri.host == 'email-verification') {
+      print("✅ Regular email verification, navigating to home");
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (mounted) {
+          context.go("/homePage");
+        }
+      });
+    }
   }
 
   @override
