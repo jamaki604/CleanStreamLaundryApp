@@ -38,6 +38,20 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="clean-stream" android:host="email-verification" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="clean-stream" android:host="oauth" />
+            </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="clean-stream" android:host="change-email" />
+            </intent-filter>
         </activity>
 
         <!-- Don't delete the meta-data below.

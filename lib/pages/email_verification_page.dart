@@ -31,16 +31,18 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   void initState() {
     super.initState();
 
-    authService.onAuthChange.listen((isLoggedIn) {
-      if (isLoggedIn && authService.isEmailVerified()) {
-        context.go("/homePage");
-      }
-    });
+    // authService.onAuthChange.listen((isLoggedIn) {
+    //   if (isLoggedIn && authService.isEmailVerified()) {
+    //     context.go("/homePage");
+    //   }
+    // });
 
     _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
       if (uri == null) return;
 
-      if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
+      if (uri.scheme == 'clean-stream' &&
+          (uri.host == 'email-verification' ||
+              uri.host == 'email-verification')) {
         try {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go("/homePage");

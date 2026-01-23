@@ -5,6 +5,8 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:app_links/app_links.dart';
+import 'dart:async';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -20,8 +22,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _emailController = TextEditingController(
     text: '',
   );
+  late final StreamSubscription? _linkSub;
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
+  final AppLinks _appLinks = AppLinks();
 
   String currentName = '';
   String currentEmail = '';
@@ -31,6 +35,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
+    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
+      if (uri == null) return;
+
+      if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {
+        try {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.go("/email-verification");
+          });
+        } catch (e) {
+          print("Deep link handling error: $e");
+        }
+      }
+    });
     _loadUserData();
   }
 
@@ -80,6 +97,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _linkSub?.cancel();
     super.dispose();
   }
 
