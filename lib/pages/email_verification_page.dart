@@ -31,12 +31,6 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   void initState() {
     super.initState();
 
-    authService.onAuthChange.listen((isLoggedIn) {
-      if (isLoggedIn && authService.isEmailVerified()) {
-        context.go("/homePage");
-      }
-    });
-
     _isOldEmailStep = !authService.isEmailVerified();
 
 
