@@ -245,6 +245,7 @@ class SupabaseAuthService implements AuthService {
   }) async {
     final response = await _client.auth.updateUser(
       UserAttributes(email: email, data: data),
+      emailRedirectTo: "clean-stream://change-email"
     );
 
     if (response.user == null) {

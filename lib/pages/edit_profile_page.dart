@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
@@ -15,6 +17,7 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
+  late final StreamSubscription _authSub;
 
   final TextEditingController _nameController = TextEditingController(text: '');
   final TextEditingController _emailController = TextEditingController(
@@ -31,7 +34,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _authSub = authService.onAuthChange.listen((_) {
+      _loadUserData();
+    });
   }
 
   void _loadUserData() async {
@@ -80,22 +85,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _authSub.cancel();
     super.dispose();
   }
 
   void _onSavePressed() async {
     if (_isSaving) return;
-
-    final confirmed = await _confirmationWindow();
-    if (!confirmed) return;
-
-    if (!_formKey.currentState!.validate()) return;
-
     final newName = _nameController.text.trim();
     final newEmail = _emailController.text.trim();
 
     final nameChanged = newName != currentName;
     final emailChanged = newEmail != currentEmail;
+
 
     if (!nameChanged && !emailChanged) {
       statusDialog(
@@ -106,6 +107,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
       return;
     }
+
+    final confirmed = await _confirmationWindow();
+    if (!confirmed) return;
+
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
 
@@ -126,6 +132,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       // NAME ONLY
       setState(() {
         currentName = newName;
+        currentEmail = newEmail;
       });
 
       statusDialog(
