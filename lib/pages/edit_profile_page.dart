@@ -5,8 +5,6 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app_links/app_links.dart';
-import 'dart:async';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -22,10 +20,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _emailController = TextEditingController(
     text: '',
   );
-  StreamSubscription? _linkSub;
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
-  final AppLinks _appLinks = AppLinks();
 
   String currentName = '';
   String currentEmail = '';
@@ -35,21 +31,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
-      if (uri == null) return;
-
-      if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {
-        await _linkSub?.cancel();
-        _linkSub = null;
-        try {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go("/email-verification");
-          });
-        } catch (e) {
-          print("Deep link handling error: $e");
-        }
-      }
-    });
     _loadUserData();
   }
 
@@ -62,7 +43,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _showErrorDialog(
             'Unable to load user data. Please try logging in again.',
           );
-          context.go('/login'); // or wherever your login page is
+          context.go('/login');
         }
         return;
       }
@@ -99,95 +80,72 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _linkSub?.cancel();
     super.dispose();
   }
 
   void _onSavePressed() async {
-    if (_isSaving) return; // Prevent double-tap
+    if (_isSaving) return;
 
     final confirmed = await _confirmationWindow();
     if (!confirmed) return;
 
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) return;
+
+    final newName = _nameController.text.trim();
+    final newEmail = _emailController.text.trim();
+
+    final nameChanged = newName != currentName;
+    final emailChanged = newEmail != currentEmail;
+
+    if (!nameChanged && !emailChanged) {
+      statusDialog(
+        context,
+        title: "No Changes",
+        message: "You haven’t changed anything.",
+        isSuccess: false,
+      );
       return;
     }
 
-    setState(() {
-      _isSaving = true;
-    });
+    setState(() => _isSaving = true);
 
     try {
-      final name = _nameController.text.trim();
-      final email = _emailController.text.trim();
-
-      // Track which operations succeed
-      bool emailUpdated = false;
-      bool nameUpdated = false;
-      String errorMessage = '';
-
-      // Update email
-      try {
-        authService.updateEmail(email);
-        emailUpdated = true;
-      } catch (e) {
-        errorMessage += 'Failed to update email. ';
-      }
-
-      // Update name
-      try {
-        await profileService.updateName(name);
-        nameUpdated = true;
-      } catch (e) {
-        errorMessage += 'Failed to update name. ';
-      }
+      await authService.updateUserAttributes(
+        email: emailChanged ? newEmail : null,
+        data: nameChanged ? {'full_name': newName} : null,
+      );
 
       if (!mounted) return;
 
-      if (emailUpdated && nameUpdated) {
-        // Full success
-        statusDialog(
-          context,
-          title: "Information Updated",
-          message: "Your information has successfully been updated.",
-          isSuccess: true,
-        );
-        // Update current values
-        setState(() {
-          currentName = name;
-          currentEmail = email;
-        });
-      } else if (emailUpdated || nameUpdated) {
-        // Partial success
-        statusDialog(
-          context,
-          title: "Partially Updated",
-          message: errorMessage.trim() + " Please try again.",
-          isSuccess: false,
-        );
-      } else {
-        // Complete failure
-        statusDialog(
-          context,
-          title: "Update Failed",
-          message: "Unable to update your information. Please try again later.",
-          isSuccess: false,
-        );
+      // EMAIL CHANGE
+      if (emailChanged) {
+        context.go('/change-email-verification');
+        return;
       }
+
+      // NAME ONLY
+      setState(() {
+        currentName = newName;
+      });
+
+      statusDialog(
+        context,
+        title: "Profile Updated",
+        message: "Your information has been updated successfully.",
+        isSuccess: true,
+      );
     } catch (e) {
-      if (mounted) {
-        statusDialog(
-          context,
-          title: "Error",
-          message: "An unexpected error occurred: ${e.toString()}",
-          isSuccess: false,
-        );
-      }
+      if (!mounted) return;
+
+      statusDialog(
+        context,
+        title: "Update Failed",
+        message: e.toString(),
+        isSuccess: false,
+      );
     } finally {
       if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
+        setState(() => _isSaving = false);
       }
     }
   }

@@ -7,14 +7,16 @@ import 'package:go_router/go_router.dart';
 import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
-class EmailVerificationPage extends StatefulWidget {
-  EmailVerificationPage({super.key}) {}
+class ChangeEmailVerificationPage extends StatefulWidget {
+  ChangeEmailVerificationPage({super.key}) {}
 
   @override
-  State<EmailVerificationPage> createState() => _EmailVerificationPageState();
+  State<ChangeEmailVerificationPage> createState() =>
+      _ChangeEmailVerificationPageState();
 }
 
-class _EmailVerificationPageState extends State<EmailVerificationPage> {
+class _ChangeEmailVerificationPageState
+    extends State<ChangeEmailVerificationPage> {
   late final StreamSubscription? _linkSub;
   final AppLinks _appLinks = AppLinks();
   final authService = GetIt.instance<AuthService>();
@@ -23,18 +25,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   void initState() {
     super.initState();
 
-    //Checks for if application has been updated
-    authService.onAuthChange.listen((isLoggedIn) {
-      if (isLoggedIn && authService.isEmailVerified()) {
-        context.go("/homePage");
-      }
-    });
-
-    // Handles app links
     _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) {
       if (uri != null &&
           uri.scheme == 'clean-stream' &&
-          uri.host == 'email-verification') {
+          uri.host == 'change-email') {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             context.go('/homePage');
@@ -72,7 +66,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               Icon(Icons.email, size: 80, color: Colors.blueAccent),
               const SizedBox(height: 24),
               Text(
-                'Please verify your email address',
+                'Please verify your new email address',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -81,7 +75,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Check your inbox and click the verification link.',
+                'Check your new email\'s inbox and click the verification link.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,

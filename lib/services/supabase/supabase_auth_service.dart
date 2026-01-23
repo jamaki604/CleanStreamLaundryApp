@@ -239,14 +239,16 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> updateEmail(String email) async {
-    try {
-      await _client.auth.updateUser(
-        UserAttributes(email: email),
-        emailRedirectTo: "clean-stream://change-email",
-      );
-    } catch (e) {
-      throw Exception('Failed to update email: $e');
+  Future<void> updateUserAttributes({
+    String? email,
+    Map<String, dynamic>? data,
+  }) async {
+    final response = await _client.auth.updateUser(
+      UserAttributes(email: email, data: data),
+    );
+
+    if (response.user == null) {
+      throw Exception("Failed to update user attributes");
     }
   }
 }

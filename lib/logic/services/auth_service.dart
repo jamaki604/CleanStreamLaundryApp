@@ -20,5 +20,8 @@ abstract class AuthService {
   Future<void> handleOAuthRedirect(Uri uri);
   User? getCurrentUser();
   String? getCurrentUserEmail();
-  void updateEmail(String email);
+  Future<void> updateUserAttributes({
+    String? email,
+    Map<String, dynamic>? data,
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:app_links/app_links.dart';
+import 'package:clean_stream_laundry_app/pages/change_email_verification.dart';
 import 'package:clean_stream_laundry_app/pages/edit_profile_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
@@ -109,6 +110,16 @@ class RouterService {
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
           child: StartPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/change-email-verification',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: ChangeEmailVerificationPage(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,
