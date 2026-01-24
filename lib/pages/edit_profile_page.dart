@@ -34,9 +34,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
+    _loadUserData();
     _authSub = authService.onAuthChange.listen((_) {
       _loadUserData();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadUserData();
   }
 
   void _loadUserData() async {

@@ -18,6 +18,7 @@ abstract class AuthService {
   Future<void> appleSignIn();
   Future<void> googleSignIn();
   Future<void> handleOAuthRedirect(Uri uri);
+  Future<void> refreshSession();
   User? getCurrentUser();
   String? getCurrentUserEmail();
   Future<void> updateUserAttributes({

@@ -234,6 +234,14 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
+  Future<void> refreshSession() async {
+    final session = _client.auth.currentSession;
+    if (session != null) {
+      await _client.auth.refreshSession();
+    }
+  }
+
+  @override
   String? getCurrentUserEmail() {
     return _client.auth.currentUser?.email;
   }

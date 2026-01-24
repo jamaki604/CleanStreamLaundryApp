@@ -29,6 +29,7 @@ class _ChangeEmailVerificationPageState
       if (uri != null &&
           uri.scheme == 'clean-stream' &&
           uri.host == 'change-email') {
+        await authService.refreshSession();
         await authService.getCurrentUser();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
