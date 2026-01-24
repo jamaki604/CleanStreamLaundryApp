@@ -138,7 +138,7 @@ void main() {
 
     testWidgets('should navigate to email verification on success',
             (WidgetTester tester) async {
-          when(() => mockAuthService.signUp(any(), any()))
+          when(() => mockAuthService.signUp(any(), any(), any()))
               .thenAnswer((_) async => AuthenticationResponses.success);
 
           when(() => mockAuthService.getLastSignedUpUserId())
@@ -171,7 +171,7 @@ void main() {
         WidgetTester tester,) async {
       setupViewport(tester);
       when(
-            () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.noDigit);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -191,7 +191,7 @@ void main() {
         WidgetTester tester,) async {
       setupViewport(tester);
       when(
-            () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.lessThanMinLength);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -214,7 +214,7 @@ void main() {
         WidgetTester tester,) async {
       setupViewport(tester);
       when(
-            () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.noSpecialCharacter);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -237,7 +237,7 @@ void main() {
         WidgetTester tester,) async {
       setupViewport(tester);
       when(
-            () => mockAuthService.signUp(any(), any()),
+            () => mockAuthService.signUp(any(), any(), any()),
       ).thenAnswer((_) async => AuthenticationResponses.noUppercase);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -259,7 +259,7 @@ void main() {
     testWidgets('should show error for invalid special character', (
         WidgetTester tester,) async {
       setupViewport(tester);
-      when(() => mockAuthService.signUp(any(), any())).thenAnswer(
+      when(() => mockAuthService.signUp(any(), any(), any())).thenAnswer(
             (_) async => AuthenticationResponses.invalidSpecialCharacter,
       );
 
