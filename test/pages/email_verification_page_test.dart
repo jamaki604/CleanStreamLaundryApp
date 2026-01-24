@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
@@ -13,6 +15,8 @@ import 'package:clean_stream_laundry_app/pages/home_page.dart';
 void main() {
   late MockAuthService mockAuthService;
   late StreamController<bool> authChangeController;
+  late MockMachineService mockMachineService;
+  late MockLocationService mockLocationService;
 
   setUpAll(() {
     registerFallbackValue(FakeAuthService());
@@ -21,12 +25,20 @@ void main() {
   setUp(() {
     mockAuthService = MockAuthService();
     authChangeController = StreamController<bool>.broadcast();
+    mockMachineService = MockMachineService();
+    mockLocationService = MockLocationService();
 
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
+    GetIt.instance.registerSingleton<MachineService>(mockMachineService);
+    GetIt.instance.registerSingleton<LocationService>(mockLocationService);
 
-    when(() => mockAuthService.onAuthChange)
-        .thenAnswer((_) => authChangeController.stream);
+    when(
+      () => mockAuthService.onAuthChange,
+    ).thenAnswer((_) => authChangeController.stream);
     when(() => mockAuthService.isEmailVerified()).thenReturn(false);
+    when(
+      () => mockLocationService.getLocations(),
+    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
   });
 
   tearDown(() {
@@ -42,6 +54,7 @@ void main() {
           path: '/email-verification',
           builder: (context, state) => EmailVerificationPage(),
         ),
+        GoRoute(path: '/homePage', builder: (context, state) => HomePage()),
         GoRoute(
           path: '/scanner',
           builder: (context, state) => Scaffold(body: Text('Scanner Page')),
@@ -59,8 +72,10 @@ void main() {
 
       expect(find.byIcon(Icons.email), findsOneWidget);
       expect(find.text('Please verify your email address'), findsOneWidget);
-      expect(find.text('Check your inbox and click the verification link.'),
-          findsOneWidget);
+      expect(
+        find.text('Check your inbox and click the verification link.'),
+        findsOneWidget,
+      );
       expect(find.text('Resend Verification'), findsOneWidget);
     });
 
@@ -106,7 +121,9 @@ void main() {
   });
 
   group('Navigation', () {
-    testWidgets('navigates to home page when email is verified', (tester) async {
+    testWidgets('navigates to home page when email is verified', (
+      tester,
+    ) async {
       when(() => mockAuthService.isEmailVerified()).thenReturn(true);
 
       await tester.pumpWidget(createTestWidget());
@@ -147,8 +164,9 @@ void main() {
 
   group('Resend Verification - Success', () {
     testWidgets('calls resend service method', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -160,8 +178,9 @@ void main() {
     });
 
     testWidgets('shows success icon after resend', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -174,8 +193,9 @@ void main() {
     });
 
     testWidgets('success icon has correct styling', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -189,8 +209,9 @@ void main() {
     });
 
     testWidgets('prevents multiple resend attempts', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -209,8 +230,9 @@ void main() {
 
   group('Resend Verification - Failure', () {
     testWidgets('shows error message on failure', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.error);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.error);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -219,13 +241,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.close), findsOneWidget);
-      expect(find.text('Please resend verification again at another time.'),
-          findsOneWidget);
+      expect(
+        find.text('Please resend verification again at another time.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('error icon has correct styling', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.error);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.error);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -234,10 +259,12 @@ void main() {
       await tester.pumpAndSettle();
 
       final container = tester.widget<Container>(
-        find.ancestor(
-          of: find.byIcon(Icons.close),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.byIcon(Icons.close),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       final decoration = container.decoration as BoxDecoration;
@@ -246,8 +273,9 @@ void main() {
     });
 
     testWidgets('prevents retry after failure', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.error);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.error);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -278,8 +306,9 @@ void main() {
     });
 
     testWidgets('InkWell triggers resend on tap', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
