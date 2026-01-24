@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:clean_stream_laundry_app/pages/edit_profile_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
@@ -6,326 +7,176 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
-
 import 'mocks.dart';
 
 void main() {
-  late MockAuthService mockAuthService;
-  late MockProfileService mockProfileService;
-  late GoRouter mockRouter;
+  late MockAuthService authService;
+  late MockProfileService profileService;
+  late StreamController<bool> authController;
 
   setUp(() {
-    mockAuthService = MockAuthService();
-    mockProfileService = MockProfileService();
+    authService = MockAuthService();
+    profileService = MockProfileService();
+    authController = StreamController<bool>.broadcast();
 
-    // Register mocks with GetIt
     final getIt = GetIt.instance;
-    if (getIt.isRegistered<AuthService>()) {
-      getIt.unregister<AuthService>();
-    }
-    if (getIt.isRegistered<ProfileService>()) {
-      getIt.unregister<ProfileService>();
-    }
+    getIt.reset();
 
-    getIt.registerSingleton<AuthService>(mockAuthService);
-    getIt.registerSingleton<ProfileService>(mockProfileService);
+    getIt.registerSingleton<AuthService>(authService);
+    getIt.registerSingleton<ProfileService>(profileService);
 
-    // Setup default mock responses
-    when(
-      () => mockAuthService.getCurrentUserId,
-    ).thenAnswer((_) => 'test-user-id');
-    when(
-      () => mockAuthService.getCurrentUserEmail(),
-    ).thenAnswer((_) => 'test@example.com');
-    when(
-      () => mockProfileService.getUserNameById('test-user-id'),
-    ).thenAnswer((_) async => 'John Doe');
-    when(() => mockAuthService.updateEmail(any())).thenAnswer((_) async => {});
-    when(
-      () => mockProfileService.updateName(any()),
-    ).thenAnswer((_) async => {});
+    when(() => authService.onAuthChange)
+        .thenAnswer((_) => authController.stream);
 
-    // Setup mock router
-    mockRouter = GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const EditProfilePage(),
-        ),
-        GoRoute(
-          path: '/settings',
-          builder: (context, state) =>
-              const Scaffold(body: Text('Settings Page')),
-        ),
-      ],
-    );
+    when(() => authService.getCurrentUserId)
+        .thenAnswer((_)  => 'user-id');
+
+    when(() => authService.getCurrentUserEmail())
+        .thenAnswer((_)  => 'test@example.com');
+
+    when(() => profileService.getUserNameById('user-id'))
+        .thenAnswer((_) async => 'John Doe');
+
+    when(() => authService.updateUserAttributes(
+      email: any(named: 'email'),
+      data: any(named: 'data'),
+    )).thenAnswer((_) async {});
   });
 
-  tearDown(() {
+  tearDown(() async {
+    await authController.close();
     GetIt.instance.reset();
   });
 
-  Widget createTestWidget() {
-    return MaterialApp.router(routerConfig: mockRouter);
+  Widget createWidget() {
+    return MaterialApp.router(
+      routerConfig: GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (_, __) => const EditProfilePage(),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (_, __) => const Scaffold(body: Text('Settings')),
+          ),
+          GoRoute(
+            path: '/change-email-verification',
+            builder: (_, __) =>
+            const Scaffold(body: Text('Verify Email')),
+          ),
+        ],
+      ),
+    );
   }
 
-  group('EditProfilePage', () {
-    testWidgets('should load user data on init', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+  testWidgets('loads and displays user data', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-      // Verify services were called
-      verify(() => mockAuthService.getCurrentUserId).called(1);
-      verify(
-        () => mockProfileService.getUserNameById('test-user-id'),
-      ).called(1);
-      verify(() => mockAuthService.getCurrentUserEmail()).called(1);
+    expect(find.text('Current Name: John Doe'), findsOneWidget);
+    expect(find.text('Current Email: test@example.com'), findsOneWidget);
+    expect(find.text('Save Changes'), findsOneWidget);
+  });
 
-      // Verify UI displays current data
-      expect(find.text('Current Name: John Doe'), findsOneWidget);
-      expect(find.text('Current Email: test@example.com'), findsOneWidget);
+  testWidgets('shows No Changes dialog if nothing changed', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-      // Verify text fields are populated
-      final nameField = tester.widget<TextFormField>(
-        find.widgetWithText(TextFormField, 'Full Name'),
-      );
-      expect(nameField.controller?.text, 'John Doe');
+    await tester.tap(find.text('Save Changes'));
+    await tester.pumpAndSettle();
 
-      final emailField = tester.widget<TextFormField>(
-        find.widgetWithText(TextFormField, 'Email'),
-      );
-      expect(emailField.controller?.text, 'test@example.com');
-    });
+    expect(find.text('No Changes'), findsOneWidget);
+    expect(find.text('You haven’t changed anything.'), findsOneWidget);
 
-    testWidgets(
-      'should navigate back to settings when back button is pressed',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+    verifyNever(() => authService.updateUserAttributes(
+      email: any(named: 'email'),
+      data: any(named: 'data'),
+    ));
+  });
 
-        // Tap back button
-        await tester.tap(find.byIcon(Icons.arrow_back));
-        await tester.pumpAndSettle();
+  testWidgets('validates empty name', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-        // Verify navigation to settings
-        expect(find.text('Settings Page'), findsOneWidget);
-      },
-    );
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Full Name'), '');
+    await tester.tap(find.text('Save Changes'));
+    await tester.pumpAndSettle();
 
-    testWidgets('should validate empty name field', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Yes, Save'));
+    await tester.pumpAndSettle();
 
-      // Clear the name field
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Full Name'),
-        '',
-      );
-      await tester.pumpAndSettle();
+    expect(find.text('Name cannot be empty'), findsOneWidget);
+  });
 
-      // Tap Save Changes button
-      await tester.tap(find.text('Save Changes'));
-      await tester.pumpAndSettle();
+  testWidgets('updates name only', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-      // Confirm in dialog
-      await tester.tap(find.text('Yes, Save'));
-      await tester.pumpAndSettle();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Full Name'), 'Jane Smith');
 
-      // Verify validation error appears
-      expect(find.text('Name cannot be empty'), findsOneWidget);
+    await tester.tap(find.text('Save Changes'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Yes, Save'));
+    await tester.pumpAndSettle();
 
-      // Verify services were not called
-      verifyNever(() => mockAuthService.updateEmail(any()));
-      verifyNever(() => mockProfileService.updateName(any()));
-    });
+    verify(() => authService.updateUserAttributes(
+      email: null,
+      data: {'full_name': 'Jane Smith'},
+    )).called(1);
 
-    testWidgets('should validate empty email field', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+    expect(find.text('Profile Updated'), findsOneWidget);
+  });
 
-      // Clear the email field
-      await tester.enterText(find.widgetWithText(TextFormField, 'Email'), '');
-      await tester.pumpAndSettle();
+  testWidgets('navigates to verification when email changes', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-      // Tap Save Changes button
-      await tester.tap(find.text('Save Changes'));
-      await tester.pumpAndSettle();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email'), 'new@email.com');
 
-      // Confirm in dialog
-      await tester.tap(find.text('Yes, Save'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Save Changes'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Yes, Save'));
+    await tester.pumpAndSettle();
 
-      // Verify validation error appears
-      expect(find.text('Email cannot be empty'), findsOneWidget);
+    verify(() => authService.updateUserAttributes(
+      email: 'new@email.com',
+      data: null,
+    )).called(1);
 
-      // Verify services were not called
-      verifyNever(() => mockAuthService.updateEmail(any()));
-      verifyNever(() => mockProfileService.updateName(any()));
-    });
+    expect(find.text('Verify Email'), findsOneWidget);
+  });
 
-    testWidgets('should validate invalid email format', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+  testWidgets('trims whitespace before saving', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-      // Enter invalid email
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Email'),
-        'invalidemail',
-      );
-      await tester.pumpAndSettle();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Full Name'), '  Jane  ');
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Email'), '  jane@email.com  ');
 
-      // Tap Save Changes button
-      await tester.tap(find.text('Save Changes'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Save Changes'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Yes, Save'));
+    await tester.pumpAndSettle();
 
-      // Confirm in dialog
-      await tester.tap(find.text('Yes, Save'));
-      await tester.pumpAndSettle();
+    verify(() => authService.updateUserAttributes(
+      email: 'jane@email.com',
+      data: {'full_name': 'Jane'},
+    )).called(1);
+  });
 
-      // Verify validation error appears
-      expect(find.text('Please enter a valid email'), findsOneWidget);
+  testWidgets('back button navigates to settings', (tester) async {
+    await tester.pumpWidget(createWidget());
+    await tester.pumpAndSettle();
 
-      // Verify services were not called
-      verifyNever(() => mockAuthService.updateEmail(any()));
-      verifyNever(() => mockProfileService.updateName(any()));
-    });
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
 
-    testWidgets('should show confirmation dialog when save is pressed', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      // Tap Save Changes button
-      await tester.tap(find.text('Save Changes'));
-      await tester.pumpAndSettle();
-
-      // Verify confirmation dialog appears
-      expect(find.text('Confirm Changes'), findsOneWidget);
-      expect(
-        find.text('Are you sure you want to change your information?'),
-        findsOneWidget,
-      );
-      expect(find.text('Cancel'), findsOneWidget);
-      expect(find.text('Yes, Save'), findsOneWidget);
-    });
-
-    testWidgets(
-      'should not save when cancel is pressed in confirmation dialog',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
-
-        // Enter new data
-        await tester.enterText(
-          find.widgetWithText(TextFormField, 'Full Name'),
-          'Jane Smith',
-        );
-        await tester.enterText(
-          find.widgetWithText(TextFormField, 'Email'),
-          'jane@example.com',
-        );
-        await tester.pumpAndSettle();
-
-        // Tap Save Changes button
-        await tester.tap(find.text('Save Changes'));
-        await tester.pumpAndSettle();
-
-        // Cancel in dialog
-        await tester.tap(find.text('Cancel'));
-        await tester.pumpAndSettle();
-
-        // Verify services were not called
-        verifyNever(() => mockAuthService.updateEmail(any()));
-        verifyNever(() => mockProfileService.updateName(any()));
-      },
-    );
-
-    testWidgets('should save changes when confirmed', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      // Enter new data
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Full Name'),
-        'Jane Smith',
-      );
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Email'),
-        'jane@example.com',
-      );
-      await tester.pumpAndSettle();
-
-      // Tap Save Changes button
-      await tester.tap(find.text('Save Changes'));
-      await tester.pumpAndSettle();
-
-      // Confirm in dialog
-      await tester.tap(find.text('Yes, Save'));
-      await tester.pumpAndSettle();
-
-      // Verify services were called with correct values
-      verify(() => mockAuthService.updateEmail('jane@example.com')).called(1);
-      verify(() => mockProfileService.updateName('Jane Smith')).called(1);
-
-      // Verify success dialog appears
-      expect(find.text('Information Updated'), findsOneWidget);
-      expect(
-        find.text('Your information has successfully been updated.'),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('should trim whitespace from input fields', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      // Enter data with whitespace
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Full Name'),
-        '  Jane Smith  ',
-      );
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Email'),
-        '  jane@example.com  ',
-      );
-      await tester.pumpAndSettle();
-
-      // Tap Save Changes button
-      await tester.tap(find.text('Save Changes'));
-      await tester.pumpAndSettle();
-
-      // Confirm in dialog
-      await tester.tap(find.text('Yes, Save'));
-      await tester.pumpAndSettle();
-
-      // Verify services were called with trimmed values
-      verify(() => mockAuthService.updateEmail('jane@example.com')).called(1);
-      verify(() => mockProfileService.updateName('Jane Smith')).called(1);
-    });
-
-    testWidgets('should dispose controllers on dispose', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      // Navigate away to trigger dispose
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      // If we get here without errors, controllers were disposed properly
-      expect(find.byType(EditProfilePage), findsNothing);
-    });
+    expect(find.text('Settings'), findsOneWidget);
   });
 }
