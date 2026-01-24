@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:go_router/go_router.dart';
 import 'mocks.dart';
+import 'package:clean_stream_laundry_app/pages/home_page.dart';
 
 void main() {
   late MockAuthService mockAuthService;
@@ -105,7 +106,7 @@ void main() {
   });
 
   group('Navigation', () {
-    testWidgets('navigates to scanner when email is verified', (tester) async {
+    testWidgets('navigates to home page when email is verified', (tester) async {
       when(() => mockAuthService.isEmailVerified()).thenReturn(true);
 
       await tester.pumpWidget(createTestWidget());
@@ -114,7 +115,7 @@ void main() {
       authChangeController.add(true);
       await tester.pumpAndSettle();
 
-      expect(find.text('Scanner Page'), findsOneWidget);
+      expect(find.byKey(HomePage.pageKey), findsOneWidget);
     });
 
     testWidgets('stays on page when email not verified', (tester) async {

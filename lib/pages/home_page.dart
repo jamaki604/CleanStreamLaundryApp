@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  static const pageKey = Key("home_page");
 
   @override
   HomePageState createState() => HomePageState();
@@ -42,6 +43,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     return BasePage(
+      key:HomePage.pageKey,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(

@@ -137,6 +137,7 @@ void main(){
       when(() => supabaseAuth.signUp(
           email: any(named: 'email'),
           password: any(named: 'password'),
+          data: {"full_name": "testname"},
           emailRedirectTo: 'clean-stream://email-verification'
       )).thenAnswer((_) async =>
           AuthResponse(
