@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/password_parser.dart';
+import 'package:flutter/services.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -168,6 +169,10 @@ class SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 10),
                   TextField(
                     controller: _nameCtrl,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(36)
+                    ],
+                    maxLength: 36,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.fontInverted,
                     ),
