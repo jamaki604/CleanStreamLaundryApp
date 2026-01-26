@@ -235,6 +235,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           RegExp(r'[a-zA-Z0-9 ]'),
                         ),
                       ],
+                      
                       maxLength: 36,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.fontSecondary,
