@@ -241,6 +241,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         labelStyle: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
+                        counterStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.fontSecondary,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 10,
                           horizontal: 16,
