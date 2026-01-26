@@ -7,6 +7,8 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
+
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -227,6 +229,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     TextFormField(
                       controller: _nameController,
                       enabled: !_isSaving,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(36)
+                      ],
+                      maxLength: 36,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.fontSecondary,
                       ),
