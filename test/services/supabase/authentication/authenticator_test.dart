@@ -14,6 +14,7 @@ void main(){
   setUpAll(() {
     registerFallbackValue(Uri());
     registerFallbackValue(OAuthProvider.google);
+    registerFallbackValue(UserAttributesFake());
   });
 
   group("authentication Tests", (){
@@ -905,6 +906,37 @@ void main(){
     test("Tests that the user was grabbed correctly",() async{
       await authenticator.getCurrentUser();
       verify(() => client.auth.currentUser);
+    });
+
+    test("Tests that the correct userID is gotten",() async{
+      String? userID = await authenticator.getCurrentUserId;
+      expect(userID, '11111111-1111-1111-1111-111111111111');
+    });
+
+    test("Tests that as session is returned",() async{
+      
+      when(() => supabaseAuth.getSessionFromUrl(any())).thenAnswer( (_) async => AuthSessionUrlResponse(session: Session(accessToken: "test", tokenType: "test", user: User(id: "1234", appMetadata: {}, userMetadata: {}, aud: "test", createdAt: "test")), redirectType: "test"));
+      
+      await authenticator.handleOAuthRedirect(Uri());
+      verify(() => client.auth.getSessionFromUrl(any()));
+
+    });
+
+    test("Verifies that a session was refreshed if it's not null",() async {
+
+      when(() => supabaseAuth.currentSession).thenReturn(Session(accessToken: "test", tokenType: "test", user: User(id: '', appMetadata: {}, userMetadata: {}, aud: '', createdAt: '')));
+
+      await authenticator.refreshSession();
+
+      verify(() => supabaseAuth.refreshSession());
+    });
+
+    test("Verifies that a session was not refreshed if the session is null",() async {
+      when(() => supabaseAuth.currentSession).thenReturn(null);
+
+      await authenticator.refreshSession();
+
+      verifyNever(() => supabaseAuth.refreshSession());
     });
 
   });
