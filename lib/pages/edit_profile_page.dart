@@ -230,8 +230,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: _nameController,
                       enabled: !_isSaving,
                       inputFormatters: [
-                        LengthLimitingTextInputFormatter(36)
+                        LengthLimitingTextInputFormatter(36),
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9 ]'),
+                        ),
                       ],
+                      
                       maxLength: 36,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.fontSecondary,
@@ -240,6 +244,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         labelText: 'Full Name',
                         labelStyle: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
+                        ),
+                        counterStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.fontSecondary,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 10,
