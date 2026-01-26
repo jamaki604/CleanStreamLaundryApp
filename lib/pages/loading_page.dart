@@ -9,7 +9,6 @@ import 'package:app_links/app_links.dart';
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
 
-
   @override
   State<LoadingPage> createState() => _LoadingPageState();
 }
@@ -29,16 +28,19 @@ class _LoadingPageState extends State<LoadingPage> {
     _coldStartRedirect();
   }
 
-
-  Future<void>_coldStartRedirect() async {
+  Future<void> _coldStartRedirect() async {
     try {
       final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
       if (initialUri == null) return;
 
-      if (initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
+      if (initialUri.scheme == 'clean-stream' &&
+          initialUri.host == 'email-verification') {
         context.go("/homePage");
-      }else if (initialUri.scheme == 'clean-stream' && initialUri.host == 'oauth') {
+      } else if (initialUri.host == 'change-email') {
+        context.go("/email-verification");
+      } else if (initialUri.scheme == 'clean-stream' &&
+          initialUri.host == 'oauth') {
         await authService.handleOAuthRedirect(initialUri);
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
           if (!mounted) return;
@@ -48,9 +50,7 @@ class _LoadingPageState extends State<LoadingPage> {
           context.go("/login");
         }
       }
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   void _automaticLogIn() async {
@@ -62,15 +62,14 @@ class _LoadingPageState extends State<LoadingPage> {
 
         final currentUser = authService.getCurrentUser();
         if (currentUser != null) {
-
           final userId = currentUser.id;
 
           final name =
               currentUser.userMetadata?['full_name'] ??
-                  currentUser.userMetadata?['name'] ??
-                  currentUser.userMetadata?['given_name'];
+              currentUser.userMetadata?['name'] ??
+              currentUser.userMetadata?['given_name'];
 
-          if(name != null && name.isNotEmpty) {
+          if (name != null && name.isNotEmpty) {
             await profileService.createAccount(id: userId, name: name);
           }
         }
@@ -89,63 +88,60 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: _error != null
-            ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, color: Colors.redAccent, size: 80),
-            const SizedBox(height: 20),
-            Text(
-              'Authentication Failed',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
+      child: _error != null
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: Colors.redAccent, size: 80),
+                const SizedBox(height: 20),
+                Text(
+                  'Authentication Failed',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _error!,
+                  style: TextStyle(
+                    color: Colors.redAccent.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 26),
+                ElevatedButton.icon(
+                  onPressed: () => context.go("/login"),
+                  icon: const Icon(Icons.login),
+                  label: const Text('Return to Login'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: begin, end: end),
+              duration: const Duration(seconds: 1),
+              curve: Curves.easeInOut,
+              builder: (context, scale, child) {
+                return Transform.scale(scale: scale, child: child);
+              },
+              child: Image.asset("assets/Logo.png", height: 250),
+              onEnd: () {
+                setState(() {
+                  double temp = begin;
+                  begin = end;
+                  end = temp;
+                });
+              },
             ),
-            const SizedBox(height: 10),
-            Text(
-              _error!,
-              style: TextStyle(
-                color: Colors.redAccent.withValues(alpha: 0.8),
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 26),
-            ElevatedButton.icon(
-              onPressed: () => context.go("/login"),
-              icon: const Icon(Icons.login),
-              label: const Text('Return to Login'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-            ),
-          ],
-        )
-            : TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: begin, end: end),
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeInOut,
-          builder: (context, scale, child) {
-            return Transform.scale(
-              scale: scale,
-              child: child,
-            );
-          },
-          child: Image.asset(
-            "assets/Logo.png",
-            height: 250,
-          ),
-          onEnd: () {
-            setState(() {
-              double temp = begin;
-              begin = end;
-              end = temp;
-            });
-          },
-        ),
-      );
-   }
+    );
+  }
 }

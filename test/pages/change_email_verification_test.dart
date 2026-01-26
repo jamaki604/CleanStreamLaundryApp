@@ -1,9 +1,8 @@
-import 'dart:async';
-import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
-import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
+import 'package:clean_stream_laundry_app/pages/change_email_verification.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -14,51 +13,62 @@ import 'package:clean_stream_laundry_app/pages/home_page.dart';
 
 void main() {
   late MockAuthService mockAuthService;
-  late StreamController<bool> authChangeController;
-  late MockMachineService mockMachineService;
+  late FakeAppLinks fakeAppLinks;
   late MockLocationService mockLocationService;
+  late MockMachineService mockMachineService;
 
   setUpAll(() {
     registerFallbackValue(FakeAuthService());
+    registerFallbackValue(FakeUri());
+    registerFallbackValue('');
   });
 
   setUp(() {
     mockAuthService = MockAuthService();
-    authChangeController = StreamController<bool>.broadcast();
-    mockMachineService = MockMachineService();
+    fakeAppLinks = FakeAppLinks();
     mockLocationService = MockLocationService();
+    mockMachineService = MockMachineService();
 
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
-    GetIt.instance.registerSingleton<MachineService>(mockMachineService);
     GetIt.instance.registerSingleton<LocationService>(mockLocationService);
+    GetIt.instance.registerSingleton<MachineService>(mockMachineService);
 
-    when(
-      () => mockAuthService.onAuthChange,
-    ).thenAnswer((_) => authChangeController.stream);
-    when(() => mockAuthService.isEmailVerified()).thenReturn(false);
+    // Mock HomePage dependencies
     when(
       () => mockLocationService.getLocations(),
     ).thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(
+      () => mockMachineService.getWasherCountByLocation(any()),
+    ).thenAnswer((_) async => 0);
+    when(
+      () => mockMachineService.getIdleWasherCountByLocation(any()),
+    ).thenAnswer((_) async => 0);
+    when(
+      () => mockMachineService.getDryerCountByLocation(any()),
+    ).thenAnswer((_) async => 0);
+    when(
+      () => mockMachineService.getIdleDryerCountByLocation(any()),
+    ).thenAnswer((_) async => 0);
+
+    // Mock auth service methods for deep link handling
+    when(() => mockAuthService.refreshSession()).thenAnswer((_) async => {});
+    when(() => mockAuthService.getCurrentUser()).thenAnswer((_) => null);
   });
 
   tearDown(() {
-    authChangeController.close();
+    fakeAppLinks.dispose();
     GetIt.instance.reset();
   });
 
   Widget createTestWidget() {
     final router = GoRouter(
-      initialLocation: '/email-verification',
+      initialLocation: '/change-email-verification',
       routes: [
         GoRoute(
-          path: '/email-verification',
-          builder: (context, state) => EmailVerificationPage(),
+          path: '/change-email-verification',
+          builder: (context, state) => ChangeEmailVerificationPage(),
         ),
         GoRoute(path: '/homePage', builder: (context, state) => HomePage()),
-        GoRoute(
-          path: '/scanner',
-          builder: (context, state) => Scaffold(body: Text('Scanner Page')),
-        ),
       ],
     );
 
@@ -71,9 +81,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.email), findsOneWidget);
-      expect(find.text('Please verify your email address'), findsOneWidget);
+      expect(find.text('Please verify your new email address'), findsOneWidget);
       expect(
-        find.text('Check your inbox and click the verification link.'),
+        find.text(
+          'Check your new email\'s inbox and click the verification link.',
+        ),
         findsOneWidget,
       );
       expect(find.text('Resend Verification'), findsOneWidget);
@@ -97,68 +109,21 @@ void main() {
       expect(textWidget.style?.decoration, equals(TextDecoration.underline));
     });
 
-    testWidgets('sets up auth change listener', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      verify(() => mockAuthService.onAuthChange).called(1);
-    });
-
     testWidgets('text uses center alignment', (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
       final titleText = tester.widget<Text>(
-        find.text('Please verify your email address'),
+        find.text('Please verify your new email address'),
       );
       final descText = tester.widget<Text>(
-        find.text('Check your inbox and click the verification link.'),
+        find.text(
+          'Check your new email\'s inbox and click the verification link.',
+        ),
       );
 
       expect(titleText.textAlign, equals(TextAlign.center));
       expect(descText.textAlign, equals(TextAlign.center));
-    });
-  });
-
-  group('Navigation', () {
-    testWidgets('navigates to home page when email is verified', (
-      tester,
-    ) async {
-      when(() => mockAuthService.isEmailVerified()).thenReturn(true);
-
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      authChangeController.add(true);
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(HomePage.pageKey), findsOneWidget);
-    });
-
-    testWidgets('stays on page when email not verified', (tester) async {
-      when(() => mockAuthService.isEmailVerified()).thenReturn(false);
-
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      authChangeController.add(true);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please verify your email address'), findsOneWidget);
-      expect(find.text('Scanner Page'), findsNothing);
-    });
-
-    testWidgets('stays on page when user logs out', (tester) async {
-      when(() => mockAuthService.isEmailVerified()).thenReturn(true);
-
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      authChangeController.add(false);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please verify your email address'), findsOneWidget);
-      expect(find.text('Scanner Page'), findsNothing);
     });
   });
 
@@ -330,11 +295,11 @@ void main() {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
-      final context = tester.element(find.byType(EmailVerificationPage));
-      GoRouter.of(context).go('/scanner');
+      final context = tester.element(find.byType(ChangeEmailVerificationPage));
+      GoRouter.of(context).go('/homePage');
       await tester.pumpAndSettle();
 
-      expect(find.byType(EmailVerificationPage), findsNothing);
+      expect(find.byType(ChangeEmailVerificationPage), findsNothing);
     });
 
     testWidgets('uses theme background color', (tester) async {

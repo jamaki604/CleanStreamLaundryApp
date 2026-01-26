@@ -30,7 +30,6 @@ class _SettingsState extends State<Settings> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset('assets/Logo.png', width: 230, height: 230),
-                  SizedBox(height: 16),
                   SettingsCard(
                     icon: Icons.lightbulb,
                     title: Theme.of(context).colorScheme.modeChangerText,
@@ -57,6 +56,14 @@ class _SettingsState extends State<Settings> {
                     title: "Request Refund",
                     onTap: () {
                       context.push('/refundPage');
+                    },
+                  ),
+                  SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.person,
+                    title: "Edit Profile",
+                    onTap: () {
+                      context.go('/editProfile');
                     },
                   ),
                   SizedBox(height: 14),

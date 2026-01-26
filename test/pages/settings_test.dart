@@ -63,15 +63,17 @@ void main() {
       );
     });
 
-    testWidgets('should display all four SettingsCard widgets', (
+    testWidgets('should display all five SettingsCard widgets', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.byType(SettingsCard), findsNWidgets(4));
+      expect(find.byType(SettingsCard), findsNWidgets(5));
       expect(find.text('Sign Out'), findsOneWidget);
       expect(find.text('Monthly Report'), findsOneWidget);
       expect(find.text('Request Refund'), findsOneWidget);
+      expect(find.text('Dark Mode'), findsOneWidget);
+      expect(find.text('Edit Profile'), findsOneWidget);
     });
 
     testWidgets(
@@ -150,6 +152,28 @@ void main() {
       },
     );
 
+    testWidgets(
+      'should navigate to edit profile page when edit profile is tapped',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+
+        // Scroll to make Request Refund visible
+        await tester.ensureVisible(
+          find.widgetWithText(SettingsCard, 'Edit Profile'),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.widgetWithText(SettingsCard, 'Edit Profile'));
+        await tester.pumpAndSettle();
+
+        // Verify navigation occurred (router location check)
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          '/editProfile',
+        );
+      },
+    );
+
     testWidgets('should display correct icons for each card', (
       WidgetTester tester,
     ) async {
@@ -159,6 +183,7 @@ void main() {
       expect(find.byIcon(Icons.money), findsOneWidget);
       expect(find.byIcon(Icons.request_page), findsOneWidget);
       expect(find.byIcon(Icons.logout), findsOneWidget);
+      expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
     testWidgets('should center content properly', (WidgetTester tester) async {
