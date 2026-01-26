@@ -189,60 +189,56 @@ class _PaymentPageState extends State<PaymentPage> {
             onPressed: (_isConfirmed || _price == null || _price == 0)
                 ? null
                 : () async {
-                    final success = await paymentProcessor.processPayment(
-                      _price!,
-                      MachineFormatter.formatMachineType(
-                        _machineName.toString(),
-                      ),
-                    );
+              final success = await paymentProcessor.processPayment(
+                _price!,
+                MachineFormatter.formatMachineType(
+                  _machineName.toString(),
+                ),
+              );
 
-                    if (deviceAuthorized) {
-                      makeNotification();
+              if (success == PaymentResult.success) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext dialogContext) =>
+                  const Center(child: CircularProgressIndicator()),
+                );
 
-                      statusDialog(
-                        context,
-                        title: "Payment Processed! Machine Ready!",
-                        message: "Machine $_machineName is now active.",
-                        isSuccess: true,
-                      );
-                    } else {
-                      statusDialog(
-                        context,
-                        title: "Machine Error",
-                        message: "payment succeeded but machine did not wake up.",
-                        isSuccess: false,
-                    if (success == PaymentResult.success) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext dialogContext) =>
-                            const Center(child: CircularProgressIndicator()),
-                      );
-                      final deviceAuthorized = await machineCommunicator
-                          .wakeDevice(widget.machineId);
-                      Navigator.of(context, rootNavigator: true).pop();
+                final deviceAuthorized =
+                await machineCommunicator.wakeDevice(widget.machineId);
 
-                      if (deviceAuthorized) {
-                        setState(() {
-                          _paymentCompleted = true;
-                        });
-                        statusDialog(
-                          context,
-                          title: "Payment processed! Machine Ready!",
-                          message: "Machine $_machineName is now active.",
-                          isSuccess: true,
-                        );
-                      } else {
-                        statusDialog(
-                          context,
-                          title: "Machine Error",
-                          message:
-                              "Payment succeeded but machine did not wake up.",
-                          isSuccess: false,
-                        );
-                      }
-                    }
-                  },
+                Navigator.of(context, rootNavigator: true).pop();
+
+                if (deviceAuthorized) {
+                  setState(() {
+                    _paymentCompleted = true;
+                  });
+
+                  makeNotification();
+
+                  statusDialog(
+                    context,
+                    title: "Payment Processed! Machine Ready!",
+                    message: "Machine $_machineName is now active.",
+                    isSuccess: true,
+                  );
+                } else {
+                  statusDialog(
+                    context,
+                    title: "Machine Error",
+                    message: "Payment succeeded but machine did not wake up.",
+                    isSuccess: false,
+                  );
+                }
+              } else {
+                statusDialog(
+                  context,
+                  title: "Payment Failed",
+                  message: "Your payment could not be processed.",
+                  isSuccess: false,
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: (_isConfirmed || _price == null || _price == 0)
                   ? Colors.grey
