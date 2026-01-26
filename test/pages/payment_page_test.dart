@@ -4,6 +4,7 @@ import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -21,26 +22,27 @@ void main() {
   late MockTransactionService mockTransactionService;
   late MockMachineCommunicationService mockMachineCommunicator;
   late MockRouterService mockRouterService;
+  late MockNotificationService mockNotificationService;
   late MockPaymentProcessor mockPaymentProcessor;
   late MockLoyaltyViewModel mockLoyaltyViewModel;
 
   setUpAll(() {
     // Register fallback values for mocktail
     registerFallbackValue(FakeAuthService());
+    registerFallbackValue(const Duration(seconds: 1));
   });
 
   setUp(() {
-    // Initialize mocks
     mockAuthService = MockAuthService();
     mockMachineService = MockMachineService();
     mockProfileService = MockProfileService();
     mockTransactionService = MockTransactionService();
     mockMachineCommunicator = MockMachineCommunicationService();
     mockRouterService = MockRouterService();
+    mockNotificationService = MockNotificationService();
     mockPaymentProcessor = MockPaymentProcessor();
     mockLoyaltyViewModel = MockLoyaltyViewModel();
 
-    // Register mocks with GetIt
     final getIt = GetIt.instance;
     getIt.registerSingleton<AuthService>(mockAuthService);
     getIt.registerSingleton<MachineService>(mockMachineService);
@@ -50,6 +52,14 @@ void main() {
       mockMachineCommunicator,
     );
     getIt.registerSingleton<RouterService>(mockRouterService);
+    getIt.registerSingleton<NotificationService>(mockNotificationService);
+
+    when(() => mockNotificationService.scheduleNotification(
+      id: any(named: 'id'),
+      title: any(named: 'title'),
+      body: any(named: 'body'),
+      delay: any(named: 'delay'),
+    )).thenAnswer((_) async {});
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
     getIt.registerSingleton<LoyaltyViewModel>(mockLoyaltyViewModel);
   });
