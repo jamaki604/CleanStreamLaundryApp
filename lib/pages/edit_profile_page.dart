@@ -230,7 +230,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: _nameController,
                       enabled: !_isSaving,
                       inputFormatters: [
-                        LengthLimitingTextInputFormatter(36)
+                        LengthLimitingTextInputFormatter(36),
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9 ]'),
+                        ),
                       ],
                       maxLength: 36,
                       style: TextStyle(
