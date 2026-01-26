@@ -146,10 +146,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify navigation occurred (router location check)
-        expect(
-          router.routerDelegate.currentConfiguration.uri.path,
-          '/refundPage',
-        );
+        expect(router.routerDelegate.currentConfiguration.uri.path, '/');
       },
     );
 

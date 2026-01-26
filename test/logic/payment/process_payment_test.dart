@@ -1,10 +1,9 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
+import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:clean_stream_laundry_app/logic/exceptions/platform_exception.dart';
 
@@ -12,232 +11,30 @@ class MockPaymentService extends Mock implements PaymentService {}
 
 class MockTransactionService extends Mock implements TransactionService {}
 
-class MockNavigatorObserver extends Mock implements NavigatorObserver {}
-
 void main() {
   late MockPaymentService mockPaymentService;
   late MockTransactionService mockTransactionService;
-  final getIt = GetIt.instance;
+  late PaymentProcessor paymentProcessor;
 
   setUp(() {
     mockPaymentService = MockPaymentService();
     mockTransactionService = MockTransactionService();
 
-    getIt.registerSingleton<PaymentService>(mockPaymentService);
-    getIt.registerSingleton<TransactionService>(mockTransactionService);
+    paymentProcessor = PaymentProcessor(
+      paymentService: mockPaymentService,
+      transactionService: mockTransactionService,
+    );
   });
 
-  tearDown(() {
-    getIt.reset();
-  });
-
-  Widget createTestWidget(Widget child) {
-    return MaterialApp(home: Scaffold(body: child));
-  }
-
-  group('processPayment', () {
-    testWidgets(
-      'should show loading dialog and return true on successful payment (status 200)',
-      (WidgetTester tester) async {
-        const amount = 100.0;
-        const description = 'Test payment';
-        when(() => mockPaymentService.makePayment(amount)).thenAnswer((
-          _,
-        ) async {
-          await Future.delayed(const Duration(milliseconds: 100));
-          return;
-        });
-        when(
-          () => mockTransactionService.recordTransaction(
-            amount: amount,
-            description: description,
-            type: 'Laundry',
-          ),
-        ).thenAnswer((_) async => {});
-
-        await tester.pumpWidget(
-          createTestWidget(
-            Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    await processPayment(context, amount, description);
-                  },
-                  child: const Text('Pay'),
-                );
-              },
-            ),
-          ),
-        );
-
-        await tester.tap(find.text('Pay'));
-        await tester.pump();
-
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-        await tester.pumpAndSettle();
-
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
-
-        verify(
-          () => mockTransactionService.recordTransaction(
-            amount: amount,
-            description: description,
-            type: 'Laundry',
-          ),
-        ).called(1);
-
-        expect(find.text('Payment Successful!'), findsOneWidget);
-        expect(
-          find.text('Thank you! Your payment was processed successfully.'),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'should return false and show error dialog when payment is canceled (status 401)',
-      (WidgetTester tester) async {
-        const amount = 50.0;
-        const description = 'Test payment';
-        when(() => mockPaymentService.makePayment(amount)).thenAnswer(
-          (_) async => throw StripeException(
-            error: LocalizedErrorMessage(code: FailureCode.Canceled),
-          ),
-        );
-
-        await tester.pumpWidget(
-          createTestWidget(
-            Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    await processPayment(context, amount, description);
-                  },
-                  child: const Text('Pay'),
-                );
-              },
-            ),
-          ),
-        );
-
-        await tester.tap(find.text('Pay'));
-        await tester.pump();
-        await tester.pumpAndSettle();
-
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
-        verifyNever(
-          () => mockTransactionService.recordTransaction(
-            amount: any(named: 'amount'),
-            description: any(named: 'description'),
-            type: any(named: 'type'),
-          ),
-        );
-
-        expect(find.text('Payment Failed!'), findsOneWidget);
-        expect(
-          find.text('The payment was canceled or declined.'),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'should return false and show error dialog when stripe is unavailable (status 403)',
-      (WidgetTester tester) async {
-        const amount = 75.0;
-        const description = 'Test payment';
-        when(() => mockPaymentService.makePayment(amount)).thenAnswer(
-          (_) async => throw PlatformException('Platform not supported'),
-        );
-
-        await tester.pumpWidget(
-          createTestWidget(
-            Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    await processPayment(context, amount, description);
-                  },
-                  child: const Text('Pay'),
-                );
-              },
-            ),
-          ),
-        );
-
-        await tester.tap(find.text('Pay'));
-        await tester.pump();
-        await tester.pumpAndSettle();
-
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
-        verifyNever(
-          () => mockTransactionService.recordTransaction(
-            amount: any(named: 'amount'),
-            description: any(named: 'description'),
-            type: any(named: 'type'),
-          ),
-        );
-
-        expect(find.text('Payment Failed!'), findsOneWidget);
-        expect(
-          find.text('Platform is not supported for payments.'),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'should return false and show generic error dialog for unexpected status codes',
-      (WidgetTester tester) async {
-        const amount = 25.0;
-        const description = 'Test payment';
-        when(
-          () => mockPaymentService.makePayment(amount),
-        ).thenAnswer((_) async => throw Exception('Unexpected error'));
-
-        await tester.pumpWidget(
-          createTestWidget(
-            Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    await processPayment(context, amount, description);
-                  },
-                  child: const Text('Pay'),
-                );
-              },
-            ),
-          ),
-        );
-
-        await tester.tap(find.text('Pay'));
-        await tester.pump();
-        await tester.pumpAndSettle();
-
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
-        verifyNever(
-          () => mockTransactionService.recordTransaction(
-            amount: any(named: 'amount'),
-            description: any(named: 'description'),
-            type: any(named: 'type'),
-          ),
-        );
-
-        expect(find.text('Payment Failed!'), findsOneWidget);
-        expect(find.text('An unexpected error occurred.'), findsOneWidget);
-      },
-    );
-
-    testWidgets('should dismiss loading dialog before showing result dialog', (
-      WidgetTester tester,
-    ) async {
+  group('PaymentProcessor.processPayment', () {
+    test('should complete payment and record transaction on success', () async {
+      // Arrange
       const amount = 100.0;
       const description = 'Test payment';
-      when(() => mockPaymentService.makePayment(amount)).thenAnswer((_) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-        return;
-      });
+
+      when(
+        () => mockPaymentService.makePayment(amount),
+      ).thenAnswer((_) async => Future.value());
       when(
         () => mockTransactionService.recordTransaction(
           amount: amount,
@@ -246,31 +43,135 @@ void main() {
         ),
       ).thenAnswer((_) async => {});
 
-      await tester.pumpWidget(
-        createTestWidget(
-          Builder(
-            builder: (context) {
-              return ElevatedButton(
-                onPressed: () async {
-                  await processPayment(context, amount, description);
-                },
-                child: const Text('Pay'),
-              );
-            },
-          ),
+      // Act
+      final result = await paymentProcessor.processPayment(amount, description);
+
+      // Assert
+      expect(result, PaymentResult.success);
+      verify(() => mockPaymentService.makePayment(amount)).called(1);
+      verify(
+        () => mockTransactionService.recordTransaction(
+          amount: amount,
+          description: description,
+          type: 'Laundry',
         ),
+      ).called(1);
+    });
+
+    test(
+      'should return canceled and not record transaction on StripeException with canceled code',
+      () async {
+        // Arrange
+        const amount = 50.0;
+        const description = 'Test payment';
+
+        when(() => mockPaymentService.makePayment(amount)).thenThrow(
+          StripeException(
+            error: LocalizedErrorMessage(code: FailureCode.Canceled),
+          ),
+        );
+
+        // Act
+        final result = await paymentProcessor.processPayment(
+          amount,
+          description,
+        );
+
+        // Assert
+        expect(result, PaymentResult.canceled);
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
+            amount: any(named: 'amount'),
+            description: any(named: 'description'),
+            type: any(named: 'type'),
+          ),
+        );
+      },
+    );
+
+    test(
+      'should return failed and not record transaction on PlatformException',
+      () async {
+        // Arrange
+        const amount = 75.0;
+        const description = 'Test payment';
+
+        when(
+          () => mockPaymentService.makePayment(amount),
+        ).thenThrow(PlatformException('Platform not supported'));
+
+        // Act
+        final result = await paymentProcessor.processPayment(
+          amount,
+          description,
+        );
+
+        // Assert
+        expect(result, PaymentResult.failed);
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
+            amount: any(named: 'amount'),
+            description: any(named: 'description'),
+            type: any(named: 'type'),
+          ),
+        );
+      },
+    );
+
+    test(
+      'should return failed and not record transaction on unexpected error',
+      () async {
+        // Arrange
+        const amount = 25.0;
+        const description = 'Test payment';
+
+        when(
+          () => mockPaymentService.makePayment(amount),
+        ).thenThrow(Exception('Unexpected error'));
+
+        // Act
+        final result = await paymentProcessor.processPayment(
+          amount,
+          description,
+        );
+
+        // Assert
+        expect(result, PaymentResult.failed);
+        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
+            amount: any(named: 'amount'),
+            description: any(named: 'description'),
+            type: any(named: 'type'),
+          ),
+        );
+      },
+    );
+
+    test('should handle any StripeException as canceled', () async {
+      // Arrange
+      const amount = 60.0;
+      const description = 'Test payment';
+
+      when(() => mockPaymentService.makePayment(amount)).thenThrow(
+        StripeException(error: LocalizedErrorMessage(code: FailureCode.Failed)),
       );
 
-      await tester.tap(find.text('Pay'));
-      await tester.pump();
+      // Act
+      final result = await paymentProcessor.processPayment(amount, description);
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-      await tester.pumpAndSettle();
-
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-
-      expect(find.text('Payment Successful!'), findsOneWidget);
+      // Assert
+      expect(result, PaymentResult.canceled);
+      verify(() => mockPaymentService.makePayment(amount)).called(1);
+      verifyNever(
+        () => mockTransactionService.recordTransaction(
+          amount: any(named: 'amount'),
+          description: any(named: 'description'),
+          type: any(named: 'type'),
+        ),
+      );
     });
   });
 }

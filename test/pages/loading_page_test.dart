@@ -1,5 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/pages/loading_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,20 +8,33 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'mocks.dart';
 
 void main() {
   late MockAuthService mockAuthService;
+  late MockProfileService mockProfileService;
+
+  setUpAll(() {
+    registerFallbackValue(Uri.parse('clean-stream://fallback'));
+  });
 
   setUp(() {
     mockAuthService = MockAuthService();
+    mockProfileService = MockProfileService();
 
     final getIt = GetIt.instance;
     if (getIt.isRegistered<AuthService>()) {
       getIt.unregister<AuthService>();
     }
+
+    if (getIt.isRegistered<ProfileService>()) {
+      getIt.unregister<ProfileService>();
+    }
+
     getIt.registerSingleton<AuthService>(mockAuthService);
+    getIt.registerSingleton<ProfileService>(mockProfileService);
   });
 
   tearDown(() {
@@ -207,6 +221,38 @@ void main() {
 
       when(() => mockAuthService.isLoggedIn())
           .thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(LoadingPage()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('navigates to home page on oauth deep link', (WidgetTester tester) async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+            (MethodCall methodCall) async {
+          if (methodCall.method == 'getInitialAppLink') {
+            return 'clean-stream://oauth';
+          }
+          return null;
+        },
+      );
+
+      when(() => mockAuthService.isLoggedIn())
+          .thenAnswer((_) async => AuthenticationResponses.success);
+
+      when(() => mockAuthService.getCurrentUser())
+          .thenReturn(User(id: '', appMetadata: {}, userMetadata: {'full_name':"Test Name"}, aud: '', createdAt: ''));
+
+      when(() => mockProfileService.createAccount(
+        id: any(named: 'id'),
+        name: any(named: 'name'),
+      )).thenAnswer((_) async {});
+
+      when(() => mockAuthService.handleOAuthRedirect(any()))
+          .thenAnswer((_) async {});
 
       await tester.pumpWidget(createTestWidget(LoadingPage()));
       await tester.pumpAndSettle();

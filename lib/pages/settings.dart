@@ -45,7 +45,7 @@ class _SettingsState extends State<Settings> {
                     onTap: () async {
                       final transactions = await transactionService
                           .getTransactionsForUser();
-                      context.go(
+                      context.push(
                         '/monthlyTransactionHistory',
                         extra: transactions,
                       );
@@ -56,7 +56,7 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.request_page,
                     title: "Request Refund",
                     onTap: () {
-                      context.go('/refundPage');
+                      context.push('/refundPage');
                     },
                   ),
                   SizedBox(height: 14),

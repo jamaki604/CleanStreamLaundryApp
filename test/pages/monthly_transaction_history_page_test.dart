@@ -30,9 +30,10 @@ void main() {
     router = GoRouter(
       routes: [
         GoRoute(
-            path: '/',
-            builder: (context, state) =>
-                MonthlyTransactionHistory(transactions: [],))
+          path: '/',
+          builder: (context, state) =>
+              MonthlyTransactionHistory(transactions: []),
+        ),
       ],
     );
   });
@@ -46,43 +47,51 @@ void main() {
   }
 
   group('MonthlyTransactionHistory Widget Tests', () {
-    testWidgets('renders AppBar title even when transactions empty',
-          (WidgetTester tester) async {
-          await tester.pumpWidget(createTestWidget());
-          await tester.pumpAndSettle();
+    testWidgets('renders AppBar title even when transactions empty', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
 
-          expect(find.text('Monthly Transaction History'), findsOneWidget);
-          expect(find.byType(Card), findsNWidgets(2));
-        });
+      expect(find.text('Monthly Transaction History'), findsOneWidget);
+      expect(find.byType(Card), findsNWidgets(3));
+    });
 
+    testWidgets('renders one month card with correct totals', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
 
-    testWidgets('renders one month card with correct totals',
-          (WidgetTester tester) async {
-          await tester.pumpWidget(createTestWidget());
-          await tester.pumpAndSettle();
+      expect(find.byType(Card), findsNWidgets(3));
 
-          expect(find.byType(Card), findsNWidgets(2));
+      expect(find.text('Nov 2025'), findsOneWidget);
 
-          expect(find.text('Nov 2025'), findsOneWidget);
+      expect(find.textContaining('\$'), findsWidgets);
 
-          expect(find.textContaining('\$'), findsWidgets);
+      expect(find.text('Direct Washer Payments'), findsNWidgets(3));
+      expect(find.text('Direct Dryer Payments'), findsNWidgets(3));
+    });
 
-          expect(find.text('Direct Washer Payments'), findsNWidgets(2));
-          expect(find.text('Direct Dryer Payments'), findsNWidgets(2));
-        });
+    testWidgets('renders multiple months sorted descending', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+      DateTime currentDate = DateTime.now();
+      DateTime lastMonth = DateTime(currentDate.year, currentDate.month - 1);
+      expect(find.byType(Card), findsNWidgets(3));
 
-    testWidgets('renders multiple months sorted descending',
-         (WidgetTester tester) async {
-          await tester.pumpWidget(createTestWidget());
-          await tester.pumpAndSettle();
-          DateTime currentDate = DateTime.now();
-          DateTime lastMonth = DateTime(currentDate.year, currentDate.month - 1);
-          expect(find.byType(Card), findsNWidgets(2));
-
-          final firstCardFinder = find.byType(Card).first;
-          expect(find.descendant(
-              of: firstCardFinder, matching: find.text(DateFormat('MMM yyyy').format(lastMonth).toString())),
-              findsOneWidget);
-        });
+      final firstCardFinder = find.byType(Card).first;
+      expect(
+        find.descendant(
+          of: firstCardFinder,
+          matching: find.text(
+            DateFormat('MMM yyyy').format(lastMonth).toString(),
+          ),
+        ),
+        findsOneWidget,
+      );
+    });
   });
 }
