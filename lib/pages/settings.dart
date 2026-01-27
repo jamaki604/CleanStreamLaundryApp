@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -17,8 +18,29 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final transactionService = GetIt.instance<TransactionService>();
   final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
 
-  int notificationDelay = 5; // starting value
+  int notificationDelay = 5;
+  bool _loadingDelay = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationDelay();
+  }
+
+  Future<void> _loadNotificationDelay() async {
+    final value = await profileService.getNotificationDelay();
+    setState(() {
+      notificationDelay = value;
+      _loadingDelay = false;
+    });
+  }
+
+  Future<void> _updateDelay(int newValue) async {
+    setState(() => notificationDelay = newValue);
+    await profileService.setNotificationDelay(newValue);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,54 +95,62 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.timer,
                     title: "Notification Delay",
                     subtitle:
-                    "How many minutes before your machine is done",
-                    trailing: Row(
+                    "Minutes you’re notified before a machine finishes",
+                    trailing: _loadingDelay
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                        : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
+                            color:
+                            Theme.of(context).colorScheme.primary,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.add, color: Colors.white, size: 20),
-                            onPressed: () {
-                              setState(() {
-                                notificationDelay++;
-                              });
+                            icon: const Icon(Icons.add,
+                                color: Colors.white, size: 20),
+                            onPressed: () async {
+                              final newValue = notificationDelay + 1;
+                              await _updateDelay(newValue);
                             },
                           ),
                         ),
-
                         const SizedBox(width: 12),
-
                         Text(
                           "$notificationDelay",
                           style: TextStyle(
                             fontSize: 18,
-                            color: Theme.of(context).colorScheme.fontSecondary,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .fontSecondary,
                           ),
                         ),
-
                         const SizedBox(width: 12),
-
                         Container(
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
+                            color:
+                            Theme.of(context).colorScheme.primary,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.remove, color: Colors.white, size: 20),
-                            onPressed: () {
-                              setState(() {
-                                if (notificationDelay > 1) notificationDelay--;
-                              });
+                            icon: const Icon(Icons.remove,
+                                color: Colors.white, size: 20),
+                            onPressed: () async {
+                              if (notificationDelay > 1) {
+                                final newValue = notificationDelay - 1;
+                                await _updateDelay(newValue);
+                              }
                             },
                           ),
                         ),

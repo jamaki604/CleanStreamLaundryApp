@@ -103,4 +103,37 @@ class NotificationService {
       );
     });
   }
+
+  Future<void> scheduleDelayedNotification({
+    required int id,
+    required String title,
+    required String body,
+    required Duration delay,
+  }) async {
+    final allowed = await _requestPermission();
+    if (!allowed) {
+      return;
+    }
+
+    Future.delayed(delay, () async {
+      await flutterLocalNotificationsPlugin.show(
+        id,
+        title,
+        body,
+        const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'your_channel_id',
+              'Your Channel',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+            iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            )
+        ),
+      );
+    });
+  }
 }
