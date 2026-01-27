@@ -1,13 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get_it/get_it.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
+
+  final profileService = GetIt.instance<ProfileService>();
 
   NotificationService() {
     _init();
@@ -104,34 +108,51 @@ class NotificationService {
     });
   }
 
-  Future<void> scheduleDelayedNotification({
+  Future<void> scheduleDelayedMachineNotification({
     required int id,
-    required String title,
-    required String body,
-    required Duration delay,
+    required Duration givenDelay,
   }) async {
     final allowed = await _requestPermission();
-    if (!allowed) {
-      return;
+    if (!allowed) return;
+
+    final userDelayMinutes = await profileService.getNotificationDelay();
+    final userDelay = Duration(minutes: userDelayMinutes);
+
+    Duration totalDelay = givenDelay - userDelay;
+
+    String notifTitle;
+    String notifBody;
+
+    if (totalDelay.isNegative) {
+      totalDelay = Duration.zero;
+      notifTitle = "Machine Started!";
+      final roundedDelay = givenDelay.inMinutes;
+      final unit = roundedDelay == 1 ? "minute" : "minutes";
+      notifBody = "Your machine will be finished in $roundedDelay $unit!";
+    } else {
+      notifTitle = "Machine Almost Ready";
+
+      final unit = userDelayMinutes == 1 ? "minute" : "minutes";
+      notifBody = "Your machine will be ready in $userDelayMinutes $unit!";
     }
 
-    Future.delayed(delay, () async {
+    Future.delayed(totalDelay, () async {
       await flutterLocalNotificationsPlugin.show(
         id,
-        title,
-        body,
+        notifTitle,
+        notifBody,
         const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'your_channel_id',
-              'Your Channel',
-              importance: Importance.high,
-              priority: Priority.high,
-            ),
-            iOS: DarwinNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-            )
+          android: AndroidNotificationDetails(
+            'your_channel_id',
+            'Your Channel',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
       );
     });
