@@ -18,6 +18,8 @@ class _SettingsState extends State<Settings> {
   final transactionService = GetIt.instance<TransactionService>();
   final authService = GetIt.instance<AuthService>();
 
+  int notificationDelay = 5; // starting value
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
@@ -37,20 +39,20 @@ class _SettingsState extends State<Settings> {
                       themeManager.toggleTheme();
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.money,
                     title: "Monthly Report",
                     onTap: () async {
-                      final transactions = await transactionService
-                          .getTransactionsForUser();
+                      final transactions =
+                      await transactionService.getTransactionsForUser();
                       context.push(
                         '/monthlyTransactionHistory',
                         extra: transactions,
                       );
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.request_page,
                     title: "Request Refund",
@@ -58,7 +60,7 @@ class _SettingsState extends State<Settings> {
                       context.push('/refundPage');
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.person,
                     title: "Edit Profile",
@@ -66,7 +68,66 @@ class _SettingsState extends State<Settings> {
                       context.go('/editProfile');
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.timer,
+                    title: "Notification Delay",
+                    subtitle:
+                    "How many minutes before your machine is done",
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.add, color: Colors.white, size: 20),
+                            onPressed: () {
+                              setState(() {
+                                notificationDelay++;
+                              });
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Text(
+                          "$notificationDelay",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.fontSecondary,
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.remove, color: Colors.white, size: 20),
+                            onPressed: () {
+                              setState(() {
+                                if (notificationDelay > 1) notificationDelay--;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.logout,
                     title: "Sign Out",
