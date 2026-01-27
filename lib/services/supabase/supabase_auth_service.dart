@@ -253,11 +253,28 @@ class SupabaseAuthService implements AuthService {
   }) async {
     final response = await _client.auth.updateUser(
       UserAttributes(email: email, data: data),
-      emailRedirectTo: "clean-stream://change-email"
+      emailRedirectTo: "clean-stream://change-email",
     );
 
     if (response.user == null) {
       throw Exception("Failed to update user attributes");
     }
+  }
+
+  @override
+  Future<AuthenticationResponses> resetPassword(String email) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
+    try {
+      // Send password reset email and redirect back to the app via deep link.
+      await _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'clean-stream://reset-protected',
+      );
+      output = AuthenticationResponses.success;
+    } catch (e) {
+      print('resetPassword error: $e');
+      output = AuthenticationResponses.failure;
+    }
+    return output;
   }
 }
