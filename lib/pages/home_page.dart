@@ -256,7 +256,6 @@ class HomePageState extends State<HomePage> {
 
                     return Container(
                       width: 520,
-                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
                         borderRadius: BorderRadius.circular(8),
@@ -274,18 +273,37 @@ class HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "$idleWashers available",
+                                      "Available Machines:",
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.fontInverted,
+                                        color: Theme.of(context).colorScheme.fontSecondary,
                                         fontSize: 28,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 2,
+                            height: 80,
+                            color: Colors.blue,
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
                                     Text(
                                       "$idleWashers/$totalWashers washers",
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.fontSecondary,
-                                        fontSize: 14,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -315,18 +333,11 @@ class HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "$idleDryers available",
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.fontInverted,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
                                       "$idleDryers/$totalDryers dryers",
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.fontSecondary,
-                                        fontSize: 14,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold
                                       ),
                                     ),
                                   ],
