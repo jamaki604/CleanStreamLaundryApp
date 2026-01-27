@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:clean_stream_laundry_app/pages/settings.dart';
@@ -14,15 +15,30 @@ import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
 void main() {
   late MockAuthService mockAuthService;
   late MockTransactionService mockTransactionService;
+  late MockProfileService mockProfileService;
   late MockThemeManager mockThemeManager;
   late GoRouter router;
 
   setUp(() {
+    final getIt = GetIt.instance;
+
     mockAuthService = MockAuthService();
     mockTransactionService = MockTransactionService();
     mockThemeManager = MockThemeManager();
+    mockProfileService = MockProfileService();
 
-    final getIt = GetIt.instance;
+    if (getIt.isRegistered<ProfileService>()) {
+      getIt.unregister<ProfileService>();
+    }
+
+    getIt.registerSingleton<ProfileService>(mockProfileService);
+
+    when(() => mockProfileService.getNotificationDelay())
+        .thenAnswer((_) async => 5);
+
+    when(() => mockProfileService.setNotificationDelay(any()))
+        .thenAnswer((_) async {});
+
     if (getIt.isRegistered<AuthService>()) {
       getIt.unregister<AuthService>();
     }
@@ -63,17 +79,18 @@ void main() {
       );
     });
 
-    testWidgets('should display all five SettingsCard widgets', (
+    testWidgets('should display all six SettingsCard widgets', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.byType(SettingsCard), findsNWidgets(5));
+      expect(find.byType(SettingsCard), findsNWidgets(6));
       expect(find.text('Sign Out'), findsOneWidget);
       expect(find.text('Monthly Report'), findsOneWidget);
       expect(find.text('Request Refund'), findsOneWidget);
       expect(find.text('Dark Mode'), findsOneWidget);
       expect(find.text('Edit Profile'), findsOneWidget);
+      expect(find.text('Notification Delay'), findsOneWidget);
     });
 
     testWidgets(
@@ -192,6 +209,84 @@ void main() {
       expect(find.byType(Center), findsWidgets);
       expect(find.byType(Column), findsWidgets);
       expect(find.byType(SingleChildScrollView), findsOneWidget);
+    });
+
+    testWidgets('loads notification delay from ProfileService', (tester) async {
+      when(() => mockProfileService.getNotificationDelay())
+          .thenAnswer((_) async => 7);
+
+      when(() => mockProfileService.setNotificationDelay(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      expect(find.text('  ' + '7'), findsOneWidget);
+    });
+
+    testWidgets('increments notification delay when + is tapped', (tester) async {
+      when(() => mockProfileService.getNotificationDelay())
+          .thenAnswer((_) async => 5);
+
+      when(() => mockProfileService.setNotificationDelay(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final plusButton = find.byIcon(Icons.add);
+
+      await tester.ensureVisible(plusButton);
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      verify(() => mockProfileService.setNotificationDelay(6)).called(1);
+    });
+
+    testWidgets('does not decrement below 0', (tester) async {
+      when(() => mockProfileService.getNotificationDelay())
+          .thenAnswer((_) async => 0);
+
+      when(() => mockProfileService.setNotificationDelay(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final minusButton = find.byIcon(Icons.remove);
+
+      await tester.tap(minusButton);
+      await tester.pumpAndSettle();
+
+      verifyNever(() => mockProfileService.setNotificationDelay(any()));
+    });
+
+    testWidgets('notification delay does not exceed max limit', (tester) async {
+      when(() => mockProfileService.getNotificationDelay())
+          .thenAnswer((_) async => Settings.maxNotificationDelay - 2);
+
+      when(() => mockProfileService.setNotificationDelay(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final plusButton = find.byIcon(Icons.add);
+
+      await tester.ensureVisible(plusButton);
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text('  ' + '${Settings.maxNotificationDelay}'), findsOneWidget);
+
+      verify(() => mockProfileService
+          .setNotificationDelay(Settings.maxNotificationDelay)).called(1);
     });
   });
 }

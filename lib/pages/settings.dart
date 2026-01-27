@@ -11,6 +11,8 @@ import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 class Settings extends StatefulWidget {
+  static const int maxNotificationDelay = 30;
+
   @override
   State<Settings> createState() => _SettingsState();
 }
@@ -119,7 +121,7 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.add,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
-                              if (notificationDelay < 30) {
+                              if (notificationDelay < Settings.maxNotificationDelay) {
                                 final newDelay = notificationDelay + 1;
                                 await _updateDelay(newDelay);
                               }
