@@ -131,8 +131,13 @@ class SupabaseProfileService extends ProfileService {
   }
 
   @override
-  Future<void> setNotificationDelay(int value) {
-    // TODO: implement setNotificationDelay
-    throw UnimplementedError();
+  Future<void> setNotificationDelay(int value) async {
+    final user = _client.auth.currentUser;
+    if (user == null) return;
+
+    await _client
+        .from('profiles')
+        .update({'notif_delay': value})
+        .eq('id', user.id);
   }
 }
