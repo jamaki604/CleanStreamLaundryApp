@@ -37,9 +37,9 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Future<void> _updateDelay(int newValue) async {
-    setState(() => notificationDelay = newValue);
-    await profileService.setNotificationDelay(newValue);
+  Future<void> _updateDelay(int newDelayValue) async {
+    setState(() => notificationDelay = newDelayValue);
+    await profileService.setNotificationDelay(newDelayValue);
   }
 
   @override
@@ -119,8 +119,10 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.add,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
-                              final newValue = notificationDelay + 1;
-                              await _updateDelay(newValue);
+                              if (notificationDelay < 30) {
+                                final newDelay = notificationDelay + 1;
+                                await _updateDelay(newDelay);
+                              }
                             },
                           ),
                         ),
@@ -154,8 +156,8 @@ class _SettingsState extends State<Settings> {
                                 color: Colors.white, size: 20),
                             onPressed: () async {
                               if (notificationDelay > 0) {
-                                final newValue = notificationDelay - 1;
-                                await _updateDelay(newValue);
+                                final newDelay = notificationDelay - 1;
+                                await _updateDelay(newDelay);
                               }
                             },
                           ),
