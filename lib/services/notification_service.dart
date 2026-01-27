@@ -123,7 +123,7 @@ class NotificationService {
     String notifTitle;
     String notifBody;
 
-    if (totalDelay.isNegative) {
+    if (totalDelay.isNegative || userDelayMinutes <= 0) {
       totalDelay = Duration.zero;
       notifTitle = "Machine Started!";
       final roundedDelay = givenDelay.inMinutes;

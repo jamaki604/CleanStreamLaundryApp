@@ -153,7 +153,7 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.remove,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
-                              if (notificationDelay > 1) {
+                              if (notificationDelay > 0) {
                                 final newValue = notificationDelay - 1;
                                 await _updateDelay(newValue);
                               }
