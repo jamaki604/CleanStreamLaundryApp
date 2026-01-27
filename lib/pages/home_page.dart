@@ -292,7 +292,6 @@ class HomePageState extends State<HomePage> {
                             ),
                           ),
 
-                          // ───────── CONTENT ROW ─────────
                           SizedBox(
                             height: 80,
                             child: Row(
