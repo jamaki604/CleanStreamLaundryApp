@@ -30,7 +30,6 @@ class _SettingsState extends State<Settings> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset('assets/Logo.png', width: 230, height: 230),
-                  SizedBox(height: 16),
                   SettingsCard(
                     icon: Icons.lightbulb,
                     title: Theme.of(context).colorScheme.modeChangerText,
@@ -45,7 +44,7 @@ class _SettingsState extends State<Settings> {
                     onTap: () async {
                       final transactions = await transactionService
                           .getTransactionsForUser();
-                      context.go(
+                      context.push(
                         '/monthlyTransactionHistory',
                         extra: transactions,
                       );
@@ -56,7 +55,15 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.request_page,
                     title: "Request Refund",
                     onTap: () {
-                      context.go('/refundPage');
+                      context.push('/refundPage');
+                    },
+                  ),
+                  SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.person,
+                    title: "Edit Profile",
+                    onTap: () {
+                      context.go('/editProfile');
                     },
                   ),
                   SizedBox(height: 14),

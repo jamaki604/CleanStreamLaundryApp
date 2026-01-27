@@ -23,7 +23,7 @@ void main() {
       () => mockAuthService.login(any(), any()),
     ).thenAnswer((_) async => AuthenticationResponses.failure);
     when(
-      () => mockAuthService.signUp(any(), any()),
+      () => mockAuthService.signUp(any(), any(), any()),
     ).thenAnswer((_) async => AuthenticationResponses.failure);
     when(
       () => mockAuthService.resendVerification(),

@@ -11,6 +11,7 @@ import 'package:latlong2/latlong.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  static const pageKey = Key("home_page");
 
   @override
   HomePageState createState() => HomePageState();
@@ -61,6 +62,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
+      key:HomePage.pageKey,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -171,7 +173,7 @@ class HomePageState extends State<HomePage> {
                           return DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              value: selectedName,
+                              value: locationID.containsKey(selectedName) ? selectedName : null,
                               hint: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,

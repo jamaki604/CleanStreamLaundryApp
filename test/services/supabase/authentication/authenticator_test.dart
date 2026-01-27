@@ -137,6 +137,7 @@ void main(){
       when(() => supabaseAuth.signUp(
           email: any(named: 'email'),
           password: any(named: 'password'),
+          data: {"full_name": "testname"},
           emailRedirectTo: 'clean-stream://email-verification'
       )).thenAnswer((_) async =>
           AuthResponse(
@@ -215,7 +216,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123G@");
+      final response = await authenticator.signUp("testemail", "testpassword123G@", "testname");
 
       expect(response,AuthenticationResponses.success);
     });
@@ -303,7 +304,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpasswordG");
+      final response = await authenticator.signUp("testemail", "testpasswordG", "testname");
 
       expect(response,AuthenticationResponses.noDigit);
     });
@@ -391,7 +392,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123G");
+      final response = await authenticator.signUp("testemail", "testpassword123G", "testname");
 
       expect(response,AuthenticationResponses.noSpecialCharacter);
     });
@@ -479,7 +480,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123@");
+      final response = await authenticator.signUp("testemail", "testpassword123@", "testname");
 
       expect(response,AuthenticationResponses.noUppercase);
     });
@@ -567,7 +568,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "test");
+      final response = await authenticator.signUp("testemail", "test", "testname");
 
       expect(response,AuthenticationResponses.lessThanMinLength);
     });

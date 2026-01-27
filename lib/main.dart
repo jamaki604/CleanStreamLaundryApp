@@ -19,6 +19,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
+import 'services/notification_service.dart';
 import 'logic/theme/theme_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +86,12 @@ Future<void> setupDependencies() async {
     () => MachineCommunicator(),
   );
 
-  getIt.registerLazySingleton<RouterService>(() => RouterService());
+  getIt.registerLazySingleton<RouterService>(
+      () => RouterService()
+  );
+
+  getIt.registerLazySingleton<NotificationService>(
+      () => NotificationService());
 
   getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
 

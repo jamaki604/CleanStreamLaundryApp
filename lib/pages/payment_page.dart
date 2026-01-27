@@ -10,6 +10,7 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/machine_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:go_router/go_router.dart';
 
@@ -35,6 +36,7 @@ class _PaymentPageState extends State<PaymentPage> {
   final authService = GetIt.instance<AuthService>();
   final transactionService = GetIt.instance<TransactionService>();
   final machineCommunicator = GetIt.instance<MachineCommunicationService>();
+  final notificationService = GetIt.instance<NotificationService>();
   final paymentProcessor = GetIt.instance<PaymentProcessor>();
 
   @override
@@ -68,6 +70,16 @@ class _PaymentPageState extends State<PaymentPage> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> makeNotification() async {
+    final notificationService = GetIt.instance<NotificationService>();
+    await notificationService.scheduleNotification(
+      id: 1,
+      title: "Machine Finished",
+      body: "Your machine is finished!",
+      delay: const Duration(seconds: 5),
+    );
   }
 
   @override
@@ -177,45 +189,56 @@ class _PaymentPageState extends State<PaymentPage> {
             onPressed: (_isConfirmed || _price == null || _price == 0)
                 ? null
                 : () async {
-                    final success = await paymentProcessor.processPayment(
-                      _price!,
-                      MachineFormatter.formatMachineType(
-                        _machineName.toString(),
-                      ),
-                    );
+              final success = await paymentProcessor.processPayment(
+                _price!,
+                MachineFormatter.formatMachineType(
+                  _machineName.toString(),
+                ),
+              );
 
-                    if (success == PaymentResult.success) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext dialogContext) =>
-                            const Center(child: CircularProgressIndicator()),
-                      );
-                      final deviceAuthorized = await machineCommunicator
-                          .wakeDevice(widget.machineId);
-                      Navigator.of(context, rootNavigator: true).pop();
+              if (success == PaymentResult.success) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext dialogContext) =>
+                  const Center(child: CircularProgressIndicator()),
+                );
 
-                      if (deviceAuthorized) {
-                        setState(() {
-                          _paymentCompleted = true;
-                        });
-                        statusDialog(
-                          context,
-                          title: "Payment processed! Machine Ready!",
-                          message: "Machine $_machineName is now active.",
-                          isSuccess: true,
-                        );
-                      } else {
-                        statusDialog(
-                          context,
-                          title: "Machine Error",
-                          message:
-                              "Payment succeeded but machine did not wake up.",
-                          isSuccess: false,
-                        );
-                      }
-                    }
-                  },
+                final deviceAuthorized =
+                await machineCommunicator.wakeDevice(widget.machineId);
+
+                Navigator.of(context, rootNavigator: true).pop();
+
+                if (deviceAuthorized) {
+                  setState(() {
+                    _paymentCompleted = true;
+                  });
+
+                  makeNotification();
+
+                  statusDialog(
+                    context,
+                    title: "Payment Processed! Machine Ready!",
+                    message: "Machine $_machineName is now active.",
+                    isSuccess: true,
+                  );
+                } else {
+                  statusDialog(
+                    context,
+                    title: "Machine Error",
+                    message: "Payment succeeded but machine did not wake up.",
+                    isSuccess: false,
+                  );
+                }
+              } else {
+                statusDialog(
+                  context,
+                  title: "Payment Failed",
+                  message: "Your payment could not be processed.",
+                  isSuccess: false,
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: (_isConfirmed || _price == null || _price == 0)
                   ? Colors.grey
@@ -293,6 +316,7 @@ class _PaymentPageState extends State<PaymentPage> {
   void _processLoyaltyPayment(BuildContext context) async {
     final updatedBalance = _userBalance! - _price!;
     profileService.updateBalanceById(updatedBalance);
+
     setState(() {
       _userBalance = updatedBalance;
     });
@@ -308,6 +332,7 @@ class _PaymentPageState extends State<PaymentPage> {
     Navigator.of(context, rootNavigator: true).pop();
 
     if (deviceAuthorized) {
+      makeNotification();
       setState(() {
         _paymentCompleted = true;
       });
@@ -317,25 +342,27 @@ class _PaymentPageState extends State<PaymentPage> {
         message: "Machine $_machineName is now active.",
         isSuccess: true,
       );
+
       await transactionService.recordTransaction(
         amount: _price!,
         description:
-            "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
+        "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
         type: "laundry",
       );
     } else {
       statusDialog(
         context,
         title: "Machine Error",
-        message: "Payment succeeded but machine did not wake up.",
+        message: "payment succeeded but machine did not wake up.",
         isSuccess: false,
       );
     }
+
     statusDialog(
       context,
       title: "Payment Successful!",
       message:
-          "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
+      "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
       isSuccess: true,
     );
   }
