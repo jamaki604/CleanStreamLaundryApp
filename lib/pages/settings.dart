@@ -95,12 +95,12 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.timer,
                     title: "Notification Delay",
                     subtitle:
-                    "Minutes you’re notified before a machine finishes",
+                    "Minutes you’re notified before machine finish",
                     trailing: _loadingDelay
                         ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      height: 100,
+                      width: 100,
+                      child: CircularProgressIndicator(strokeWidth: 4),
                     )
                         : Row(
                       mainAxisSize: MainAxisSize.min,
@@ -115,6 +115,7 @@ class _SettingsState extends State<Settings> {
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                             icon: const Icon(Icons.add,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
@@ -123,16 +124,19 @@ class _SettingsState extends State<Settings> {
                             },
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          "$notificationDelay",
+                    SizedBox(
+                      width: 20,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          ("  " + "$notificationDelay"),
                           style: TextStyle(
                             fontSize: 18,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .fontSecondary,
+                            color: Theme.of(context).colorScheme.fontSecondary,
                           ),
                         ),
+                      ),
+                    ),
                         const SizedBox(width: 12),
                         Container(
                           width: 32,
@@ -144,6 +148,7 @@ class _SettingsState extends State<Settings> {
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                             icon: const Icon(Icons.remove,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
