@@ -134,7 +134,6 @@ class _SettingsState extends State<Settings> {
                           ("  " + "$notificationDelay"),
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'RobotoMono',
                             color: Theme.of(context).colorScheme.fontSecondary,
                           ),
                         ),

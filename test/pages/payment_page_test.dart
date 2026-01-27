@@ -54,11 +54,9 @@ void main() {
     getIt.registerSingleton<RouterService>(mockRouterService);
     getIt.registerSingleton<NotificationService>(mockNotificationService);
 
-    when(() => mockNotificationService.scheduleNotification(
+    when(() => mockNotificationService.scheduleDelayedMachineNotification(
       id: any(named: 'id'),
-      title: any(named: 'title'),
-      body: any(named: 'body'),
-      delay: any(named: 'delay'),
+      givenDelay: any(named: 'givenDelay'),
     )).thenAnswer((_) async {});
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
     getIt.registerSingleton<LoyaltyViewModel>(mockLoyaltyViewModel);
