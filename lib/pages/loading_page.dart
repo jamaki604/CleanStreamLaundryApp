@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:app_links/app_links.dart';
+import 'dart:async';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -23,25 +24,68 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    _automaticLogIn();
-    _coldStartRedirect();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startup();
+    });
   }
 
+  Future<void> _startup() async {
+    bool handled = false;
+    try {
+      handled = await _coldStartRedirect();
+    } catch (e) {}
 
-  Future<void>_coldStartRedirect() async {
+    if (!handled) {
+      await _automaticLogIn();
+    }
+  }
+
+  Future<bool> _coldStartRedirect() async {
     try {
       final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
 
-      if (initialUri != null && initialUri.scheme == 'clean-stream' && initialUri.host == 'email-verification') {
-        context.go("/homePage");
-      }
-    } catch (e) {
+      if (initialUri == null) return false;
 
+      if (initialUri.scheme == 'clean-stream' &&
+          initialUri.host == 'email-verification') {
+        context.go("/homePage");
+        return true;
+      }
+
+      if (initialUri.scheme == 'clean-stream' &&
+          initialUri.host == 'reset-protected') {
+        context.go('/reset-protected', extra: initialUri);
+        return true;
+      }
+    } catch (e) {}
+
+    return false;
+  }
+
+  StreamSubscription? _linkSub;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_linkSub == null) {
+      final AppLinks appLinks = AppLinks();
+      _linkSub = appLinks.uriLinkStream.listen((Uri? uri) {
+        if (uri == null) return;
+        if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
+          if (mounted) context.go('/reset-protected', extra: uri);
+        }
+      });
     }
   }
 
-  void _automaticLogIn() async {
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _automaticLogIn() async {
     await Future.delayed(Duration.zero);
 
     try {
