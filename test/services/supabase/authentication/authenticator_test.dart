@@ -939,6 +939,14 @@ void main(){
       verifyNever(() => supabaseAuth.refreshSession());
     });
 
+    test("getCurrentUserEmail returns correct email",() async {
+      when(() => supabaseAuth.currentSession).thenReturn(null);
+
+      String? result = await authenticator.getCurrentUserEmail();
+
+      expect(result,'testemail@test.com');
+    });
+    
   });
 
 }
