@@ -62,7 +62,7 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      key:HomePage.pageKey,
+      key: HomePage.pageKey,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -94,8 +94,10 @@ class HomePageState extends State<HomePage> {
                     if (location["Address"] != null &&
                         location["Latitude"] != null &&
                         location["Longitude"] != null) {
-                      locationCoordinates[location["Address"]] =
-                          LatLng(location["Latitude"], location["Longitude"]);
+                      locationCoordinates[location["Address"]] = LatLng(
+                        location["Latitude"],
+                        location["Longitude"],
+                      );
                     }
                   }
 
@@ -120,8 +122,9 @@ class HomePageState extends State<HomePage> {
                       children: [
                         TileLayer(
                           urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'https://cleanstreamlaundry.com/',
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName:
+                              'https://cleanstreamlaundry.com/',
                           tileProvider: NetworkTileProvider(),
                         ),
                         MarkerLayer(markers: markers),
@@ -173,7 +176,9 @@ class HomePageState extends State<HomePage> {
                           return DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              value: locationID.containsKey(selectedName) ? selectedName : null,
+                              value: locationID.containsKey(selectedName)
+                                  ? selectedName
+                                  : null,
                               hint: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
@@ -261,92 +266,85 @@ class HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.transparent,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Available Machines:",
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.fontSecondary,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
                           Container(
-                            width: 2,
-                            height: 80,
-                            color: Colors.blue,
-                          ),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "$idleWashers/$totalWashers washers",
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.fontSecondary,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(width: 15),
-                                Icon(
-                                  Icons.local_laundry_service,
+                            height: 45,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
                                   color: Colors.blue,
-                                  size: 40,
+                                  width: 2,
                                 ),
-                              ],
+                              ),
+                            ),
+                            child: Text(
+                              "Availability",
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.fontSecondary,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
 
-                          Container(
-                            width: 2,
+                          // ───────── CONTENT ROW ─────────
+                          SizedBox(
                             height: 80,
-                            color: Colors.blue,
-                          ),
-
-                          Expanded(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "$idleDryers/$totalDryers dryers",
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.fontSecondary,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "$idleWashers/$totalWashers Washers",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.fontSecondary,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 12),
+                                      const Icon(
+                                        Icons.local_laundry_service,
+                                        color: Colors.blue,
+                                        size: 36,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(width: 15),
-                                Icon(
-                                  Icons.local_laundry_service,
-                                  color: Colors.blue,
-                                  size: 40,
+
+                                Container(width: 2, color: Colors.blue),
+
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "$idleDryers/$totalDryers Dryers",
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.fontSecondary,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Icon(
+                                        Icons.local_laundry_service,
+                                        color: Colors.blue,
+                                        size: 36,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -355,7 +353,7 @@ class HomePageState extends State<HomePage> {
                       ),
                     );
                   },
-                )
+                ),
             ],
           ),
         ),
