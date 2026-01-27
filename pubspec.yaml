@@ -118,6 +118,11 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
+  fonts:
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Regular.ttf
+
 flutter_native_splash:
   color: "#ffffff"
   image: assets/splash-logo.png

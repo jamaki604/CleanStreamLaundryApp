@@ -98,8 +98,8 @@ class _SettingsState extends State<Settings> {
                     "Minutes you’re notified before machine finish",
                     trailing: _loadingDelay
                         ? const SizedBox(
-                      height: 100,
-                      width: 100,
+                      height: 110,
+                      width: 110,
                       child: CircularProgressIndicator(strokeWidth: 4),
                     )
                         : Row(
@@ -125,13 +125,14 @@ class _SettingsState extends State<Settings> {
                           ),
                         ),
                     SizedBox(
-                      width: 20,
+                      width: 40,
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
                           ("  " + "$notificationDelay"),
                           style: TextStyle(
                             fontSize: 18,
+                            fontFamily: 'RobotoMono',
                             color: Theme.of(context).colorScheme.fontSecondary,
                           ),
                         ),
