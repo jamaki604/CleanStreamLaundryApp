@@ -1,3 +1,3 @@
-abstract class PaymentService{
-  Future<int> makePayment(double amount);
+abstract class PaymentService {
+  Future<void> makePayment(double amount);
 }

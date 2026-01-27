@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:clean_stream_laundry_app/logic/exceptions/null_url_exception.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'dart:html' as html show window;
@@ -12,11 +13,14 @@ class StripeService implements PaymentService {
   bool channelSubscribed = false;
 
   @override
-  Future<int> makePayment(double amount) async {
+  Future<void> makePayment(double amount) async {
     _paymentCompleter = Completer<int>();
 
     try {
-      await transactionService.subscribeForPaymentConfirmation(channelSubscribed, _paymentCompleter);
+      await transactionService.subscribeForPaymentConfirmation(
+        channelSubscribed,
+        _paymentCompleter,
+      );
 
       final response = await edgeFunctionService.runEdgeFunction(
         name: 'createCheckoutSession',
@@ -24,29 +28,31 @@ class StripeService implements PaymentService {
       );
 
       final url = response?.data['url'];
-      if (url == null) return 400;
+      if (url == null) throw NullUrlException("Checkout URL is null");
 
       final paymentPortal = html.window.open(url, '_blank');
 
       late Timer closeCheckoutTimer;
-      closeCheckoutTimer = Timer.periodic(const Duration(milliseconds: 200), (_) {
-      if (paymentPortal.closed!) {
-        closeCheckoutTimer.cancel();
-        if(!_paymentCompleter!.isCompleted) {
-          _paymentCompleter!.complete(400);
+      closeCheckoutTimer = Timer.periodic(const Duration(milliseconds: 200), (
+        _,
+      ) {
+        if (paymentPortal.closed!) {
+          closeCheckoutTimer.cancel();
+          if (!_paymentCompleter!.isCompleted) {
+            _paymentCompleter!.complete(400);
+            throw Exception("Payment portal was closed before completion");
+          }
         }
-      }
       });
 
-      return _paymentCompleter!.future.timeout(
-        const Duration(minutes: 2),
-        onTimeout: () => 400,
-      ).whenComplete(() {
-        paymentPortal.close();
-        closeCheckoutTimer.cancel();
-      });
+      await _paymentCompleter!.future
+          .timeout(const Duration(minutes: 2), onTimeout: () => 400)
+          .whenComplete(() {
+            paymentPortal.close();
+            closeCheckoutTimer.cancel();
+          });
     } catch (e) {
-      return 400;
+      rethrow;
     }
   }
 }

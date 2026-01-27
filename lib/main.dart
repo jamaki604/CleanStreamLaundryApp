@@ -14,30 +14,36 @@ import 'package:clean_stream_laundry_app/services/supabase/supabase_location_ser
 import 'package:clean_stream_laundry_app/services/supabase/supabase_machine_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_profile_service.dart';
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/pages/root_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
 import 'logic/theme/theme_manager.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_transaction_service.dart';
 
 final getIt = GetIt.instance;
 
+late final GoRouter pageRouter;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: '.env');
   await setupDependencies();
+  final authService = getIt<AuthService>();
+  final routerService = getIt<RouterService>();
+  pageRouter = routerService.createRouter(authService);
+
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ThemeManager(),
+      create: (_) => ThemeManager(),
       child: const MyApp(),
     ),
   );
-}                                              
+}
 
 
 Future<void> setupDependencies() async{
@@ -92,11 +98,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeManager = Provider.of<ThemeManager>(context);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: themeManager.themeData,
-      home: RootApp(theme: themeManager.themeData),
+    return Consumer<ThemeManager>(
+      builder: (context, themeManager, _) {
+        return MaterialApp.router(
+          routerConfig: pageRouter,
+          theme: themeManager.themeData,
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

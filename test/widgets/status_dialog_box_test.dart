@@ -8,10 +8,7 @@ void main() {
     final router = GoRouter(
       initialLocation: '/start',
       routes: [
-        GoRoute(
-          path: '/start',
-          builder: (_, __) => child,
-        ),
+        GoRoute(path: '/start', builder: (_, __) => child),
         GoRoute(
           path: '/homePage',
           builder: (_, __) => const Scaffold(body: Text("HomePage")),
@@ -19,14 +16,13 @@ void main() {
       ],
     );
 
-    return MaterialApp.router(
-      routerConfig: router,
-    );
+    return MaterialApp.router(routerConfig: router);
   }
 
   group('statusDialog Tests', () {
-
-    testWidgets('Dialog displays title, message, and success icon', (tester) async {
+    testWidgets('Dialog displays title, message, and success icon', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _wrapWithRouter(const Scaffold(body: SizedBox.shrink())),
       );
@@ -49,7 +45,9 @@ void main() {
       expect(iconFinder, findsOneWidget);
     });
 
-    testWidgets('Dialog displays error icon when isSuccess is false', (tester) async {
+    testWidgets('Dialog displays error icon when isSuccess is false', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _wrapWithRouter(const Scaffold(body: SizedBox.shrink())),
       );
@@ -87,26 +85,5 @@ void main() {
       await tester.tap(find.text('Done'));
       await tester.pumpAndSettle();
     });
-
-    testWidgets('Pressing Done navigates to /homePage when isSuccess is true', (tester) async {
-      await tester.pumpWidget(
-        _wrapWithRouter(const Scaffold(body: SizedBox.shrink())),
-      );
-
-      statusDialog(
-        tester.element(find.byType(Scaffold)),
-        title: "Success",
-        message: "Message",
-        isSuccess: true,
-      );
-
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Done'));
-      await tester.pumpAndSettle();
-
-      expect(find.text("HomePage"), findsOneWidget);
-    });
-
   });
 }

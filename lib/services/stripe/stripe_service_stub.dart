@@ -1,9 +1,10 @@
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
+import 'package:clean_stream_laundry_app/logic/exceptions/platform_exception.dart';
 
 class StripeService implements PaymentService {
-
-  Future<int> makePayment(double amount) async {
+  @override
+  Future<void> makePayment(double amount) async {
     print("StripeService is not supported on this platform.");
-    return 403;
+    throw PlatformException("StripeService is not supported on this platform.");
   }
 }

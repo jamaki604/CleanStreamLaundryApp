@@ -10,7 +10,9 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAuthService extends Mock implements AuthService {}
+
 class MockTransactionService extends Mock implements TransactionService {}
+
 class MockProfileService extends Mock implements ProfileService {}
 
 void main() {
@@ -21,12 +23,14 @@ void main() {
 
   final List<Map<String, dynamic>> fiveMockRawTransactions = List.generate(
     5,
-        (index) => {
+    (index) => {
       'id': 'mock-id-$index',
       'amount': 10.0 + index,
       'description': 'Item $index',
       'type': 'test type',
-      'created_at': DateTime.now().subtract(Duration(days: index)).toIso8601String(),
+      'created_at': DateTime.now()
+          .subtract(Duration(days: index))
+          .toIso8601String(),
     },
   );
 
@@ -52,17 +56,25 @@ void main() {
 
     when(() => mockAuthService.getCurrentUserId).thenReturn('test-user-id');
 
-    when(() => mockProfileService.getUserBalanceById('test-user-id'))
-        .thenAnswer((_) async => {'balance': 50.0, 'full_name': 'Test User'});
+    when(
+      () => mockProfileService.getUserBalanceById('test-user-id'),
+    ).thenAnswer((_) async => {'balance': 50.0, 'full_name': 'Test User'});
 
-    when(() => mockTransactionService.getTransactionsForUser())
-        .thenAnswer((_) async => []);
+    when(
+      () => mockTransactionService.getTransactionsForUser(),
+    ).thenAnswer((_) async => []);
 
     router = GoRouter(
       routes: [
         GoRoute(path: '/', builder: (context, state) => LoyaltyPage()),
-        GoRoute(path: '/login', builder: (context, state) => Scaffold(body: Text('Login Page'))),
-        GoRoute(path: '/scanner', builder: (context, state) => Scaffold(body: Text('Scanner Page'))),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => Scaffold(body: Text('Login Page')),
+        ),
+        GoRoute(
+          path: '/scanner',
+          builder: (context, state) => Scaffold(body: Text('Scanner Page')),
+        ),
       ],
     );
   });
@@ -76,143 +88,209 @@ void main() {
   }
 
   group('LoyaltyPage Widget Tests', () {
-    testWidgets('Displays the CreditCard widget after loading', (WidgetTester tester) async {
+    testWidgets('Displays the CreditCard widget after loading', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(CreditCard), findsOneWidget,
-          reason: 'The CreditCard widget should be displayed after data is fetched.');
+      expect(
+        find.byType(CreditCard),
+        findsOneWidget,
+        reason:
+            'The CreditCard widget should be displayed after data is fetched.',
+      );
     });
 
-    testWidgets('Displays the Load card button after loading', (WidgetTester tester) async {
+    testWidgets('Displays the Load card button after loading', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(ElevatedButton, 'Load card'), findsOneWidget,
-          reason: 'The "Load card" ElevatedButton should be displayed and functional.');
+      expect(
+        find.widgetWithText(ElevatedButton, 'Load card'),
+        findsOneWidget,
+        reason:
+            'The "Load card" ElevatedButton should be displayed and functional.',
+      );
     });
 
-    testWidgets('Displays the correct username after fetching data', (WidgetTester tester) async {
+    testWidgets('Displays the correct username after fetching data', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Test User'), findsOneWidget,
-          reason: 'Should display the mocked full_name (Test User).');
+      expect(
+        find.text('Test User'),
+        findsOneWidget,
+        reason: 'Should display the mocked full_name (Test User).',
+      );
 
-      verify(() => mockProfileService.getUserBalanceById('test-user-id')).called(1);
+      verify(
+        () => mockProfileService.getUserBalanceById('test-user-id'),
+      ).called(1);
     });
 
-    testWidgets('Displays the correct current balance after fetching data', (WidgetTester tester) async {
+    testWidgets('Displays the correct current balance after fetching data', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Current Balance: \$50.00'), findsOneWidget,
-          reason: 'Should display the mocked user balance formatted to two decimal places.');
+      expect(
+        find.text('Current Balance: \$50.00'),
+        findsOneWidget,
+        reason:
+            'Should display the mocked user balance formatted to two decimal places.',
+      );
     });
 
-    testWidgets('Displays "No recent transactions" when none are fetched', (WidgetTester tester) async {
+    testWidgets('Displays "No recent transactions" when none are fetched', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
 
       await tester.pumpAndSettle();
 
       expect(find.text('Transactions'), findsOneWidget);
 
-      expect(find.text('No recent transactions'), findsOneWidget,
-          reason: 'Should display the default message when the transaction list is empty.');
+      expect(
+        find.text('No recent transactions'),
+        findsOneWidget,
+        reason:
+            'Should display the default message when the transaction list is empty.',
+      );
 
-      expect(find.byType(ListTile), findsNothing,
-          reason: 'Should not display any ListTile when transactions are empty.');
+      expect(
+        find.byType(ListTile),
+        findsNothing,
+        reason: 'Should not display any ListTile when transactions are empty.',
+      );
     });
 
     testWidgets('Find Show More/Less text)', (WidgetTester tester) async {
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => fiveMockRawTransactions);
+      when(
+        () => mockTransactionService.getTransactionsForUser(),
+      ).thenAnswer((_) async => fiveMockRawTransactions);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Show'), findsOneWidget,
-          reason: 'The text "Show" (part of "Show More/Less") should be visible on the page.');
+      expect(
+        find.textContaining('Show'),
+        findsOneWidget,
+        reason:
+            'The text "Show" (part of "Show More/Less") should be visible on the page.',
+      );
     });
 
-    testWidgets('Load card button opens the load amount dialog with pay button', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Load card button opens the load amount dialog with pay button',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
 
-      final loadCardButton = find.widgetWithText(ElevatedButton, 'Load card');
-      await tester.tap(loadCardButton);
-      await tester.pump();
+        final loadCardButton = find.widgetWithText(ElevatedButton, 'Load card');
+        await tester.tap(loadCardButton);
+        await tester.pump();
 
-      expect(find.byType(AlertDialog), findsOneWidget, reason: 'The AlertDialog for loading card should be displayed.');
+        expect(
+          find.byType(AlertDialog),
+          findsOneWidget,
+          reason: 'The AlertDialog for loading card should be displayed.',
+        );
 
-      expect(find.text('Enter load amount'), findsOneWidget, reason: 'The dialog should have the title "Enter load amount".');
+        expect(
+          find.widgetWithText(ElevatedButton, 'Pay'),
+          findsOneWidget,
+          reason: 'The dialog must contain a "Pay" ElevatedButton.',
+        );
 
-      expect(find.widgetWithText(ElevatedButton, 'Pay'), findsOneWidget, reason: 'The dialog must contain a "Pay" ElevatedButton.');
+        final cancelButton = find.widgetWithText(TextButton, 'Cancel');
+        await tester.tap(cancelButton);
+        await tester.pumpAndSettle();
+        expect(
+          find.byType(AlertDialog),
+          findsNothing,
+          reason: 'Dialog should be dismissed.',
+        );
+      },
+    );
 
-      final cancelButton = find.widgetWithText(TextButton, 'Cancel');
-      await tester.tap(cancelButton);
-      await tester.pumpAndSettle();
-      expect(find.byType(AlertDialog), findsNothing, reason: 'Dialog should be dismissed.');
-    });
+    testWidgets(
+      'Shows error dialog and navigates to login when user is not known',
+      (WidgetTester tester) async {
+        when(() => mockAuthService.getCurrentUserId).thenReturn(null);
 
-    testWidgets('Shows error dialog and navigates to login when user is not known', (WidgetTester tester) async {
-      when(() => mockAuthService.getCurrentUserId).thenReturn(null);
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Error'), findsOneWidget);
+        expect(find.text('User not known'), findsOneWidget);
+        expect(find.byIcon(Icons.error), findsOneWidget);
 
-      expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Error'), findsOneWidget);
-      expect(find.text('User not known'), findsOneWidget);
-      expect(find.byIcon(Icons.error), findsOneWidget);
+        final okButton = find.widgetWithText(TextButton, 'OK');
+        await tester.tap(okButton);
+        await tester.pumpAndSettle();
 
-      final okButton = find.widgetWithText(TextButton, 'OK');
-      await tester.tap(okButton);
-      await tester.pumpAndSettle();
+        expect(find.text('Login Page'), findsOneWidget);
+      },
+    );
 
-      expect(find.text('Login Page'), findsOneWidget);
-    });
+    testWidgets(
+      'Shows error dialog and navigates to scanner when balance fetch fails',
+      (WidgetTester tester) async {
+        when(
+          () => mockProfileService.getUserBalanceById('test-user-id'),
+        ).thenThrow(Exception('Network error'));
 
-    testWidgets('Shows error dialog and navigates to scanner when balance fetch fails', (WidgetTester tester) async {
-      when(() => mockProfileService.getUserBalanceById('test-user-id'))
-          .thenThrow(Exception('Network error'));
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Error'), findsOneWidget);
+        expect(find.text('Failed to fetch balance'), findsOneWidget);
 
-      expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Error'), findsOneWidget);
-      expect(find.text('Failed to fetch balance'), findsOneWidget);
+        final okButton = find.widgetWithText(TextButton, 'OK');
+        await tester.tap(okButton);
+        await tester.pumpAndSettle();
 
-      final okButton = find.widgetWithText(TextButton, 'OK');
-      await tester.tap(okButton);
-      await tester.pumpAndSettle();
+        expect(find.text('Scanner Page'), findsOneWidget);
+      },
+    );
 
-      expect(find.text('Scanner Page'), findsOneWidget);
-    });
+    testWidgets(
+      'Displays default values when getUserBalanceById returns null',
+      (WidgetTester tester) async {
+        when(
+          () => mockProfileService.getUserBalanceById('test-user-id'),
+        ).thenAnswer((_) async => null);
 
-    testWidgets('Displays default values when getUserBalanceById returns null', (WidgetTester tester) async {
-      when(() => mockProfileService.getUserBalanceById('test-user-id'))
-          .thenAnswer((_) async => null);
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+        expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+        expect(find.text('John Doe'), findsOneWidget);
+      },
+    );
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
-      expect(find.text('John Doe'), findsOneWidget);
-    });
-
-    testWidgets('Displays transactions when fetched successfully', (WidgetTester tester) async {
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => fiveMockRawTransactions.take(3).toList());
+    testWidgets('Displays transactions when fetched successfully', (
+      WidgetTester tester,
+    ) async {
+      when(
+        () => mockTransactionService.getTransactionsForUser(),
+      ).thenAnswer((_) async => fiveMockRawTransactions.take(3).toList());
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -221,9 +299,12 @@ void main() {
       expect(find.byIcon(Icons.receipt_long), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('Show More button expands transaction list', (WidgetTester tester) async {
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => fiveMockRawTransactions);
+    testWidgets('Show More button expands transaction list', (
+      WidgetTester tester,
+    ) async {
+      when(
+        () => mockTransactionService.getTransactionsForUser(),
+      ).thenAnswer((_) async => fiveMockRawTransactions);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -241,9 +322,12 @@ void main() {
       verify(() => mockTransactionService.getTransactionsForUser()).called(2);
     });
 
-    testWidgets('Show Less button collapses transaction list', (WidgetTester tester) async {
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => fiveMockRawTransactions);
+    testWidgets('Show Less button collapses transaction list', (
+      WidgetTester tester,
+    ) async {
+      when(
+        () => mockTransactionService.getTransactionsForUser(),
+      ).thenAnswer((_) async => fiveMockRawTransactions);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -262,7 +346,9 @@ void main() {
       verify(() => mockTransactionService.getTransactionsForUser()).called(3);
     });
 
-    testWidgets('Shows snackbar when invalid amount (zero) is entered', (WidgetTester tester) async {
+    testWidgets('Verify styling of load card dialog elements', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
@@ -270,67 +356,60 @@ void main() {
       await tester.tap(loadCardButton);
       await tester.pump();
 
-      final textField = find.byType(TextField);
-      await tester.enterText(textField, '0');
+      // Verify dialog title
+      expect(find.text('Load Loyalty Card'), findsOneWidget);
 
-      final payButton = find.widgetWithText(ElevatedButton, 'Pay');
-      await tester.tap(payButton);
-      await tester.pumpAndSettle();
+      // Verify initial amount display
+      expect(find.text('\$1.00'), findsOneWidget);
 
-      expect(find.text('Please enter a valid amount'), findsOneWidget);
-    });
+      // Verify choice chips exist
+      expect(find.text('\$10'), findsOneWidget);
+      expect(find.text('\$15'), findsOneWidget);
+      expect(find.text('\$25'), findsOneWidget);
 
-    testWidgets('Shows snackbar when negative amount is entered', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
+      // Verify increment/decrement buttons
+      expect(find.text('-25¢'), findsOneWidget);
+      expect(find.text('+25¢'), findsOneWidget);
 
-      final loadCardButton = find.widgetWithText(ElevatedButton, 'Load card');
-      await tester.tap(loadCardButton);
+      // Verify slider exists
+      expect(find.byType(Slider), findsOneWidget);
+
+      // Verify action buttons
+      expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Pay'), findsOneWidget);
+
+      // Verify descriptive text
+      expect(
+        find.text('Select an amount to add to your card.'),
+        findsOneWidget,
+      );
+
+      // Test decrement button is disabled at minimum (1.0)
+      final decrementButton = find.widgetWithText(OutlinedButton, '-25¢');
+      final OutlinedButton decrementWidget = tester.widget(decrementButton);
+      expect(decrementWidget.onPressed, isNull); // Should be disabled at 1.0
+
+      // Test increment button functionality
+      final incrementButton = find.widgetWithText(OutlinedButton, '+25¢');
+      await tester.tap(incrementButton);
       await tester.pump();
+      expect(find.text('\$1.25'), findsOneWidget);
 
-      final textField = find.byType(TextField);
-      await tester.enterText(textField, '-10');
-
-      final payButton = find.widgetWithText(ElevatedButton, 'Pay');
-      await tester.tap(payButton);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please enter a valid amount'), findsOneWidget);
-    });
-
-    testWidgets('Shows snackbar when invalid text is entered', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      final loadCardButton = find.widgetWithText(ElevatedButton, 'Load card');
-      await tester.tap(loadCardButton);
+      // Verify decrement is now enabled
+      await tester.tap(decrementButton);
       await tester.pump();
+      expect(find.text('\$1.00'), findsOneWidget);
 
-      final textField = find.byType(TextField);
-      await tester.enterText(textField, 'invalid');
-
-      final payButton = find.widgetWithText(ElevatedButton, 'Pay');
-      await tester.tap(payButton);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please enter a valid amount'), findsOneWidget);
-    });
-
-    testWidgets('Verify styling of load card dialog elements', (WidgetTester tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      final loadCardButton = find.widgetWithText(ElevatedButton, 'Load card');
-      await tester.tap(loadCardButton);
+      // Test choice chip selection
+      await tester.tap(find.text('\$10'));
       await tester.pump();
+      expect(find.text('\$10.00'), findsOneWidget);
 
-      final textField = find.byType(TextField);
-      expect(textField, findsOneWidget);
-
-      final TextField widget = tester.widget(textField);
-      expect(widget.decoration?.prefixText, equals('\$ '));
-      expect(widget.keyboardType, equals(const TextInputType.numberWithOptions(decimal: true)));
-      expect(widget.autofocus, isTrue);
+      // Verify slider properties
+      final Slider sliderWidget = tester.widget(find.byType(Slider));
+      expect(sliderWidget.min, equals(1.0));
+      expect(sliderWidget.max, equals(50.0));
+      expect(sliderWidget.value, equals(10.0));
     });
   });
 }

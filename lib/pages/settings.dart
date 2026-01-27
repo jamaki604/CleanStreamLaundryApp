@@ -7,6 +7,7 @@ import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -22,66 +23,53 @@ class _SettingsState extends State<Settings> {
     return Consumer<ThemeManager>(
       builder: (context, themeManager, child) {
         return BasePage(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Settings \n",
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontSecondary,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/Logo.png', width: 230, height: 230),
+                  SizedBox(height: 16),
+                  SettingsCard(
+                    icon: Icons.lightbulb,
+                    title: Theme.of(context).colorScheme.modeChangerText,
+                    onTap: () {
+                      themeManager.toggleTheme();
+                    },
                   ),
-                  textAlign: TextAlign.center,
-                ),
-
-                ElevatedButton(
-                  onPressed: () {
-                    authService.logout();
-                    context.go('/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.money,
+                    title: "Monthly Report",
+                    onTap: () async {
+                      final transactions = await transactionService
+                          .getTransactionsForUser();
+                      context.go(
+                        '/monthlyTransactionHistory',
+                        extra: transactions,
+                      );
+                    },
                   ),
-                  child: Text("Sign Out"),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    themeManager.toggleTheme();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.request_page,
+                    title: "Request Refund",
+                    onTap: () {
+                      context.go('/refundPage');
+                    },
                   ),
-                  child: Text(Theme.of(context).colorScheme.modeChangerText),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final transactions = await transactionService.getTransactionsForUser();
-                    context.go('/monthlyTransactionHistory', extra: transactions);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.logout,
+                    title: "Sign Out",
+                    onTap: () {
+                      authService.logout();
+                      context.go('/login');
+                    },
                   ),
-                  child: Text("Monthly Report"),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    context.go('/refundPage');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text("Request Refund"),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
