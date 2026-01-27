@@ -3,6 +3,7 @@ PODS:
     - Flutter
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
+    - Flutter
   - flutter_native_splash (2.4.3):
     - Flutter
   - mobile_scanner (7.0.0):
@@ -139,6 +140,6 @@ SPEC CHECKSUMS:
   StripeUICore: a63d95d604e70a5895f9d6b09c49a46757e86353
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
-PODFILE CHECKSUM: 9e7f5b21c32dcb172491ee992950f2b455b1501d
+PODFILE CHECKSUM: dde47d96407cc4773a0230668fc39f2886630aa8
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2
