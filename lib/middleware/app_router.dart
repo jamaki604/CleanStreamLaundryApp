@@ -119,7 +119,7 @@ class RouterService {
         path: '/change-email-verification',
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: ChangeEmailVerificationPage(),
+          child: ChangeEmailVerificationPage(appLinks: AppLinks()),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,
