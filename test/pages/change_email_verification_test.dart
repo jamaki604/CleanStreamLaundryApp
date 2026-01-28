@@ -66,7 +66,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/change-email-verification',
-          builder: (context, state) => ChangeEmailVerificationPage(),
+          builder: (context, state) => ChangeEmailVerificationPage(appLinks: fakeAppLinks,),
         ),
         GoRoute(path: '/homePage', builder: (context, state) => HomePage()),
       ],
@@ -309,5 +309,19 @@ void main() {
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.backgroundColor, isNotNull);
     });
+
+    testWidgets("Tests for an app link",(tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      fakeAppLinks.emit(Uri.parse('clean-stream://change-email'));
+
+      await tester.pumpAndSettle();
+      await tester.pump();
+
+      verify(() => mockAuthService.refreshSession()).called(1);
+      verify(() => mockAuthService.getCurrentUser()).called(1);
+    });
+
   });
 }
