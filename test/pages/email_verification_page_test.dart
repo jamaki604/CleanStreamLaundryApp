@@ -17,6 +17,7 @@ void main() {
   late StreamController<bool> authChangeController;
   late MockMachineService mockMachineService;
   late MockLocationService mockLocationService;
+  late FakeAppLinks fakeAppLinks;
 
   setUpAll(() {
     registerFallbackValue(FakeAuthService());
@@ -27,6 +28,7 @@ void main() {
     authChangeController = StreamController<bool>.broadcast();
     mockMachineService = MockMachineService();
     mockLocationService = MockLocationService();
+    fakeAppLinks = FakeAppLinks();
 
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
     GetIt.instance.registerSingleton<MachineService>(mockMachineService);
@@ -52,7 +54,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/email-verification',
-          builder: (context, state) => EmailVerificationPage(),
+          builder: (context, state) => EmailVerificationPage(appLinks: fakeAppLinks,),
         ),
         GoRoute(path: '/homePage', builder: (context, state) => HomePage()),
         GoRoute(
@@ -343,6 +345,13 @@ void main() {
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.backgroundColor, isNotNull);
+    });
+
+    testWidgets('test deepLink is handled correctly', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      fakeAppLinks.emit(Uri.parse('clean-stream://change-email'));
     });
   });
 }
