@@ -20,11 +20,11 @@ void main() {
   test('getLocations returns fake addresses', () async {
 
     final fakeLocations = [
-      {'id': 1, 'Address': '49687 Made Up Drive, Muncie, IN'},
-      {'id': 2, 'Address': '39853 Fake Avenue, Muncie, IN'},
+      {'id': 1, 'Address': '49687 Made Up Drive, Muncie, IN', 'Latitude':32, 'Longitude':32},
+      {'id': 2, 'Address': '39853 Fake Avenue, Muncie, IN', 'Latitude': 44, 'Longitude': 44},
     ];
 
-    when(() => queryBuilderMock.select('id, Address'))
+    when(() => queryBuilderMock.select('id, Address, Latitude, Longitude'))
         .thenAnswer((_) => FakeFilterBuilder(fakeLocations));
 
     final locationHandler = SupabaseLocationHandler(client: supabaseMock);
