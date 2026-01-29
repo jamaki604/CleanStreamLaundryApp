@@ -14,14 +14,11 @@ void main() {
       // Verify Container exists
       expect(find.byType(Container), findsOneWidget);
 
-      // Verify Image exists with correct key
       expect(find.byKey(const Key('app_Icon')), findsOneWidget);
 
-      // Verify Image widget
       final imageFinder = find.byType(Image);
       expect(imageFinder, findsOneWidget);
 
-      // Verify Image properties
       final Image imageWidget = tester.widget(imageFinder);
       final AssetImage assetImage = imageWidget.image as AssetImage;
       expect(assetImage.assetName, 'assets/Icon.png');
