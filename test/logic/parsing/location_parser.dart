@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clean_stream_laundry_app/widgets/map_marker.dart';
+import 'package:flutter/material.dart';
 
 
 
@@ -98,22 +99,36 @@ void main() {
       expect(result[0].point.latitude, 40.7128);
       expect(result[1].point.latitude, 51.5074);
     });
+    group('LocationParser', () {
+      // Your existing tests...
 
-    test('parseLocations handles locations with extra fields', () {
-      final locations = [
-        {
-          'Latitude': 40.7128,
-          'Longitude': -74.0060,
-          'Name': 'New York',
-          'Population': 8000000
-        },
-      ];
+      // Add this widget test
+      testWidgets('parseLocations creates fully initialized Marker objects', (WidgetTester tester) async {
+        final locations = [
+          {'Latitude': 40.7128, 'Longitude': -74.0060},
+        ];
 
-      final result = LocationParser.parseLocations(locations);
+        final result = LocationParser.parseLocations(locations);
 
-      expect(result.length, 1);
-      expect(result[0].point.latitude, 40.7128);
-      expect(result[0].point.longitude, -74.0060);
+        expect(result.length, 1);
+
+        final marker = result[0];
+        expect(marker.point.latitude, 40.7128);
+        expect(marker.point.longitude, -74.0060);
+        expect(marker.width, 50);
+        expect(marker.height, 50);
+
+        // Actually build the widget to ensure it's instantiated
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: marker.child,
+            ),
+          ),
+        );
+
+        expect(find.byType(MapMarker), findsOneWidget);
+      });
     });
   });
 }

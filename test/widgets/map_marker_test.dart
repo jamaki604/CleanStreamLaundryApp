@@ -11,7 +11,6 @@ void main() {
         ),
       );
 
-      // Verify Container exists
       expect(find.byType(Container), findsOneWidget);
 
       expect(find.byKey(const Key('app_Icon')), findsOneWidget);
