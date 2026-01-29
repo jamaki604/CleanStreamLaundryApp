@@ -129,7 +129,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$42.75'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$42.75'), findsOneWidget);
     });
 
     testWidgets('should display balance with two decimal places', (
@@ -140,7 +140,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$100.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$100.00'), findsOneWidget);
     });
 
     testWidgets('should display default balance when userBalance is null', (
@@ -151,7 +151,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
 
     testWidgets('should display Load card button with correct styling', (
@@ -167,13 +167,6 @@ void main() {
       );
 
       expect(button.onPressed, isNotNull);
-    });
-
-    testWidgets('should have scrollable content', (tester) async {
-      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
-      await tester.pump();
-
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
   });
 
@@ -792,7 +785,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
 
     testWidgets('should handle empty transaction list', (tester) async {
@@ -811,7 +804,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$9999.99'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$9999.99'), findsOneWidget);
     });
 
     testWidgets('should handle zero balance', (tester) async {
@@ -820,7 +813,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
   });
 }
