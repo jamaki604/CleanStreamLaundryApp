@@ -123,13 +123,18 @@ class NotificationService {
     String notifTitle;
     String notifBody;
 
-    if (totalDelay.isNegative || userDelayMinutes <= 0) {
+    if (totalDelay.isNegative) {
       totalDelay = Duration.zero;
       notifTitle = "Machine Started!";
       final roundedDelay = givenDelay.inMinutes;
       final unit = roundedDelay == 1 ? "minute" : "minutes";
       notifBody = "Your machine will be finished in $roundedDelay $unit!";
-    } else {
+    }
+    else if(userDelayMinutes == 0){
+      notifTitle = "Machine Finished!";
+      notifBody = "Your machine is finished";
+  }
+    else {
       notifTitle = "Machine Almost Ready";
 
       final unit = userDelayMinutes == 1 ? "minute" : "minutes";
