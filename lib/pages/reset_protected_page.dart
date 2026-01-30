@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
 class ResetProtectedPage extends StatefulWidget {
@@ -13,15 +13,20 @@ class ResetProtectedPage extends StatefulWidget {
 }
 
 class _ResetProtectedPageState extends State<ResetProtectedPage> {
-  final edgeService = GetIt.instance<EdgeFunctionService>();
+  final SupabaseClient _client = Supabase.instance.client;
 
-  String? token;
+  String? code;
   bool loading = true;
   bool valid = false;
   String? lastReceivedUri;
   Map<String, String>? lastParams;
   final _pwController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  var iconColor = Colors.blue;
+  var enabledBorderColor = Colors.grey;
+  var focusedBorderColor = Colors.blue;
+  var labelColor = Colors.blue;
 
   @override
   void initState() {
@@ -62,10 +67,10 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
     final params = {...queryParams, ...fragmentParams};
 
-    // Common token param names: access_token, token, oobCode
-    token = params['access_token'] ?? params['token'] ?? params['oobCode'];
+    // Common code param names: code, oobCode
+    code = params['code'] ?? params['oobCode'];
 
-    if (token == null) {
+    if (code == null) {
       setState(() {
         loading = false;
         valid = false;
@@ -77,13 +82,9 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
       return;
     }
 
-    // Validate token via edge function (you should implement an edge function '/complete-reset')
     try {
-      final resp = await edgeService.runEdgeFunction(
-        name: 'validate-reset-token',
-        body: {'token': token},
-      );
-      if (resp != null && resp.status == 200) {
+      final response = await _client.auth.exchangeCodeForSession(code!);
+      if (response.session?.user != null) {
         setState(() {
           valid = true;
           loading = false;
@@ -109,26 +110,24 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || token == null) return;
+    if (!_formKey.currentState!.validate() || code == null) return;
     setState(() => loading = true);
 
-    final resp = await edgeService.runEdgeFunction(
-      name: 'complete-reset',
-      body: {'token': token, 'password': _pwController.text.trim()},
-    );
-
-    setState(() => loading = false);
-
-    if (resp != null && resp.status == 200) {
+    try {
+      await _client.auth.updateUser(
+        UserAttributes(password: _pwController.text.trim()),
+      );
+      setState(() => loading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password reset successful')),
         );
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/login', (route) => false);
+        if (mounted) {
+          context.go('/login');
+        }
       }
-    } else {
+    } catch (e) {
+      setState(() => loading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to reset password')),
@@ -173,6 +172,12 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Icon(
+                Icons.lock_reset,
+                size: 80,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(height: 16),
               Text(
                 'Invalid or expired reset link',
                 style: TextStyle(color: scheme.fontPrimary),
@@ -192,6 +197,14 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                     style: TextStyle(color: scheme.fontSecondary),
                   ),
               ],
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => context.go('/login'),
+                child: const Text(
+                  'Back to Login',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
             ],
           ),
         ),
@@ -200,34 +213,96 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
     return Scaffold(
       backgroundColor: scheme.surface,
-      appBar: AppBar(title: const Text('Set a New Password')),
+      appBar: AppBar(
+        title: const Text('Reset Password'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 32),
+              Icon(
+                Icons.lock_reset,
+                size: 80,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Set a new password',
+                style:
+                    Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: scheme.fontPrimary,
+                    ) ??
+                    TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: scheme.fontPrimary,
+                    ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 16),
+              Text(
+                'Enter a new password for your account.',
+                style:
+                    Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: scheme.fontSecondary,
+                    ) ??
+                    TextStyle(color: scheme.fontSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
               TextFormField(
                 controller: _pwController,
                 obscureText: true,
                 style: TextStyle(color: scheme.fontInverted),
                 decoration: InputDecoration(
                   labelText: 'New password',
-                  labelStyle: TextStyle(color: scheme.fontSecondary),
+                  labelStyle: TextStyle(color: labelColor),
                   filled: true,
                   fillColor: scheme.cardPrimary,
-                  border: const OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: focusedBorderColor,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.lock, color: iconColor),
                 ),
                 validator: _validatePw,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: loading ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
                 child: loading
                     ? const CircularProgressIndicator()
                     : const Text('Set Password'),
+              ),
+              TextButton(
+                onPressed: loading ? null : () => context.go('/login'),
+                child: const Text(
+                  'Back to Login',
+                  style: TextStyle(color: Colors.blue),
+                ),
               ),
             ],
           ),

@@ -72,9 +72,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
         });
 
         if (response == AuthenticationResponses.success) {
-          _showMessage(
-            'Password reset email sent! Check your email for the link.',
-          );
+          _showMessage('Password reset email sent! Check your email.');
         } else {
           _showMessage('Failed to send reset email.');
         }
