@@ -58,6 +58,7 @@ void main() {
       id: any(named: 'id'),
       givenDelay: any(named: 'givenDelay'),
     )).thenAnswer((_) async {});
+
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
     getIt.registerSingleton<LoyaltyViewModel>(mockLoyaltyViewModel);
   });
@@ -85,15 +86,15 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
 
       when(() => mockMachineService.getMachineById(any())).thenAnswer((
-          _,
-          ) async {
+        _,
+      ) async {
         await Future.delayed(Duration(milliseconds: 10));
         return {'Name': 'Washer01', 'Price': 3.50};
       });
 
       when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((
-          _,
-          ) async {
+        _,
+      ) async {
         await Future.delayed(Duration(milliseconds: 10));
         return {'balance': 10.0};
       });
@@ -111,14 +112,14 @@ void main() {
     });
 
     testWidgets('displays machine information after loading', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById('machine123'),
+        () => mockMachineService.getMachineById('machine123'),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-            () => mockProfileService.getUserBalanceById('user123'),
+        () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -132,7 +133,7 @@ void main() {
     testWidgets('handles null user ID gracefully', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn(null);
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -145,10 +146,10 @@ void main() {
     testWidgets('handles machine not found error', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => null);
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -163,10 +164,10 @@ void main() {
     testWidgets('displays both payment buttons', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -177,14 +178,14 @@ void main() {
     });
 
     testWidgets('disables loyalty button when balance is insufficient', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(() => mockProfileService.getUserBalanceById(any())).thenAnswer(
-            (_) async => {
+        (_) async => {
           'balance': 2.0, // Insufficient balance
         },
       );
@@ -202,14 +203,14 @@ void main() {
     });
 
     testWidgets('enables loyalty button when balance is sufficient', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -227,23 +228,23 @@ void main() {
 
   group('Loyalty payment Processing', () {
     testWidgets('processes loyalty payment successfully', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-            () => mockProfileService.updateBalanceById(any()),
+        () => mockProfileService.updateBalanceById(any()),
       ).thenAnswer((_) async => {});
       when(
-            () => mockMachineCommunicator.wakeDevice(any()),
+        () => mockMachineCommunicator.wakeDevice(any()),
       ).thenAnswer((_) async => true);
       when(
-            () => mockTransactionService.recordTransaction(
+        () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),
           type: any(named: 'type'),
@@ -260,7 +261,7 @@ void main() {
       verify(() => mockProfileService.updateBalanceById(6.5)).called(1);
       verify(() => mockMachineCommunicator.wakeDevice('machine123')).called(1);
       verify(
-            () => mockTransactionService.recordTransaction(
+        () => mockTransactionService.recordTransaction(
           amount: 3.50,
           description: any(named: 'description'),
           type: 'laundry',
@@ -269,20 +270,20 @@ void main() {
     });
 
     testWidgets('handles machine wake failure in loyalty payment', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-            () => mockProfileService.updateBalanceById(any()),
+        () => mockProfileService.updateBalanceById(any()),
       ).thenAnswer((_) async => {});
       when(
-            () => mockMachineCommunicator.wakeDevice(any()),
+        () => mockMachineCommunicator.wakeDevice(any()),
       ).thenAnswer((_) async => false);
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -294,7 +295,7 @@ void main() {
 
       expect(find.text('Machine Error'), findsWidgets);
       verifyNever(
-            () => mockTransactionService.recordTransaction(
+        () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),
           type: any(named: 'type'),
@@ -307,10 +308,10 @@ void main() {
     testWidgets('displays laundry service icon', (WidgetTester tester) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
@@ -320,14 +321,14 @@ void main() {
     });
 
     testWidgets('displays formatted price correctly', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
+        () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Dryer05', 'Price': 2.75});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 5.0});
 
       await tester.pumpWidget(createTestWidget('machine456'));
@@ -336,6 +337,45 @@ void main() {
       expect(find.text('Machine Dryer05'), findsOneWidget);
       expect(find.text('\$2.75'), findsOneWidget);
       expect(find.text('Pay \$2.75'), findsOneWidget);
+    });
+
+    testWidgets('sends notification after successful loyalty payment', (tester) async {
+      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+
+      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
+        'Name': 'Washer01',
+        'Price': 3.50,
+      });
+
+      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
+        'balance': 10.0,
+      });
+
+      when(() => mockProfileService.updateBalanceById(any())).thenAnswer((_) async {});
+      when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
+
+      when(() => mockTransactionService.recordTransaction(
+        amount: any(named: 'amount'),
+        description: any(named: 'description'),
+        type: any(named: 'type'),
+      )).thenAnswer((_) async {});
+
+      when(() => mockNotificationService.scheduleDelayedMachineNotification(
+        id: any(named: 'id'),
+        givenDelay: any(named: 'givenDelay'),
+      )).thenAnswer((_) async {});
+
+      await tester.pumpWidget(createTestWidget('machine123'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Pay with Loyalty'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      verify(() => mockNotificationService.scheduleDelayedMachineNotification(
+        id: 1,
+        givenDelay: any(named: 'givenDelay'),
+      )).called(1);
     });
   });
 }

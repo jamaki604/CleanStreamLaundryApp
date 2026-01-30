@@ -8,8 +8,8 @@ import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+  final flutterLocalNotificationsPlugin =
+  GetIt.instance<FlutterLocalNotificationsPlugin>();
 
   final profileService = GetIt.instance<ProfileService>();
 
