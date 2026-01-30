@@ -204,10 +204,28 @@ void main() {
       ]);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Loaded \$10.00 on 01/10/2025'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Used \$2.50 on 01/09/2025'),
+        100,
+        scrollable: find.descendant(
+          of: find.byType(ListView),
+          matching: find.byType(Scrollable),
+        ),
+      );
       expect(find.text('Used \$2.50 on 01/09/2025'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Loaded \$25.00 on 01/08/2025'),
+        100,
+        scrollable: find.descendant(
+          of: find.byType(ListView),
+          matching: find.byType(Scrollable),
+        ),
+      );
       expect(find.text('Loaded \$25.00 on 01/08/2025'), findsOneWidget);
     });
 
