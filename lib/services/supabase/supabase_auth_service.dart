@@ -198,4 +198,32 @@ class SupabaseAuthService implements AuthService {
     }
     return output;
   }
+
+  @override
+  Future<AuthenticationResponses> exchangeCodeForSession(String code) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
+    try {
+      final response = await _client.auth.exchangeCodeForSession(code);
+      if (response.session?.user != null) {
+        output = AuthenticationResponses.success;
+      }
+    } catch (e) {
+      output = AuthenticationResponses.failure;
+    }
+    return output;
+  }
+
+  @override
+  Future<AuthenticationResponses> updatePassword(String newPassword) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
+    try {
+      await _client.auth.updateUser(
+        UserAttributes(password: newPassword.trim()),
+      );
+      output = AuthenticationResponses.success;
+    } catch (e) {
+      output = AuthenticationResponses.failure;
+    }
+    return output;
+  }
 }

@@ -11,4 +11,6 @@ abstract class AuthService {
   Stream<bool> get onAuthChange;
   bool isEmailVerified();
   Future<AuthenticationResponses> resetPassword(String email);
+  Future<AuthenticationResponses> exchangeCodeForSession(String code);
+  Future<AuthenticationResponses> updatePassword(String newPassword);
 }

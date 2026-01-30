@@ -1,8 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:get_it/get_it.dart';
 
 class ResetProtectedPage extends StatefulWidget {
   final Uri? incomingUri;
@@ -13,7 +14,7 @@ class ResetProtectedPage extends StatefulWidget {
 }
 
 class _ResetProtectedPageState extends State<ResetProtectedPage> {
-  final SupabaseClient _client = Supabase.instance.client;
+  final authService = GetIt.instance<AuthService>();
 
   String? code;
   bool loading = true;
@@ -22,11 +23,6 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
   Map<String, String>? lastParams;
   final _pwController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
-  var iconColor = Colors.blue;
-  var enabledBorderColor = Colors.grey;
-  var focusedBorderColor = Colors.blue;
-  var labelColor = Colors.blue;
 
   @override
   void initState() {
@@ -41,9 +37,6 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
     });
 
     Uri effective = uri ?? Uri.base;
-
-    // log for debugging
-    print('reset-protected received uri: $effective');
 
     // Accept cases where path contains reset-protected (some redirects use path instead of host)
     final isResetUri =
@@ -83,8 +76,8 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
     }
 
     try {
-      final response = await _client.auth.exchangeCodeForSession(code!);
-      if (response.session?.user != null) {
+      final response = await authService.exchangeCodeForSession(code!);
+      if (response == AuthenticationResponses.success) {
         setState(() {
           valid = true;
           loading = false;
@@ -114,16 +107,24 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
     setState(() => loading = true);
 
     try {
-      await _client.auth.updateUser(
-        UserAttributes(password: _pwController.text.trim()),
+      final response = await authService.updatePassword(
+        _pwController.text.trim(),
       );
       setState(() => loading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset successful')),
-        );
+      if (response == AuthenticationResponses.success) {
         if (mounted) {
-          context.go('/login');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Password reset successful')),
+          );
+          if (mounted) {
+            context.go('/login');
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to reset password')),
+          );
         }
       }
     } catch (e) {
@@ -200,9 +201,9 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.go('/login'),
-                child: const Text(
+                child: Text(
                   'Back to Login',
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: scheme.primary),
                 ),
               ),
             ],
@@ -265,24 +266,21 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                 style: TextStyle(color: scheme.fontInverted),
                 decoration: InputDecoration(
                   labelText: 'New password',
-                  labelStyle: TextStyle(color: labelColor),
+                  labelStyle: TextStyle(color: scheme.primary),
                   filled: true,
                   fillColor: scheme.cardPrimary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: focusedBorderColor,
-                      width: 2.0,
-                    ),
+                    borderSide: BorderSide(color: scheme.primary, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderSide: BorderSide(color: scheme.outline),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: Icon(Icons.lock, color: iconColor),
+                  prefixIcon: Icon(Icons.lock, color: scheme.primary),
                 ),
                 validator: _validatePw,
               ),
@@ -290,8 +288,8 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
               ElevatedButton(
                 onPressed: loading ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  backgroundColor: scheme.primary,
+                  foregroundColor: scheme.onPrimary,
                 ),
                 child: loading
                     ? const CircularProgressIndicator()
@@ -299,9 +297,9 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
               ),
               TextButton(
                 onPressed: loading ? null : () => context.go('/login'),
-                child: const Text(
+                child: Text(
                   'Back to Login',
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: scheme.primary),
                 ),
               ),
             ],
