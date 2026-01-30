@@ -44,6 +44,44 @@ class _SettingsState extends State<Settings> {
     await profileService.setNotificationDelay(newDelayValue);
   }
 
+  Future<void> _showSignOutConfirmation() async {
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User cancelled
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirmed
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+
+    if (shouldSignOut == true) {
+      authService.logout();
+      if (mounted) {
+        context.go('/login');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
@@ -171,8 +209,7 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.logout,
                     title: "Sign Out",
                     onTap: () {
-                      authService.logout();
-                      context.go('/login');
+                      _showSignOutConfirmation();
                     },
                   ),
                 ],

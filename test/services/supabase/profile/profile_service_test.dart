@@ -94,7 +94,7 @@ void main() {
   });
 
   test("Tests that updateBalanceID catches unknown exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test execption"));
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
     await profileHandler.updateBalanceById(47.20);
     //Test will fail if exception was not caught
   });
@@ -127,4 +127,28 @@ void main() {
     var result = await profileHandler.getUserRefundAttempts("1234");
     expect(result, "0");
   });
+
+  test("Tests that the logic was called correctly to update account name", () async {
+    await profileHandler.updateName("testName");
+    verify(() => supabaseMock.auth.currentUser).called(1);
+    verify(() => supabaseMock.from("profiles")).called(1);
+    verify(() => queryBuilderMock.update({"full_name": "testName"})).called(1);
+  });
+
+  test("Tests that updateName catches Postgrest exception", () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+  });
+
+  test("Tests that updateName throws unknown exception", () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+  });
+
+  test("Tests that updateName throws exception when userID is null ", () async {
+    when(() => supabaseAuth.currentUser?.id).thenReturn(null);
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+  });
+
 }

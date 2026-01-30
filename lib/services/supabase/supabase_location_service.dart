@@ -14,7 +14,7 @@ class SupabaseLocationHandler extends LocationService{
     try {
       final response = await _client
           .from('Locations')
-          .select('id, Address');
+          .select('id, Address, Latitude, Longitude');
 
       return response;
     } on PostgrestException  {

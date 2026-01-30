@@ -8,7 +8,10 @@ import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
 class ChangeEmailVerificationPage extends StatefulWidget {
-  const ChangeEmailVerificationPage({super.key});
+
+  final AppLinks appLinks;
+
+  const ChangeEmailVerificationPage({super.key,required this.appLinks});
 
   @override
   State<ChangeEmailVerificationPage> createState() =>
@@ -18,14 +21,13 @@ class ChangeEmailVerificationPage extends StatefulWidget {
 class _ChangeEmailVerificationPageState
     extends State<ChangeEmailVerificationPage> {
   late final StreamSubscription? _linkSub;
-  final AppLinks _appLinks = AppLinks();
   final authService = GetIt.instance<AuthService>();
 
   @override
   void initState() {
     super.initState();
 
-    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
+    _linkSub = widget.appLinks.uriLinkStream.listen((Uri? uri) async {
       if (uri != null &&
           uri.scheme == 'clean-stream' &&
           uri.host == 'change-email') {

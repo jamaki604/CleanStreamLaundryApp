@@ -95,8 +95,9 @@ void main() {
 
     testWidgets(
       'should call logout and navigate to login when Sign Out is tapped',
-      (WidgetTester tester) async {
-        when(() => mockAuthService.logout()).thenAnswer((_) async => {});
+          (WidgetTester tester) async {
+        when(() => mockAuthService.logout())
+            .thenAnswer((_) async {});
 
         await tester.pumpWidget(createWidgetUnderTest());
 
@@ -106,13 +107,24 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Find and tap the Sign Out card
+        // Tap the Sign Out card
         await tester.tap(find.widgetWithText(SettingsCard, 'Sign Out'));
         await tester.pumpAndSettle();
 
+        //Test to see if dialog box appears
+        expect(find.text('Are you sure you want to sign out?'), findsOneWidget);
+
+        // Tap dialog "Sign Out" button
+        await tester.tap(
+          find.widgetWithText(ElevatedButton, 'Sign Out'),
+        );
+        await tester.pumpAndSettle();
+
+        // Verify logout was called
         verify(() => mockAuthService.logout()).called(1);
       },
     );
+
 
     testWidgets('should call toggleTheme when theme card is tapped', (
       WidgetTester tester,
