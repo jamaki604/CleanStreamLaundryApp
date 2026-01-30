@@ -26,4 +26,6 @@ abstract class AuthService {
     String? email,
     Map<String, dynamic>? data,
   });
+  Future<AuthenticationResponses> exchangeCodeForSession(String code);
+  Future<AuthenticationResponses> updatePassword(String newPassword);
 }

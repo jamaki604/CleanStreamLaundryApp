@@ -21,11 +21,6 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   StreamSubscription? _linkSub;
   final AppLinks _appLinks = AppLinks();
 
-  var iconColor = Colors.blue;
-  var enabledBorderColor = Colors.grey;
-  var focusedBorderColor = Colors.blue;
-  var labelColor = Colors.blue;
-
   final authService = GetIt.instance<AuthService>();
 
   @override
@@ -153,25 +148,22 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: TextStyle(color: labelColor),
+                  labelStyle: TextStyle(color: scheme.primary),
                   hintText: 'Enter your email address',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: focusedBorderColor,
-                      width: 2.0,
-                    ),
+                    borderSide: BorderSide(color: scheme.primary, width: 2.0),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: enabledBorderColor),
+                    borderSide: BorderSide(color: scheme.outline),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
                   fillColor: scheme.cardPrimary,
-                  prefixIcon: Icon(Icons.email, color: iconColor),
+                  prefixIcon: Icon(Icons.email, color: scheme.primary),
                 ),
                 validator: _validateEmail,
                 enabled: !_isLoading,
@@ -184,8 +176,8 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                       child: ElevatedButton(
                         onPressed: _sendResetEmail,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
+                          backgroundColor: scheme.primary,
+                          foregroundColor: scheme.onPrimary,
                         ),
                         child: const Text('Send Reset Link'),
                       ),
@@ -193,9 +185,9 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: _isLoading ? null : () => context.pop(),
-                child: const Text(
+                child: Text(
                   'Back to Login',
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: scheme.primary),
                 ),
               ),
             ],
