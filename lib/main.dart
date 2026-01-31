@@ -91,7 +91,8 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<NotificationService>(
-      () => NotificationService());
+        () => NotificationService(initialize: true),
+  );
 
   getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
 

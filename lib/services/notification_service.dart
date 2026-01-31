@@ -1,19 +1,23 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get_it/get_it.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import '../main.dart';
 
 
 class NotificationService {
-  final flutterLocalNotificationsPlugin =
-  GetIt.instance<FlutterLocalNotificationsPlugin>();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final ProfileService profileService;
 
-  final profileService = GetIt.instance<ProfileService>();
-
-  NotificationService() {
+  NotificationService({
+    FlutterLocalNotificationsPlugin? plugin,
+    ProfileService? profileService, required bool initialize,
+  })  : flutterLocalNotificationsPlugin =
+      plugin ?? getIt<FlutterLocalNotificationsPlugin>(),
+        profileService = profileService ?? getIt<ProfileService>() {
     _init();
   }
 
