@@ -29,7 +29,10 @@ class SupabaseAuthService implements AuthService {
       if (_client.auth.currentUser != null) {
         output = AuthenticationResponses.success;
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+      return output;
+    }
     return output;
   }
 
@@ -253,11 +256,56 @@ class SupabaseAuthService implements AuthService {
   }) async {
     final response = await _client.auth.updateUser(
       UserAttributes(email: email, data: data),
-      emailRedirectTo: "clean-stream://change-email"
+      emailRedirectTo: "clean-stream://change-email",
     );
 
     if (response.user == null) {
       throw Exception("Failed to update user attributes");
     }
+  }
+
+  @override
+  Future<AuthenticationResponses> resetPassword(String email) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
+    try {
+      // Send password reset email and redirect back to the app via deep link.
+      await _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'clean-stream://reset-protected',
+      );
+      output = AuthenticationResponses.success;
+    } catch (e) {
+      print('resetPassword error: $e');
+      output = AuthenticationResponses.failure;
+    }
+    return output;
+  }
+
+  @override
+  Future<AuthenticationResponses> exchangeCodeForSession(String code) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
+    try {
+      final response = await _client.auth.exchangeCodeForSession(code);
+      if (response.session.user != null) {
+        output = AuthenticationResponses.success;
+      }
+    } catch (e) {
+      output = AuthenticationResponses.failure;
+    }
+    return output;
+  }
+
+  @override
+  Future<AuthenticationResponses> updatePassword(String newPassword) async {
+    AuthenticationResponses output = AuthenticationResponses.failure;
+    try {
+      await _client.auth.updateUser(
+        UserAttributes(password: newPassword.trim()),
+      );
+      output = AuthenticationResponses.success;
+    } catch (e) {
+      output = AuthenticationResponses.failure;
+    }
+    return output;
   }
 }

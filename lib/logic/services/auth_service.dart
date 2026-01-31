@@ -15,6 +15,7 @@ abstract class AuthService {
   Future<AuthenticationResponses> resendVerification();
   Stream<bool> get onAuthChange;
   bool isEmailVerified();
+  Future<AuthenticationResponses> resetPassword(String email);
   Future<void> appleSignIn();
   Future<void> googleSignIn();
   Future<void> handleOAuthRedirect(Uri uri);
@@ -25,4 +26,6 @@ abstract class AuthService {
     String? email,
     Map<String, dynamic>? data,
   });
+  Future<AuthenticationResponses> exchangeCodeForSession(String code);
+  Future<AuthenticationResponses> updatePassword(String newPassword);
 }

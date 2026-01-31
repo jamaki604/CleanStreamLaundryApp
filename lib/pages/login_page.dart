@@ -12,10 +12,9 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
-
   final AppLinks appLinks;
 
-  const LoginScreen({super.key,required this.appLinks});
+  const LoginScreen({super.key, required this.appLinks});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -39,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final profileService = GetIt.instance<ProfileService>();
   late final StreamSubscription<Uri?> _listener;
 
-  final FocusNode _focusNode =  FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -51,19 +50,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
         context.go("/homePage");
-      }else if (uri.scheme == 'clean-stream' && uri.host == 'oauth') {
-
+      } else if (uri.scheme == 'clean-stream' && uri.host == 'oauth') {
         await authService.handleOAuthRedirect(uri);
 
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
-
           if (!mounted) return;
           final currentUser = authService.getCurrentUser();
 
           if (currentUser != null) {
-
             final userId = currentUser.id;
-            final name = currentUser.userMetadata?['full_name'] ??
+            final name =
+                currentUser.userMetadata?['full_name'] ??
                 currentUser.userMetadata?['name'] ??
                 currentUser.userMetadata?['given_name'];
 
@@ -132,12 +129,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: KeyboardListener(
-      focusNode: _focusNode,
-      autofocus: kIsWeb,
-      onKeyEvent: (keyEvent) {
-        if(keyEvent is KeyDownEvent && keyEvent.logicalKey == LogicalKeyboardKey.enter){
-          _handleLogin();
-        }},
+        focusNode: _focusNode,
+        autofocus: kIsWeb,
+        onKeyEvent: (keyEvent) {
+          if (keyEvent is KeyDownEvent &&
+              keyEvent.logicalKey == LogicalKeyboardKey.enter) {
+            _handleLogin();
+          }
+        },
         child: ScrollbarTheme(
           data: ScrollbarThemeData(
             thumbColor: WidgetStateProperty.all(Colors.blue),
@@ -153,7 +152,12 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset("assets/Logo.png", height: 250, width: 250,key: const Key('app_logo'),),
+                  Image.asset(
+                    "assets/Logo.png",
+                    height: 250,
+                    width: 250,
+                    key: const Key('app_logo'),
+                  ),
                   TextField(
                     controller: _emailCtrl,
                     style: TextStyle(
@@ -166,7 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
+                        borderSide: BorderSide(
+                          color: focusedBorderColor,
+                          width: 2.0,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -191,7 +198,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
+                        borderSide: BorderSide(
+                          color: focusedBorderColor,
+                          width: 2.0,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -201,7 +211,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icon(Icons.lock, color: iconColor),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: Colors.blue,
                         ),
                         onPressed: () {
@@ -221,7 +233,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: _handleLogin,
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
                       child: const Text('Log In'),
                     ),
                   ),
@@ -243,9 +257,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset("assets/Google.png", width: 16, height: 16, key: const Key('google_logo')),
+                            Image.asset(
+                              "assets/Google.png",
+                              width: 16,
+                              height: 16,
+                              key: const Key('google_logo'),
+                            ),
                             const SizedBox(width: 8),
-                            const Text("Sign in with Google", style: TextStyle(fontSize: 14)),
+                            const Text(
+                              "Sign in with Google",
+                              style: TextStyle(fontSize: 14),
+                            ),
                           ],
                         ),
                       ),
@@ -271,8 +293,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: const [
                             Icon(Icons.apple, size: 16),
                             SizedBox(width: 8),
-                            Text("Sign in with Apple", style: TextStyle(fontSize: 14)),
+                            Text(
+                              "Sign in with Apple",
+                              style: TextStyle(fontSize: 14),
+                            ),
                           ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: InkWell(
+                      onTap: () => context.go("/signup"),
+                      child: const Text(
+                        'Create Account',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),
@@ -280,9 +319,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: InkWell(
-                      onTap: () => context.go("/signup"),
+                      onTap: () => context.go("/password-reset"),
                       child: const Text(
-                        'Create Account',
+                        'Reset Password',
                         style: TextStyle(
                           color: Colors.blue,
                           decoration: TextDecoration.underline,
