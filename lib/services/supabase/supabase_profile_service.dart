@@ -117,27 +117,27 @@ class SupabaseProfileService extends ProfileService {
   }
 
   @override
-  Future<int> getNotificationDelay() async {
+  Future<int> getNotificationLeadTime() async {
     final user = _client.auth.currentUser;
     if (user == null) return 5;
 
     final response = await _client
         .from('profiles')
-        .select('notif_delay')
+        .select('notif_lead_time')
         .eq('id', user.id)
         .single();
 
-    return (response['notif_delay'] as int?) ?? 5;
+    return (response['notif_lead_time'] as int?) ?? 5;
   }
 
   @override
-  Future<void> setNotificationDelay(int value) async {
+  Future<void> setNotificationLeadTime(int value) async {
     final user = _client.auth.currentUser;
     if (user == null) return;
 
     await _client
         .from('profiles')
-        .update({'notif_delay': value})
+        .update({'notif_lead_time': value})
         .eq('id', user.id);
   }
 }

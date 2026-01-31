@@ -86,7 +86,7 @@ void main() {
       any(),
     )).thenAnswer((_) async {});
 
-    when(() => mockProfileService.getNotificationDelay())
+    when(() => mockProfileService.getNotificationLeadTime())
         .thenAnswer((_) async => 5);
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -116,14 +116,14 @@ void main() {
         profileService: mockProfileService,
       );
 
-      when(() => mockProfileService.getNotificationDelay())
+      when(() => mockProfileService.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
-      const givenDelay = Duration(minutes: 5);
+      const givenMachineTime = Duration(minutes: 5);
 
-      service.scheduleDelayedMachineNotification(
+      service.scheduleEarlyMachineNotification(
         id: 1,
-        givenDelay: givenDelay,
+        machineTime: givenMachineTime,
       );
 
       async.elapse(Duration.zero);
@@ -144,14 +144,14 @@ void main() {
         profileService: mockProfileService,
       );
 
-      when(() => mockProfileService.getNotificationDelay())
+      when(() => mockProfileService.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
-      const givenDelay = Duration(minutes: 20);
+      const givenMachineTime = Duration(minutes: 20);
 
-      service.scheduleDelayedMachineNotification(
+      service.scheduleEarlyMachineNotification(
         id: 2,
-        givenDelay: givenDelay,
+        machineTime: givenMachineTime,
       );
 
       async.elapse(const Duration(minutes: 15));
@@ -173,14 +173,14 @@ void main() {
         profileService: mockProfileService,
       );
 
-      when(() => mockProfileService.getNotificationDelay())
+      when(() => mockProfileService.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
-      const givenDelay = Duration(minutes: 3);
+      const givenMachineTime = Duration(minutes: 3);
 
-      service.scheduleDelayedMachineNotification(
+      service.scheduleEarlyMachineNotification(
         id: 3,
-        givenDelay: givenDelay,
+        machineTime: givenMachineTime,
       );
 
       async.elapse(Duration.zero);

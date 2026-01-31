@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
@@ -112,40 +110,40 @@ class NotificationService {
     });
   }
 
-  Future<void> scheduleDelayedMachineNotification({
+  Future<void> scheduleEarlyMachineNotification({
     required int id,
-    required Duration givenDelay,
+    required Duration machineTime,
   }) async {
     final allowed = await _requestPermission();
     if (!allowed) return;
 
-    final userDelayMinutes = await profileService.getNotificationDelay();
-    final userDelay = Duration(minutes: userDelayMinutes);
+    final userLeadTime = await profileService.getNotificationLeadTime();
+    final userLeadMinutes = Duration(minutes: userLeadTime);
 
-    Duration totalDelay = givenDelay - userDelay;
+    Duration arrivalTime = machineTime - userLeadMinutes;
 
     String notifTitle;
     String notifBody;
 
-    if (totalDelay.isNegative) {
-      totalDelay = Duration.zero;
+    if (arrivalTime.isNegative) {
+      arrivalTime = Duration.zero;
       notifTitle = "Machine Started!";
-      final roundedDelay = givenDelay.inMinutes;
+      final roundedDelay = machineTime.inMinutes;
       final unit = roundedDelay == 1 ? "minute" : "minutes";
       notifBody = "Your machine will be finished in $roundedDelay $unit!";
     }
-    else if(userDelayMinutes == 0){
+    else if(userLeadTime == 0){
       notifTitle = "Machine Finished!";
       notifBody = "Your machine is finished";
   }
     else {
       notifTitle = "Machine Almost Ready";
 
-      final unit = userDelayMinutes == 1 ? "minute" : "minutes";
-      notifBody = "Your machine will be ready in $userDelayMinutes $unit!";
+      final unit = userLeadTime == 1 ? "minute" : "minutes";
+      notifBody = "Your machine will be ready in $userLeadTime $unit!";
     }
 
-    Future.delayed(totalDelay, () async {
+    Future.delayed(arrivalTime, () async {
       await flutterLocalNotificationsPlugin.show(
         id,
         notifTitle,

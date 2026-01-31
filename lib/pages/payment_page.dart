@@ -74,11 +74,11 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Future<void> makeNotification() async {
     final notificationService = GetIt.instance<NotificationService>();
-    await notificationService.scheduleDelayedMachineNotification(
+    await notificationService.scheduleEarlyMachineNotification(
       id: 1,
       //This is where we would add code to get the machine finish time
       //Use the machine finish time instead of hardcoding 5 mins
-      givenDelay: const Duration(minutes: 5, seconds: 5),
+      machineTime: const Duration(minutes: 5, seconds: 5),
     );
   }
 

@@ -33,10 +33,10 @@ void main() {
 
     getIt.registerSingleton<ProfileService>(mockProfileService);
 
-    when(() => mockProfileService.getNotificationDelay())
+    when(() => mockProfileService.getNotificationLeadTime())
         .thenAnswer((_) async => 5);
 
-    when(() => mockProfileService.setNotificationDelay(any()))
+    when(() => mockProfileService.setNotificationLeadTime(any()))
         .thenAnswer((_) async {});
 
     if (getIt.isRegistered<AuthService>()) {
@@ -90,7 +90,7 @@ void main() {
       expect(find.text('Request Refund'), findsOneWidget);
       expect(find.text('Dark Mode'), findsOneWidget);
       expect(find.text('Edit Profile'), findsOneWidget);
-      expect(find.text('Notification Delay'), findsOneWidget);
+      expect(find.text('Notify Before Finish'), findsOneWidget);
     });
 
     testWidgets(
@@ -223,11 +223,11 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
 
-    testWidgets('loads notification delay from ProfileService', (tester) async {
-      when(() => mockProfileService.getNotificationDelay())
+    testWidgets('loads notification lead time from ProfileService', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
           .thenAnswer((_) async => 7);
 
-      when(() => mockProfileService.setNotificationDelay(any()))
+      when(() => mockProfileService.setNotificationLeadTime(any()))
           .thenAnswer((_) async {});
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -236,11 +236,11 @@ void main() {
       expect(find.text('  ' + '7'), findsOneWidget);
     });
 
-    testWidgets('increments notification delay when + is tapped', (tester) async {
-      when(() => mockProfileService.getNotificationDelay())
+    testWidgets('increments notification lead time when + is tapped', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
-      when(() => mockProfileService.setNotificationDelay(any()))
+      when(() => mockProfileService.setNotificationLeadTime(any()))
           .thenAnswer((_) async {});
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -252,14 +252,14 @@ void main() {
       await tester.tap(plusButton);
       await tester.pumpAndSettle();
 
-      verify(() => mockProfileService.setNotificationDelay(6)).called(1);
+      verify(() => mockProfileService.setNotificationLeadTime(6)).called(1);
     });
 
     testWidgets('does not decrement below 0', (tester) async {
-      when(() => mockProfileService.getNotificationDelay())
+      when(() => mockProfileService.getNotificationLeadTime())
           .thenAnswer((_) async => 0);
 
-      when(() => mockProfileService.setNotificationDelay(any()))
+      when(() => mockProfileService.setNotificationLeadTime(any()))
           .thenAnswer((_) async {});
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -270,14 +270,14 @@ void main() {
       await tester.tap(minusButton);
       await tester.pumpAndSettle();
 
-      verifyNever(() => mockProfileService.setNotificationDelay(any()));
+      verifyNever(() => mockProfileService.setNotificationLeadTime(any()));
     });
 
-    testWidgets('notification delay does not exceed max limit', (tester) async {
-      when(() => mockProfileService.getNotificationDelay())
-          .thenAnswer((_) async => Settings.maxNotificationDelay - 2);
+    testWidgets('notification lead time does not exceed max limit', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
+          .thenAnswer((_) async => Settings.maxNotificationLeadTime - 2);
 
-      when(() => mockProfileService.setNotificationDelay(any()))
+      when(() => mockProfileService.setNotificationLeadTime(any()))
           .thenAnswer((_) async {});
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -295,10 +295,10 @@ void main() {
       await tester.tap(plusButton);
       await tester.pumpAndSettle();
 
-      expect(find.text('  ' + '${Settings.maxNotificationDelay}'), findsOneWidget);
+      expect(find.text('  ' + '${Settings.maxNotificationLeadTime}'), findsOneWidget);
 
       verify(() => mockProfileService
-          .setNotificationDelay(Settings.maxNotificationDelay)).called(1);
+          .setNotificationLeadTime(Settings.maxNotificationLeadTime)).called(1);
     });
   });
 }

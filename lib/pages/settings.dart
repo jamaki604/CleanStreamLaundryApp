@@ -11,7 +11,7 @@ import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 class Settings extends StatefulWidget {
-  static const int maxNotificationDelay = 30;
+  static const int maxNotificationLeadTime = 30;
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -22,26 +22,26 @@ class _SettingsState extends State<Settings> {
   final authService = GetIt.instance<AuthService>();
   final profileService = GetIt.instance<ProfileService>();
 
-  int notificationDelay = 5;
+  int notificationLeadTime = 5;
   bool _loadingDelay = true;
 
   @override
   void initState() {
     super.initState();
-    _loadNotificationDelay();
+    _loadNotificationLeadTime();
   }
 
-  Future<void> _loadNotificationDelay() async {
-    final value = await profileService.getNotificationDelay();
+  Future<void> _loadNotificationLeadTime() async {
+    final value = await profileService.getNotificationLeadTime();
     setState(() {
-      notificationDelay = value;
+      notificationLeadTime = value;
       _loadingDelay = false;
     });
   }
 
-  Future<void> _updateDelay(int newDelayValue) async {
-    setState(() => notificationDelay = newDelayValue);
-    await profileService.setNotificationDelay(newDelayValue);
+  Future<void> _updateLeadTime(int newLeadTimeValue) async {
+    setState(() => notificationLeadTime = newLeadTimeValue);
+    await profileService.setNotificationLeadTime(newLeadTimeValue);
   }
 
   Future<void> _showSignOutConfirmation() async {
@@ -133,7 +133,7 @@ class _SettingsState extends State<Settings> {
                   const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.timer,
-                    title: "Notification Delay",
+                    title: "Notify Before Finish",
                     subtitle:
                     "Minutes you’re notified before machine finish",
                     trailing: _loadingDelay
@@ -159,9 +159,9 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.add,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
-                              if (notificationDelay < Settings.maxNotificationDelay) {
-                                final newDelay = notificationDelay + 1;
-                                await _updateDelay(newDelay);
+                              if (notificationLeadTime < Settings.maxNotificationLeadTime) {
+                                final newLeadTime = notificationLeadTime + 1;
+                                await _updateLeadTime(newLeadTime);
                               }
                             },
                           ),
@@ -171,7 +171,7 @@ class _SettingsState extends State<Settings> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          ("  " + "$notificationDelay"),
+                          ("  " + "$notificationLeadTime"),
                           style: TextStyle(
                             fontSize: 18,
                             color: Theme.of(context).colorScheme.fontSecondary,
@@ -194,9 +194,9 @@ class _SettingsState extends State<Settings> {
                             icon: const Icon(Icons.remove,
                                 color: Colors.white, size: 20),
                             onPressed: () async {
-                              if (notificationDelay > 0) {
-                                final newDelay = notificationDelay - 1;
-                                await _updateDelay(newDelay);
+                              if (notificationLeadTime > 0) {
+                                final newLeadTime = notificationLeadTime - 1;
+                                await _updateLeadTime(newLeadTime);
                               }
                             },
                           ),
