@@ -93,7 +93,13 @@ class _LoadingPageState extends State<LoadingPage> {
     }
   }
 
-  void _automaticLogIn() async {
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _automaticLogIn() async {
     await Future.delayed(Duration.zero);
 
     try {
@@ -123,12 +129,6 @@ class _LoadingPageState extends State<LoadingPage> {
       if (!mounted) return;
       setState(() => _error = e.toString());
     }
-  }
-
-  @override
-  void dispose() {
-    _linkSub?.cancel();
-    super.dispose();
   }
 
   @override

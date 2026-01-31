@@ -29,7 +29,10 @@ class SupabaseAuthService implements AuthService {
       if (_client.auth.currentUser != null) {
         output = AuthenticationResponses.success;
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+      return output;
+    }
     return output;
   }
 
@@ -283,7 +286,7 @@ class SupabaseAuthService implements AuthService {
     AuthenticationResponses output = AuthenticationResponses.failure;
     try {
       final response = await _client.auth.exchangeCodeForSession(code);
-      if (response.session?.user != null) {
+      if (response.session.user != null) {
         output = AuthenticationResponses.success;
       }
     } catch (e) {
