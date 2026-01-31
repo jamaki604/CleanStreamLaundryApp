@@ -4,8 +4,6 @@ import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enu
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
-import 'package:app_links/app_links.dart';
-import 'dart:async';
 
 class PasswordResetPage extends StatefulWidget {
   const PasswordResetPage({super.key});
@@ -18,33 +16,13 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  StreamSubscription? _linkSub;
-  final AppLinks _appLinks = AppLinks();
 
   final authService = GetIt.instance<AuthService>();
 
   @override
   void dispose() {
     _emailController.dispose();
-    _linkSub?.cancel();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) {
-      if (uri != null &&
-          uri.scheme == 'clean-stream' &&
-          uri.host == 'reset-protected') {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            context.go('/reset-protected', extra: uri);
-          }
-        });
-      }
-    });
   }
 
   void _showMessage(String text) {

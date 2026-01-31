@@ -184,9 +184,21 @@ class RouterService {
         },
       ),
     ],
-    errorBuilder: (context, state) => const NotFoundScreen(),
+    errorBuilder: (context, state) {
+      final uri = state.uri;
+      if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
+        return ResetProtectedPage(incomingUri: uri);
+      }
+      return const NotFoundScreen();
+    },
     redirect: (context, state) {
       final uri = state.uri;
+
+      // Handle clean-stream://reset-protected deep links
+      if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
+        final query = uri.query;
+        return query.isEmpty ? '/reset-protected' : '/reset-protected?$query';
+      }
 
       // Handle clean-stream://change-email deep links
       if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {

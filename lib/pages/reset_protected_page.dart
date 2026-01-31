@@ -38,11 +38,13 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
     Uri effective = uri ?? Uri.base;
 
-    // Accept cases where path contains reset-protected (some redirects use path instead of host)
+    // Accept app links and in-app routes for reset-protected
     final isResetUri =
         (effective.scheme == 'clean-stream' &&
-        (effective.host == 'reset-protected' ||
-            effective.path.contains('reset-protected')));
+            (effective.host == 'reset-protected' ||
+                effective.path.contains('reset-protected'))) ||
+        effective.path == '/reset-protected' ||
+        effective.path.contains('reset-protected');
 
     if (!isResetUri) {
       setState(() {
