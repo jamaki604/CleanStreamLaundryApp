@@ -54,9 +54,9 @@ void main() {
     getIt.registerSingleton<RouterService>(mockRouterService);
     getIt.registerSingleton<NotificationService>(mockNotificationService);
 
-    when(() => mockNotificationService.scheduleDelayedMachineNotification(
+    when(() => mockNotificationService.scheduleEarlyMachineNotification(
       id: any(named: 'id'),
-      givenDelay: any(named: 'givenDelay'),
+      machineTime: any(named: 'machineTime'),
     )).thenAnswer((_) async {});
 
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
@@ -360,11 +360,6 @@ void main() {
         type: any(named: 'type'),
       )).thenAnswer((_) async {});
 
-      when(() => mockNotificationService.scheduleDelayedMachineNotification(
-        id: any(named: 'id'),
-        givenDelay: any(named: 'givenDelay'),
-      )).thenAnswer((_) async {});
-
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
@@ -372,9 +367,9 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      verify(() => mockNotificationService.scheduleDelayedMachineNotification(
+      verify(() => mockNotificationService.scheduleEarlyMachineNotification(
         id: 1,
-        givenDelay: any(named: 'givenDelay'),
+        machineTime: any(named: 'machineTime'),
       )).called(1);
     });
   });
