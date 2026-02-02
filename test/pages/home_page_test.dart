@@ -1,5 +1,7 @@
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,10 +14,14 @@ import 'mocks.dart';
 void main() {
   late MockLocationService mockLocationService;
   late MockMachineService mockMachineService;
+  late MockProfileService mockProfileService;
+  late MockAuthService mockAuthService;
 
   setUp(() {
     mockLocationService = MockLocationService();
     mockMachineService = MockMachineService();
+    mockProfileService = MockProfileService();
+    mockAuthService = MockAuthService();
 
     final getIt = GetIt.instance;
     if (getIt.isRegistered<LocationService>()) {
@@ -24,9 +30,17 @@ void main() {
     if (getIt.isRegistered<MachineService>()) {
       getIt.unregister<MachineService>();
     }
+    if (getIt.isRegistered<AuthService>()) {
+      getIt.unregister<AuthService>();
+    }
+    if (getIt.isRegistered<ProfileService>()) {
+      getIt.unregister<ProfileService>();
+    }
 
     getIt.registerSingleton<LocationService>(mockLocationService);
     getIt.registerSingleton<MachineService>(mockMachineService);
+    getIt.registerSingleton<AuthService>(mockAuthService);
+    getIt.registerSingleton<ProfileService>(mockProfileService);
 
     SharedPreferences.setMockInitialValues({});
   });

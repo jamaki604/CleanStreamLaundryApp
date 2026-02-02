@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -19,6 +22,8 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   String? selectedName;
+  String? username;
+  Map<String, dynamic>? balance;
   late final Map<String, int> locationID = {};
   late final Map<String, LatLng> locationCoordinates = {};
   bool locationSelected = false;
@@ -26,11 +31,16 @@ class HomePageState extends State<HomePage> {
   late StorageService storage;
   late final MapController _mapController;
 
+
+  final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
+
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
     _initStorage();
+    _loadUserData();
   }
 
   @override
@@ -56,6 +66,21 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  void _loadUserData() async {
+    final userId = authService.getCurrentUserId;
+    if (userId == null) return;
+
+    final loadedUsername = await profileService.getUserNameById(userId);
+    final loadedBalance = await profileService.getUserBalanceById(userId);
+
+    if (mounted) {
+      setState(() {
+        username = loadedUsername;
+        balance = loadedBalance;
+      });
+    }
+  }
+
   final machineService = GetIt.instance<MachineService>();
   final locationService = GetIt.instance<LocationService>();
 
@@ -69,6 +94,26 @@ class HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Welcome ${username ?? 'Loading...'}",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Text(
+                      "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
+
               FutureBuilder(
                 future: locationService.getLocations(),
                 builder: (context, snapshot) {
