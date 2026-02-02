@@ -1,4 +1,5 @@
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -108,6 +109,32 @@ void main() {
     await GetIt.instance.reset();
   });
 
+  testWidgets('tests send notification function', (tester) async {
+    fakeAsync((async) {
+      final service = NotificationService(
+        initialize: false,
+        plugin: mockPlugin,
+      );
+
+      const delay = Duration(minutes: 5);
+
+      service.scheduleNotification(
+        id: 1,
+        delay: delay,
+        title: 'Test Title', body: 'Test Body',
+      );
+
+      async.elapse(const Duration(minutes: 5));
+
+      verify(() => mockPlugin.show(
+        1,
+        "Test Title",
+        "Test Body",
+        any(),
+      )).called(1);
+    });
+  });
+
   testWidgets('sends notification with equal given delay and user delay', (tester) async {
     fakeAsync((async) {
       final service = NotificationService(
@@ -194,4 +221,4 @@ void main() {
           )).called(1);
     });
   });
-  }
+}
