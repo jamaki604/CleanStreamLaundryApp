@@ -25,14 +25,14 @@ class MonthlyTransactionHistory extends StatelessWidget {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Theme.of(context).colorScheme.fontPrimary,
+            color:  Colors.white,
           ),
           onPressed: () => context.pop(),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           'Monthly Transaction History',
-          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
+          style: TextStyle(color: Colors.white),
         ),
         elevation: 2,
         centerTitle: true,

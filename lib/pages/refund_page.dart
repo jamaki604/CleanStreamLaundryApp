@@ -88,13 +88,13 @@ class RefundPageState extends State<RefundPage> {
           onPressed: () => context.pop(),
           icon: Icon(
             Icons.arrow_back,
-            color: Theme.of(context).colorScheme.fontPrimary,
+            color: Colors.white,
           ),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           "Request Refund",
-          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
       ),
