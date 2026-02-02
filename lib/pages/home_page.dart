@@ -89,30 +89,33 @@ class HomePageState extends State<HomePage> {
     return BasePage(
       key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(4.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Welcome ${username ?? 'Loading...'}",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Text(
-                      "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                  ),
-                ],
+              Text(
+                username == null
+                    ? "Welcome!"
+                    : "Welcome $username!",
+
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
               ),
+              const SizedBox(height: 2),
+              Text(
+                "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
+              ),
+
+              const SizedBox(height: 10),
 
               FutureBuilder(
                 future: locationService.getLocations(),
