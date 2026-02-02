@@ -456,7 +456,7 @@ void main() {
       expect(find.text('\$1.00'), findsOneWidget);
     });
 
-    testWidgets('should not go above \$50.00 maximum', (tester) async {
+    testWidgets('should not go above \$500.00 maximum', (tester) async {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
@@ -465,13 +465,13 @@ void main() {
 
       // Tap increment many times to reach max
       final incrementButton = find.text('+25¢');
-      for (int i = 0; i < 200; i++) {
+      for (int i = 0; i < 2000; i++) {
         await tester.tap(incrementButton);
         await tester.pump();
       }
       await tester.pumpAndSettle();
 
-      expect(find.text('\$50.00'), findsOneWidget);
+      expect(find.text('\$500.00'), findsOneWidget);
 
       // Button should be disabled
       final button = tester.widget<OutlinedButton>(
