@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
