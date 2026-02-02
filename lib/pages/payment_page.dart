@@ -96,14 +96,6 @@ class _PaymentPageState extends State<PaymentPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 20),
-                        Text(
-                          'Machine $_machineName',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.fontInverted,
-                          ),
-                        ),
                         const SizedBox(height: 40),
                         _buildAmountCard(),
                         const SizedBox(height: 30),
@@ -128,7 +120,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.cardPrimary,
+        color: Theme.of(context).colorScheme.greyCard,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -136,10 +128,17 @@ class _PaymentPageState extends State<PaymentPage> {
           Icon(Icons.local_laundry_service, size: 80, color: Color(0xFF2073A9)),
           const SizedBox(height: 20),
           Text(
+            'Machine $_machineName',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          Text(
             _paymentCompleted ? 'Payment Complete' : 'Amount Due',
             style: TextStyle(fontSize: 16, color: Colors.black87),
           ),
-          const SizedBox(height: 10),
           Text(
             '\$${_price?.toStringAsFixed(2) ?? '0.00'}',
             style: TextStyle(
