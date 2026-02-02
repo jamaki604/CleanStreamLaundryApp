@@ -3,19 +3,16 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import '../main.dart';
+import 'package:get_it/get_it.dart';
 
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  final ProfileService profileService;
+  final flutterLocalNotificationsPlugin =
+    GetIt.instance<FlutterLocalNotificationsPlugin>();
 
-  NotificationService({
-    FlutterLocalNotificationsPlugin? plugin,
-    ProfileService? profileService, required bool initialize,
-  })  : flutterLocalNotificationsPlugin =
-      plugin ?? getIt<FlutterLocalNotificationsPlugin>(),
-        profileService = profileService ?? getIt<ProfileService>() {
+  final profileService = GetIt.instance<ProfileService>();
+
+  NotificationService() {
     _init();
   }
 
@@ -51,15 +48,15 @@ class NotificationService {
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
     const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-      defaultPresentAlert: true
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+        defaultPresentAlert: true
     );
 
     const initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings
+        android: androidSettings,
+        iOS: iosSettings
     );
 
     await flutterLocalNotificationsPlugin.initialize(initSettings);
@@ -94,16 +91,16 @@ class NotificationService {
         title,
         body,
         const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'your_channel_id',
-            'Your Channel',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-           iOS: DarwinNotificationDetails(
-             presentAlert: true,
-             presentBadge: true,
-             presentSound: true,
+            android: AndroidNotificationDetails(
+              'your_channel_id',
+              'Your Channel',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+            iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
             )
         ),
       );
@@ -128,14 +125,14 @@ class NotificationService {
     if (arrivalTime.isNegative) {
       arrivalTime = Duration.zero;
       notifTitle = "Machine Started!";
-      final roundedDelay = machineTime.inMinutes;
-      final unit = roundedDelay == 1 ? "minute" : "minutes";
-      notifBody = "Your machine will be finished in $roundedDelay $unit!";
+      final roundedTime = machineTime.inMinutes;
+      final unit = roundedTime == 1 ? "minute" : "minutes";
+      notifBody = "Your machine will be finished in $roundedTime $unit!";
     }
     else if(userLeadTime == 0){
       notifTitle = "Machine Finished!";
       notifBody = "Your machine is finished";
-  }
+    }
     else {
       notifTitle = "Machine Almost Ready";
 

@@ -16,6 +16,7 @@ import 'package:clean_stream_laundry_app/services/supabase/supabase_machine_serv
 import 'package:clean_stream_laundry_app/services/supabase/supabase_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
@@ -91,7 +92,11 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<NotificationService>(
-        () => NotificationService(initialize: true),
+        () => NotificationService(),
+  );
+
+  GetIt.instance.registerSingleton<FlutterLocalNotificationsPlugin>(
+    FlutterLocalNotificationsPlugin(),
   );
 
   getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());

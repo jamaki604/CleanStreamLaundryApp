@@ -1,31 +1,27 @@
 import 'package:fake_async/fake_async.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import 'mocks.dart';
 
-class MockFlutterLocalNotificationsPlugin extends Mock
-    implements FlutterLocalNotificationsPlugin {}
+// -------------------- MOCKS --------------------
 
-class MockAndroidFlutterLocalNotificationsPlugin extends Mock
-    implements AndroidFlutterLocalNotificationsPlugin {}
+class MockPlugin extends Mock implements FlutterLocalNotificationsPlugin {}
+class MockAndroidPlugin extends Mock implements AndroidFlutterLocalNotificationsPlugin {}
+class MockIOSPlugin extends Mock implements IOSFlutterLocalNotificationsPlugin {}
+class MockProfileService extends Mock implements ProfileService {}
 
-class MockIOSFlutterLocalNotificationsPlugin extends Mock
-    implements IOSFlutterLocalNotificationsPlugin {}
-
-
-class FakeInitializationSettings extends Fake implements InitializationSettings {}
-class FakeAndroidInitializationSettings extends Fake implements AndroidInitializationSettings {}
-class FakeDarwinInitializationSettings extends Fake implements DarwinInitializationSettings {}
-class FakeNotificationDetails extends Fake implements NotificationDetails {}
-class FakeAndroidNotificationChannel extends Fake implements AndroidNotificationChannel {}
-class FakeAndroidNotificationDetails extends Fake implements AndroidNotificationDetails {}
-class FakeDarwinNotificationDetails extends Fake implements DarwinNotificationDetails {}
+class FakeInit extends Fake implements InitializationSettings {}
+class FakeAndroidInit extends Fake implements AndroidInitializationSettings {}
+class FakeIOSInit extends Fake implements DarwinInitializationSettings {}
+class FakeNotifDetails extends Fake implements NotificationDetails {}
+class FakeAndroidNotifDetails extends Fake implements AndroidNotificationDetails {}
+class FakeIOSNotifDetails extends Fake implements DarwinNotificationDetails {}
+class FakeChannel extends Fake implements AndroidNotificationChannel {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -34,94 +30,85 @@ void main() {
   MethodChannel('flutter.baseflow.com/permissions/methods');
 
   setUpAll(() {
-    registerFallbackValue(FakeInitializationSettings());
-    registerFallbackValue(FakeAndroidInitializationSettings());
-    registerFallbackValue(FakeDarwinInitializationSettings());
-    registerFallbackValue(FakeNotificationDetails());
-    registerFallbackValue(FakeAndroidNotificationChannel());
-    registerFallbackValue(FakeAndroidNotificationDetails());
-    registerFallbackValue(FakeDarwinNotificationDetails());
+    registerFallbackValue(FakeInit());
+    registerFallbackValue(FakeAndroidInit());
+    registerFallbackValue(FakeIOSInit());
+    registerFallbackValue(FakeNotifDetails());
+    registerFallbackValue(FakeAndroidNotifDetails());
+    registerFallbackValue(FakeIOSNotifDetails());
+    registerFallbackValue(FakeChannel());
   });
 
-  late MockFlutterLocalNotificationsPlugin mockPlugin;
-  late MockAndroidFlutterLocalNotificationsPlugin mockAndroidImpl;
-  late MockIOSFlutterLocalNotificationsPlugin mockIOSImpl;
-  late MockProfileService mockProfileService;
+  late MockPlugin mockPlugin;
+  late MockAndroidPlugin mockAndroid;
+  late MockIOSPlugin mockIOS;
+  late MockProfileService mockProfile;
 
   setUp(() {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    GetIt.instance.reset();
+    GetIt.I.reset();
 
-    mockPlugin = MockFlutterLocalNotificationsPlugin();
-    mockAndroidImpl = MockAndroidFlutterLocalNotificationsPlugin();
-    mockIOSImpl = MockIOSFlutterLocalNotificationsPlugin();
-    mockProfileService = MockProfileService();
+    mockPlugin = MockPlugin();
+    mockAndroid = MockAndroidPlugin();
+    mockIOS = MockIOSPlugin();
+    mockProfile = MockProfileService();
 
-    final getIt = GetIt.instance;
-    getIt.registerSingleton<FlutterLocalNotificationsPlugin>(mockPlugin);
-    getIt.registerSingleton<ProfileService>(mockProfileService);
+    // Register mocks BEFORE constructing NotificationService
+    GetIt.I.registerSingleton<FlutterLocalNotificationsPlugin>(mockPlugin);
+    GetIt.I.registerSingleton<ProfileService>(mockProfile);
 
-    when(() => mockPlugin.initialize(any())).thenAnswer((_) async {});
+    // Mock plugin initialization
+    when(() => mockPlugin.initialize(any())).thenAnswer((_) async => true);
 
     when(() => mockPlugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>())
-        .thenReturn(mockAndroidImpl);
+        .thenReturn(mockAndroid);
 
     when(() => mockPlugin.resolvePlatformSpecificImplementation<
         IOSFlutterLocalNotificationsPlugin>())
-        .thenReturn(mockIOSImpl);
+        .thenReturn(mockIOS);
 
-    when(() => mockAndroidImpl.createNotificationChannel(any()))
+    when(() => mockAndroid.createNotificationChannel(any()))
         .thenAnswer((_) async {});
 
-    when(() => mockIOSImpl.requestPermissions(
+    when(() => mockIOS.requestPermissions(
       alert: any(named: 'alert'),
       badge: any(named: 'badge'),
       sound: any(named: 'sound'),
     )).thenAnswer((_) async => true);
 
-    when(() => mockPlugin.show(
-      any(),
-      any(),
-      any(),
-      any(),
-    )).thenAnswer((_) async {});
+    when(() => mockPlugin.show(any(), any(), any(), any()))
+        .thenAnswer((_) async {});
 
-    when(() => mockProfileService.getNotificationLeadTime())
+    when(() => mockProfile.getNotificationLeadTime())
         .thenAnswer((_) async => 5);
 
+    // Mock permission handler
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(permissionChannel, (MethodCall call) async {
-      if (call.method == 'checkPermissionStatus') {
-        return 1;
-      }
-      if (call.method == 'requestPermissions') {
-        return <int, int>{0: 1};
-      }
+        .setMockMethodCallHandler(permissionChannel, (call) async {
+      if (call.method == 'checkPermissionStatus') return 1;
+      if (call.method == 'requestPermissions') return {0: 1};
       return null;
     });
   });
 
-  tearDown(() async {
+  tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(permissionChannel, null);
-
-    await GetIt.instance.reset();
   });
 
-  testWidgets('tests send notification function', (tester) async {
-    fakeAsync((async) {
-      final service = NotificationService(
-        initialize: false,
-        plugin: mockPlugin,
-      );
+  // ------------------------------------------------------------
+  // TESTS
+  // ------------------------------------------------------------
 
-      const delay = Duration(minutes: 5);
+  testWidgets("scheduleNotification triggers .show() after delay", (tester) async {
+    fakeAsync((async) {
+      final service = NotificationService();
 
       service.scheduleNotification(
         id: 1,
-        delay: delay,
-        title: 'Test Title', body: 'Test Body',
+        title: "Test Title",
+        body: "Test Body",
+        delay: const Duration(minutes: 5),
       );
 
       async.elapse(const Duration(minutes: 5));
@@ -135,22 +122,16 @@ void main() {
     });
   });
 
-  testWidgets('sends notification with equal given delay and user delay', (tester) async {
+  testWidgets("equal machineTime and leadTime → Machine Almost Ready", (tester) async {
     fakeAsync((async) {
-      final service = NotificationService(
-        initialize: false,
-        plugin: mockPlugin,
-        profileService: mockProfileService,
-      );
+      final service = NotificationService();
 
-      when(() => mockProfileService.getNotificationLeadTime())
+      when(() => mockProfile.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
-
-      const givenMachineTime = Duration(minutes: 5);
 
       service.scheduleEarlyMachineNotification(
         id: 1,
-        machineTime: givenMachineTime,
+        machineTime: const Duration(minutes: 5),
       );
 
       async.elapse(Duration.zero);
@@ -163,22 +144,17 @@ void main() {
       )).called(1);
     });
   });
-  testWidgets('sends notification when given delay is greater than user delay', (tester) async {
+
+  testWidgets("machineTime > leadTime → delayed Machine Almost Ready", (tester) async {
     fakeAsync((async) {
-      final service = NotificationService(
-        initialize: false,
-        plugin: mockPlugin,
-        profileService: mockProfileService,
-      );
+      final service = NotificationService();
 
-      when(() => mockProfileService.getNotificationLeadTime())
+      when(() => mockProfile.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
-
-      const givenMachineTime = Duration(minutes: 20);
 
       service.scheduleEarlyMachineNotification(
         id: 2,
-        machineTime: givenMachineTime,
+        machineTime: const Duration(minutes: 20),
       );
 
       async.elapse(const Duration(minutes: 15));
@@ -192,33 +168,26 @@ void main() {
     });
   });
 
-  testWidgets('sends "Machine Started!" when user delay is greater than given delay', (tester) async {
+  testWidgets("leadTime > machineTime → Machine Started!", (tester) async {
     fakeAsync((async) {
-      final service = NotificationService(
-        initialize: false,
-        plugin: mockPlugin,
-        profileService: mockProfileService,
-      );
+      final service = NotificationService();
 
-      when(() => mockProfileService.getNotificationLeadTime())
+      when(() => mockProfile.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
-
-      const givenMachineTime = Duration(minutes: 3);
 
       service.scheduleEarlyMachineNotification(
         id: 3,
-        machineTime: givenMachineTime,
+        machineTime: const Duration(minutes: 3),
       );
 
       async.elapse(Duration.zero);
 
-      verify(() =>
-          mockPlugin.show(
-            3,
-            "Machine Started!",
-            "Your machine will be finished in 3 minutes!",
-            any(),
-          )).called(1);
+      verify(() => mockPlugin.show(
+        3,
+        "Machine Started!",
+        "Your machine will be finished in 3 minutes!",
+        any(),
+      )).called(1);
     });
   });
 }
