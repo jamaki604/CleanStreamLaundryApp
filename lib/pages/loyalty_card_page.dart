@@ -44,13 +44,14 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   Widget _buildContent(BuildContext context) {
-    return Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
           const SizedBox(height: 20),
           CreditCard(username: viewModel.userName ?? 'John Doe'),
-          const SizedBox(height: 25),
+          const SizedBox(height: 50),
           Text(
-            'Loyalty Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
+            'Current Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 26,
@@ -58,7 +59,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               color: Theme.of(context).colorScheme.fontSecondary,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
           ElevatedButton(
             onPressed: () => _loadCard(),
             style: ElevatedButton.styleFrom(
@@ -78,10 +79,11 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ),
             ),
           ),
-          const SizedBox(height: 15),
-          Expanded(child: _transactions())
+          const SizedBox(height: 20),
+          _transactions(),
         ],
-      );
+      ),
+    );
   }
 
   Widget _transactions() {
@@ -124,10 +126,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             ],
           ),
           const SizedBox(height: 10),
-          Expanded(
-          child: ListView.builder(
+          ListView.builder(
             shrinkWrap: true,
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: viewModel.recentTransactions.length,
             itemBuilder: (context, index) {
               final transaction = viewModel.recentTransactions[index];
@@ -154,7 +155,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               );
             },
           ),
-          )
         ],
       ),
     );
