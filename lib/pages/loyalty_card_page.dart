@@ -419,11 +419,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     if (result == PaymentResult.success) {
-      final newBalance = viewModel.userBalance! + amount;
-
-      setState(() {
-        viewModel.userBalance = newBalance;
-      });
 
       viewModel.fetchTransactions();
 
