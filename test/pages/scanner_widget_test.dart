@@ -1,12 +1,5 @@
-import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
-import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/pages/payment_page.dart';
 import 'package:clean_stream_laundry_app/pages/scanner_widget.dart';
-import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';

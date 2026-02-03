@@ -2,8 +2,7 @@ import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clean_stream_laundry_app/widgets/map_marker.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:latlong2/latlong.dart';
 
 void main() {
   group('LocationParser', () {
@@ -130,5 +129,26 @@ void main() {
         expect(find.byType(MapMarker), findsOneWidget);
       });
     });
+  });
+
+  test('parseLocations constructs complete Marker with all properties', () {
+    final locations = [
+      {'Latitude': 40.7128, 'Longitude': -74.0060},
+    ];
+
+    final result = LocationParser.parseLocations(locations);
+    final marker = result[0];
+
+    // Verify each property to ensure the constructor was called
+    expect(marker.point, isA<LatLng>());
+    expect(marker.point.latitude, 40.7128);
+    expect(marker.point.longitude, -74.0060);
+    expect(marker.width, 50.0);
+    expect(marker.height, 50.0);
+    expect(marker.child, isA<MapMarker>());
+
+    // Verify toDouble() conversion happened correctly
+    expect(marker.point.latitude, isA<double>());
+    expect(marker.point.longitude, isA<double>());
   });
 }
