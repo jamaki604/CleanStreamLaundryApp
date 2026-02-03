@@ -1,11 +1,9 @@
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
-import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:app_links/app_links.dart';
-import 'dart:async';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -20,82 +18,46 @@ class _LoadingPageState extends State<LoadingPage> {
   double end = 1.05;
 
   final authService = GetIt.instance<AuthService>();
-  final profileService = GetIt.instance<ProfileService>();
-  StreamSubscription? _linkSub;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startup();
-    });
+    _automaticLogIn();
+    _coldStartRedirect();
   }
 
-  Future<void> _startup() async {
-    bool handled = false;
-    try {
-      handled = await _coldStartRedirect();
-    } catch (e) {}
-
-    if (!handled) {
-      _automaticLogIn();
-    }
-  }
-
-  Future<bool> _coldStartRedirect() async {
+  Future<void> _coldStartRedirect() async {
     try {
       final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
-      if (initialUri == null) return false;
 
-      if (initialUri.scheme == 'clean-stream' &&
+      if (initialUri != null &&
+          initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'reset-protected') {
         context.go('/reset-protected', extra: initialUri);
-        return true;
       }
 
-      if (initialUri.scheme == 'clean-stream' &&
+      if (initialUri != null &&
+          initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'email-verification') {
         context.go("/homePage");
-        return true;
-      } else if (initialUri.host == 'change-email') {
+      } else if (initialUri != null && initialUri.host == 'change-email') {
         context.go("/email-verification");
-        return true;
-      } else if (initialUri.scheme == 'clean-stream' &&
+      } else if (initialUri != null &&
+          initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'oauth') {
         await authService.handleOAuthRedirect(initialUri);
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
-          if (!mounted) return true;
           context.go("/homePage");
-          return true;
         } else {
-          if (!mounted) return true;
           context.go("/login");
-          return true;
         }
       }
     } catch (e) {}
-
-    return false;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_linkSub == null) {
-      final AppLinks appLinks = AppLinks();
-      _linkSub = appLinks.uriLinkStream.listen((Uri? uri) {
-        if (uri == null) return;
-        if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
-          if (mounted) context.go('/reset-protected', extra: uri);
-        }
-      });
-    }
   }
 
   @override
   void dispose() {
-    _linkSub?.cancel();
     super.dispose();
   }
 
@@ -105,21 +67,6 @@ class _LoadingPageState extends State<LoadingPage> {
     try {
       if (await authService.isLoggedIn() == AuthenticationResponses.success) {
         if (!mounted) return;
-
-        final currentUser = authService.getCurrentUser();
-        if (currentUser != null) {
-          final userId = currentUser.id;
-
-          final name =
-              currentUser.userMetadata?['full_name'] ??
-              currentUser.userMetadata?['name'] ??
-              currentUser.userMetadata?['given_name'];
-
-          if (name != null && name.isNotEmpty) {
-            await profileService.createAccount(id: userId, name: name);
-          }
-        }
-
         context.go("/homePage");
       } else {
         if (!mounted) return;
