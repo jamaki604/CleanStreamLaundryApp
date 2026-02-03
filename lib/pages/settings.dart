@@ -23,8 +23,13 @@ class _SettingsState extends State<Settings> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Sign Out'),
-          content: const Text('Are you sure you want to sign out?'),
+          title: Text('Sign Out',
+              style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+        ),
+
+          content: Text('Are you sure you want to sign out?',
+            style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+          ),
           actions: [
             TextButton(
               onPressed: () {

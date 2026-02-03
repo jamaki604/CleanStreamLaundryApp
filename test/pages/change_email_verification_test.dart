@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/pages/change_email_verification.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
@@ -16,6 +17,7 @@ void main() {
   late FakeAppLinks fakeAppLinks;
   late MockLocationService mockLocationService;
   late MockMachineService mockMachineService;
+  late MockProfileService mockProfileService;
 
   setUpAll(() {
     registerFallbackValue(FakeAuthService());
@@ -28,10 +30,12 @@ void main() {
     fakeAppLinks = FakeAppLinks();
     mockLocationService = MockLocationService();
     mockMachineService = MockMachineService();
+    mockProfileService = MockProfileService();
 
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
     GetIt.instance.registerSingleton<LocationService>(mockLocationService);
     GetIt.instance.registerSingleton<MachineService>(mockMachineService);
+    GetIt.instance.registerSingleton<ProfileService>(mockProfileService);
 
     // Mock HomePage dependencies
     when(

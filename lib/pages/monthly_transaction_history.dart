@@ -25,14 +25,14 @@ class MonthlyTransactionHistory extends StatelessWidget {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Theme.of(context).colorScheme.fontPrimary,
+            color:  Colors.white,
           ),
           onPressed: () => context.pop(),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           'Monthly Transaction History',
-          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
+          style: TextStyle(color: Colors.white),
         ),
         elevation: 2,
         centerTitle: true,
@@ -41,9 +41,9 @@ class MonthlyTransactionHistory extends StatelessWidget {
         body: Theme(
           data: Theme.of(context).copyWith(
             scrollbarTheme: ScrollbarThemeData(
-              thumbColor: MaterialStateProperty.all(Colors.lightBlue),
-              trackColor: MaterialStateProperty.all(Colors.transparent),
-              thickness: MaterialStateProperty.all(8),
+              thumbColor: WidgetStateProperty.all(Colors.lightBlue),
+              trackColor: WidgetStateProperty.all(Colors.transparent),
+              thickness: WidgetStateProperty.all(8),
               radius: const Radius.circular(4),
             ),
           ),
@@ -59,12 +59,18 @@ class MonthlyTransactionHistory extends StatelessWidget {
                 final data = monthlySums[month]!;
                 final total =
                     data['directWasher']! +
-                    data['directDryer']! +
-                    data['loyaltyCard']!;
+                        data['directDryer']! +
+                        data['loyaltyCard']!;
+                if (total == 0 && data['loyaltyWasher']==0 && data['loyaltyDryer']==0) {
+                  return SizedBox(width: 0, height: 0,);
+                } else {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
                   elevation: 2,
-                  color: Theme.of(context).colorScheme.cardPrimary,
+                  color: Theme
+                      .of(context)
+                      .colorScheme
+                      .cardPrimary,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -101,7 +107,10 @@ class MonthlyTransactionHistory extends StatelessWidget {
                         _buildTransactionRow(
                           'Loyalty Washer Payments',
                           data['loyaltyWasher']!,
-                          Theme.of(context).colorScheme.primary,
+                          Theme
+                              .of(context)
+                              .colorScheme
+                              .primary,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
@@ -113,7 +122,10 @@ class MonthlyTransactionHistory extends StatelessWidget {
                         _buildTransactionRow(
                           'Loyalty Dryer Payments',
                           data['loyaltyDryer']!,
-                          Theme.of(context).colorScheme.primary,
+                          Theme
+                              .of(context)
+                              .colorScheme
+                              .primary,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
@@ -125,6 +137,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
                     ),
                   ),
                 );
+              }
               },
             ),
           ),
