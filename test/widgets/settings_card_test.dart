@@ -21,12 +21,11 @@ void main() {
 
       expect(find.text('Settings'), findsOneWidget);
       expect(find.byIcon(Icons.settings), findsOneWidget);
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      
+      expect(find.byIcon(Icons.chevron_right), findsNothing);
     });
 
-    testWidgets('renders with subtitle when provided', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('renders with subtitle when provided', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -45,9 +44,7 @@ void main() {
       expect(find.byIcon(Icons.notifications), findsOneWidget);
     });
 
-    testWidgets('does not render subtitle when null', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('does not render subtitle when null', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -62,7 +59,9 @@ void main() {
       );
 
       expect(find.text('Account'), findsOneWidget);
-      expect(find.byType(Text), findsNWidgets(1)); // Only title text
+
+      final textWidgets = tester.widgetList<Text>(find.byType(Text));
+      expect(textWidgets.length, 1);
     });
 
     testWidgets('calls onTap when tapped', (WidgetTester tester) async {
@@ -80,13 +79,13 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(SettingsCard));
+      await tester.tap(find.byType(ListTile));
       await tester.pumpAndSettle();
 
       expect(tapped, true);
     });
 
-    testWidgets('has correct Card styling', (WidgetTester tester) async {
+    testWidgets('Card has correct margin', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -97,56 +96,7 @@ void main() {
 
       final card = tester.widget<Card>(find.byType(Card));
 
-      expect(card.elevation, 5);
-      expect(
-        card.margin,
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      );
-      expect(card.shape, isA<RoundedRectangleBorder>());
-    });
-
-    testWidgets('has InkWell with correct border radius', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SettingsCard(icon: Icons.info, title: 'About', onTap: () {}),
-          ),
-        ),
-      );
-
-      final inkWell = tester.widget<InkWell>(find.byType(InkWell));
-
-      expect(inkWell.borderRadius, BorderRadius.circular(14));
-    });
-
-    testWidgets('icon container has correct styling', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SettingsCard(
-              icon: Icons.language,
-              title: 'Language',
-              onTap: () {},
-            ),
-          ),
-        ),
-      );
-
-      final containers = tester.widgetList<Container>(find.byType(Container));
-      final iconContainer = containers.firstWhere(
-        (container) => container.constraints?.maxWidth == 40,
-      );
-
-      expect(iconContainer.constraints?.maxWidth, 40);
-      expect(iconContainer.constraints?.maxHeight, 40);
-      expect(
-        (iconContainer.decoration as BoxDecoration).borderRadius,
-        BorderRadius.circular(10),
-      );
+      expect(card.margin, const EdgeInsets.symmetric(horizontal: 24));
     });
 
     testWidgets('displays correct icon', (WidgetTester tester) async {
@@ -163,9 +113,12 @@ void main() {
       expect(find.byIcon(testIcon), findsOneWidget);
     });
 
-    testWidgets('text uses correct theme styles', (WidgetTester tester) async {
+    testWidgets('text uses theme colors', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          ),
           home: Scaffold(
             body: SettingsCard(
               icon: Icons.palette,
@@ -178,90 +131,13 @@ void main() {
       );
 
       final titleText = tester.widget<Text>(find.text('Theme'));
-      expect(titleText.style?.fontWeight, FontWeight.w600);
+      expect(titleText.style?.fontSize, 16);
 
-      final subtitleText = tester.widget<Text>(
-        find.text('Customize appearance'),
-      );
-      expect(subtitleText.style, isNotNull);
+      final subtitleText = tester.widget<Text>(find.text('Customize appearance'));
+      expect(subtitleText.style?.fontSize, 12);
     });
 
-    testWidgets('chevron icon is always displayed', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SettingsCard(
-              icon: Icons.backup,
-              title: 'Backup',
-              onTap: () {},
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
-
-      final chevronIcon = tester.widget<Icon>(find.byIcon(Icons.chevron_right));
-      expect(chevronIcon.color, Colors.grey);
-    });
-
-    testWidgets('can tap on any part of the card', (WidgetTester tester) async {
-      int tapCount = 0;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SettingsCard(
-              icon: Icons.download,
-              title: 'Downloads',
-              subtitle: 'Manage downloads',
-              onTap: () => tapCount++,
-            ),
-          ),
-        ),
-      );
-
-      // Tap on title
-      await tester.tap(find.text('Downloads'));
-      await tester.pumpAndSettle();
-      expect(tapCount, 1);
-
-      // Tap on subtitle
-      await tester.tap(find.text('Manage downloads'));
-      await tester.pumpAndSettle();
-      expect(tapCount, 2);
-
-      // Tap on icon
-      await tester.tap(find.byIcon(Icons.download));
-      await tester.pumpAndSettle();
-      expect(tapCount, 3);
-    });
-
-    testWidgets('respects theme colors', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
-          ),
-          home: Scaffold(
-            body: SettingsCard(
-              icon: Icons.color_lens,
-              title: 'Colors',
-              onTap: () {},
-            ),
-          ),
-        ),
-      );
-
-      final icon = tester.widget<Icon>(find.byIcon(Icons.color_lens));
-      expect(icon.color, isNotNull);
-    });
-
-    testWidgets('handles long text without overflow', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('handles long text without overflow', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -269,7 +145,7 @@ void main() {
               icon: Icons.text_fields,
               title: 'Very Long Title That Should Not Overflow The Card Width',
               subtitle:
-                  'This is a very long subtitle that should also handle gracefully without causing any overflow issues',
+              'This is a very long subtitle that should also handle gracefully without causing any overflow issues',
               onTap: () {},
             ),
           ),
@@ -277,6 +153,23 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders trailing widget when provided', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SettingsCard(
+              icon: Icons.timer,
+              title: 'Timer',
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
     });
   });
 }
