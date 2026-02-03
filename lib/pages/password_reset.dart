@@ -126,6 +126,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                   labelText: 'Email',
                   labelStyle: TextStyle(color: scheme.primary),
                   hintText: 'Enter your email address',
+                  hintStyle: TextStyle(color: scheme.fontInverted.withOpacity(0.6)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
