@@ -175,15 +175,11 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.lock_reset,
-                size: 80,
-                color: Theme.of(context).primaryColor,
-              ),
+              Icon(Icons.lock_reset, size: 80, color: scheme.primary),
               const SizedBox(height: 16),
               Text(
                 'Invalid or expired reset link',
-                style: TextStyle(color: scheme.fontPrimary),
+                style: TextStyle(color: scheme.fontInverted),
               ),
               const SizedBox(height: 8),
               if (lastReceivedUri != null)
@@ -217,6 +213,8 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.fontInverted,
         title: const Text('Reset Password'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -231,23 +229,19 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              Icon(
-                Icons.lock_reset,
-                size: 80,
-                color: Theme.of(context).primaryColor,
-              ),
+              Icon(Icons.lock_reset, size: 80, color: scheme.primary),
               const SizedBox(height: 32),
               Text(
                 'Set a new password',
                 style:
                     Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: scheme.fontPrimary,
+                      color: scheme.fontInverted,
                     ) ??
                     TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: scheme.fontPrimary,
+                      color: scheme.fontInverted,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -269,8 +263,6 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                 decoration: InputDecoration(
                   labelText: 'New password',
                   labelStyle: TextStyle(color: scheme.primary),
-                  filled: true,
-                  fillColor: scheme.cardPrimary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -279,9 +271,11 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: scheme.outline),
+                    borderSide: BorderSide(color: scheme.fontSecondary),
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: scheme.surface,
                   prefixIcon: Icon(Icons.lock, color: scheme.primary),
                 ),
                 validator: _validatePw,

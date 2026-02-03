@@ -75,6 +75,8 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
     return Scaffold(
       backgroundColor: scheme.surface,
       appBar: AppBar(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.fontInverted,
         title: const Text('Reset Password'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -89,23 +91,19 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              Icon(
-                Icons.lock_reset,
-                size: 80,
-                color: Theme.of(context).primaryColor,
-              ),
+              Icon(Icons.lock_reset, size: 80, color: scheme.primary),
               const SizedBox(height: 32),
               Text(
                 'Forgot your password?',
                 style:
                     Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: scheme.fontPrimary,
+                      color: scheme.fontInverted,
                     ) ??
                     TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: scheme.fontPrimary,
+                      color: scheme.fontInverted,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -136,11 +134,11 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: scheme.outline),
+                    borderSide: BorderSide(color: scheme.fontSecondary),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: scheme.cardPrimary,
+                  fillColor: scheme.surface,
                   prefixIcon: Icon(Icons.email, color: scheme.primary),
                 ),
                 validator: _validateEmail,
@@ -162,7 +160,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                     ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: _isLoading ? null : () => context.pop(),
+                onPressed: _isLoading ? null : () => context.go('/login'),
                 child: Text(
                   'Back to Login',
                   style: TextStyle(color: scheme.primary),
