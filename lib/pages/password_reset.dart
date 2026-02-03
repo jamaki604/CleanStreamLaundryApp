@@ -80,7 +80,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
         title: const Text('Reset Password'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go("/login"),
         ),
       ),
       body: SingleChildScrollView(
