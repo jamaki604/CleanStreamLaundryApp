@@ -129,7 +129,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$42.75'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$42.75'), findsOneWidget);
     });
 
     testWidgets('should display balance with two decimal places', (
@@ -140,7 +140,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$100.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$100.00'), findsOneWidget);
     });
 
     testWidgets('should display default balance when userBalance is null', (
@@ -151,7 +151,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
 
     testWidgets('should display Load card button with correct styling', (
@@ -167,13 +167,6 @@ void main() {
       );
 
       expect(button.onPressed, isNotNull);
-    });
-
-    testWidgets('should have scrollable content', (tester) async {
-      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
-      await tester.pump();
-
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
   });
 
@@ -211,10 +204,28 @@ void main() {
       ]);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Loaded \$10.00 on 01/10/2025'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Used \$2.50 on 01/09/2025'),
+        100,
+        scrollable: find.descendant(
+          of: find.byType(ListView),
+          matching: find.byType(Scrollable),
+        ),
+      );
       expect(find.text('Used \$2.50 on 01/09/2025'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Loaded \$25.00 on 01/08/2025'),
+        100,
+        scrollable: find.descendant(
+          of: find.byType(ListView),
+          matching: find.byType(Scrollable),
+        ),
+      );
       expect(find.text('Loaded \$25.00 on 01/08/2025'), findsOneWidget);
     });
 
@@ -792,7 +803,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
 
     testWidgets('should handle empty transaction list', (tester) async {
@@ -811,7 +822,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$9999.99'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$9999.99'), findsOneWidget);
     });
 
     testWidgets('should handle zero balance', (tester) async {
@@ -820,7 +831,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
   });
 }
