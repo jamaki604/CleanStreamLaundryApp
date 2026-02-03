@@ -21,10 +21,10 @@ class SupabaseProfileService extends ProfileService {
         await _client
             .from('profiles')
             .upsert(
-              {'id': id, 'full_name': name},
-              onConflict: 'id',
-              ignoreDuplicates: true,
-            );
+          {'id': id, 'full_name': name},
+          onConflict: 'id',
+          ignoreDuplicates: true,
+        );
       }
     } catch (e) {
       print(e);
@@ -114,5 +114,30 @@ class SupabaseProfileService extends ProfileService {
     } catch (e) {
       return null;
     }
+  }
+
+  @override
+  Future<int> getNotificationLeadTime() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return 5;
+
+    final response = await _client
+        .from('profiles')
+        .select('notif_lead_time')
+        .eq('id', user.id)
+        .single();
+
+    return (response['notif_lead_time'] as int?) ?? 5;
+  }
+
+  @override
+  Future<void> setNotificationLeadTime(int value) async {
+    final user = _client.auth.currentUser;
+    if (user == null) return;
+
+    await _client
+        .from('profiles')
+        .update({'notif_lead_time': value})
+        .eq('id', user.id);
   }
 }

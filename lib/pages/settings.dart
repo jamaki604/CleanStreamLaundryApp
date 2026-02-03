@@ -8,8 +8,11 @@ import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 class Settings extends StatefulWidget {
+  static const int maxNotificationLeadTime = 30;
+
   @override
   State<Settings> createState() => _SettingsState();
 }
@@ -17,6 +20,29 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final transactionService = GetIt.instance<TransactionService>();
   final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
+
+  int notificationLeadTime = 5;
+  bool _loadingDelay = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationLeadTime();
+  }
+
+  Future<void> _loadNotificationLeadTime() async {
+    final value = await profileService.getNotificationLeadTime();
+    setState(() {
+      notificationLeadTime = value;
+      _loadingDelay = false;
+    });
+  }
+
+  Future<void> _updateLeadTime(int newLeadTimeValue) async {
+    setState(() => notificationLeadTime = newLeadTimeValue);
+    await profileService.setNotificationLeadTime(newLeadTimeValue);
+  }
 
   Future<void> _showSignOutConfirmation() async {
     final shouldSignOut = await showDialog<bool>(
@@ -80,20 +106,20 @@ class _SettingsState extends State<Settings> {
                       themeManager.toggleTheme();
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.money,
                     title: "Monthly Report",
                     onTap: () async {
-                      final transactions = await transactionService
-                          .getTransactionsForUser();
+                      final transactions =
+                      await transactionService.getTransactionsForUser();
                       context.push(
                         '/monthlyTransactionHistory',
                         extra: transactions,
                       );
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.request_page,
                     title: "Request Refund",
@@ -101,7 +127,7 @@ class _SettingsState extends State<Settings> {
                       context.push('/refundPage');
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.person,
                     title: "Edit Profile",
@@ -109,7 +135,81 @@ class _SettingsState extends State<Settings> {
                       context.go('/editProfile');
                     },
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.timer,
+                    title: "Notify Before Finish",
+                    subtitle:
+                    "Minutes you’re notified before machine finish",
+                    trailing: _loadingDelay
+                        ? const SizedBox(
+                      height: 110,
+                      width: 110,
+                      child: CircularProgressIndicator(strokeWidth: 4),
+                    )
+                        : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color:
+                            Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.add,
+                                color: Colors.white, size: 20),
+                            onPressed: () async {
+                              if (notificationLeadTime < Settings.maxNotificationLeadTime) {
+                                final newLeadTime = notificationLeadTime + 1;
+                                await _updateLeadTime(newLeadTime);
+                              }
+                            },
+                          ),
+                        ),
+                    SizedBox(
+                      width: 40,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          ("  " + "$notificationLeadTime"),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.fontSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                        const SizedBox(width: 12),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color:
+                            Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.remove,
+                                color: Colors.white, size: 20),
+                            onPressed: () async {
+                              if (notificationLeadTime > 0) {
+                                final newLeadTime = notificationLeadTime - 1;
+                                await _updateLeadTime(newLeadTime);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.logout,
                     title: "Sign Out",

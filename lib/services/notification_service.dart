@@ -1,13 +1,16 @@
 import 'dart:io';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:get_it/get_it.dart';
 
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+  final flutterLocalNotificationsPlugin =
+    GetIt.instance<FlutterLocalNotificationsPlugin>();
+
+  final profileService = GetIt.instance<ProfileService>();
 
   NotificationService() {
     _init();
@@ -45,15 +48,15 @@ class NotificationService {
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
     const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-      defaultPresentAlert: true
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+        defaultPresentAlert: true
     );
 
     const initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings
+        android: androidSettings,
+        iOS: iosSettings
     );
 
     await flutterLocalNotificationsPlugin.initialize(initSettings);
@@ -88,17 +91,72 @@ class NotificationService {
         title,
         body,
         const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'your_channel_id',
+              'Your Channel',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+            iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            )
+        ),
+      );
+    });
+  }
+
+  Future<void> scheduleEarlyMachineNotification({
+    required int id,
+    required Duration machineTime,
+  }) async {
+    final allowed = await _requestPermission();
+    if (!allowed) return;
+
+    final userLeadTime = await profileService.getNotificationLeadTime();
+    final userLeadMinutes = Duration(minutes: userLeadTime);
+
+    Duration arrivalTime = machineTime - userLeadMinutes;
+
+    String notifTitle;
+    String notifBody;
+
+    if (arrivalTime.isNegative) {
+      arrivalTime = Duration.zero;
+      notifTitle = "Machine Started!";
+      final roundedTime = machineTime.inMinutes;
+      final unit = roundedTime == 1 ? "minute" : "minutes";
+      notifBody = "Your machine will be finished in $roundedTime $unit!";
+    }
+    else if(userLeadTime == 0){
+      notifTitle = "Machine Finished!";
+      notifBody = "Your machine is finished";
+    }
+    else {
+      notifTitle = "Machine Almost Ready";
+
+      final unit = userLeadTime == 1 ? "minute" : "minutes";
+      notifBody = "Your machine will be ready in $userLeadTime $unit!";
+    }
+
+    Future.delayed(arrivalTime, () async {
+      await flutterLocalNotificationsPlugin.show(
+        id,
+        notifTitle,
+        notifBody,
+        const NotificationDetails(
           android: AndroidNotificationDetails(
             'your_channel_id',
             'Your Channel',
             importance: Importance.high,
             priority: Priority.high,
           ),
-           iOS: DarwinNotificationDetails(
-             presentAlert: true,
-             presentBadge: true,
-             presentSound: true,
-            )
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
       );
     });
