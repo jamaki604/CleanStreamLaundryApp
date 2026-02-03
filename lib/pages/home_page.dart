@@ -339,68 +339,78 @@ class HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-
-                          SizedBox(
-                            height: 80,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "$idleWashers/$totalWashers Washers",
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.fontSecondary,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
+                      SizedBox(
+                        height: 80,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "$idleWashers/$totalWashers Washers",
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.fontSecondary,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      const Icon(
-                                        Icons.local_laundry_service,
-                                        color: Colors.blue,
-                                        size: 36,
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.local_laundry_service,
+                                      color: Colors.blue,
+                                      size: 36,
+                                    ),
+                                  ],
                                 ),
-
-                                Container(width: 2, color: Colors.blue),
-
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "$idleDryers/$totalDryers Dryers",
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.fontSecondary,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      const Icon(
-                                        Icons.local_laundry_service,
-                                        color: Colors.blue,
-                                        size: 36,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+
+                            Container(width: 2, color: Colors.blue),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "$idleDryers/$totalDryers Dryers",
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.fontSecondary,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.local_laundry_service,
+                                      color: Colors.blue,
+                                      size: 36,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
