@@ -16,6 +16,8 @@ import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
 import 'package:clean_stream_laundry_app/pages/payment_page.dart';
 import 'package:clean_stream_laundry_app/pages/monthly_transaction_history.dart';
 import 'package:clean_stream_laundry_app/pages/refund_page.dart';
+import 'package:clean_stream_laundry_app/pages/password_reset.dart';
+import 'package:clean_stream_laundry_app/pages/reset_protected_page.dart';
 
 class RouterService {
   GoRouter createRouter(AuthService authenticator) => GoRouter(
@@ -158,10 +160,45 @@ class RouterService {
           transitionsBuilder: (_, _, _, child) => child,
         ),
       ),
+      GoRoute(
+        path: '/password-reset',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const PasswordResetPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/reset-protected',
+        pageBuilder: (context, state) {
+          final uri = (state.extra as Uri?) ?? state.uri;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: ResetProtectedPage(incomingUri: uri),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            transitionsBuilder: (_, _, _, child) => child,
+          );
+        },
+      ),
     ],
-    errorBuilder: (context, state) => const NotFoundScreen(),
+    errorBuilder: (context, state) {
+      final uri = state.uri;
+      if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
+        return ResetProtectedPage(incomingUri: uri);
+      }
+      return const NotFoundScreen();
+    },
     redirect: (context, state) {
       final uri = state.uri;
+
+      // Handle clean-stream://reset-protected deep links
+      if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
+        final query = uri.query;
+        return query.isEmpty ? '/reset-protected' : '/reset-protected?$query';
+      }
 
       // Handle clean-stream://change-email deep links
       if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {
