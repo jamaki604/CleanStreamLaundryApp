@@ -52,11 +52,9 @@ void main() {
     mockIOS = MockIOSPlugin();
     mockProfile = MockProfileService();
 
-    // Register mocks BEFORE constructing NotificationService
     GetIt.I.registerSingleton<FlutterLocalNotificationsPlugin>(mockPlugin);
     GetIt.I.registerSingleton<ProfileService>(mockProfile);
 
-    // Mock plugin initialization
     when(() => mockPlugin.initialize(any())).thenAnswer((_) async => true);
 
     when(() => mockPlugin.resolvePlatformSpecificImplementation<
@@ -82,7 +80,6 @@ void main() {
     when(() => mockProfile.getNotificationLeadTime())
         .thenAnswer((_) async => 5);
 
-    // Mock permission handler
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(permissionChannel, (call) async {
       if (call.method == 'checkPermissionStatus') return 1;
@@ -95,10 +92,6 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(permissionChannel, null);
   });
-
-  // ------------------------------------------------------------
-  // TESTS
-  // ------------------------------------------------------------
 
   testWidgets("scheduleNotification triggers .show() after delay", (tester) async {
     fakeAsync((async) {
