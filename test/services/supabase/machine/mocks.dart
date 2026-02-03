@@ -72,7 +72,7 @@ class FakeFilterBuilderMap extends Fake implements PostgrestFilterBuilder<Postgr
   @override
   Future<U> then<U>(FutureOr<U> Function(PostgrestList) onValue, {Function? onError,}) async {
     try {
-      final result = onValue([fakeData] as PostgrestList);
+      final result = onValue([fakeData]);
       return Future.value(result);
     } catch (e) {
       if (onError != null) onError(e);
@@ -101,7 +101,6 @@ class FakeTransformBuilder extends Fake implements PostgrestTransformBuilder<Map
     }
   }
 
-  @override
   Map<String, dynamic> eq(String column, dynamic value) {
     return fakeData;
   }

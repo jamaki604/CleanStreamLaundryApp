@@ -631,9 +631,7 @@ void main() {
       state.setState(() {
         const int newIndex = 0;
         state.selectedTransactionIndex = newIndex;
-        state.selectedTransaction = newIndex != null
-            ? state.recentTransactions[newIndex]
-            : null;
+        state.selectedTransaction = state.recentTransactions[newIndex];
       });
       await tester.pumpAndSettle();
 
