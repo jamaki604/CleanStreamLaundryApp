@@ -72,13 +72,14 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
-  Future<void> makeNotification() async {
+  Future<void> makeNotification(String name) async {
     final notificationService = GetIt.instance<NotificationService>();
     await notificationService.scheduleEarlyMachineNotification(
       id: 1,
       //This is where we would add code to get the machine finish time
       //Use the machine finish time instead of hardcoding 5 mins
       machineTime: const Duration(minutes: 5, seconds: 5),
+      machineName: name,
     );
   }
 
@@ -213,7 +214,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     _paymentCompleted = true;
                   });
 
-                  makeNotification();
+                  makeNotification(_machineName.toString());
 
                   statusDialog(
                     context,
@@ -331,7 +332,7 @@ class _PaymentPageState extends State<PaymentPage> {
     Navigator.of(context, rootNavigator: true).pop();
 
     if (deviceAuthorized) {
-      makeNotification();
+      makeNotification(_machineName.toString());
       setState(() {
         _paymentCompleted = true;
       });

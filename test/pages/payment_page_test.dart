@@ -57,6 +57,7 @@ void main() {
     when(() => mockNotificationService.scheduleEarlyMachineNotification(
       id: any(named: 'id'),
       machineTime: any(named: 'machineTime'),
+      machineName: any(named: 'machineName'),
     )).thenAnswer((_) async {});
 
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
@@ -370,6 +371,7 @@ void main() {
       verify(() => mockNotificationService.scheduleEarlyMachineNotification(
         id: 1,
         machineTime: any(named: 'machineTime'),
+        machineName: any(named: 'machineName'),
       )).called(1);
     });
   });

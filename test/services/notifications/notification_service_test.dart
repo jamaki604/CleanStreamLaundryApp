@@ -7,9 +7,6 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-
-// -------------------- MOCKS --------------------
-
 class MockPlugin extends Mock implements FlutterLocalNotificationsPlugin {}
 class MockAndroidPlugin extends Mock implements AndroidFlutterLocalNotificationsPlugin {}
 class MockIOSPlugin extends Mock implements IOSFlutterLocalNotificationsPlugin {}
@@ -122,9 +119,12 @@ void main() {
       when(() => mockProfile.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
+      String name = "TestDryer123";
+
       service.scheduleEarlyMachineNotification(
         id: 1,
         machineTime: const Duration(minutes: 5),
+        machineName: name
       );
 
       async.elapse(Duration.zero);
@@ -132,7 +132,7 @@ void main() {
       verify(() => mockPlugin.show(
         1,
         "Machine Almost Ready",
-        "Your machine will be ready in 5 minutes!",
+        "$name will be finished in 5 minutes!",
         any(),
       )).called(1);
     });
@@ -145,9 +145,12 @@ void main() {
       when(() => mockProfile.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
+      String name = "TestDryer123";
+
       service.scheduleEarlyMachineNotification(
         id: 2,
         machineTime: const Duration(minutes: 20),
+        machineName: name
       );
 
       async.elapse(const Duration(minutes: 15));
@@ -155,7 +158,7 @@ void main() {
       verify(() => mockPlugin.show(
         2,
         "Machine Almost Ready",
-        "Your machine will be ready in 5 minutes!",
+        "$name will be finished in 5 minutes!",
         any(),
       )).called(1);
     });
@@ -168,9 +171,12 @@ void main() {
       when(() => mockProfile.getNotificationLeadTime())
           .thenAnswer((_) async => 5);
 
+      String name = "TestDryer123";
+
       service.scheduleEarlyMachineNotification(
         id: 3,
         machineTime: const Duration(minutes: 3),
+        machineName: name
       );
 
       async.elapse(Duration.zero);
@@ -178,7 +184,7 @@ void main() {
       verify(() => mockPlugin.show(
         3,
         "Machine Started!",
-        "Your machine will be finished in 3 minutes!",
+        "$name will be finished in 3 minutes!",
         any(),
       )).called(1);
     });

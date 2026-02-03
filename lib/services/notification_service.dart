@@ -110,6 +110,7 @@ class NotificationService {
   Future<void> scheduleEarlyMachineNotification({
     required int id,
     required Duration machineTime,
+    required String machineName
   }) async {
     final allowed = await _requestPermission();
     if (!allowed) return;
@@ -127,17 +128,17 @@ class NotificationService {
       notifTitle = "Machine Started!";
       final roundedTime = machineTime.inMinutes;
       final unit = roundedTime == 1 ? "minute" : "minutes";
-      notifBody = "Your machine will be finished in $roundedTime $unit!";
+      notifBody = "$machineName will be finished in $roundedTime $unit!";
     }
     else if(userLeadTime == 0){
       notifTitle = "Machine Finished!";
-      notifBody = "Your machine is finished";
+      notifBody = "$machineName is finished";
     }
     else {
       notifTitle = "Machine Almost Ready";
 
       final unit = userLeadTime == 1 ? "minute" : "minutes";
-      notifBody = "Your machine will be ready in $userLeadTime $unit!";
+      notifBody = "$machineName will be finished in $userLeadTime $unit!";
     }
 
     Future.delayed(arrivalTime, () async {
