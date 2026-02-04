@@ -1,68 +1,115 @@
-import 'dart:async';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/middleware/app_router.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
 
+class MockAuthService extends Mock implements AuthService {}
+
+class MockTransactionService extends Mock implements TransactionService {}
+
+class MockLocationService extends Mock implements LocationService {}
+
+class MockMachineService extends Mock implements MachineService {}
+
+class MockThemeManager extends Mock implements ThemeManager {}
+
+class MockProfileService extends Mock implements ProfileService {}
+
+class MockRouterService extends Mock implements RouterService {}
+
+class MockMachineCommunicationService extends Mock implements MachineCommunicationService {}
+
+class FakeAuthService extends Fake implements AuthService {}
+
+class MockEdgeFunctionService extends Mock implements EdgeFunctionService {}
+
+// Supabase mocks
 class SupabaseMock extends Mock implements SupabaseClient {}
+
+class QueryBuilderMock extends Mock implements SupabaseQueryBuilder {}
+
 class GoTrueMock extends Mock implements GoTrueClient {}
 
-class QueryBuilderMock extends Mock implements SupabaseQueryBuilder {
+// Custom implementation that actually works like a Future
+class FakeTransformBuilder implements PostgrestTransformBuilder<Map<String, dynamic>> {
+  final Map<String, dynamic> data;
+
+  FakeTransformBuilder(this.data);
 
   @override
-  PostgrestFilterBuilder<dynamic> insert(Object values, {bool defaultToNull = false}) {
-    return FakeFilterBuilder({'status': 'success', 'inserted': values});
+  Future<T> then<T>(FutureOr<T> Function(Map<String, dynamic>) onValue, {Function? onError}) async {
+    return onValue(data);
   }
 
+  @override
+  PostgrestTransformBuilder<Map<String, dynamic>> limit(int count, {String? referencedTable}) => this;
+
+  @override
+  PostgrestTransformBuilder<Map<String, dynamic>> order(String column, {bool ascending = false, bool nullsFirst = false, String? referencedTable}) => this;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class FakeFilterBuilder extends Fake implements PostgrestFilterBuilder<PostgrestList> {
-  final Map<String, dynamic> fakeData;
+class FakeTransformBuilderNullable implements PostgrestTransformBuilder<Map<String, dynamic>?> {
+  final Map<String, dynamic>? data;
 
-  FakeFilterBuilder(this.fakeData);
+  FakeTransformBuilderNullable(this.data);
+
+  @override
+  Future<T> then<T>(FutureOr<T> Function(Map<String, dynamic>?) onValue, {Function? onError}) async {
+    return onValue(data);
+  }
+
+  @override
+  PostgrestTransformBuilder<Map<String, dynamic>?> limit(int count, {String? referencedTable}) => this;
+
+  @override
+  PostgrestTransformBuilder<Map<String, dynamic>?> order(String column, {bool ascending = false, bool nullsFirst = false, String? referencedTable}) => this;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeFilterBuilderList extends Fake implements PostgrestFilterBuilder<PostgrestList> {
+  final dynamic data;
+
+  FakeFilterBuilderList(this.data);
+
+  @override
+  PostgrestFilterBuilder<PostgrestList> eq(String column, Object value) {
+    return this;
+  }
+
+  @override
+  PostgrestTransformBuilder<Map<String, dynamic>?> maybeSingle() {
+    return FakeTransformBuilderNullable(data is Map ? data as Map<String, dynamic>? : null);
+  }
 
   @override
   PostgrestTransformBuilder<Map<String, dynamic>> single() {
-    return FakeTransformBuilder(fakeData);
-  }
-
-  @override
-  Future<U> then<U>(FutureOr<U> Function(PostgrestList) onValue, {Function? onError,}) async {
-    try {
-      final result = onValue([fakeData] as PostgrestList);
-      return Future.value(result);
-    } catch (e) {
-      if (onError != null) onError(e);
-      return Future.error(e);
+    if (data is Map) {
+      return FakeTransformBuilder(data as Map<String, dynamic>);
     }
-  }
-
-  @override
-  PostgrestFilterBuilder<PostgrestList> eq(String column, dynamic value) {
-    return this;
-  }
-}
-
-class FakeTransformBuilder extends Fake implements PostgrestTransformBuilder<Map<String, dynamic>> {
-  final Map<String, dynamic> fakeData;
-  FakeTransformBuilder(this.fakeData);
-
-  @override
-  Future<U> then<U>(FutureOr<U> Function(Map<String, dynamic>) onValue, {Function? onError,}) async {
-    try {
-      final result = onValue(fakeData);
-      return Future.value(result);
-    } catch (e) {
-      if (onError != null) onError(e);
-      return Future.error(e);
+    if (data is List && (data as List).isNotEmpty) {
+      return FakeTransformBuilder((data as List).first as Map<String, dynamic>);
     }
+    return FakeTransformBuilder({});
   }
 
   @override
-  Map<String, dynamic> eq(String column, dynamic value) {
-    return fakeData;
-  }
-
-  @override
-  PostgrestTransformBuilder<PostgrestMap> single() {
-    return this as PostgrestTransformBuilder<PostgrestMap>;
+  Future<U> then<U>(FutureOr<U> Function(List<Map<String, dynamic>>) onValue, {Function? onError}) async {
+    if (data == null) return onValue([]);
+    if (data is Map) return onValue([data as Map<String, dynamic>]);
+    if (data is List<Map<String, dynamic>>) return onValue(data);
+    return onValue([]);
   }
 }

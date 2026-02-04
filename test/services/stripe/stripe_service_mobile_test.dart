@@ -42,25 +42,27 @@ void main() {
 
   group("StripeService Tests", () {
     group("makePayment", () {
-      test("returns 400 when no client secret is found", () async {
+      test("throws StripeConfigException when no client secret is found", () async {
         // Arrange
         when(() => mockEdgeFunctionService.runEdgeFunction(
           name: any(named: "name"),
           body: any(named: "body"),
         )).thenAnswer((_) async => null);
 
-        // Act
-        final result = await stripeService.makePayment(2.60);
+        // Act & Assert (exception)
+        await expectLater(
+          stripeService.makePayment(2.60),
+          throwsA(isA<StripeConfigException>()),
+        );
 
-        // Assert
-        expect(result, 400);
+        // Assert (interaction)
         verify(() => mockEdgeFunctionService.runEdgeFunction(
           name: 'paymentIntent',
           body: {'amount': '260', 'currency': 'usd'},
         )).called(1);
       });
 
-      test("returns 200 when payment succeeds", () async {
+      test("Runs successfully when payment succeeds", () async {
         // Arrange
         when(() => mockEdgeFunctionService.runEdgeFunction(
           name: any(named: "name"),
@@ -80,17 +82,16 @@ void main() {
             .thenAnswer((_) async => null);
 
         // Act
-        final result = await stripeService.makePayment(2.60);
+        await stripeService.makePayment(2.60);
 
         // Assert
-        expect(result, 200);
         verify(() => mockStripe.initPaymentSheet(
           paymentSheetParameters: any(named: "paymentSheetParameters"),
         )).called(1);
         verify(() => mockStripe.presentPaymentSheet()).called(1);
       });
 
-      test("returns 401 when StripeException is thrown", () async {
+      test("Throws exception when StripeException is thrown", () async {
         // Arrange
         when(() => mockEdgeFunctionService.runEdgeFunction(
           name: any(named: "name"),
@@ -110,14 +111,15 @@ void main() {
           ),
         );
 
-        // Act
-        final result = await stripeService.makePayment(2.60);
+        //Assert
+        expectLater(
+              () => stripeService.makePayment(10.0),
+          throwsA(isA<StripeException>()),
+        );
 
-        // Assert
-        expect(result, 401);
       });
 
-      test("returns 400 when generic exception is thrown", () async {
+      test("Throws exception when generic exception is thrown", () async {
         // Arrange
         when(() => mockEdgeFunctionService.runEdgeFunction(
           name: any(named: "name"),
@@ -133,14 +135,15 @@ void main() {
           paymentSheetParameters: any(named: "paymentSheetParameters"),
         )).thenThrow(Exception("Generic error"));
 
-        // Act
-        final result = await stripeService.makePayment(2.60);
 
         // Assert
-        expect(result, 400);
+        expectLater(
+              () => stripeService.makePayment(10.0),
+          throwsA(isA<Exception>()),
+        );
       });
 
-      test("returns 400 when presentPaymentSheet throws exception", () async {
+      test("Throws exception when presentPaymentSheet throws exception", () async {
         // Arrange
         when(() => mockEdgeFunctionService.runEdgeFunction(
           name: any(named: "name"),
@@ -159,11 +162,12 @@ void main() {
         when(() => mockStripe.presentPaymentSheet())
             .thenThrow(Exception("payment sheet error"));
 
-        // Act
-        final result = await stripeService.makePayment(2.60);
-
         // Assert
-        expect(result, 400);
+        expectLater(
+              () => stripeService.makePayment(10.0),
+          throwsA(isA<Exception>()),
+        );
+
       });
     });
 

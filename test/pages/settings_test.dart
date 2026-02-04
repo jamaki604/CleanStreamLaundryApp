@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:clean_stream_laundry_app/pages/settings.dart';
@@ -9,19 +10,35 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'mocks.dart';
+import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
 
 void main() {
   late MockAuthService mockAuthService;
   late MockTransactionService mockTransactionService;
+  late MockProfileService mockProfileService;
   late MockThemeManager mockThemeManager;
   late GoRouter router;
 
   setUp(() {
+    final getIt = GetIt.instance;
+
     mockAuthService = MockAuthService();
     mockTransactionService = MockTransactionService();
     mockThemeManager = MockThemeManager();
+    mockProfileService = MockProfileService();
 
-    final getIt = GetIt.instance;
+    if (getIt.isRegistered<ProfileService>()) {
+      getIt.unregister<ProfileService>();
+    }
+
+    getIt.registerSingleton<ProfileService>(mockProfileService);
+
+    when(() => mockProfileService.getNotificationLeadTime())
+        .thenAnswer((_) async => 5);
+
+    when(() => mockProfileService.setNotificationLeadTime(any()))
+        .thenAnswer((_) async {});
+
     if (getIt.isRegistered<AuthService>()) {
       getIt.unregister<AuthService>();
     }
@@ -48,47 +65,79 @@ void main() {
   }
 
   group('Settings Widget Tests', () {
-    testWidgets('should display Settings title', (WidgetTester tester) async {
+    testWidgets('should display Settings logo', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.text('Settings \n'), findsOneWidget);
-    });
-
-    testWidgets('should display all three buttons', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-
-      expect(find.text('Sign Out'), findsOneWidget);
-      expect(find.text('Monthly Report'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Sign Out'), findsOneWidget);
       expect(
-        find.widgetWithText(ElevatedButton, 'Monthly Report'),
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Image &&
+              widget.image is AssetImage &&
+              (widget.image as AssetImage).assetName == 'assets/Logo.png',
+        ),
         findsOneWidget,
       );
     });
 
-    testWidgets(
-      'should call logout and navigate to login when Sign Out is pressed',
-      (WidgetTester tester) async {
-        when(() => mockAuthService.logout()).thenAnswer((_) async => {});
-
-        await tester.pumpWidget(createWidgetUnderTest());
-
-        await tester.tap(find.text('Sign Out'));
-        await tester.pumpAndSettle();
-
-        verify(() => mockAuthService.logout()).called(1);
-      },
-    );
-
-    testWidgets('should call toggleTheme when theme toggle button is pressed', (
+    testWidgets('should display all six SettingsCard widgets', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      final themeButton = find.byType(ElevatedButton).at(1);
-      await tester.tap(themeButton);
+      expect(find.byType(SettingsCard), findsNWidgets(6));
+      expect(find.text('Sign Out'), findsOneWidget);
+      expect(find.text('Monthly Report'), findsOneWidget);
+      expect(find.text('Request Refund'), findsOneWidget);
+      expect(find.text('Dark Mode'), findsOneWidget);
+      expect(find.text('Edit Profile'), findsOneWidget);
+      expect(find.text('Notify Before Finish'), findsOneWidget);
+    });
+
+    testWidgets(
+      'should call logout and navigate to login when Sign Out is tapped',
+          (WidgetTester tester) async {
+        when(() => mockAuthService.logout())
+            .thenAnswer((_) async {});
+
+        await tester.pumpWidget(createWidgetUnderTest());
+
+        // Scroll to make Sign Out visible
+        await tester.ensureVisible(
+          find.widgetWithText(SettingsCard, 'Sign Out'),
+        );
+        await tester.pumpAndSettle();
+
+        // Tap the Sign Out card
+        await tester.tap(find.widgetWithText(SettingsCard, 'Sign Out'));
+        await tester.pumpAndSettle();
+
+        //Test to see if dialog box appears
+        expect(find.text('Are you sure you want to sign out?'), findsOneWidget);
+
+        // Tap dialog "Sign Out" button
+        await tester.tap(
+          find.widgetWithText(ElevatedButton, 'Sign Out'),
+        );
+        await tester.pumpAndSettle();
+
+        // Verify logout was called
+        verify(() => mockAuthService.logout()).called(1);
+      },
+    );
+
+
+    testWidgets('should call toggleTheme when theme card is tapped', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Find the theme toggle card by its icon
+      final themeCard = find.ancestor(
+        of: find.byIcon(Icons.lightbulb),
+        matching: find.byType(SettingsCard),
+      );
+
+      await tester.tap(themeCard);
       await tester.pumpAndSettle();
 
       verify(() => mockThemeManager.toggleTheme()).called(1);
@@ -107,29 +156,149 @@ void main() {
 
       await tester.pumpWidget(createWidgetUnderTest());
 
-      await tester.tap(find.text('Monthly Report'));
+      await tester.tap(find.widgetWithText(SettingsCard, 'Monthly Report'));
       await tester.pumpAndSettle();
 
       verify(() => mockTransactionService.getTransactionsForUser()).called(1);
     });
 
-    testWidgets('should use correct button styles', (
+    testWidgets(
+      'should navigate to refund page when Request Refund is tapped',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+
+        // Scroll to make Request Refund visible
+        await tester.ensureVisible(
+          find.widgetWithText(SettingsCard, 'Request Refund'),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.widgetWithText(SettingsCard, 'Request Refund'));
+        await tester.pumpAndSettle();
+
+        // Verify navigation occurred (router location check)
+        expect(router.routerDelegate.currentConfiguration.uri.path, '/');
+      },
+    );
+
+    testWidgets(
+      'should navigate to edit profile page when edit profile is tapped',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(createWidgetUnderTest());
+
+        // Scroll to make Request Refund visible
+        await tester.ensureVisible(
+          find.widgetWithText(SettingsCard, 'Edit Profile'),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.widgetWithText(SettingsCard, 'Edit Profile'));
+        await tester.pumpAndSettle();
+
+        // Verify navigation occurred (router location check)
+        expect(
+          router.routerDelegate.currentConfiguration.uri.path,
+          '/editProfile',
+        );
+      },
+    );
+
+    testWidgets('should display correct icons for each card', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      final signOutButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Sign Out'),
-      );
-
-      final buttonStyle = signOutButton.style;
-      expect(buttonStyle, isNotNull);
+      expect(find.byIcon(Icons.lightbulb), findsOneWidget);
+      expect(find.byIcon(Icons.money), findsOneWidget);
+      expect(find.byIcon(Icons.request_page), findsOneWidget);
+      expect(find.byIcon(Icons.logout), findsOneWidget);
+      expect(find.byIcon(Icons.person), findsOneWidget);
     });
+
     testWidgets('should center content properly', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.byType(Center), findsWidgets);
       expect(find.byType(Column), findsWidgets);
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+    });
+
+    testWidgets('loads notification lead time from ProfileService', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
+          .thenAnswer((_) async => 7);
+
+      when(() => mockProfileService.setNotificationLeadTime(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      expect(find.text('  ' + '7'), findsOneWidget);
+    });
+
+    testWidgets('increments notification lead time when + is tapped', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
+          .thenAnswer((_) async => 5);
+
+      when(() => mockProfileService.setNotificationLeadTime(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final plusButton = find.byIcon(Icons.add);
+
+      await tester.ensureVisible(plusButton);
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      verify(() => mockProfileService.setNotificationLeadTime(6)).called(1);
+    });
+
+    testWidgets('does not decrement below 0', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
+          .thenAnswer((_) async => 0);
+
+      when(() => mockProfileService.setNotificationLeadTime(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final minusButton = find.byIcon(Icons.remove);
+
+      await tester.tap(minusButton);
+      await tester.pumpAndSettle();
+
+      verifyNever(() => mockProfileService.setNotificationLeadTime(any()));
+    });
+
+    testWidgets('notification lead time does not exceed max limit', (tester) async {
+      when(() => mockProfileService.getNotificationLeadTime())
+          .thenAnswer((_) async => Settings.maxNotificationLeadTime - 2);
+
+      when(() => mockProfileService.setNotificationLeadTime(any()))
+          .thenAnswer((_) async {});
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final plusButton = find.byIcon(Icons.add);
+
+      await tester.ensureVisible(plusButton);
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      await tester.tap(plusButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text('  ' + '${Settings.maxNotificationLeadTime}'), findsOneWidget);
+
+      verify(() => mockProfileService
+          .setNotificationLeadTime(Settings.maxNotificationLeadTime)).called(1);
     });
   });
 }

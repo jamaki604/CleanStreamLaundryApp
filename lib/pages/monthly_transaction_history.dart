@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:go_router/go_router.dart';
 
 class MonthlyTransactionHistory extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
@@ -20,21 +20,30 @@ class MonthlyTransactionHistory extends StatelessWidget {
 
     final ScrollController _scrollController = ScrollController();
 
-    return BasePage(
-      body: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Monthly Transaction History',
-            style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color:  Colors.white,
           ),
-          elevation: 2,
+          onPressed: () => context.pop(),
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Monthly Transaction History',
+          style: TextStyle(color: Colors.white),
+        ),
+        elevation: 2,
+        centerTitle: true,
+      ),
+      body: Scaffold(
         body: Theme(
           data: Theme.of(context).copyWith(
             scrollbarTheme: ScrollbarThemeData(
-              thumbColor: MaterialStateProperty.all(Colors.lightBlue),
-              trackColor: MaterialStateProperty.all(Colors.transparent),
-              thickness: MaterialStateProperty.all(8),
+              thumbColor: WidgetStateProperty.all(Colors.lightBlue),
+              trackColor: WidgetStateProperty.all(Colors.transparent),
+              thickness: WidgetStateProperty.all(8),
               radius: const Radius.circular(4),
             ),
           ),
@@ -49,11 +58,19 @@ class MonthlyTransactionHistory extends StatelessWidget {
                 final month = sortedMonths[index];
                 final data = monthlySums[month]!;
                 final total =
-                    data['directWasher']! + data['directDryer']! + data['loyaltyCard']!;
+                    data['directWasher']! +
+                        data['directDryer']! +
+                        data['loyaltyCard']!;
+                if (total == 0 && data['loyaltyWasher']==0 && data['loyaltyDryer']==0) {
+                  return SizedBox(width: 0, height: 0,);
+                } else {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
                   elevation: 2,
-                  color: Theme.of(context).colorScheme.cardPrimary,
+                  color: Theme
+                      .of(context)
+                      .colorScheme
+                      .cardPrimary,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -90,7 +107,10 @@ class MonthlyTransactionHistory extends StatelessWidget {
                         _buildTransactionRow(
                           'Loyalty Washer Payments',
                           data['loyaltyWasher']!,
-                          Theme.of(context).colorScheme.primary,
+                          Theme
+                              .of(context)
+                              .colorScheme
+                              .primary,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
@@ -102,7 +122,10 @@ class MonthlyTransactionHistory extends StatelessWidget {
                         _buildTransactionRow(
                           'Loyalty Dryer Payments',
                           data['loyaltyDryer']!,
-                          Theme.of(context).colorScheme.primary,
+                          Theme
+                              .of(context)
+                              .colorScheme
+                              .primary,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
@@ -114,6 +137,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
                     ),
                   ),
                 );
+              }
               },
             ),
           ),
@@ -126,7 +150,9 @@ class MonthlyTransactionHistory extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 12),
-        Expanded(child: Text(label, style: TextStyle(fontSize: 16, color: color))),
+        Expanded(
+          child: Text(label, style: TextStyle(fontSize: 16, color: color)),
+        ),
         Text(
           '\$${amount.toStringAsFixed(2)}',
           style: TextStyle(

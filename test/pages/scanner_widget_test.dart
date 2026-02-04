@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:mocktail/mocktail.dart';
 import 'mocks.dart';
 
 void main() {
@@ -19,6 +20,7 @@ void main() {
     }
 
     getIt.registerSingleton<MachineCommunicationService>(mockMachineCommunicator);
+
   });
 
   tearDown(() => GetIt.instance.reset());
@@ -35,6 +37,20 @@ void main() {
           path: '/startPage',
           builder: (context, state) => const Scaffold(body: Text('Start Page')),
         ),
+        GoRoute(
+          path: '/paymentPage',
+          builder: (context, state) {
+            // Simple stub page - no services needed!
+            return const Scaffold(
+              body: Column(
+                children: [
+                  Text('Payment Page'),
+                  Text('Pay with Loyalty'),
+                ],
+              ),
+            );
+          },
+        )
       ],
     );
     return MaterialApp.router(routerConfig: router);
@@ -108,6 +124,34 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(ScannerWidget), findsNothing);
+      });
+
+      testWidgets('navigates to paymentPage when Nayax code passes',(tester) async {
+        when(() => mockMachineCommunicator.checkAvailability(any())).thenAnswer((_) async => "pass");
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        final dynamic state = tester.state(find.byType(ScannerWidget));
+        await state.processNayaxCode("machine123");
+
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ScannerWidget), findsNothing);
+        expect(find.text('Pay with Loyalty'), findsOneWidget);
+      });
+
+      testWidgets('navigates to paymentPage when Nayax code does not pass',(tester) async {
+        when(() => mockMachineCommunicator.checkAvailability(any())).thenAnswer((_) async => "fail");
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        final dynamic state = tester.state(find.byType(ScannerWidget));
+        await state.processNayaxCode("machine123");
+
+        await tester.pumpAndSettle();
+
+        //expect(find.byType(ScannerWidget), findsNothing);
+        expect(find.text('Machine Unavailable'), findsOneWidget);
       });
     });
   });

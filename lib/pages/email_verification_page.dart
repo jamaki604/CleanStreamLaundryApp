@@ -9,11 +9,9 @@ import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
 class EmailVerificationPage extends StatefulWidget {
 
+  final AppLinks appLinks;
 
-  EmailVerificationPage({super.key}){
-
-  }
-
+  EmailVerificationPage({super.key,required this.appLinks}) {}
 
   @override
   State<EmailVerificationPage> createState() => _EmailVerificationPageState();
@@ -21,9 +19,7 @@ class EmailVerificationPage extends StatefulWidget {
 
 class _EmailVerificationPageState extends State<EmailVerificationPage> {
   late final StreamSubscription? _linkSub;
-  final AppLinks _appLinks = AppLinks();
   final authService = GetIt.instance<AuthService>();
-
 
   @override
   void initState() {
@@ -32,19 +28,22 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     //Checks for if application has been updated
     authService.onAuthChange.listen((isLoggedIn) {
       if (isLoggedIn && authService.isEmailVerified()) {
-        context.go("/scanner");
+        context.go("/homePage");
       }
     });
 
     // Handles app links
-    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) {
-      if (uri != null && uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
+    _linkSub = widget.appLinks.uriLinkStream.listen((Uri? uri) {
+      if (uri != null &&
+          uri.scheme == 'clean-stream' &&
+          uri.host == 'email-verification') {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            context.go('/scanner');
+            context.go('/homePage');
           }
         });
-      }});
+      }
+    });
   }
 
   @override
@@ -54,12 +53,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   }
 
   Widget resendVerification = const Text(
-      'Resend Verification',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: Colors.blue,
-        decoration: TextDecoration.underline,
-      )
+    'Resend Verification',
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
   );
 
   bool resent = false;
@@ -80,28 +76,35 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               Text(
                 'Please verify your email address',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18,
-                  color: Theme.of(context).colorScheme.fontPrimary),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 'Check your inbox and click the verification link.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.fontSecondary),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.fontSecondary,
+                ),
               ),
               const SizedBox(height: 24),
               InkWell(
                 onTap: () async {
-                  if(resent == false) {
-
+                  if (resent == false) {
                     final result = await authService.resendVerification();
 
                     setState(() {
-                      if(result == AuthenticationResponses.success) {
-                        resendVerification = Icon(Icons.check_circle, size: 40,
-                            color: Colors.green);
+                      if (result == AuthenticationResponses.success) {
+                        resendVerification = Icon(
+                          Icons.check_circle,
+                          size: 40,
+                          color: Colors.green,
+                        );
                         resent = true;
-                      }else{
+                      } else {
                         resendVerification = Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -125,7 +128,12 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                               Text(
                                 'Please resend verification again at another time.',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.fontPrimary),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.fontPrimary,
+                                ),
                               ),
                             ],
                           ),

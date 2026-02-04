@@ -7,8 +7,12 @@ import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 class Settings extends StatefulWidget {
+  static const int maxNotificationLeadTime = 30;
+
   @override
   State<Settings> createState() => _SettingsState();
 }
@@ -16,72 +20,205 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   final transactionService = GetIt.instance<TransactionService>();
   final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
+
+  int notificationLeadTime = 5;
+  bool _loadingDelay = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationLeadTime();
+  }
+
+  Future<void> _loadNotificationLeadTime() async {
+    final value = await profileService.getNotificationLeadTime();
+    setState(() {
+      notificationLeadTime = value;
+      _loadingDelay = false;
+    });
+  }
+
+  Future<void> _updateLeadTime(int newLeadTimeValue) async {
+    setState(() => notificationLeadTime = newLeadTimeValue);
+    await profileService.setNotificationLeadTime(newLeadTimeValue);
+  }
+
+  Future<void> _showSignOutConfirmation() async {
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sign Out',
+              style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+        ),
+
+          content: Text('Are you sure you want to sign out?',
+            style: TextStyle(color: Theme.of(context).colorScheme.fontInverted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // User cancelled
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // User confirmed
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+
+    if (shouldSignOut == true) {
+      authService.logout();
+      if (mounted) {
+        context.go('/login');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
       builder: (context, themeManager, child) {
         return BasePage(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Settings \n",
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.fontSecondary,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/Logo.png', width: 230, height: 230),
+                  SettingsCard(
+                    icon: Icons.lightbulb,
+                    title: Theme.of(context).colorScheme.modeChangerText,
+                    onTap: () {
+                      themeManager.toggleTheme();
+                    },
                   ),
-                  textAlign: TextAlign.center,
-                ),
-
-                ElevatedButton(
-                  onPressed: () {
-                    authService.logout();
-                    context.go('/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.money,
+                    title: "Monthly Report",
+                    onTap: () async {
+                      final transactions =
+                      await transactionService.getTransactionsForUser();
+                      context.push(
+                        '/monthlyTransactionHistory',
+                        extra: transactions,
+                      );
+                    },
                   ),
-                  child: Text("Sign Out"),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    themeManager.toggleTheme();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.request_page,
+                    title: "Request Refund",
+                    onTap: () {
+                      context.push('/refundPage');
+                    },
                   ),
-                  child: Text(Theme.of(context).colorScheme.modeChangerText),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    final transactions = await transactionService.getTransactionsForUser();
-                    context.go('/monthlyTransactionHistory', extra: transactions);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.person,
+                    title: "Edit Profile",
+                    onTap: () {
+                      context.go('/editProfile');
+                    },
                   ),
-                  child: Text("Monthly Report"),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    context.go('/refundPage');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.timer,
+                    title: "Notify Before Finish",
+                    subtitle:
+                    "Minutes you’re notified before machine finish",
+                    trailing: _loadingDelay
+                        ? const SizedBox(
+                      height: 110,
+                      width: 110,
+                      child: CircularProgressIndicator(strokeWidth: 4),
+                    )
+                        : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color:
+                            Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.add,
+                                color: Colors.white, size: 20),
+                            onPressed: () async {
+                              if (notificationLeadTime < Settings.maxNotificationLeadTime) {
+                                final newLeadTime = notificationLeadTime + 1;
+                                await _updateLeadTime(newLeadTime);
+                              }
+                            },
+                          ),
+                        ),
+                    SizedBox(
+                      width: 40,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          ("  " + "$notificationLeadTime"),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.fontSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                        const SizedBox(width: 12),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color:
+                            Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: const Icon(Icons.remove,
+                                color: Colors.white, size: 20),
+                            onPressed: () async {
+                              if (notificationLeadTime > 0) {
+                                final newLeadTime = notificationLeadTime - 1;
+                                await _updateLeadTime(newLeadTime);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text("Request Refund"),
-                ),
-              ],
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.logout,
+                    title: "Sign Out",
+                    onTap: () {
+                      _showSignOutConfirmation();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );

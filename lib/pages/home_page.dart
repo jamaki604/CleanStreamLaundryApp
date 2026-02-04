@@ -1,13 +1,20 @@
+import 'dart:async';
+import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  static const pageKey = Key("home_page");
 
   @override
   HomePageState createState() => HomePageState();
@@ -15,15 +22,31 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   String? selectedName;
-  late final Map<String,int> locationID = {};
+  String? username;
+  Map<String, dynamic>? balance;
+  late final Map<String, int> locationID = {};
+  late final Map<String, LatLng> locationCoordinates = {};
   bool locationSelected = false;
   late int? locationIDSelected;
   late StorageService storage;
+  late final MapController _mapController;
+
+
+  final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
 
   @override
   void initState() {
     super.initState();
+    _mapController = MapController();
     _initStorage();
+    _loadUserData();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   Future<void> _initStorage() async {
@@ -35,20 +58,131 @@ class HomePageState extends State<HomePage> {
       selectedName = lastVal;
     });
   }
+
+  void _zoomToLocation(String locationName) {
+    if (locationCoordinates.containsKey(locationName)) {
+      final coords = locationCoordinates[locationName]!;
+      _mapController.move(coords, 15.0);
+    }
+  }
+
+  void _loadUserData() async {
+    final userId = authService.getCurrentUserId;
+    if (userId == null) return;
+
+    final loadedUsername = await profileService.getUserNameById(userId);
+    final loadedBalance = await profileService.getUserBalanceById(userId);
+
+    if (mounted) {
+      setState(() {
+        username = loadedUsername;
+        balance = loadedBalance;
+      });
+    }
+  }
+
   final machineService = GetIt.instance<MachineService>();
   final locationService = GetIt.instance<LocationService>();
 
   @override
   Widget build(BuildContext context) {
-
     return BasePage(
+      key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(4.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                username == null
+                    ? "Welcome!"
+                    : "Welcome $username!",
+
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              FutureBuilder(
+                future: locationService.getLocations(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      height: 400,
+                      width: 400,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.shade400,
+                          width: 1,
+                        ),
+                      ),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  final locations = snapshot.data ?? [];
+                  final markers = LocationParser.parseLocations(locations);
+
+                  for (var location in locations) {
+                    if (location["Address"] != null &&
+                        location["Latitude"] != null &&
+                        location["Longitude"] != null) {
+                      locationCoordinates[location["Address"]] = LatLng(
+                        location["Latitude"],
+                        location["Longitude"],
+                      );
+                    }
+                  }
+
+                  LatLng initialCenter = LatLng(40.273502, -86.126976);
+                  double initialZoom = 7.2;
+
+                  return Container(
+                    height: 400,
+                    width: 400,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade400, width: 1),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: initialCenter,
+                        initialZoom: initialZoom,
+                        keepAlive: true,
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName:
+                              'https://cleanstreamlaundry.com/',
+                          tileProvider: NetworkTileProvider(),
+                        ),
+                        MarkerLayer(markers: markers),
+                      ],
+                    ),
+                  );
+                },
+              ),
               Container(
+                margin: EdgeInsets.only(top: 20),
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
@@ -63,9 +197,11 @@ class HomePageState extends State<HomePage> {
                       child: FutureBuilder(
                         future: Future.wait([locationService.getLocations()]),
                         builder: (context, snapshot) {
-
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
                           }
 
                           final data = snapshot.data![0];
@@ -73,19 +209,24 @@ class HomePageState extends State<HomePage> {
                             locationID[item["Address"]] = item["id"];
                           }
 
-                          if (selectedName != null && locationID.containsKey(selectedName!) && !locationSelected) {
+                          if (selectedName != null &&
+                              locationID.containsKey(selectedName!) &&
+                              !locationSelected) {
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               setState(() {
                                 locationSelected = true;
                                 locationIDSelected = locationID[selectedName!];
                               });
+                              _zoomToLocation(selectedName!);
                             });
                           }
 
                           return DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              value: selectedName,
+                              value: locationID.containsKey(selectedName)
+                                  ? selectedName
+                                  : null,
                               hint: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
@@ -93,13 +234,19 @@ class HomePageState extends State<HomePage> {
                                   "Select Location",
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Theme.of(context).colorScheme.fontInverted,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.fontInverted,
                                   ),
                                 ),
                               ),
                               onChanged: (String? newValue) {
                                 if (newValue != null) {
-                                  storage.setValue("lastSelectedLocation", newValue);
+                                  storage.setValue(
+                                    "lastSelectedLocation",
+                                    newValue,
+                                  );
+                                  _zoomToLocation(newValue);
                                 }
                                 setState(() {
                                   selectedName = newValue;
@@ -117,7 +264,9 @@ class HomePageState extends State<HomePage> {
                                       entry.key,
                                       style: TextStyle(
                                         fontSize: 18,
-                                        color: Theme.of(context).colorScheme.fontInverted,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.fontInverted,
                                       ),
                                     ),
                                   ),
@@ -131,128 +280,137 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 10),
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
-                    machineService.getWasherCountByLocation(locationIDSelected.toString()),
-                    machineService.getIdleWasherCountByLocation(locationIDSelected.toString())
+                    machineService.getWasherCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
+                    machineService.getIdleWasherCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
+                    machineService.getDryerCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
+                    machineService.getIdleDryerCountByLocation(
+                      locationIDSelected.toString(),
+                    ),
                   ]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     }
 
-                    final machineIdle = snapshot.data![0];
-                    final totalMachine = snapshot.data![0];
+                    final totalWashers = snapshot.data![0];
+                    final idleWashers = snapshot.data![1];
+                    final totalDryers = snapshot.data![2];
+                    final idleDryers = snapshot.data![3];
 
                     return Container(
-                      width: 250,
-                      height: 160,
-                      padding: const EdgeInsets.all(30),
+                      width: 520,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.transparent,
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "$totalMachine available",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontInverted,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                          Container(
+                            height: 45,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
                                 ),
                               ),
-
-                              Text(
-                                "$totalMachine/$machineIdle washers",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontSecondary,
-                                  fontSize: 14,
+                            ),
+                            child: Text(
+                              "Availability",
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.fontSecondary,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      SizedBox(
+                        height: 80,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "$idleWashers/$totalWashers Washers",
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.fontSecondary,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.local_laundry_service,
+                                      color: Colors.blue,
+                                      size: 36,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
 
-                          Icon(
-                            Icons.local_laundry_service,
-                            color: Colors.blue,
-                            size: 40,
-                          ),
-                        ],
+                            Container(width: 2, color: Colors.blue),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "$idleDryers/$totalDryers Dryers",
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.fontSecondary,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.local_laundry_service,
+                                      color: Colors.blue,
+                                      size: 36,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                ),
-
-              SizedBox(height: 20),
-              if (locationSelected)
-                FutureBuilder(
-                  future: Future.wait([
-                    machineService.getDryerCountByLocation(locationIDSelected.toString()),
-                    machineService.getIdleDryerCountByLocation(locationIDSelected.toString())
-                  ]),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-
-                    final machineIdle = snapshot.data![0];
-                    final totalMachine = snapshot.data![0];
-
-                    return Container(
-                      width: 250,
-                      height: 160,
-                      padding: const EdgeInsets.all(30),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue, width: 3),
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.transparent,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "$totalMachine available",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontInverted,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-
-                              Text(
-                                "$totalMachine/$machineIdle dryers",
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.fontSecondary,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.local_laundry_service,
-                            color: Colors.blue,
-                            size: 40,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

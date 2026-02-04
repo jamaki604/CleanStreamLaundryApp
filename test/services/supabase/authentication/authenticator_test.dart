@@ -11,6 +11,12 @@ void main(){
   late SupabaseMock client;
   late GoTrueMock supabaseAuth;
 
+  setUpAll(() {
+    registerFallbackValue(Uri());
+    registerFallbackValue(OAuthProvider.google);
+    registerFallbackValue(UserAttributesFake());
+  });
+
   group("authentication Tests", (){
 
     setUp((){
@@ -132,6 +138,7 @@ void main(){
       when(() => supabaseAuth.signUp(
           email: any(named: 'email'),
           password: any(named: 'password'),
+          data: {"full_name": "testname"},
           emailRedirectTo: 'clean-stream://email-verification'
       )).thenAnswer((_) async =>
           AuthResponse(
@@ -210,7 +217,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123G@");
+      final response = await authenticator.signUp("testemail", "testpassword123G@", "testname");
 
       expect(response,AuthenticationResponses.success);
     });
@@ -298,7 +305,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpasswordG");
+      final response = await authenticator.signUp("testemail", "testpasswordG", "testname");
 
       expect(response,AuthenticationResponses.noDigit);
     });
@@ -386,7 +393,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123G");
+      final response = await authenticator.signUp("testemail", "testpassword123G", "testname");
 
       expect(response,AuthenticationResponses.noSpecialCharacter);
     });
@@ -474,7 +481,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "testpassword123@");
+      final response = await authenticator.signUp("testemail", "testpassword123@", "testname");
 
       expect(response,AuthenticationResponses.noUppercase);
     });
@@ -562,7 +569,7 @@ void main(){
           ),
       );
 
-      final response = await authenticator.signUp("testemail", "test");
+      final response = await authenticator.signUp("testemail", "test", "testname");
 
       expect(response,AuthenticationResponses.lessThanMinLength);
     });
@@ -824,6 +831,121 @@ void main(){
 
     });
 
+    test("googleSignIn calls signInWithOAuth", () async {
+      when(() => client.auth.signInWithOAuth(
+        any(),
+        redirectTo: any(named: 'redirectTo'),
+      )).thenAnswer((_) async => true);
+
+      await authenticator.googleSignIn();
+
+      verify(() => client.auth.signInWithOAuth(
+        any(),
+        redirectTo: any(named: 'redirectTo'),
+      )).called(1);
+    });
+
+    test("Tests that all errors are properly handled",() async{
+      when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
+      await authenticator.googleSignIn();
+      //If test reaches here it passed because nothing failed
+    });
+
+    test("appleSignIn calls signInWithOAuth", () async {
+      when(() => client.auth.signInWithOAuth(
+        any(),
+        redirectTo: any(named: 'redirectTo'),
+      )).thenAnswer((_) async => true);
+
+      await authenticator.appleSignIn();
+
+      verify(() => client.auth.signInWithOAuth(
+        any(),
+        redirectTo: any(named: 'redirectTo'),
+      )).called(1);
+    });
+
+    test("Tests that all errors are properly handled with apple sign in",() async{
+      when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
+      await authenticator.appleSignIn();
+      //If test reaches here it passed because nothing failed
+    });
+
+    test("Tests that all errors are properly handled with google sign in",() async{
+      when(() =>  client.auth.signInWithOAuth(any())).thenThrow(Exception("Test Error"));
+      await authenticator.googleSignIn();
+      //If test reaches here it passed because nothing failed
+    });
+
+
+    test("Tests to see that the redirect was called", () async {
+
+      when(() => supabaseAuth.getSessionFromUrl(any())).thenAnswer(
+            (_) async => AuthSessionUrlResponse(
+          session: Session(
+            accessToken: "test_token",
+            tokenType: "bearer",
+            user: User(
+              id: 'test-user-id',
+              appMetadata: {},
+              userMetadata: {},
+              aud: 'authenticated',
+              createdAt: '2024-01-01T00:00:00Z',
+            ),
+          ),
+          redirectType: "signup",
+        ),
+      );
+
+      final testUri = Uri.parse('https://example.com/callback?code=test123');
+      await authenticator.handleOAuthRedirect(testUri);
+
+      verify(() => supabaseAuth.getSessionFromUrl(testUri)).called(1);
+    });
+
+    test("Tests that the user was grabbed correctly",() async{
+      await authenticator.getCurrentUser();
+      verify(() => client.auth.currentUser);
+    });
+
+    test("Tests that the correct userID is gotten",() async{
+      String? userID = await authenticator.getCurrentUserId;
+      expect(userID, '11111111-1111-1111-1111-111111111111');
+    });
+
+    test("Tests that as session is returned",() async{
+      
+      when(() => supabaseAuth.getSessionFromUrl(any())).thenAnswer( (_) async => AuthSessionUrlResponse(session: Session(accessToken: "test", tokenType: "test", user: User(id: "1234", appMetadata: {}, userMetadata: {}, aud: "test", createdAt: "test")), redirectType: "test"));
+      
+      await authenticator.handleOAuthRedirect(Uri());
+      verify(() => client.auth.getSessionFromUrl(any()));
+
+    });
+
+    test("Verifies that a session was refreshed if it's not null",() async {
+
+      when(() => supabaseAuth.currentSession).thenReturn(Session(accessToken: "test", tokenType: "test", user: User(id: '', appMetadata: {}, userMetadata: {}, aud: '', createdAt: '')));
+
+      await authenticator.refreshSession();
+
+      verify(() => supabaseAuth.refreshSession());
+    });
+
+    test("Verifies that a session was not refreshed if the session is null",() async {
+      when(() => supabaseAuth.currentSession).thenReturn(null);
+
+      await authenticator.refreshSession();
+
+      verifyNever(() => supabaseAuth.refreshSession());
+    });
+
+    test("getCurrentUserEmail returns correct email",() async {
+      when(() => supabaseAuth.currentSession).thenReturn(null);
+
+      String? result = await authenticator.getCurrentUserEmail();
+
+      expect(result,'testemail@test.com');
+    });
   });
 
 }

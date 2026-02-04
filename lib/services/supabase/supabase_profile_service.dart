@@ -1,22 +1,34 @@
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SupabaseProfileService extends ProfileService{
-
+class SupabaseProfileService extends ProfileService {
   late final SupabaseClient _client;
 
-  SupabaseProfileService({required SupabaseClient client}){
+  SupabaseProfileService({required SupabaseClient client}) {
     _client = client;
   }
 
   @override
   Future<void> createAccount({required String id, required String name}) async {
+    try {
+      final existingProfile = await _client
+          .from('profiles')
+          .select('id')
+          .eq('id', id)
+          .maybeSingle();
 
-    await _client.from('profiles').insert({
-      'id': id,
-      'full_name': name,
-    });
-
+      if (existingProfile == null) {
+        await _client
+            .from('profiles')
+            .upsert(
+          {'id': id, 'full_name': name},
+          onConflict: 'id',
+          ignoreDuplicates: true,
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -32,6 +44,24 @@ class SupabaseProfileService extends ProfileService{
       return null;
     } catch (e) {
       return null;
+    }
+  }
+
+  @override
+  Future<void> updateName(String name) async {
+    final userId = _client.auth.currentUser?.id;
+
+    if (userId == null) {
+      throw Exception('No user logged in');
+    }
+
+    try {
+      await _client
+          .from('profiles')
+          .update({"full_name": name})
+          .eq('id', userId);
+    } catch (e) {
+      throw Exception('Failed to update name: $e');
     }
   }
 
@@ -84,5 +114,30 @@ class SupabaseProfileService extends ProfileService{
     } catch (e) {
       return null;
     }
+  }
+
+  @override
+  Future<int> getNotificationLeadTime() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return 5;
+
+    final response = await _client
+        .from('profiles')
+        .select('notif_lead_time')
+        .eq('id', user.id)
+        .single();
+
+    return (response['notif_lead_time'] as int?) ?? 5;
+  }
+
+  @override
+  Future<void> setNotificationLeadTime(int value) async {
+    final user = _client.auth.currentUser;
+    if (user == null) return;
+
+    await _client
+        .from('profiles')
+        .update({'notif_lead_time': value})
+        .eq('id', user.id);
   }
 }

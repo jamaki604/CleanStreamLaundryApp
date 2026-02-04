@@ -4,31 +4,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
 
-class StripeService implements PaymentService{
-
+class StripeService implements PaymentService {
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
   final _stripeInstance = GetIt.instance<Stripe>();
 
-  Future<int> makePayment(double amount) async {
-    try{
-        String? paymentIntentClientSecret = await createPaymentIntent(amount, "usd");
-        if (paymentIntentClientSecret == null) {
-          return 400;
-        }
-        await _stripeInstance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret: paymentIntentClientSecret,
-            merchantDisplayName: "Clean Stream Laundry Solutions",
-          ),
-        );
-        await _stripeInstance.presentPaymentSheet();
-        return 200;
+  Future<void> makePayment(double amount) async {
+    try {
+      String? paymentIntentClientSecret = await createPaymentIntent(
+        amount,
+        "usd",
+      );
+      if (paymentIntentClientSecret == null) {
+        throw StripeConfigException("Failed to create payment intent");
+      }
+      await _stripeInstance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntentClientSecret,
+          merchantDisplayName: "Clean Stream Laundry Solutions",
+        ),
+      );
+      await _stripeInstance.presentPaymentSheet();
     } on StripeException {
-      return 401;
+      rethrow;
     } catch (e) {
       print("payment error: $e");
-      return 400;
+      rethrow;
     }
   }
 
@@ -36,13 +37,9 @@ class StripeService implements PaymentService{
   Future<String?> createPaymentIntent(double amount, String currency) async {
     try {
       final response = await edgeFunctionService.runEdgeFunction(
-          name: 'paymentIntent',
-          body: {
-            'amount': convertDollarsToCents(amount),
-            'currency': currency
-          }
+        name: 'paymentIntent',
+        body: {'amount': convertDollarsToCents(amount), 'currency': currency},
       );
-
 
       if (response?.data != null && response?.data['clientSecret'] != null) {
         return response?.data["clientSecret"];
