@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
@@ -26,6 +27,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   );
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
+  final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
 
   String currentName = '';
   String currentEmail = '';
@@ -378,11 +380,84 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                       ),
                     ),
+                    Spacer(),
+                    Center(
+                      child: InkWell(
+                        onTap: _isSaving ? null : _deleteAccount,
+                        child: _isSaving
+                            ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                            : const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Delete Account',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
     );
+  }
+
+  void _deleteAccount() async {
+    bool confirm = await _confirmDeleteAccount();
+    if (confirm) {
+      String? userId = authService.getCurrentUserId;
+      final response = await edgeFunctionService.runEdgeFunction(name: "delete-account", body: {"user_id": userId});
+      if (response!.status == 200) {
+        statusDialog(context, title: "Account Deleted", message: "Your account has been deleted successfully.", isSuccess: true);
+        context.go("/login");
+      } else {
+        statusDialog(context, title: "Error", message: "An error occurred, please try again later.", isSuccess: false);
+        return;
+      }
+    } else {
+      return;
+    }
+  }
+
+  Future<bool> _confirmDeleteAccount() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Delete your account?',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.fontSecondary,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete your account? Any money on your loyalty card will be lost.',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.fontSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes, Delete'),
+          ),
+        ],
+      ),
+    ) ??
+        false;
   }
 
   Future<bool> _confirmationWindow() async {
