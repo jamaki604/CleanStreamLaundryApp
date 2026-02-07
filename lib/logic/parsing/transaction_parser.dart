@@ -68,7 +68,7 @@ class TransactionParser {
         'directDryer': 0.0,
         'loyaltyDryer': 0.0,
         'loyaltyCard': 0.0,
-        'Reward from payment': 0.0
+        'Rewards': 0.0
       };
     }
 
@@ -101,9 +101,9 @@ class TransactionParser {
       } else if (description == 'loyalty card') {
         result[monthKey]!['loyaltyCard'] =
             result[monthKey]!['loyaltyCard']! + amount;
-      } else if (description == 'Reward from payment') {
-        result[monthKey]!['Reward from payment'] =
-            result[monthKey]!['Reward from payment']! + amount;
+      } else if (description == 'reward from payment') {
+        result[monthKey]!['Rewards'] =
+            result[monthKey]!['Rewards']! + amount;
       }
     }
     return result;

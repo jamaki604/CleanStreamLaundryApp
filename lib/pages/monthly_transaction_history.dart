@@ -136,7 +136,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
                         const SizedBox(height: 8),
                         _buildTransactionRow(
                           'Rewards Earned',
-                          data['Reward from payment']!,
+                          data['Rewards']!,
                           Theme
                               .of(context)
                               .colorScheme
