@@ -45,6 +45,6 @@ class PaymentProcessor {
 
   double processRewards(double amount) {
     double rewardAmount = amount * 0.01;
-    return (rewardAmount);
+    return (double.parse(rewardAmount.toStringAsFixed(2)));
   }
 }
