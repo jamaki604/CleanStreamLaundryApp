@@ -16,6 +16,7 @@ class LoyaltyViewModel extends ChangeNotifier {
   double? userBalance;
   String? userName;
   String? errorMessage;
+  double? monthlyRewards;
   bool isLoading = true;
   bool showPastTransactions = false;
 
@@ -23,7 +24,7 @@ class LoyaltyViewModel extends ChangeNotifier {
 
   // Call once from loyalty page
   Future<void> initialize() async {
-    await Future.wait([_fetchBalance(), _fetchTransactions()]);
+    await Future.wait([_fetchBalance(), _fetchTransactions(), _fetchMonthlyRewards()]);
   }
 
   Future<void> _fetchBalance() async {
@@ -47,6 +48,21 @@ class LoyaltyViewModel extends ChangeNotifier {
 
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> _fetchMonthlyRewards() async {
+    final transactions = await _transactionService.getTransactionsForUser();
+    final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+
+    final rewardTransactions = transactions.where((t) {
+      final createdAt = DateTime.parse(t['created_at'] as String);
+      final type = t['type'] as String?;
+      return createdAt.isAfter(thirtyDaysAgo) && type == 'Rewards';
+    });
+
+    monthlyRewards = rewardTransactions.fold<double>(
+      0.0, (sum, transaction) => sum + (transaction['amount'] as num).toDouble(),
+    );
   }
 
   Future<void> _fetchTransactions() async {

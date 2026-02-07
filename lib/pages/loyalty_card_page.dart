@@ -59,7 +59,15 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               color: Theme.of(context).colorScheme.fontSecondary,
             ),
           ),
-          const SizedBox(height: 25),
+          Text(
+            'Rewards earned this month: \$${viewModel.monthlyRewards?.toStringAsFixed(2) ?? '0.00'}',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.7),
+            ),
+          ),
+          const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () => _loadCard(),
             style: ElevatedButton.styleFrom(
