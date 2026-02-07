@@ -24,7 +24,7 @@ class PaymentProcessor {
         description: description,
         type: "Laundry",
       );
-      processRewards(amount);
+      await processRewards(amount);
       return PaymentResult.success;
     } on StripeException {
       return PaymentResult.canceled;
@@ -33,7 +33,7 @@ class PaymentProcessor {
     }
   }
 
-  void processRewards(double amount) async {
+  Future<void> processRewards(double amount) async {
     final userId = _authService.getCurrentUserId;
     final data = await _profileService.getUserBalanceById(userId!);
     double rewardAmount = amount * 0.01;
