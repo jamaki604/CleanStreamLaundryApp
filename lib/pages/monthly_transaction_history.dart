@@ -133,6 +133,15 @@ class MonthlyTransactionHistory extends StatelessWidget {
                           data['loyaltyCard']!,
                           Colors.black,
                         ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Rewards Earned',
+                          data['Reward from payment']!,
+                          Theme
+                              .of(context)
+                              .colorScheme
+                              .primary,
+                        ),
                       ],
                     ),
                   ),
