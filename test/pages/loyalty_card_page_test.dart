@@ -35,6 +35,7 @@ void main() {
     when(() => mockViewModel.userBalance).thenReturn(25.50);
     when(() => mockViewModel.recentTransactions).thenReturn([]);
     when(() => mockViewModel.showPastTransactions).thenReturn(false);
+    when(() => mockViewModel.monthlyRewards).thenReturn(0.0);
 
     // Setup default method behaviors
     when(() => mockViewModel.initialize()).thenAnswer((_) async => {});
@@ -174,6 +175,122 @@ void main() {
       await tester.pump();
 
       expect(find.byType(SingleChildScrollView), findsOneWidget);
+    });
+  });
+
+  group('Rewards Display', () {
+    testWidgets('should display monthly rewards with correct formatting', (
+        tester,
+        ) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(5.25);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(
+        find.textContaining('Rewards earned this month: \$5.25'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should display default rewards when monthlyRewards is null', (
+        tester,
+        ) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(null);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(
+        find.textContaining('Rewards earned this month: \$0.00'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should display rewards with two decimal places', (
+        tester,
+        ) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(10.0);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(
+        find.textContaining('Rewards earned this month: \$10.00'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should display info icon for rewards', (tester) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(5.0);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.info_outline), findsOneWidget);
+    });
+
+    testWidgets('should show rewards dialog when info icon is tapped', (
+        tester,
+        ) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(5.0);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards Program'), findsOneWidget);
+      expect(
+        find.text(
+          'Earn 1% back on every purchase! Rewards are automatically added to your balance and can be used for future laundry services.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should close rewards dialog when Got it is tapped', (
+        tester,
+        ) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(5.0);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards Program'), findsOneWidget);
+
+      await tester.tap(find.text('Got it'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards Program'), findsNothing);
+    });
+
+    testWidgets('should handle very small reward amounts', (tester) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(0.01);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(
+        find.textContaining('Rewards earned this month: \$0.01'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should handle large reward amounts', (tester) async {
+      when(() => mockViewModel.monthlyRewards).thenReturn(999.99);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(
+        find.textContaining('Rewards earned this month: \$999.99'),
+        findsOneWidget,
+      );
     });
   });
 
