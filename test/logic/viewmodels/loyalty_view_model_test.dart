@@ -7,6 +7,7 @@ import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 import 'mocks.dart';
+import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 
 void main() {
   late LoyaltyViewModel viewModel;
@@ -84,6 +85,23 @@ void main() {
       expect(viewModel.errorMessage, 'Failed to fetch balance');
       expect(viewModel.isLoading, false);
     });
+
+    test('initialize should handle null userId', () async {
+      // Arrange
+      when(() => mockAuthService.getCurrentUserId).thenReturn(null);
+      when(() => mockTransactionService.getTransactionsForUser())
+          .thenAnswer((_) async => []);
+
+      // Act
+      await viewModel.initialize();
+
+      // Assert
+      expect(viewModel.errorMessage, 'User not known');
+      expect(viewModel.isLoading, false);
+
+      verifyNever(() => mockProfileService.getUserBalanceById(any()));
+    });
+
 
     test('should default to 0.0 balance when null', () async {
       // Arrange
@@ -167,17 +185,125 @@ void main() {
       // Assert
       verify(() => mockTransactionService.getTransactionsForUser()).called(1);
     });
+
+    test('fetchTransactions filters out Rewards and old transactions', () async {
+      // Arrange
+      final now = DateTime.now();
+      when(() => mockTransactionService.getTransactionsForUser()).thenAnswer(
+            (_) async => [
+          {
+            'created_at': now.toIso8601String(),
+            'type': 'Laundry',
+            'amount': 10,
+            'description': 'Wash',
+          },
+          {
+            'created_at': now.toIso8601String(),
+            'type': 'Rewards',
+            'amount': 1,
+            'description': 'Reward',
+          },
+          {
+            'created_at':
+            now.subtract(const Duration(days: 40)).toIso8601String(),
+            'type': 'Laundry',
+            'amount': 5,
+            'description': 'Old wash',
+          },
+        ],
+      );
+
+      // Act
+      await viewModel.toggleTransactionView();
+
+      // Assert
+      expect(viewModel.recentTransactions.length, 1);
+    });
+
+
+    test('fetchMonthlyRewards sums only recent reward transactions', () async {
+      // Arrange
+      final now = DateTime.now();
+      when(() => mockTransactionService.getTransactionsForUser()).thenAnswer(
+            (_) async => [
+          {
+            'created_at': now.toIso8601String(),
+            'type': 'Rewards',
+            'amount': 2.0,
+          },
+          {
+            'created_at': now.toIso8601String(),
+            'type': 'Rewards',
+            'amount': 3.0,
+          },
+          {
+            'created_at':
+            now.subtract(const Duration(days: 40)).toIso8601String(),
+            'type': 'Rewards',
+            'amount': 10.0,
+          },
+        ],
+      );
+
+      // Act
+      await viewModel.initialize();
+
+      // Assert
+      expect(viewModel.monthlyRewards, 5.0);
+    });
+
   });
 
   group('loadCard', () {
-    // Note: This test is incomplete because processPayment is a top-level function
-    // See options below for how to handle this
-    test(
-      'should update balance and fetch transactions on successful payment',
-      () async {
-        // You'll need to refactor processPayment to be testable
-        // See suggestions below
-      },
-    );
+    test('loadCard should update balance and fetch transactions on success', () async {
+      // Arrange
+      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+
+      viewModel.userBalance = 20.0;
+
+      when(() => mockPaymentProcessor.processPayment(
+        10.0,
+        'Loyalty Card',
+      )).thenAnswer((_) async => PaymentResult.success);
+
+      when(() => mockProfileService.updateBalanceById('user123', 30.0))
+          .thenAnswer((_) async => {});
+
+      when(() => mockTransactionService.getTransactionsForUser())
+          .thenAnswer((_) async => []);
+
+      // Act
+      final result = await viewModel.loadCard(10.0);
+
+      // Assert
+      expect(result, PaymentResult.success);
+      expect(viewModel.userBalance, 30.0);
+
+      verify(() => mockProfileService.updateBalanceById('user123', 30.0)).called(1);
+      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+    });
+
+    test('loadCard should not update balance on failed payment', () async {
+      // Arrange
+      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+
+      viewModel.userBalance = 20.0;
+
+      when(() => mockPaymentProcessor.processPayment(
+        10.0,
+        'Loyalty Card',
+      )).thenAnswer((_) async => PaymentResult.failed);
+
+      // Act
+      final result = await viewModel.loadCard(10.0);
+
+      // Assert
+      expect(result, PaymentResult.failed);
+      expect(viewModel.userBalance, 20.0);
+
+      verifyNever(() => mockProfileService.updateBalanceById(any(), any()));
+    });
+
+
   });
 }
