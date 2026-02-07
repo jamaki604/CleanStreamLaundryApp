@@ -66,12 +66,7 @@ class SupabaseProfileService extends ProfileService {
   }
 
   @override
-  Future<void> updateBalanceById(double balance) async {
-    final userId = _client.auth.currentUser?.id;
-
-    if (userId == null) {
-      return;
-    }
+  Future<void> updateBalanceById(String userId, double balance) async {
     try {
       await _client
           .from("profiles")

@@ -315,7 +315,8 @@ class _PaymentPageState extends State<PaymentPage> {
 
   void _processLoyaltyPayment(BuildContext context) async {
     final updatedBalance = _userBalance! - _price!;
-    profileService.updateBalanceById(updatedBalance);
+    final userId = authService.getCurrentUserId;
+    profileService.updateBalanceById(userId!, updatedBalance);
 
     setState(() {
       _userBalance = updatedBalance;

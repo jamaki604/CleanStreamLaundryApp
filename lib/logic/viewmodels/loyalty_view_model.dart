@@ -75,6 +75,7 @@ class LoyaltyViewModel extends ChangeNotifier {
   }
 
   Future<PaymentResult> loadCard(double amount) async {
+    final userId = _authService.getCurrentUserId;
     final result = await _paymentProcessor.processPayment(
       amount,
       "Loyalty Card",
@@ -82,7 +83,7 @@ class LoyaltyViewModel extends ChangeNotifier {
 
     if (result == PaymentResult.success) {
       final newBalance = (userBalance ?? 0) + amount;
-      await _profileService.updateBalanceById(newBalance);
+      await _profileService.updateBalanceById(userId!, newBalance);
       userBalance = newBalance;
       await _fetchTransactions();
     }
