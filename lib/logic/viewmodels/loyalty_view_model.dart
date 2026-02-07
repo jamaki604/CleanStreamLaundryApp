@@ -55,9 +55,10 @@ class LoyaltyViewModel extends ChangeNotifier {
 
     final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
 
-    final filtered = transactions.where((t) {
-      final createdAt = DateTime.parse(t['created_at'] as String);
-      return createdAt.isAfter(thirtyDaysAgo);
+    final filtered = transactions.where((transaction) {
+      final createdAt = DateTime.parse(transaction['created_at'] as String);
+      final type = transaction['type'] as String?;
+      return createdAt.isAfter(thirtyDaysAgo) && type != "Rewards";
     });
 
     recentTransactions = TransactionParser.formatTransactionsList(
