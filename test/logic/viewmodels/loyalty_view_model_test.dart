@@ -266,8 +266,12 @@ void main() {
         'Loyalty Card',
       )).thenAnswer((_) async => PaymentResult.success);
 
-      when(() => mockProfileService.updateBalanceById('user123', 30.0))
-          .thenAnswer((_) async => {});
+      when(() => mockPaymentProcessor.processRewards(10.0))
+          .thenReturn(0.1);
+
+
+      when(() => mockProfileService.updateBalanceById('user123', 30.1))
+          .thenAnswer((_) async => Future.value());
 
       when(() => mockTransactionService.getTransactionsForUser())
           .thenAnswer((_) async => []);
@@ -277,9 +281,10 @@ void main() {
 
       // Assert
       expect(result, PaymentResult.success);
-      expect(viewModel.userBalance, 30.0);
+      expect(viewModel.userBalance, 30.1);
 
-      verify(() => mockProfileService.updateBalanceById('user123', 30.0)).called(1);
+      verify(() => mockPaymentProcessor.processRewards(10.0)).called(1);
+      verify(() => mockProfileService.updateBalanceById('user123', 30.1)).called(1);
       verify(() => mockTransactionService.getTransactionsForUser()).called(1);
     });
 

@@ -39,12 +39,13 @@ class PaymentProcessor {
 
   double processRewards(double amount) {
     double rewardAmount = amount * 0.01;
+
     _transactionService.recordTransaction(
       amount: rewardAmount,
       description: "Reward from payment",
       type: "Rewards",
     );
-    return (rewardAmount);
 
+    return (rewardAmount);
   }
 }

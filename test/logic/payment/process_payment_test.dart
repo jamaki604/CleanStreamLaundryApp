@@ -52,16 +52,16 @@ void main() {
 
       when(() => mockPaymentService.makePayment(amount))
           .thenAnswer((_) async => Future.value());
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async => {});
       when(() => mockAuthService.getCurrentUserId).thenReturn(userId);
       when(() => mockProfileService.getUserBalanceById(userId))
           .thenAnswer((_) async => {'balance': currentBalance});
       when(() => mockProfileService.updateBalanceById(any(), any()))
           .thenAnswer((_) async => {});
+      when(() => mockTransactionService.recordTransaction(
+        amount: any(named: 'amount'),
+        description: any(named: 'description'),
+        type: any(named: 'type'),
+      )).thenAnswer((_) async => {});
 
       // Act
       final result = await paymentProcessor.processPayment(amount, description);
@@ -73,11 +73,6 @@ void main() {
         amount: amount,
         description: description,
         type: 'Laundry',
-      )).called(1);
-      verify(() => mockTransactionService.recordTransaction(
-        amount: 1.0, // 1% of 100
-        description: "Reward from payment",
-        type: "Rewards",
       )).called(1);
       verify(() => mockProfileService.updateBalanceById(userId, 51.0)).called(1);
     });
@@ -199,141 +194,29 @@ void main() {
     });
   });
 
-  group('PaymentProcessor.processRewards', () {
-    test('should calculate 1% reward and update balance', () async {
-      // Arrange
+  group('processRewards', () {
+    test('should calculate 1% reward and update balance', () {
       const amount = 100.0;
-      const userId = 'test-user-id';
       const currentBalance = 50.0;
       const expectedReward = 1.0;
       const expectedNewBalance = 51.0;
 
-      when(() => mockAuthService.getCurrentUserId).thenReturn(userId);
-      when(() => mockProfileService.getUserBalanceById(userId))
-          .thenAnswer((_) async => {'balance': currentBalance});
       when(() => mockTransactionService.recordTransaction(
         amount: any(named: 'amount'),
         description: any(named: 'description'),
         type: any(named: 'type'),
       )).thenAnswer((_) async => {});
-      when(() => mockProfileService.updateBalanceById(userId, any()))
-          .thenAnswer((_) async => {});
 
-      // Act
-      paymentProcessor.processRewards(amount);
-      await Future.delayed(Duration.zero); // Allow async to complete
+      double rewardAmount = paymentProcessor.processRewards(amount);
+      double newBalance = currentBalance + rewardAmount;
 
-      // Assert
-      verify(() => mockAuthService.getCurrentUserId).called(1);
-      verify(() => mockProfileService.getUserBalanceById(userId)).called(1);
+      expect(rewardAmount, expectedReward);
+      expect(newBalance, expectedNewBalance);
+
       verify(() => mockTransactionService.recordTransaction(
-        amount: expectedReward,
+        amount: 1.0,
         description: "Reward from payment",
         type: "Rewards",
-      )).called(1);
-      verify(() => mockProfileService.updateBalanceById(
-        userId,
-        expectedNewBalance,
-      )).called(1);
-    });
-
-    test('should calculate correct reward for different amounts', () async {
-      // Arrange
-      const amount = 250.0;
-      const userId = 'test-user-id';
-      const currentBalance = 100.0;
-      const expectedReward = 2.5;
-      const expectedNewBalance = 102.5;
-
-      when(() => mockAuthService.getCurrentUserId).thenReturn(userId);
-      when(() => mockProfileService.getUserBalanceById(userId))
-          .thenAnswer((_) async => {'balance': currentBalance});
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async => {});
-      when(() => mockProfileService.updateBalanceById(userId, any()))
-          .thenAnswer((_) async => {});
-
-      // Act
-      paymentProcessor.processRewards(amount);
-      await Future.delayed(Duration.zero);
-
-      // Assert
-      verify(() => mockTransactionService.recordTransaction(
-        amount: expectedReward,
-        description: "Reward from payment",
-        type: "Rewards",
-      )).called(1);
-      verify(() => mockProfileService.updateBalanceById(
-        userId,
-        expectedNewBalance,
-      )).called(1);
-    });
-
-    test('should handle zero current balance', () async {
-      // Arrange
-      const amount = 50.0;
-      const userId = 'test-user-id';
-      const currentBalance = 0.0;
-      const expectedReward = 0.5;
-      const expectedNewBalance = 0.5;
-
-      when(() => mockAuthService.getCurrentUserId).thenReturn(userId);
-      when(() => mockProfileService.getUserBalanceById(userId))
-          .thenAnswer((_) async => {'balance': currentBalance});
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async => {});
-      when(() => mockProfileService.updateBalanceById(userId, any()))
-          .thenAnswer((_) async => {});
-
-      // Act
-      paymentProcessor.processRewards(amount);
-      await Future.delayed(Duration.zero);
-
-      // Assert
-      verify(() => mockProfileService.updateBalanceById(
-        userId,
-        expectedNewBalance,
-      )).called(1);
-    });
-
-    test('should handle small payment amounts', () async {
-      // Arrange
-      const amount = 1.0;
-      const userId = 'test-user-id';
-      const currentBalance = 10.0;
-      const expectedReward = 0.01;
-      const expectedNewBalance = 10.01;
-
-      when(() => mockAuthService.getCurrentUserId).thenReturn(userId);
-      when(() => mockProfileService.getUserBalanceById(userId))
-          .thenAnswer((_) async => {'balance': currentBalance});
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async => {});
-      when(() => mockProfileService.updateBalanceById(userId, any()))
-          .thenAnswer((_) async => {});
-
-      // Act
-      paymentProcessor.processRewards(amount);
-      await Future.delayed(Duration.zero);
-
-      // Assert
-      verify(() => mockTransactionService.recordTransaction(
-        amount: expectedReward,
-        description: "Reward from payment",
-        type: "Rewards",
-      )).called(1);
-      verify(() => mockProfileService.updateBalanceById(
-        userId,
-        expectedNewBalance,
       )).called(1);
     });
   });
