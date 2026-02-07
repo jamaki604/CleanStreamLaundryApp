@@ -32,6 +32,7 @@ class HomePageState extends State<HomePage> {
   late final MapController _mapController;
 
 
+
   final authService = GetIt.instance<AuthService>();
   final profileService = GetIt.instance<ProfileService>();
 
@@ -107,7 +108,7 @@ class HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 2),
               Text(
-                "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                "Current balance: \$${balance?["balance"].toStringAsFixed(2) ?? 'Loading...'}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
