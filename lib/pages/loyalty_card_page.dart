@@ -59,13 +59,73 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               color: Theme.of(context).colorScheme.fontSecondary,
             ),
           ),
-          Text(
-            'Rewards earned this month: \$${viewModel.monthlyRewards?.toStringAsFixed(2) ?? '0.00'}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.7),
+          Text.rich(
+            TextSpan(
+              children: [
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  baseline: TextBaseline.alphabetic,
+                  child: Transform.translate(
+                    offset: const Offset(-1, -1),
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            title: Text(
+                              'Rewards Program',
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.fontSecondary,
+                              ),
+                            ),
+                            content: Text(
+                              'Earn 1% back on every purchase! Rewards are automatically added to your balance and can be used for future laundry services.',
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.fontSecondary,
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('Got it'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 0.0),
+                        child: Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.fontSecondary.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                TextSpan(
+                  text:
+                      'Rewards earned this month: \$${viewModel.monthlyRewards?.toStringAsFixed(2) ?? '0.00'}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.fontSecondary.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           ElevatedButton(
@@ -427,7 +487,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     if (result == PaymentResult.success) {
-
       viewModel.fetchTransactions();
 
       statusDialog(
