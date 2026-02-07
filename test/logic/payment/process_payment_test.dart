@@ -19,11 +19,7 @@ void main() {
   setUp(() {
     mockPaymentService = MockPaymentService();
     mockTransactionService = MockTransactionService();
-
-    paymentProcessor = PaymentProcessor(
-      paymentService: mockPaymentService,
-      transactionService: mockTransactionService,
-    );
+    paymentProcessor = PaymentProcessor();
   });
 
   group('PaymentProcessor.processPayment', () {
