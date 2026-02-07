@@ -212,12 +212,6 @@ void main() {
 
       expect(rewardAmount, expectedReward);
       expect(newBalance, expectedNewBalance);
-
-      verify(() => mockTransactionService.recordTransaction(
-        amount: 1.0,
-        description: "Reward from payment",
-        type: "Rewards",
-      )).called(1);
     });
   });
 }

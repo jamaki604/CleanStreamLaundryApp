@@ -27,7 +27,13 @@ class PaymentProcessor {
 
       final userId = _authService.getCurrentUserId;
       final data = await _profileService.getUserBalanceById(userId!);
-      _profileService.updateBalanceById(userId, data?['balance'].toDouble() + processRewards(amount));
+      final rewards = processRewards(amount);
+      _profileService.updateBalanceById(userId, data?['balance'].toDouble() + rewards);
+      _transactionService.recordTransaction(
+        amount: rewards,
+        description: "Reward from payment",
+        type: "Rewards",
+      );
 
       return PaymentResult.success;
     } on StripeException {
@@ -39,13 +45,6 @@ class PaymentProcessor {
 
   double processRewards(double amount) {
     double rewardAmount = amount * 0.01;
-
-    _transactionService.recordTransaction(
-      amount: rewardAmount,
-      description: "Reward from payment",
-      type: "Rewards",
-    );
-
     return (rewardAmount);
   }
 }
