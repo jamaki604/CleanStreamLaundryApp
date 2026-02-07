@@ -239,7 +239,7 @@ void main() {
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-        () => mockProfileService.updateBalanceById(any()),
+        () => mockProfileService.updateBalanceById(any(), any()),
       ).thenAnswer((_) async => {});
       when(
         () => mockMachineCommunicator.wakeDevice(any()),
@@ -259,7 +259,7 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      verify(() => mockProfileService.updateBalanceById(6.5)).called(1);
+      verify(() => mockProfileService.updateBalanceById(any(), 6.5)).called(1);
       verify(() => mockMachineCommunicator.wakeDevice('machine123')).called(1);
       verify(
         () => mockTransactionService.recordTransaction(
@@ -281,7 +281,7 @@ void main() {
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-        () => mockProfileService.updateBalanceById(any()),
+        () => mockProfileService.updateBalanceById(any(), any()),
       ).thenAnswer((_) async => {});
       when(
         () => mockMachineCommunicator.wakeDevice(any()),
@@ -352,7 +352,7 @@ void main() {
         'balance': 10.0,
       });
 
-      when(() => mockProfileService.updateBalanceById(any())).thenAnswer((_) async {});
+      when(() => mockProfileService.updateBalanceById(any(), any())).thenAnswer((_) async {});
       when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
 
       when(() => mockTransactionService.recordTransaction(
