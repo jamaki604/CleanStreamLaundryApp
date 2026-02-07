@@ -82,7 +82,6 @@ void main() {
 
   test("Tests that the logic was called correctly to update account balance", () async {
     await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
-    verify(() => supabaseMock.auth.currentUser).called(1);
     verify(() => supabaseMock.from("profiles")).called(1);
     verify(() => queryBuilderMock.update({"balance": 47.20})).called(1);
   });

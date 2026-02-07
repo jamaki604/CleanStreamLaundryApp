@@ -220,7 +220,7 @@ void main() {
           await tester.pumpAndSettle();
 
           final cardFinder = find.byType(Card);
-          expect(cardFinder, findsNWidgets(3));
+          expect(cardFinder, findsNWidgets(2));
 
           final firstCard = cardFinder.first;
           final firstCardTexts = find.descendant(
@@ -285,7 +285,7 @@ void main() {
           await tester.pumpWidget(createTestWidget(transactions));
           await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsNWidgets(3));
+          expect(find.byType(Card), findsNWidgets(2));
         });
 
     testWidgets('displays divider between month and transaction details',

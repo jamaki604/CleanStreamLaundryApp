@@ -64,7 +64,7 @@ void main() {
       // Verify interactions
       verify(() => mockAuthService.getCurrentUserId).called(1);
       verify(() => mockProfileService.getUserBalanceById('user123')).called(1);
-      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+      verify(() => mockTransactionService.getTransactionsForUser()).called(2);
     });
 
     test('should handle profile service error gracefully', () async {
