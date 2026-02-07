@@ -7,6 +7,7 @@ import '../parsing/transaction_parser.dart';
 import '../enums/payment_result_enum.dart';
 import '../payment/process_payment.dart';
 
+
 class LoyaltyViewModel extends ChangeNotifier {
   final _authService = GetIt.instance<AuthService>();
   final _profileService = GetIt.instance<ProfileService>();
@@ -99,7 +100,7 @@ class LoyaltyViewModel extends ChangeNotifier {
     );
 
     if (result == PaymentResult.success) {
-      final newBalance = (userBalance ?? 0) + amount;
+      final newBalance = (userBalance ?? 0) + amount + _paymentProcessor.processRewards(amount);
       await _profileService.updateBalanceById(userId!, newBalance);
       userBalance = newBalance;
       await _fetchTransactions();

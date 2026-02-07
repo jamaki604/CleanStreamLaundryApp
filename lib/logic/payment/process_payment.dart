@@ -24,7 +24,11 @@ class PaymentProcessor {
         description: description,
         type: "Laundry",
       );
-      await processRewards(amount);
+
+      final userId = _authService.getCurrentUserId;
+      final data = await _profileService.getUserBalanceById(userId!);
+      _profileService.updateBalanceById(userId, data?['balance'].toDouble() + processRewards(amount));
+
       return PaymentResult.success;
     } on StripeException {
       return PaymentResult.canceled;
@@ -33,17 +37,14 @@ class PaymentProcessor {
     }
   }
 
-  Future<void> processRewards(double amount) async {
-    final userId = _authService.getCurrentUserId;
-    final data = await _profileService.getUserBalanceById(userId!);
+  double processRewards(double amount) {
     double rewardAmount = amount * 0.01;
-    double? balance = data?['balance'].toDouble();
     _transactionService.recordTransaction(
       amount: rewardAmount,
       description: "Reward from payment",
       type: "Rewards",
     );
-    _profileService.updateBalanceById(userId, balance! + rewardAmount);
+    return (rewardAmount);
 
   }
 }
