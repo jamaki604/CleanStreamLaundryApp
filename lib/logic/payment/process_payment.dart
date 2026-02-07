@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
@@ -8,6 +9,8 @@ import 'package:get_it/get_it.dart';
 class PaymentProcessor {
   final PaymentService _paymentService = GetIt.instance<PaymentService>();
   final TransactionService _transactionService = GetIt.instance<TransactionService>();
+  final AuthService _authService = GetIt.instance<AuthService>();
+  final ProfileService _profileService = GetIt.instance<ProfileService>();
 
 
   Future<PaymentResult> processPayment(
@@ -30,12 +33,17 @@ class PaymentProcessor {
     }
   }
 
-  void processRewards(double amount) {
+  void processRewards(double amount) async {
+    final userId = _authService.getCurrentUserId;
+    final data = await _profileService.getUserBalanceById(userId!);
     double rewardAmount = amount * 0.01;
+    double? balance = data?['balance'].toDouble();
     _transactionService.recordTransaction(
       amount: rewardAmount,
       description: "Reward from payment",
       type: "Rewards",
     );
+    _profileService.updateBalanceById(userId, balance! + rewardAmount);
+
   }
 }
