@@ -64,6 +64,11 @@ class RefundPageState extends State<RefundPage> {
     } catch (e) {
       print(e.toString());
     }
+
+    //Filters out loyalty transactions
+    recentTransactions.removeWhere(
+          (transaction) => transaction.contains("Loyalty"),
+    );
   }
 
   String getTransactionID() {
