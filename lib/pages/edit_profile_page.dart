@@ -581,6 +581,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           message: "Your account has been deleted successfully.",
           isSuccess: true,
         );
+        await authService.logout();
         context.go("/login");
       } else {
         statusDialog(
