@@ -67,7 +67,7 @@ class RefundPageState extends State<RefundPage> {
 
     //Filters out loyalty transactions
     recentTransactions.removeWhere(
-          (transaction) => transaction.contains("Loyalty"),
+          (transaction) => transaction.contains("added to Loyalty Card"),
     );
   }
 
