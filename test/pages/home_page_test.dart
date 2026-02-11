@@ -194,7 +194,10 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        final nearestLocationButton = find.byType(ElevatedButton);
+        final nearestLocationButton = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
         expect(nearestLocationButton, findsOneWidget);
 
         await tester.tap(nearestLocationButton);
@@ -208,11 +211,16 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        final button = find.byType(ElevatedButton);
+        final button = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
         expect(button, findsOneWidget);
 
-        final elevatedButton = tester.widget<ElevatedButton>(button);
-        expect(elevatedButton.onPressed, isNotNull);
+        final inkWell = tester.widget<InkWell>(button);
+        expect(inkWell.onTap, isNotNull);
+
+        expect(find.text('Find Nearest Location'), findsOneWidget);
       });
 
       testWidgets('should update selected location after finding nearest', (tester) async {
@@ -240,7 +248,10 @@ void main() {
 
         expect(find.text('Select Location'), findsOneWidget);
 
-        final nearestLocationButton = find.byType(ElevatedButton);
+        final nearestLocationButton = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
         await tester.tap(nearestLocationButton);
         await tester.pumpAndSettle();
 
@@ -262,7 +273,10 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        final nearestLocationButton = find.byType(ElevatedButton);
+        final nearestLocationButton = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
         await tester.tap(nearestLocationButton);
         await tester.pumpAndSettle();
       });
