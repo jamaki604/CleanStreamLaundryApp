@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,7 +31,6 @@ class HomePageState extends State<HomePage> {
   late int? locationIDSelected;
   late StorageService storage;
   late final MapController _mapController;
-
 
   final authService = GetIt.instance<AuthService>();
   final profileService = GetIt.instance<ProfileService>();
@@ -83,6 +83,7 @@ class HomePageState extends State<HomePage> {
 
   final machineService = GetIt.instance<MachineService>();
   final locationService = GetIt.instance<LocationService>();
+  final locationParser = LocationParser();
 
   @override
   Widget build(BuildContext context) {
@@ -95,9 +96,7 @@ class HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                username == null
-                    ? "Welcome!"
-                    : "Welcome $username!",
+                username == null ? "Welcome!" : "Welcome $username!",
 
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -105,16 +104,56 @@ class HomePageState extends State<HomePage> {
                   color: Theme.of(context).colorScheme.fontInverted,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Theme.of(context).colorScheme.fontInverted,
-                ),
-              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.fontInverted,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final locations = await locationService.getLocations();
+                      final nearest = await locationParser.getNearestLocation(
+                        locations,
+                      );
 
+                      if (nearest != null) {
+                        final address = nearest["Address"] as String;
+                        setState(() {
+                          selectedName = address;
+                          locationSelected = true;
+                          locationIDSelected = locationID[address];
+                        });
+                        storage.setValue("lastSelectedLocation", address);
+                        _zoomToLocation(address);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      disabledBackgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: SvgPicture.asset(
+                      "assets/locationPin.svg",
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 10),
 
               FutureBuilder(
@@ -166,6 +205,7 @@ class HomePageState extends State<HomePage> {
                         initialCenter: initialCenter,
                         initialZoom: initialZoom,
                         keepAlive: true,
+                        maxZoom: 15,
                       ),
                       children: [
                         TileLayer(
@@ -280,7 +320,9 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
+
               SizedBox(height: 10),
+
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
@@ -339,78 +381,88 @@ class HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                      SizedBox(
-                        height: 80,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          "$idleWashers/$totalWashers Washers",
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.fontSecondary,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                          SizedBox(
+                            height: 80,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "$idleWashers/$totalWashers Washers",
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.fontSecondary,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.local_laundry_service,
+                                          color: Colors.blue,
+                                          size: 36,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 8),
-                                    const Icon(
-                                      Icons.local_laundry_service,
-                                      color: Colors.blue,
-                                      size: 36,
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
 
-                            Container(width: 2, color: Colors.blue),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          "$idleDryers/$totalDryers Dryers",
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.fontSecondary,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                                Container(width: 2, color: Colors.blue),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "$idleDryers/$totalDryers Dryers",
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.fontSecondary,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.local_laundry_service,
+                                          color: Colors.blue,
+                                          size: 36,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 8),
-                                    const Icon(
-                                      Icons.local_laundry_service,
-                                      color: Colors.blue,
-                                      size: 36,
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
             ],
           ),
         ),
