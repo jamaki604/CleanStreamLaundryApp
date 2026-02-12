@@ -626,7 +626,7 @@ void main(){
 
     test("User is logged in",() async{
 
-      when(() => supabaseAuth.refreshSession()).thenAnswer((_) async => AuthResponse());
+      when(() => supabaseAuth.currentSession).thenReturn(Session(accessToken: 'test', tokenType: 'test', user: User(id: '', appMetadata: {}, userMetadata: {}, aud: '', createdAt: '')));
 
       final response = await authenticator.isLoggedIn();
       expect(response,AuthenticationResponses.success);
