@@ -37,7 +37,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
       if (uri != null &&
           uri.scheme == 'clean-stream' &&
           uri.host == 'email-verification') {
-        await authService.handleOAuthRedirect(uri);
+        await authService.getSessionFromURI(uri);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             context.go('/homePage');

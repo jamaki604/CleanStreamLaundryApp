@@ -47,7 +47,7 @@ class _LoadingPageState extends State<LoadingPage> {
       } else if (initialUri != null &&
           initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'oauth') {
-        await authService.handleOAuthRedirect(initialUri);
+        await authService.getSessionFromURI(initialUri);
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
           context.go("/homePage");
         } else {
