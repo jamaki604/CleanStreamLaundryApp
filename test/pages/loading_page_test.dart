@@ -251,7 +251,7 @@ void main() {
         name: any(named: 'name'),
       )).thenAnswer((_) async {});
 
-      when(() => mockAuthService.handleOAuthRedirect(any()))
+      when(() => mockAuthService.getSessionFromURI(any()))
           .thenAnswer((_) async {});
 
       await tester.pumpWidget(createTestWidget(LoadingPage()));

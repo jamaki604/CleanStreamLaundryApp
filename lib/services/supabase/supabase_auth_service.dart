@@ -225,7 +225,7 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> handleOAuthRedirect(Uri uri) async {
+  Future<void> getSessionFromURI(Uri uri) async {
     await _client.auth.getSessionFromUrl(uri);
   }
 
