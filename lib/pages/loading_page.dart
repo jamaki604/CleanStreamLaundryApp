@@ -22,68 +22,51 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    _initialize();
+    _automaticLogIn();
+    _coldStartRedirect();
   }
 
-  Future<void> _initialize() async {
-    final handledDeepLink = await _coldStartRedirect();
-
-    if (!handledDeepLink) {
-      await _automaticLogIn();
-    }
-  }
-
-  Future<bool> _coldStartRedirect() async {
+  Future<void> _coldStartRedirect() async {
     try {
       final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
 
-      if (initialUri == null) return false;
-
-      if (initialUri.scheme == 'clean-stream' &&
+      if (initialUri != null &&
+          initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'reset-protected') {
         context.go('/reset-protected', extra: initialUri);
-        return true;
       }
 
-      if (initialUri.scheme == 'clean-stream' &&
+      if (initialUri != null &&
+          initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'email-verification') {
         context.go("/homePage");
-        return true;
-      }
+      } else if (initialUri != null && initialUri.host == 'change-email') {
 
-      if (initialUri.scheme == 'clean-stream' &&
-          initialUri.host == 'change-email') {
         context.go("/email-verification");
-        return true;
-      }
-
-      if (initialUri.scheme == 'clean-stream' &&
+      } else if (initialUri != null &&
+          initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'oauth') {
         await authService.handleOAuthRedirect(initialUri);
-
-        if (await authService.isLoggedIn() ==
-            AuthenticationResponses.success) {
+        if (await authService.isLoggedIn() == AuthenticationResponses.success) {
           context.go("/homePage");
         } else {
           context.go("/login");
         }
-
-        return true;
       }
+    } catch (e) {}
+  }
 
-      return false;
-    } catch (e) {
-      return false;
-    }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> _automaticLogIn() async {
     await Future.delayed(Duration.zero);
 
     try {
-      if (await authService.isLoggedIn() ==
-          AuthenticationResponses.success) {
+      if (await authService.isLoggedIn() == AuthenticationResponses.success) {
         if (!mounted) return;
         context.go("/homePage");
       } else {
@@ -103,8 +86,7 @@ class _LoadingPageState extends State<LoadingPage> {
           ? Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline,
-              color: Colors.redAccent, size: 80),
+          Icon(Icons.error_outline, color: Colors.redAccent, size: 80),
           const SizedBox(height: 20),
           Text(
             'Authentication Failed',
@@ -129,6 +111,12 @@ class _LoadingPageState extends State<LoadingPage> {
             onPressed: () => context.go("/login"),
             icon: const Icon(Icons.login),
             label: const Text('Return to Login'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 12,
+              ),
+            ),
           ),
         ],
       )
@@ -141,12 +129,6 @@ class _LoadingPageState extends State<LoadingPage> {
         },
         child: Image.asset("assets/Logo.png", height: 250),
         onEnd: () {
-          // Prevent infinite animation loop during widget tests
-          if (WidgetsBinding.instance.runtimeType.toString() ==
-              'TestWidgetsFlutterBinding') {
-            return;
-          }
-
           setState(() {
             double temp = begin;
             begin = end;
