@@ -223,7 +223,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                             ? () {
                                 setDialogState(() {
                                   selectedAmount = (selectedAmount - 0.25)
-                                      .clamp(1.0, 50.0);
+                                      .clamp(1.0, 500.0);
                                 });
                               }
                             : null,
@@ -265,17 +265,17 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                       ),
                       const SizedBox(width: 12),
                       OutlinedButton(
-                        onPressed: selectedAmount < 50.0
+                        onPressed: selectedAmount < 500.0
                             ? () {
                                 setDialogState(() {
                                   selectedAmount = (selectedAmount + 0.25)
-                                      .clamp(1.0, 50.0);
+                                      .clamp(1.0, 500.0);
                                 });
                               }
                             : null,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: selectedAmount < 50.0
+                            color: selectedAmount < 500.0
                                 ? Colors.blue
                                 : Colors.grey,
                           ),
@@ -292,7 +292,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                         child: Text(
                           "+25¢",
                           style: TextStyle(
-                            color: selectedAmount < 50.0
+                            color: selectedAmount < 500.0
                                 ? Colors.blue
                                 : Colors.grey,
                             fontWeight: FontWeight.bold,
@@ -350,7 +350,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                             child: Slider(
                               value: selectedAmount,
                               min: 1,
-                              max: 50,
+                              max: 500,
                               onChanged: (value) {
                                 setDialogState(() {
                                   selectedAmount = value.roundToDouble();
@@ -419,11 +419,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     if (result == PaymentResult.success) {
-      final newBalance = viewModel.userBalance! + amount;
-
-      setState(() {
-        viewModel.userBalance = newBalance;
-      });
 
       viewModel.fetchTransactions();
 

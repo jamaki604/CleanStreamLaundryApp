@@ -82,7 +82,7 @@ void main() {
             .thenAnswer((_) async => null);
 
         // Act
-        final result = await stripeService.makePayment(2.60);
+        await stripeService.makePayment(2.60);
 
         // Assert
         verify(() => mockStripe.initPaymentSheet(

@@ -54,12 +54,12 @@ void main() {
     getIt.registerSingleton<RouterService>(mockRouterService);
     getIt.registerSingleton<NotificationService>(mockNotificationService);
 
-    when(() => mockNotificationService.scheduleNotification(
+    when(() => mockNotificationService.scheduleEarlyMachineNotification(
       id: any(named: 'id'),
-      title: any(named: 'title'),
-      body: any(named: 'body'),
-      delay: any(named: 'delay'),
+      machineTime: any(named: 'machineTime'),
+      machineName: any(named: 'machineName'),
     )).thenAnswer((_) async {});
+
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
     getIt.registerSingleton<LoyaltyViewModel>(mockLoyaltyViewModel);
   });
@@ -338,6 +338,41 @@ void main() {
       expect(find.text('Machine Dryer05'), findsOneWidget);
       expect(find.text('\$2.75'), findsOneWidget);
       expect(find.text('Pay \$2.75'), findsOneWidget);
+    });
+
+    testWidgets('sends notification after successful loyalty payment', (tester) async {
+      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+
+      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
+        'Name': 'Washer01',
+        'Price': 3.50,
+      });
+
+      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
+        'balance': 10.0,
+      });
+
+      when(() => mockProfileService.updateBalanceById(any())).thenAnswer((_) async {});
+      when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
+
+      when(() => mockTransactionService.recordTransaction(
+        amount: any(named: 'amount'),
+        description: any(named: 'description'),
+        type: any(named: 'type'),
+      )).thenAnswer((_) async {});
+
+      await tester.pumpWidget(createTestWidget('machine123'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Pay with Loyalty'));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      verify(() => mockNotificationService.scheduleEarlyMachineNotification(
+        id: 1,
+        machineTime: any(named: 'machineTime'),
+        machineName: any(named: 'machineName'),
+      )).called(1);
     });
   });
 }

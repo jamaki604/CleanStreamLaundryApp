@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/password_parser.dart';
-import 'package:flutter/services.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override

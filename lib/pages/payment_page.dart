@@ -72,13 +72,14 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
-  Future<void> makeNotification() async {
+  Future<void> makeNotification(String name) async {
     final notificationService = GetIt.instance<NotificationService>();
-    await notificationService.scheduleNotification(
+    await notificationService.scheduleEarlyMachineNotification(
       id: 1,
-      title: "Machine Finished",
-      body: "Your machine is finished!",
-      delay: const Duration(seconds: 5),
+      //This is where we would add code to get the machine finish time
+      //Use the machine finish time instead of hardcoding 5 mins
+      machineTime: const Duration(minutes: 5, seconds: 5),
+      machineName: name,
     );
   }
 
@@ -96,14 +97,6 @@ class _PaymentPageState extends State<PaymentPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 20),
-                        Text(
-                          'Machine $_machineName',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.fontInverted,
-                          ),
-                        ),
                         const SizedBox(height: 40),
                         _buildAmountCard(),
                         const SizedBox(height: 30),
@@ -128,7 +121,7 @@ class _PaymentPageState extends State<PaymentPage> {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.cardPrimary,
+        color: Theme.of(context).colorScheme.greyCard,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -136,10 +129,17 @@ class _PaymentPageState extends State<PaymentPage> {
           Icon(Icons.local_laundry_service, size: 80, color: Color(0xFF2073A9)),
           const SizedBox(height: 20),
           Text(
+            'Machine $_machineName',
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          Text(
             _paymentCompleted ? 'Payment Complete' : 'Amount Due',
             style: TextStyle(fontSize: 16, color: Colors.black87),
           ),
-          const SizedBox(height: 10),
           Text(
             '\$${_price?.toStringAsFixed(2) ?? '0.00'}',
             style: TextStyle(
@@ -214,7 +214,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     _paymentCompleted = true;
                   });
 
-                  makeNotification();
+                  makeNotification(_machineName.toString());
 
                   statusDialog(
                     context,
@@ -332,7 +332,7 @@ class _PaymentPageState extends State<PaymentPage> {
     Navigator.of(context, rootNavigator: true).pop();
 
     if (deviceAuthorized) {
-      makeNotification();
+      makeNotification(_machineName.toString());
       setState(() {
         _paymentCompleted = true;
       });

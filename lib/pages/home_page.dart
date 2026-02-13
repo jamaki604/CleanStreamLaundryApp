@@ -1,13 +1,17 @@
+import 'dart:async';
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,6 +23,8 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   String? selectedName;
+  String? username;
+  Map<String, dynamic>? balance;
   late final Map<String, int> locationID = {};
   late final Map<String, LatLng> locationCoordinates = {};
   bool locationSelected = false;
@@ -26,11 +32,15 @@ class HomePageState extends State<HomePage> {
   late StorageService storage;
   late final MapController _mapController;
 
+  final authService = GetIt.instance<AuthService>();
+  final profileService = GetIt.instance<ProfileService>();
+
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
     _initStorage();
+    _loadUserData();
   }
 
   @override
@@ -56,19 +66,111 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  void _loadUserData() async {
+    final userId = authService.getCurrentUserId;
+    if (userId == null) return;
+
+    final loadedUsername = await profileService.getUserNameById(userId);
+    final loadedBalance = await profileService.getUserBalanceById(userId);
+
+    if (mounted) {
+      setState(() {
+        username = loadedUsername;
+        balance = loadedBalance;
+      });
+    }
+  }
+
   final machineService = GetIt.instance<MachineService>();
   final locationService = GetIt.instance<LocationService>();
+  final locationParser = LocationParser();
 
   @override
   Widget build(BuildContext context) {
     return BasePage(
       key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(4.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                username == null ? "Welcome!" : "Welcome $username!",
+
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Theme.of(context).colorScheme.fontInverted,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Theme.of(context).colorScheme.fontInverted,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () async {
+                      final locations = await locationService.getLocations();
+                      final nearest = await locationParser.getNearestLocation(
+                        locations,
+                      );
+
+                      if (nearest != null) {
+                        final address = nearest["Address"] as String;
+                        setState(() {
+                          selectedName = address;
+                          locationSelected = true;
+                          locationIDSelected = locationID[address];
+                        });
+                        storage.setValue("lastSelectedLocation", address);
+                        _zoomToLocation(address);
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Find Nearest Location",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Theme.of(context).colorScheme.primary
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          SvgPicture.asset(
+                            "assets/locationPin.svg",
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(
+                              Theme.of(context).colorScheme.primary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
               FutureBuilder(
                 future: locationService.getLocations(),
                 builder: (context, snapshot) {
@@ -118,6 +220,7 @@ class HomePageState extends State<HomePage> {
                         initialCenter: initialCenter,
                         initialZoom: initialZoom,
                         keepAlive: true,
+                        maxZoom: 15,
                       ),
                       children: [
                         TileLayer(
@@ -232,7 +335,9 @@ class HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
+
               SizedBox(height: 10),
+
               if (locationSelected)
                 FutureBuilder(
                   future: Future.wait([
@@ -291,58 +396,78 @@ class HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-
                           SizedBox(
                             height: 80,
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "$idleWashers/$totalWashers Washers",
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.fontSecondary,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "$idleWashers/$totalWashers Washers",
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.fontSecondary,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      const Icon(
-                                        Icons.local_laundry_service,
-                                        color: Colors.blue,
-                                        size: 36,
-                                      ),
-                                    ],
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.local_laundry_service,
+                                          color: Colors.blue,
+                                          size: 36,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
 
                                 Container(width: 2, color: Colors.blue),
-
                                 Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "$idleDryers/$totalDryers Dryers",
-                                        style: TextStyle(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.fontSecondary,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              "$idleDryers/$totalDryers Dryers",
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.fontSecondary,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      const Icon(
-                                        Icons.local_laundry_service,
-                                        color: Colors.blue,
-                                        size: 36,
-                                      ),
-                                    ],
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                          Icons.local_laundry_service,
+                                          color: Colors.blue,
+                                          size: 36,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],

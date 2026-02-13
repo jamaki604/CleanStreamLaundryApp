@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
 
@@ -16,7 +17,7 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
-            android:theme="@style/LaunchTheme"
+            android:theme="@style/NormalTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
@@ -39,6 +40,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="clean-stream" android:host="email-verification" />
+                <data android:scheme="clean-stream" android:host="reset-protected" />
             </intent-filter>
 
             <intent-filter android:autoVerify="true">

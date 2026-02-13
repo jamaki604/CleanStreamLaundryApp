@@ -58,4 +58,10 @@ extension ModeChangerText on ColorScheme {
         ? Color(0xFF2073A9)
         : Colors.white;
   }
+
+  Color get greyCard{
+    return brightness == Brightness.dark
+        ? Color(0xFFCFCFCD)
+        : Color(0xEECFCFCD);
+  }
 }
