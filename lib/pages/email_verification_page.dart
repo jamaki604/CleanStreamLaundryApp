@@ -33,10 +33,11 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     });
 
     // Handles app links
-    _linkSub = widget.appLinks.uriLinkStream.listen((Uri? uri) {
+    _linkSub = widget.appLinks.uriLinkStream.listen((Uri? uri) async {
       if (uri != null &&
           uri.scheme == 'clean-stream' &&
           uri.host == 'email-verification') {
+        await authService.handleOAuthRedirect(uri);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             context.go('/homePage');

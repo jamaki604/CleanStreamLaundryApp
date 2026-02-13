@@ -200,6 +200,10 @@ class RouterService {
         return query.isEmpty ? '/reset-protected' : '/reset-protected?$query';
       }
 
+      if (uri.scheme == 'clean-stream' && uri.host == 'email-verification') {
+        return '/email-verification';
+      }
+
       // Handle clean-stream://change-email deep links
       if (uri.scheme == 'clean-stream' && uri.host == 'change-email') {
         // Optional: check type query param
