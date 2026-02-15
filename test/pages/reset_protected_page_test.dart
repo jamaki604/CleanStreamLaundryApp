@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/password_parser.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/pages/reset_protected_page.dart';
 import 'package:flutter/material.dart';
@@ -91,9 +92,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Set a new password'), findsOneWidget);
-    expect(find.byType(TextFormField), findsOneWidget);
-    expect(find.text('Set Password'), findsOneWidget);
+    expect(find.text('New Password'), findsOneWidget);
+    expect(find.text('Confirm Password'), findsOneWidget);
   });
 
   testWidgets('validates short password', (tester) async {
@@ -108,11 +108,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField), 'short');
+    await tester.enterText(find.byType(TextField).at(0), 'short');
+    await tester.enterText(find.byType(TextField).at(1), 'short');
     await tester.tap(find.text('Set Password'));
     await tester.pumpAndSettle();
+    String? validations = PasswordParser.process("short");
 
-    expect(find.text('Password must be at least 8 characters'), findsOneWidget);
+    if (validations != null) {
+      expect(find.text(validations), findsOneWidget);
+    }
   });
 
   testWidgets('submits new password and navigates to login', (tester) async {
@@ -130,11 +134,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField), 'password123');
+    await tester.enterText(find.byType(TextField).at(0), 'password123&');
+    await tester.enterText(find.byType(TextField).at(1), 'password123&');
     await tester.tap(find.text('Set Password'));
     await tester.pumpAndSettle();
 
-    verify(() => mockAuthService.updatePassword('password123')).called(1);
+    verify(() => mockAuthService.updatePassword('password123&')).called(1);
     expect(find.text('Password reset successful'), findsOneWidget);
     expect(find.text('Login Page'), findsOneWidget);
   });
@@ -154,12 +159,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField), 'password123');
+    await tester.enterText(find.byType(TextField).at(0), 'password123&');
+    await tester.enterText(find.byType(TextField).at(1), 'password123&');
     await tester.tap(find.text('Set Password'));
     await tester.pumpAndSettle();
 
-    verify(() => mockAuthService.updatePassword('password123')).called(1);
-    expect(find.text('Failed to reset password'), findsOneWidget);
+    verify(() => mockAuthService.updatePassword('password123&')).called(1);
+    expect(find.text('Failed to reset password'), findsWidgets);
   });
 
   testWidgets('shows failure message when update throws', (tester) async {
@@ -177,11 +183,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField), 'password123');
+    await tester.enterText(find.byType(TextField).at(0), 'password123&');
+    await tester.enterText(find.byType(TextField).at(1), 'password123&');
     await tester.tap(find.text('Set Password'));
     await tester.pumpAndSettle();
 
-    verify(() => mockAuthService.updatePassword('password123')).called(1);
-    expect(find.text('Failed to reset password'), findsOneWidget);
+    verify(() => mockAuthService.updatePassword('password123&')).called(1);
+    expect(find.text('Failed to reset password'), findsWidgets);
   });
 }

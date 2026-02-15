@@ -225,7 +225,7 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
           children: [
             const SizedBox(height: 32),
 
-            /// Password Requirements (Same as Sign Up)
+            // Password Requirements (Same as Sign Up)
             ValueListenableBuilder<TextEditingValue>(
               valueListenable: _pwController,
               builder: (context, value, _) {
