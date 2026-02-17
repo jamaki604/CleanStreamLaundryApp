@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -25,18 +26,26 @@ class SupabaseTransactionService extends TransactionService{
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getRefundableTransactionsForUser() async {
+  Future<({List<String> transactions, List<int> ids})> getRefundableTransactionsForUser() async {
     final user = _client.auth.currentUser;
-    if (user == null) return [];
 
     final response = await _client
         .from('transactions')
         .select('id, amount, description, created_at')
-        .eq('user_id', user.id)
+        .eq('user_id', user!.id)
         .neq('requested_refund', true)
         .order('created_at', ascending: false);
 
-    return List<Map<String, dynamic>>.from(response);
+    final raw = List<Map<String, dynamic>>.from(response).take(100);
+    print(raw);
+
+    final transactions = TransactionParser.formatTransactionsList(raw, "refundHistory")
+    ..removeWhere((e) => e.isEmpty || e.contains("added to Loyalty Card"));
+
+    final ids = TransactionParser.createTransactionIDList(raw)
+      ..removeWhere((e) => e.isNegative);
+
+    return (transactions: transactions, ids: ids);
   }
 
   @override
