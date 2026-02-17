@@ -37,7 +37,6 @@ class SupabaseTransactionService extends TransactionService{
         .order('created_at', ascending: false);
 
     final raw = List<Map<String, dynamic>>.from(response).take(100);
-    print(raw);
 
     final transactions = TransactionParser.formatTransactionsList(raw, "refundHistory")
     ..removeWhere((e) => e.isEmpty || e.contains("added to Loyalty Card"));
