@@ -32,7 +32,7 @@ void main() {
         GoRoute(
           path: '/reset-protected',
           builder: (context, state) =>
-              ResetProtectedPage(incomingUri: incomingUri),
+              ResetProtectedPage(),
         ),
         GoRoute(
           path: '/login',
