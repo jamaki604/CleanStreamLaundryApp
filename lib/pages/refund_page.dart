@@ -167,7 +167,7 @@ class RefundPageState extends State<RefundPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLabel("Transaction"),
+                      _buildLabel("Select a Transaction"),
                       const SizedBox(height: 8),
                       _isFetchingTransactions
                           ? const Center(child: CircularProgressIndicator())
