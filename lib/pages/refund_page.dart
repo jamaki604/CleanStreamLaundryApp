@@ -193,6 +193,7 @@ class RefundPageState extends State<RefundPage> {
                           child: TextFormField(
                             decoration: _inputDecoration(context).copyWith(
                               hintText: 'Select a transaction',
+                              hintStyle: TextStyle(color: colorScheme.fontSecondary),
                             ),
                             controller: TextEditingController(
                               text: selectedTransaction,

@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/Logic/Theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class TransactionSearchSheet extends StatefulWidget {
@@ -50,8 +51,12 @@ class _TransactionSearchSheetState
                 child: TextField(
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: 'Search by date...',
-                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Theme.of(context).colorScheme.fontSecondary,
+                    ),
                   ),
                   onChanged: _filter,
                 ),
@@ -63,6 +68,7 @@ class _TransactionSearchSheetState
                     final transaction = filtered[index];
 
                     return ListTile(
+                      textColor: Theme.of(context).colorScheme.fontInverted,
                       title: Text(transaction),
                       onTap: () {
                         Navigator.pop(context, transaction);
