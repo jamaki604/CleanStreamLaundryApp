@@ -15,6 +15,7 @@ void main(){
     registerFallbackValue(Uri());
     registerFallbackValue(OAuthProvider.google);
     registerFallbackValue(UserAttributesFake());
+    registerFallbackValue(OtpType.recovery);
   });
 
   group("authentication Tests", (){
@@ -946,6 +947,59 @@ void main(){
 
       expect(result,'testemail@test.com');
     });
+
+    test("Tests that code is verified correctly",() async {
+      when(() => supabaseAuth.verifyOTP(
+        email: any(named: 'email'),
+        token: any(named: 'token'),
+        type: any(named: 'type'),
+      )).thenAnswer((_) async => AuthResponse(
+        session: Session(
+          accessToken: "test",
+          tokenType: "test",
+          user: User(
+            id: '',
+            appMetadata: {},
+            userMetadata: {},
+            aud: '',
+            createdAt: '',
+          ),
+        ),
+      ));
+
+      AuthenticationResponses testResponse = await authenticator.verifyCode(email: "test", code: "testCode");
+
+      expect(testResponse, AuthenticationResponses.success);
+    });
+
+    test("Tests that failure is returned when exception is thrown",() async {
+      when(() => supabaseAuth.verifyOTP(
+        email: any(named: 'email'),
+        token: any(named: 'token'),
+        type: any(named: 'type'),
+      )).thenThrow(Exception());
+
+      AuthenticationResponses testResponse = await authenticator.verifyCode(email: "test", code: "testCode");
+
+      expect(testResponse, AuthenticationResponses.failure);
+    });
+    
+    test("Tests that exchange code for session runs correctly",() async {
+      when(() => supabaseAuth.exchangeCodeForSession(any())).thenAnswer((_) async => AuthSessionUrlResponse(session: Session(accessToken: "", tokenType: "", user: User(id: "", appMetadata: {}, userMetadata: {}, aud: "", createdAt: "")), redirectType:""));
+      AuthenticationResponses response = await authenticator.exchangeCodeForSession("testCode");
+      expect(response, AuthenticationResponses.success);
+    });
+
+    test("Tests that failure is sent with an exception",() async {
+      when(() => supabaseAuth.exchangeCodeForSession(any())).thenThrow(Exception());
+      AuthenticationResponses response = await authenticator.exchangeCodeForSession("testCode");
+      expect(response, AuthenticationResponses.failure);
+    });
+
+    test("Tests that update password runs correctly",(){
+
+    });
+
   });
 
 }

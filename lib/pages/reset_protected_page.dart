@@ -76,12 +76,17 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
     setState(() => _isLoading = true);
 
     try {
-      await authService.resetPassword(password);
+      await authService.updatePassword(password);
 
-      _showMessage("Password reset successful");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset successful')),
+      );
+
       context.go("/login");
     } catch (e) {
-      _showMessage("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to reset password')),
+      );
     } finally {
       if (!mounted) return;
       setState(() => _isLoading = false);
