@@ -343,6 +343,8 @@ class RefundPageState extends State<RefundPage> {
       title: "Success",
       message: 'Your refund request has been submitted',
       isSuccess: true,
-    );
+    ).then((_) {
+      context.go("/settings");
+    });
   }
 }
