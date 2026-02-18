@@ -65,3 +65,41 @@ extension ModeChangerText on ColorScheme {
         : Color(0xEECFCFCD);
   }
 }
+
+extension GradientScheme on ColorScheme {
+  LinearGradient get primaryGradient {
+    return brightness == Brightness.dark
+        ? LinearGradient(
+      colors: [
+        Color(0xFF2073A9),
+        Colors.deepPurple,
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    )
+        : LinearGradient(
+      colors: [
+        Color(0xFF2073A9),
+        Color(0xFFf3c404),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
+
+  LinearGradient get backgroundGradient {
+    return brightness == Brightness.dark
+        ? LinearGradient(
+      colors: [
+        Colors.grey.shade900,
+        Colors.black,
+      ],
+    )
+        : LinearGradient(
+      colors: [
+        Colors.white,
+        Color(0xFFE3F2FD),
+      ],
+    );
+  }
+}
