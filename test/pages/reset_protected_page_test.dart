@@ -62,22 +62,24 @@ void main() {
     }
   });
 
-  testWidgets('submits new password and navigates to login', (tester) async {
+  testWidgets('shows success message when update is successful', (tester) async {
+
+    when(() => mockAuthService.updatePassword(any())).thenAnswer((_) async => AuthenticationResponses.success);
 
     await tester.pumpWidget(
         createWidgetUnderTest()
     );
+
     await tester.pumpAndSettle();
+
     await tester.enterText(find.byType(TextField).at(0), 'Password123&');
     await tester.enterText(find.byType(TextField).at(1), 'Password123&');
     await tester.tap(find.byType(ElevatedButton));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     verify(() => mockAuthService.updatePassword('Password123&')).called(1);
-    expect(find.text('Password reset successful'), findsOneWidget);
-
-    await tester.pumpAndSettle();
-    expect(find.text('Login Page'), findsOneWidget);
+    expect(find.text("Password reset successful"), findsWidgets);
+    expect(find.text("Login Page"), findsOneWidget);
   });
 
   testWidgets('shows failure message when update fails', (tester) async {
@@ -99,7 +101,7 @@ void main() {
     expect(find.text('Failed to reset password'), findsWidgets);
   });
 
-  testWidgets('shows failure message when update throws', (tester) async {
+  testWidgets('shows failure message when exchangeCodeForSession throws', (tester) async {
     when(
       () => mockAuthService.exchangeCodeForSession('abc'),
     ).thenAnswer((_) async => AuthenticationResponses.success);

@@ -160,7 +160,7 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                 children: [
                   const SizedBox(height: 20),
 
-                  /// Title
+                  // Title
                   Text(
                     "Reset Password",
                     style: theme.textTheme.headlineMedium?.copyWith(
@@ -233,7 +233,7 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
                   const SizedBox(height: 16),
 
-                  /// Confirm field
+                  // Confirm field
                   TextField(
                     controller: _confirmCtrl,
                     obscureText: _obscureConfirm,
@@ -258,7 +258,7 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
                   const SizedBox(height: 24),
 
-                  /// Button (blue like signup)
+                  // Button
                   SizedBox(
                     height: 50,
                     child: ElevatedButton(
