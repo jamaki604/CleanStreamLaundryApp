@@ -91,7 +91,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
           children: [
             const SizedBox(height: 40),
 
-            /// Title
+            // Title
             Text(
               'Enter Verification Code',
               style: TextStyle(
@@ -103,7 +103,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             const SizedBox(height: 12),
 
-            /// Subtitle
+            // Subtitle
             Text(
               'We sent a 6-digit code to',
               style: TextStyle(color: scheme.fontInverted.withOpacity(0.7)),
@@ -112,7 +112,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             const SizedBox(height: 6),
 
-            /// Email
+            // Email
             Text(
               widget.email,
               style: TextStyle(
@@ -124,14 +124,14 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             const SizedBox(height: 32),
 
-            /// Code Input
+            // Code Input
             TextField(
               controller: _codeController,
               keyboardType: TextInputType.number,
               maxLength: 6,
               style: TextStyle(
                 color: scheme.fontInverted,
-                letterSpacing: 8, // 👈 nice spaced digits
+                letterSpacing: 8,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -159,7 +159,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             const SizedBox(height: 32),
 
-            /// Verify Button
+            // Verify Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -181,7 +181,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             const SizedBox(height: 16),
 
-            /// Error Message (optional extra under field)
+            // Error Message (optional extra under field)
             if (_error != null)
               Text(
                 _error!,
@@ -190,7 +190,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             const SizedBox(height: 16),
 
-            /// Resend
+            // Resend
             TextButton(
               onPressed: () async {
                 // TODO: implement resend
