@@ -18,7 +18,7 @@ void main(){
     registerFallbackValue(OtpType.recovery);
   });
 
-  group("authentication Tests", (){
+  group("authentication Tests", () {
 
     setUp((){
       client = SupabaseMock();
@@ -996,10 +996,45 @@ void main(){
       expect(response, AuthenticationResponses.failure);
     });
 
-    test("Tests that update password runs correctly",(){
+    test("Tests that update password runs correctly",() async {
 
+      when(() => supabaseAuth.updateUser(any())).thenAnswer((_) async => UserResponse.fromJson({}));
+
+      AuthenticationResponses response = await authenticator.updatePassword("password");
+
+      expect(response, AuthenticationResponses.success);
+    });
+
+    test("Tests that update password handles errors",() async {
+
+      when(() => supabaseAuth.updateUser(any())).thenThrow(Exception());
+
+      AuthenticationResponses response = await authenticator.updatePassword("password");
+
+      expect(response, AuthenticationResponses.failure);
+    });
+
+    test("Reset password runs correctly",() async {
+
+      when(() => supabaseAuth.resetPasswordForEmail(any()))
+          .thenAnswer((_) async {});
+
+
+      AuthenticationResponses response = await authenticator.resetPassword("testEmail");
+
+      expect(response, AuthenticationResponses.success);
+    });
+
+    test("Reset password handles errors",() async {
+
+      when(() => supabaseAuth.resetPasswordForEmail(any()))
+          .thenThrow(Exception());
+
+
+      AuthenticationResponses response = await authenticator.resetPassword("testEmail");
+
+      expect(response, AuthenticationResponses.failure);
     });
 
   });
-
 }
