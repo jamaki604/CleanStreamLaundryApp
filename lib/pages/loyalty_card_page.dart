@@ -45,43 +45,43 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
   Widget _buildContent(BuildContext context) {
     return Column(
-        children: [
-          const SizedBox(height: 20),
-          CreditCard(username: viewModel.userName ?? 'John Doe'),
-          const SizedBox(height: 25),
-          Text(
-            'Loyalty Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
-            textAlign: TextAlign.center,
+      children: [
+        const SizedBox(height: 20),
+        CreditCard(username: viewModel.userName ?? 'John Doe'),
+        const SizedBox(height: 25),
+        Text(
+          'Loyalty Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.fontSecondary,
+          ),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () => _loadCard(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            disabledBackgroundColor: Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 2,
+          ),
+          child: const Text(
+            "Load card",
             style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.fontSecondary,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => _loadCard(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              disabledBackgroundColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              "Load card",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          Expanded(child: _transactions())
-        ],
-      );
+        ),
+        const SizedBox(height: 15),
+        Expanded(child: _transactions()),
+      ],
+    );
   }
 
   Widget _transactions() {
@@ -125,36 +125,39 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
           ),
           const SizedBox(height: 10),
           Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: viewModel.recentTransactions.length,
-            itemBuilder: (context, index) {
-              final transaction = viewModel.recentTransactions[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 4.0,
-                  vertical: 6.0,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 4,
-                color: Theme.of(context).colorScheme.cardPrimary,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.receipt_long,
-                    color: Color(0xFF2073A9),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: viewModel.recentTransactions.length,
+              itemBuilder: (context, index) {
+                final transaction = viewModel.recentTransactions[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 4.0,
+                    vertical: 6.0,
                   ),
-                  title: Text(
-                    transaction.toString(),
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-              );
-            },
+                  elevation: 4,
+                  color: Theme.of(context).colorScheme.cardPrimary,
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.receipt_long,
+                      color: Color(0xFF2073A9),
+                    ),
+                    title: Text(
+                      transaction.toString(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-          )
         ],
       ),
     );
@@ -419,7 +422,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     if (result == PaymentResult.success) {
-
       viewModel.fetchTransactions();
 
       statusDialog(
