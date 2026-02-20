@@ -10,6 +10,7 @@ import 'mocks.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/widgets/transactions_search_sheet.dart';
 
 void main() {
   late MockAuthService mockAuthService;
@@ -62,12 +63,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Request Refund'), findsOneWidget);
+      expect(find.text('Select a transaction and describe your issue. Our team will review it shortly.'), findsOneWidget);
+      expect(find.byIcon(Icons.receipt_long_rounded), findsOneWidget);
+      expect(find.text("Submit a Refund Request"), findsOneWidget);
       expect(find.text('Select a Transaction'), findsOneWidget);
       expect(
-        find.text('Please explain your reason for the refund...'),
+        find.text('Describe the issue with your transaction...'),
         findsOneWidget,
       );
-      expect(find.text('Submit Refund'), findsOneWidget);
+      expect(find.text('Submit Refund Request'), findsOneWidget);
     });
 
     testWidgets('submit button shows error when form is invalid', (
@@ -76,7 +80,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      final submitButton = find.widgetWithText(ElevatedButton, 'Submit Refund');
+      final submitButton = find.widgetWithText(ElevatedButton, 'Submit Refund Request');
       expect(submitButton, findsOneWidget);
 
       // Tap the button
@@ -88,42 +92,55 @@ void main() {
     });
 
     testWidgets('loads transactions on init', (tester) async {
-      final mockTransactions = [
-        {'id': 1, 'amount': 10.0, 'date': '2024-01-01'},
-        {'id': 2, 'amount': 20.0, 'date': '2024-01-02'},
-      ];
 
       when(
-        () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => mockTransactions);
+        () => mockTransactionService.getRefundableTransactionsForUser(),
+      ).thenAnswer((_) async => (
+        transactions: ['\$10.00 - machine on Jan 01, 2024', '\$20.00 - machine on Jan 02, 2024'],
+        ids: [1, 2],));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+      verify(() => mockTransactionService.getRefundableTransactionsForUser()).called(1);
     });
 
     testWidgets('can select transaction from dropdown', (tester) async {
-      final mockTransactions = [
-        {'id': 1, 'amount': 10.0, 'date': '2024-01-01'},
-      ];
-
       when(
-        () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => mockTransactions);
+            () => mockTransactionService.getRefundableTransactionsForUser(),
+      ).thenAnswer((_) async => (
+      transactions: ['\$10.00 - machine on Jan 01, 2024'],
+      ids: [1],
+      ));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownButtonFormField<int>));
+      // Tap the TextFormField to open the bottom sheet
+      await tester.tap(find.byType(TextFormField));
       await tester.pumpAndSettle();
+
+      // Bottom sheet is now open, tap the transaction in the list
+      expect(find.byType(TransactionSearchSheet), findsOneWidget);
+      await tester.tap(find.text('\$10.00 - machine on Jan 01, 2024'));
+      await tester.pumpAndSettle();
+
+      // Verify the selection appeared in the field
+      expect(find.text('\$10.00 - machine on Jan 01, 2024'), findsOneWidget);
     });
 
     testWidgets('can enter description text', (tester) async {
+      when(
+            () => mockTransactionService.getRefundableTransactionsForUser(),
+      ).thenAnswer((_) async => (
+      transactions: ['\$10.00 - machine on Jan 01, 2024'],
+      ids: [1],
+      ));
+
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      final textField = find.byType(TextField);
+      final textField = find.widgetWithText(TextField, "Describe the issue with your transaction...");
       await tester.enterText(textField, 'Test refund reason');
       await tester.pumpAndSettle();
 
@@ -131,19 +148,33 @@ void main() {
     });
 
     testWidgets('submit button enabled when form is valid', (tester) async {
-      final mockTransactions = [
-        {'id': 123, 'amount': 10.0, 'date': '2024-01-01'},
-      ];
-
       when(
-        () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => mockTransactions);
+            () => mockTransactionService.getRefundableTransactionsForUser(),
+      ).thenAnswer((_) async => (
+      transactions: ['\$10.00 - machine on Jan 01, 2024'],
+      ids: [1],
+      ));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'Test refund reason');
+      // Select a transaction
+      await tester.tap(find.byType(TextFormField));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('\$10.00 - machine on Jan 01, 2024'));
+      await tester.pumpAndSettle();
+
+      // Enter description
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Describe the issue with your transaction...'),
+        'Test refund reason',
+      );
+      await tester.pumpAndSettle();
+
+      // Verify button is enabled
+      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+      expect(button.onPressed, isNotNull);
+      expect(button.style?.backgroundColor?.resolve({}), equals(Theme.of(tester.element(find.byType(ElevatedButton))).colorScheme.primary));
     });
 
     testWidgets('handles refund submission successfully', (tester) async {
@@ -223,74 +254,54 @@ void main() {
     });
   });
 
-  testWidgets('onChanged callback updates selectedTransaction state', (
-    tester,
-  ) async {
-    final mockTransactions = [
-      {
-        'id': 1,
-        'amount': 10.0,
-        'date': '2024-01-01',
-        'description': 'Wash & Fold',
-        'type': 'debit',
-      },
-      {
-        'id': 2,
-        'amount': 20.0,
-        'date': '2024-01-02',
-        'description': 'Dry Cleaning',
-        'type': 'debit',
-      },
-    ];
-
+  testWidgets('selecting a transaction updates state', (tester) async {
     when(
-      () => mockTransactionService.getTransactionsForUser(),
-    ).thenAnswer((_) async => mockTransactions);
+          () => mockTransactionService.getRefundableTransactionsForUser(),
+    ).thenAnswer((_) async => (
+    transactions: ['\$10.00 - machine on Jan 01, 2024', '\$20.00 - machine on Jan 02, 2024'],
+    ids: [1, 2],
+    ));
 
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 
-    final dropdown = find.byType(DropdownButtonFormField<int>);
-    expect(dropdown, findsOneWidget);
-
-    await tester.tap(dropdown);
+    // Open the search sheet
+    await tester.tap(find.byType(TextFormField));
     await tester.pumpAndSettle();
 
-    final hasItems = find.byType(DropdownMenuItem<int>).evaluate().isNotEmpty;
+    expect(find.byType(TransactionSearchSheet), findsOneWidget);
 
-    expect(
-      hasItems || find.text('Select a Transaction').evaluate().isNotEmpty,
-      true,
-    );
+    // Select a transaction
+    await tester.tap(find.text('\$10.00 - machine on Jan 01, 2024'));
+    await tester.pumpAndSettle();
+
+    // Verify the TextFormField now shows the selected transaction
+    expect(find.text('\$10.00 - machine on Jan 01, 2024'), findsOneWidget);
   });
 
   testWidgets('_handleRefund calls all required services in correct order', (
-    tester,
-  ) async {
-    final mockTransactions = [
-      {
-        'id': 123,
-        'amount': 25.50,
-        'date': '2024-01-01',
-        'description': 'Test Transaction',
-        'type': 'debit',
-      },
-    ];
-
+      tester,
+      ) async {
     when(
-      () => mockTransactionService.getTransactionsForUser(),
-    ).thenAnswer((_) async => mockTransactions);
+          () => mockTransactionService.getRefundableTransactionsForUser(),
+    ).thenAnswer((_) async => (
+    transactions: ['\$25.50 - machine on Jan 01, 2024'],
+    ids: [123],
+    ));
     when(
-      () => mockProfileService.getUserNameById('test-user-id'),
+          () => mockAuthService.getCurrentUserId,
+    ).thenReturn('test-user-id');
+    when(
+          () => mockProfileService.getUserNameById('test-user-id'),
     ).thenAnswer((_) async => 'Test User');
     when(
-      () => mockTransactionService.recordRefundRequest(
+          () => mockTransactionService.recordRefundRequest(
         transaction_id: any(named: 'transaction_id'),
         description: any(named: 'description'),
       ),
-    ).thenAnswer((_) async => "25.50");
+    ).thenAnswer((_) async => '25.50');
     when(
-      () => mockEdgeFunctionService.runEdgeFunction(
+          () => mockEdgeFunctionService.runEdgeFunction(
         name: any(named: 'name'),
         body: any(named: 'body'),
       ),
@@ -299,52 +310,34 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'Test refund reason');
+    // Select a transaction
+    await tester.tap(find.byType(TextFormField));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('\$25.50 - machine on Jan 01, 2024'));
     await tester.pumpAndSettle();
 
-    verify(() => mockTransactionService.getTransactionsForUser()).called(1);
-  });
-
-  testWidgets('_handleRefund completes full flow when form is submitted', (
-    tester,
-  ) async {
-    final mockTransactions = [
-      {
-        'id': 123,
-        'amount': 25.50,
-        'date': '2024-01-01',
-        'description': 'Test Transaction',
-        'type': 'debit',
-      },
-    ];
-
-    when(
-      () => mockTransactionService.getTransactionsForUser(),
-    ).thenAnswer((_) async => mockTransactions);
-    when(
-      () => mockProfileService.getUserNameById('test-user-id'),
-    ).thenAnswer((_) async => 'Test User');
-    when(
-      () => mockTransactionService.recordRefundRequest(
-        transaction_id: any(named: 'transaction_id'),
-        description: any(named: 'description'),
-      ),
-    ).thenAnswer((_) async => "25.50");
-    when(
-      () => mockEdgeFunctionService.runEdgeFunction(
-        name: any(named: 'name'),
-        body: any(named: 'body'),
-      ),
-    ).thenAnswer((_) async => null);
-
-    await tester.pumpWidget(createWidgetUnderTest());
+    // Enter description
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Describe the issue with your transaction...'),
+      'Test refund reason',
+    );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'Test refund reason');
+    // Submit
+    await tester.tap(find.byType(ElevatedButton));
     await tester.pumpAndSettle();
 
-    final submitButton = find.widgetWithText(ElevatedButton, 'Submit Refund');
-    expect(submitButton, findsOneWidget);
+    // Verify services were called
+    verify(() => mockTransactionService.getRefundableTransactionsForUser()).called(1);
+    verify(() => mockProfileService.getUserNameById('test-user-id')).called(1);
+    verify(() => mockTransactionService.recordRefundRequest(
+      transaction_id: '123',
+      description: 'Test refund reason',
+    )).called(1);
+    verify(() => mockEdgeFunctionService.runEdgeFunction(
+      name: 'refund-email',
+      body: any(named: 'body'),
+    )).called(1);
   });
 
   testWidgets('_handleRefund early return when userId is null', (tester) async {
@@ -368,32 +361,25 @@ void main() {
   });
 
   testWidgets('verifies edge function is called with correct parameters', (
-    tester,
-  ) async {
-    final mockTransactions = [
-      {
-        'id': 456,
-        'amount': 50.00,
-        'date': '2024-01-15',
-        'description': 'Premium Service',
-        'type': 'debit',
-      },
-    ];
-
+      tester,
+      ) async {
     when(
-      () => mockTransactionService.getTransactionsForUser(),
-    ).thenAnswer((_) async => mockTransactions);
+          () => mockTransactionService.getRefundableTransactionsForUser(),
+    ).thenAnswer((_) async => (
+    transactions: ['\$50.00 - machine on Jan 15, 2024'],
+    ids: [456],
+    ));
     when(
-      () => mockProfileService.getUserNameById('test-user-id'),
+          () => mockProfileService.getUserNameById('test-user-id'),
     ).thenAnswer((_) async => 'John Doe');
     when(
-      () => mockTransactionService.recordRefundRequest(
+          () => mockTransactionService.recordRefundRequest(
         transaction_id: any(named: 'transaction_id'),
         description: any(named: 'description'),
       ),
-    ).thenAnswer((_) async => "50.00");
+    ).thenAnswer((_) async => '50.00');
     when(
-      () => mockEdgeFunctionService.runEdgeFunction(
+          () => mockEdgeFunctionService.runEdgeFunction(
         name: 'refund-email',
         body: any(named: 'body'),
       ),
@@ -401,36 +387,55 @@ void main() {
 
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
-    verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+
+    // Select transaction
+    await tester.tap(find.byType(TextFormField));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('\$50.00 - machine on Jan 15, 2024'));
+    await tester.pumpAndSettle();
+
+    // Enter description
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Describe the issue with your transaction...'),
+      'Wrong charge',
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pumpAndSettle();
+
+    verify(() => mockEdgeFunctionService.runEdgeFunction(
+      name: 'refund-email',
+      body: {
+        'username': 'John Doe',
+        'user_id': 'test-user-id',
+        'transaction_id': '456',
+        'amount': '50.00',
+        'description': 'Wrong charge',
+      },
+    )).called(1);
   });
 
   testWidgets('complete refund submission flow with dialog and navigation', (
-    tester,
-  ) async {
-    final mockTransactions = [
-      {
-        'id': 789,
-        'amount': 100.00,
-        'date': '2024-01-20',
-        'description': 'Large Order',
-        'type': 'debit',
-      },
-    ];
-
+      tester,
+      ) async {
     when(
-      () => mockTransactionService.getTransactionsForUser(),
-    ).thenAnswer((_) async => mockTransactions);
+          () => mockTransactionService.getRefundableTransactionsForUser(),
+    ).thenAnswer((_) async => (
+    transactions: ['\$100.00 - machine on Jan 20, 2024'],
+    ids: [789],
+    ));
     when(
-      () => mockProfileService.getUserNameById('test-user-id'),
+          () => mockProfileService.getUserNameById('test-user-id'),
     ).thenAnswer((_) async => 'Jane Smith');
     when(
-      () => mockTransactionService.recordRefundRequest(
+          () => mockTransactionService.recordRefundRequest(
         transaction_id: any(named: 'transaction_id'),
         description: any(named: 'description'),
       ),
-    ).thenAnswer((_) async => "100.00");
+    ).thenAnswer((_) async => '100.00');
     when(
-      () => mockEdgeFunctionService.runEdgeFunction(
+          () => mockEdgeFunctionService.runEdgeFunction(
         name: 'refund-email',
         body: any(named: 'body'),
       ),
@@ -440,40 +445,29 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Request Refund'), findsOneWidget);
-    expect(find.text('Submit Refund'), findsOneWidget);
+    expect(find.text('Submit Refund Request'), findsOneWidget);
   });
 
   testWidgets('_handleRefund executes all service calls correctly', (
-    tester,
-  ) async {
-    final recentDate = DateTime.now().subtract(Duration(days: 5));
-    final formattedDate = recentDate.toIso8601String();
-
-    final mockTransactions = [
-      {
-        'id': 123,
-        'amount': 25.50,
-        'created_at': formattedDate,
-        'description': 'Wash & Fold',
-        'type': 'debit',
-        'user_id': 'test-user-id',
-      },
-    ];
-
+      tester,
+      ) async {
     when(
-      () => mockTransactionService.getTransactionsForUser(),
-    ).thenAnswer((_) async => mockTransactions);
+          () => mockTransactionService.getRefundableTransactionsForUser(),
+    ).thenAnswer((_) async => (
+    transactions: ['\$25.50 - machine on Jan 01, 2024'],
+    ids: [123],
+    ));
     when(
-      () => mockProfileService.getUserNameById('test-user-id'),
+          () => mockProfileService.getUserNameById('test-user-id'),
     ).thenAnswer((_) async => 'Test User');
     when(
-      () => mockTransactionService.recordRefundRequest(
+          () => mockTransactionService.recordRefundRequest(
         transaction_id: any(named: 'transaction_id'),
         description: any(named: 'description'),
       ),
-    ).thenAnswer((_) async => "25.50");
+    ).thenAnswer((_) async => '25.50');
     when(
-      () => mockEdgeFunctionService.runEdgeFunction(
+          () => mockEdgeFunctionService.runEdgeFunction(
         name: 'refund-email',
         body: any(named: 'body'),
       ),
@@ -482,48 +476,37 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 
-    final RefundPageState state = tester.state(find.byType(RefundPage));
-
-    await tester.pump(const Duration(milliseconds: 100));
+    // Select transaction
+    await tester.tap(find.byType(TextFormField));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('\$25.50 - machine on Jan 01, 2024'));
     await tester.pumpAndSettle();
 
-    expect(state.recentTransactions.isNotEmpty, true);
-    expect(state.recentTransactionIDs.isNotEmpty, true);
-
-    state.setState(() {
-      state.selectedTransactionIndex = 0;
-      state.selectedTransaction = state.recentTransactions[0];
-      state.descriptionController.text = 'I want a refund please';
-    });
+    // Enter description
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Describe the issue with your transaction...'),
+      'I want a refund please',
+    );
     await tester.pumpAndSettle();
 
-    final submitButton = find.widgetWithText(ElevatedButton, 'Submit Refund');
-    await tester.tap(submitButton);
-
-    for (int i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
+    await tester.tap(find.byType(ElevatedButton));
     await tester.pumpAndSettle();
 
     verify(() => mockProfileService.getUserNameById('test-user-id')).called(1);
-    verify(
-      () => mockTransactionService.recordRefundRequest(
-        transaction_id: '123',
-        description: 'I want a refund please',
-      ),
-    ).called(1);
-    verify(
-      () => mockEdgeFunctionService.runEdgeFunction(
-        name: 'refund-email',
-        body: {
-          'username': 'Test User',
-          'user_id': 'test-user-id',
-          'transaction_id': '123',
-          'amount': '25.50',
-          'description': 'I want a refund please',
-        },
-      ),
-    ).called(1);
+    verify(() => mockTransactionService.recordRefundRequest(
+      transaction_id: '123',
+      description: 'I want a refund please',
+    )).called(1);
+    verify(() => mockEdgeFunctionService.runEdgeFunction(
+      name: 'refund-email',
+      body: {
+        'username': 'Test User',
+        'user_id': 'test-user-id',
+        'transaction_id': '123',
+        'amount': '25.50',
+        'description': 'I want a refund please',
+      },
+    )).called(1);
   });
 
   testWidgets(

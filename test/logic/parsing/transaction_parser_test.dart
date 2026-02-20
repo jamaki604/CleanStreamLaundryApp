@@ -10,7 +10,7 @@ void main(){
     test("Test that transactions are parsed correctly",(){
 
       final result = TransactionParser.formatTransaction(({"amount": 2.75, "description": "Dryer", "created_at": DateTime.now().toString()}), "transactionHistory");
-      expect(result, "\$2.75 used on Dryer on ${DateFormat("MMM").format(DateTime.now()).toString()} ${DateFormat("dd").format(DateTime.now()).toString()}, ${DateFormat("y").format(DateTime.now()).toString()}");
+      expect(result, "\$2.75 - Dryer on ${DateFormat("MMM").format(DateTime.now()).toString()} ${DateFormat("dd").format(DateTime.now()).toString()}, ${DateFormat("y").format(DateTime.now()).toString()}");
     });
 
     test("Test that transactions are parsed correctly if description is Loyalty Card",(){
@@ -21,7 +21,7 @@ void main(){
 
     test("Test that it can format a list of transactions",(){
       final result = TransactionParser.formatTransactionsList([{"amount": 2.75, "description": "Dryer", "created_at": DateTime.now().toString()},{"amount": 4.75, "description": "Washer", "created_at": "2025-11-12T19:23:24.781326+00:00"}], "transactionHistory");
-      expect(result[0], "\$2.75 used on Dryer on ${DateFormat("MMM").format(DateTime.now()).toString()} ${DateFormat("dd").format(DateTime.now()).toString()}, ${DateFormat("y").format(DateTime.now()).toString()}");
+      expect(result[0], "\$2.75 - Dryer on ${DateFormat("MMM").format(DateTime.now()).toString()} ${DateFormat("dd").format(DateTime.now()).toString()}, ${DateFormat("y").format(DateTime.now()).toString()}");
     });
     
     test("Test for monthly report",(){
