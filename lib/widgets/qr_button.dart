@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class LargeButton extends StatelessWidget {
+class QRButton extends StatelessWidget {
   final String headLineText;
   final String descriptionText;
   final IconData icon;
   final VoidCallback? onPressed;
 
-  const LargeButton({
+  const QRButton({
     super.key,
     required this.headLineText,
     required this.descriptionText,
@@ -16,22 +16,25 @@ class LargeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Center(
       child: SizedBox(
         width: double.infinity,
-        height: 170,
+        height: 160, // slightly tighter
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+              backgroundColor: colors.primary,
+              foregroundColor: Colors.white,
+              elevation: 8, // less aggressive
+              shadowColor: colors.primary.withOpacity(0.4),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(22),
               ),
-              elevation: 8,
-              backgroundColor: Colors.blue.shade800,
-              shadowColor: Colors.blueAccent.shade400,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -43,27 +46,33 @@ class LargeButton extends StatelessWidget {
                     children: [
                       Text(
                         headLineText,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Text(
                         descriptionText,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.85),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
-                  icon,
-                  size: 48,
-                  color: Colors.white,
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 28, // reduced from 48 (too large before)
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
