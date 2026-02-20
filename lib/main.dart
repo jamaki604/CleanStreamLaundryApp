@@ -54,6 +54,8 @@ Future<void> setupDependencies() async {
   final supabase = Supabase.instance.client;
 
   Stripe.publishableKey = "${dotenv.env['STRIPE_PUBLISHABLE_KEY']}";
+  Stripe.merchantIdentifier = "merchant.com.cleanstream.laundry";
+  await Stripe.instance.applySettings();
 
   getIt.registerLazySingleton<TransactionService>(
     () => SupabaseTransactionService(client: supabase),
@@ -87,13 +89,9 @@ Future<void> setupDependencies() async {
     () => MachineCommunicator(),
   );
 
-  getIt.registerLazySingleton<RouterService>(
-      () => RouterService()
-  );
+  getIt.registerLazySingleton<RouterService>(() => RouterService());
 
-  getIt.registerLazySingleton<NotificationService>(
-        () => NotificationService(),
-  );
+  getIt.registerLazySingleton<NotificationService>(() => NotificationService());
 
   GetIt.instance.registerSingleton<FlutterLocalNotificationsPlugin>(
     FlutterLocalNotificationsPlugin(),
@@ -101,9 +99,12 @@ Future<void> setupDependencies() async {
 
   getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
 
-  getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor(
-        paymentService: getIt<PaymentService>(),
-        transactionService: getIt<TransactionService>(),));
+  getIt.registerLazySingleton<PaymentProcessor>(
+    () => PaymentProcessor(
+      paymentService: getIt<PaymentService>(),
+      transactionService: getIt<TransactionService>(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
