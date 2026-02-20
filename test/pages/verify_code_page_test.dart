@@ -190,6 +190,36 @@ void main() {
 
     });
 
+    testWidgets('Shows message if email reset was successful', (tester) async {
+
+      when(() => mockAuthService.resetPassword(any())).thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(
+          createWidgetUnderTest()
+      );
+
+      await tester.tap(find.byType(TextButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text("Password reset email sent! Check your email."), findsWidgets);
+
+    });
+
+    testWidgets('Shows message if email reset was unsuccessful', (tester) async {
+
+      when(() => mockAuthService.resetPassword(any())).thenAnswer((_) async => AuthenticationResponses.failure);
+
+      await tester.pumpWidget(
+          createWidgetUnderTest()
+      );
+
+      await tester.tap(find.byType(TextButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text("Failed to send reset email."), findsWidgets);
+
+    });
+
   });
 
 }

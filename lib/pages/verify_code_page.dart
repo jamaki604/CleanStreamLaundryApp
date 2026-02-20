@@ -22,6 +22,36 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
   bool _isLoading = false;
   String? _error;
 
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+
+  Future<void> _sendResetEmail() async {
+
+    try {
+      final response = await authService.resetPassword(
+        widget.email,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (response == AuthenticationResponses.success) {
+        _showMessage('Password reset email sent! Check your email.');
+      } else {
+        _showMessage('Failed to send reset email.');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showMessage('Error: $e');
+    }
+  }
+
   void _verifyCode() async {
     final code = _codeController.text.trim();
 
@@ -73,6 +103,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
     _codeController.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -192,9 +223,7 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
 
             // Resend
             TextButton(
-              onPressed: () async {
-                // TODO: implement resend
-              },
+              onPressed: _sendResetEmail,
               child: Text(
                 'Resend code',
                 style: TextStyle(color: scheme.primary),

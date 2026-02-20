@@ -15,6 +15,7 @@ class ResetProtectedPage extends StatefulWidget {
 }
 
 class _ResetProtectedPageState extends State<ResetProtectedPage> {
+
   final _passwordCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
 
@@ -26,8 +27,17 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
   var passwordText = "New Password";
   var confirmText = "Confirm Password";
-  var iconColor = Colors.blue;
-  var labelColor = Colors.blue;
+  var iconColor;
+  var labelColor;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    iconColor = Theme.of(context).colorScheme.primary;
+    labelColor = Theme.of(context).colorScheme.primary;
+
+  }
 
   void _changeColorsToRed(String reason) {
     setState(() {
