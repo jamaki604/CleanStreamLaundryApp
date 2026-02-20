@@ -67,7 +67,7 @@ class RefundPageState extends State<RefundPage> {
 
     //Filters out loyalty transactions
     recentTransactions.removeWhere(
-          (transaction) => transaction.contains("added to Loyalty Card"),
+      (transaction) => transaction.contains("added to Loyalty Card"),
     );
   }
 
@@ -91,17 +91,16 @@ class RefundPageState extends State<RefundPage> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        title: Text("Request Refund", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: Theme.of(context).colorScheme.primaryGradient,
           ),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
-          "Request Refund",
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
       ),
       body: Scaffold(
         body: KeyboardListener(
