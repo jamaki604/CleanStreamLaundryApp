@@ -267,8 +267,7 @@ class SupabaseAuthService implements AuthService {
     try {
       // Send password reset email and redirect back to the app via deep link.
       await _client.auth.resetPasswordForEmail(
-        email,
-        redirectTo: 'clean-stream://reset-protected',
+        email
       );
       output = AuthenticationResponses.success;
     } catch (e) {
@@ -305,4 +304,26 @@ class SupabaseAuthService implements AuthService {
     }
     return output;
   }
+
+  @override
+  Future<AuthenticationResponses> verifyCode({required String email, required String code}) async {
+    AuthenticationResponses output = AuthenticationResponses.success;
+
+    try {
+      final response = await _client.auth.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.recovery,
+      );
+
+      if (response.session == null) {
+        output = AuthenticationResponses.failure;
+      }
+    }catch (e){
+      output = AuthenticationResponses.failure;
+    }
+
+    return output;
+  }
+
 }

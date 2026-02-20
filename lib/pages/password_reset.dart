@@ -46,6 +46,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
         if (response == AuthenticationResponses.success) {
           _showMessage('Password reset email sent! Check your email.');
+          context.go("/verify-code", extra: _emailController.text.trim());
         } else {
           _showMessage('Failed to send reset email.');
         }
@@ -151,7 +152,9 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _sendResetEmail,
+                        onPressed: () {
+                          _sendResetEmail();
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: scheme.primary,
                           foregroundColor: scheme.onPrimary,
