@@ -280,6 +280,9 @@ void main() {
         await tester.tap(nearestLocationButton);
         await tester.pumpAndSettle();
       });
+    });
+
+    group("Tests navigation button", (){
 
       testWidgets('Tests that icon button is visible', (tester) async {
 
