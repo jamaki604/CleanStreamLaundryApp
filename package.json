@@ -1,0 +1,28 @@
+{
+  "name": "cleanstreamlaundryapp",
+  "version": "1.0.0",
+  "description": "Code repository for the Clean Stream Laundry Client mobile/web app.",
+  "homepage": "https://github.com/jamaki604/CleanStreamLaundryApp#readme",
+  "bugs": {
+    "url": "https://github.com/jamaki604/CleanStreamLaundryApp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamaki604/CleanStreamLaundryApp.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "supabase:update-functions": "node scripts/update-functions.js"
+  },
+  "dependencies": {
+    "supabase": "^2.76.14"
+  }
+}
