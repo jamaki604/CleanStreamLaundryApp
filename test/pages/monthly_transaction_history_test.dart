@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'mocks.dart';
 
 void main() {
@@ -60,13 +61,14 @@ void main() {
   }
 
   group('MonthlyTransactionHistory Widget Tests', () {
-    testWidgets('renders AppBar title even when transactions empty',
-            (WidgetTester tester) async {
-          await tester.pumpWidget(createTestWidget([]));
-          await tester.pumpAndSettle();
+    testWidgets('renders AppBar title even when transactions empty', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget([]));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Monthly Transaction History'), findsOneWidget);
-        });
+      expect(find.text('Monthly Transaction History'), findsOneWidget);
+    });
 
     testWidgets('renders AppBar with back button', (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget([]));
@@ -85,42 +87,32 @@ void main() {
       expect(tester.takeException(), isNotNull);
     });
 
-    testWidgets('displays no cards when transactions are empty',
-            (WidgetTester tester) async {
-          await tester.pumpWidget(createTestWidget([]));
-          await tester.pumpAndSettle();
+    testWidgets('displays no cards when transactions are empty', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget([]));
+      await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsNothing);
-        });
+      expect(find.byType(Card), findsNothing);
+    });
 
-    testWidgets('displays card for month with transactions',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-          ];
+    testWidgets('displays card for month with transactions', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsOneWidget);
-        });
+      expect(find.byType(Card), findsOneWidget);
+    });
 
     testWidgets('displays correct monthly total', (WidgetTester tester) async {
       final transactions = [
-        createTransaction(
-          monthsAgo: 1,
-          description: 'Washer #5',
-          amount: 2.50,
-        ),
-        createTransaction(
-          monthsAgo: 1,
-          description: 'Dryer #3',
-          amount: 1.75,
-        ),
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+        createTransaction(monthsAgo: 1, description: 'Dryer #3', amount: 1.75),
         createTransaction(
           monthsAgo: 1,
           description: 'loyalty card',
@@ -134,109 +126,80 @@ void main() {
       expect(find.text('\$14.25'), findsOneWidget);
     });
 
-    testWidgets('displays all transaction categories',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Loyalty Payment on Washer #3',
-              amount: 2.00,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Dryer #2',
-              amount: 1.75,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Loyalty Payment on Dryer #1',
-              amount: 1.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'loyalty card',
-              amount: 10.00,
-            ),
-          ];
+    testWidgets('displays all transaction categories', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'Loyalty Payment on Washer #3',
+          amount: 2.00,
+        ),
+        createTransaction(monthsAgo: 1, description: 'Dryer #2', amount: 1.75),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'Loyalty Payment on Dryer #1',
+          amount: 1.50,
+        ),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'loyalty card',
+          amount: 10.00,
+        ),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Direct Washer Payments'), findsOneWidget);
-          expect(find.text('Loyalty Washer Payments'), findsOneWidget);
-          expect(find.text('Direct Dryer Payments'), findsOneWidget);
-          expect(find.text('Loyalty Dryer Payments'), findsOneWidget);
-          expect(find.text('Loyalty Card Loads'), findsOneWidget);
-        });
+      expect(find.text('Direct Washer Payments'), findsOneWidget);
+      expect(find.text('Loyalty Washer Payments'), findsOneWidget);
+      expect(find.text('Direct Dryer Payments'), findsOneWidget);
+      expect(find.text('Loyalty Dryer Payments'), findsOneWidget);
+      expect(find.text('Loyalty Card Loads'), findsOneWidget);
+    });
 
-    testWidgets('displays correct amounts for each category',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #3',
-              amount: 3.00,
-            ),
-          ];
+    testWidgets('displays correct amounts for each category', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+        createTransaction(monthsAgo: 1, description: 'Washer #3', amount: 3.00),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$5.50'), findsWidgets);
-        });
+      expect(find.text('\$5.50'), findsWidgets);
+    });
 
-    testWidgets('sorts months in descending order',
-            (WidgetTester tester) async {
-          final now = DateTime.now();
-          final transactions = [
-            createTransaction(
-              monthsAgo: 3,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 3.00,
-            ),
-            createTransaction(
-              monthsAgo: 2,
-              description: 'Washer #5',
-              amount: 2.75,
-            ),
-          ];
+    testWidgets('sorts months in descending order', (
+      WidgetTester tester,
+    ) async {
+      final now = DateTime.now();
+      final transactions = [
+        createTransaction(monthsAgo: 3, description: 'Washer #5', amount: 2.50),
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 3.00),
+        createTransaction(monthsAgo: 2, description: 'Washer #5', amount: 2.75),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          final cardFinder = find.byType(Card);
-          expect(cardFinder, findsNWidgets(3));
+      final cardFinder = find.byType(Card);
+      expect(cardFinder, findsNWidgets(3));
 
-          final firstCard = cardFinder.first;
-          final firstCardTexts = find.descendant(
-            of: firstCard,
-            matching: find.byType(Text),
-          );
-          expect(firstCardTexts, findsAtLeastNWidgets(1));
-        });
+      final firstCard = cardFinder.first;
+      final firstCardTexts = find.descendant(
+        of: firstCard,
+        matching: find.byType(Text),
+      );
+      expect(firstCardTexts, findsAtLeastNWidgets(1));
+    });
 
     testWidgets('displays scrollbar', (WidgetTester tester) async {
       final transactions = [
-        createTransaction(
-          monthsAgo: 1,
-          description: 'Washer #5',
-          amount: 2.50,
-        ),
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
       ];
 
       await tester.pumpWidget(createTestWidget(transactions));
@@ -245,89 +208,65 @@ void main() {
       expect(find.byType(Scrollbar), findsOneWidget);
     });
 
-    testWidgets('displays ListView with proper padding',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-          ];
+    testWidgets('displays ListView with proper padding', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          final listView = tester.widget<ListView>(find.byType(ListView));
-          expect(listView.padding, const EdgeInsets.all(16));
-        });
+      final listView = tester.widget<ListView>(find.byType(ListView));
+      expect(listView.padding, const EdgeInsets.all(16));
+    });
 
-    testWidgets('displays multiple months correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 3,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 2,
-              description: 'Washer #5',
-              amount: 3.00,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 3.50,
-            ),
-          ];
+    testWidgets('displays multiple months correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 3, description: 'Washer #5', amount: 2.50),
+        createTransaction(monthsAgo: 2, description: 'Washer #5', amount: 3.00),
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 3.50),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsNWidgets(3));
-        });
+      expect(find.byType(Card), findsNWidgets(3));
+    });
 
-    testWidgets('displays divider between month and transaction details',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-          ];
+    testWidgets('displays divider between month and transaction details', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.byType(Divider), findsOneWidget);
-        });
+      expect(find.byType(Divider), findsOneWidget);
+    });
 
-    testWidgets('displays zero amounts when no transactions of that type',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-          ];
+    testWidgets('displays zero amounts when no transactions of that type', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          final zeroAmountFinder = find.text('\$0.00');
-          expect(zeroAmountFinder, findsWidgets);
-        });
+      final zeroAmountFinder = find.text('\$0.00');
+      expect(zeroAmountFinder, findsWidgets);
+    });
 
     testWidgets('card has proper margin', (WidgetTester tester) async {
       final transactions = [
-        createTransaction(
-          monthsAgo: 1,
-          description: 'Washer #5',
-          amount: 2.50,
-        ),
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
       ];
 
       await tester.pumpWidget(createTestWidget(transactions));
@@ -337,217 +276,247 @@ void main() {
       expect(card.margin, const EdgeInsets.only(bottom: 16));
     });
 
-    testWidgets('handles loyalty washer payments correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Loyalty Payment on Washer #5',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'loyalty payment on washer #3',
-              amount: 3.00,
-            ),
-          ];
+    testWidgets('handles loyalty washer payments correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(
+          monthsAgo: 1,
+          description: 'Loyalty Payment on Washer #5',
+          amount: 2.50,
+        ),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'loyalty payment on washer #3',
+          amount: 3.00,
+        ),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$5.50'), findsWidgets);
-        });
+      expect(find.text('\$5.50'), findsWidgets);
+    });
 
-    testWidgets('handles loyalty dryer payments correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Loyalty Payment on Dryer #2',
-              amount: 1.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'loyalty payment on dryer #1',
-              amount: 1.25,
-            ),
-          ];
+    testWidgets('handles loyalty dryer payments correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(
+          monthsAgo: 1,
+          description: 'Loyalty Payment on Dryer #2',
+          amount: 1.50,
+        ),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'loyalty payment on dryer #1',
+          amount: 1.25,
+        ),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$2.75'), findsWidgets);
-        });
+      expect(find.text('\$2.75'), findsWidgets);
+    });
 
-    testWidgets('handles direct dryer payments correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Dryer #2',
-              amount: 1.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'DRYER #1',
-              amount: 1.25,
-            ),
-          ];
+    testWidgets('handles direct dryer payments correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Dryer #2', amount: 1.50),
+        createTransaction(monthsAgo: 1, description: 'DRYER #1', amount: 1.25),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$2.75'), findsWidgets);
-        });
+      expect(find.text('\$2.75'), findsWidgets);
+    });
 
-    testWidgets('handles loyalty card loads correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'loyalty card',
-              amount: 10.00,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'loyalty card',
-              amount: 20.00,
-            ),
-          ];
+    testWidgets('handles loyalty card loads correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(
+          monthsAgo: 1,
+          description: 'loyalty card',
+          amount: 10.00,
+        ),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'loyalty card',
+          amount: 20.00,
+        ),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$30.00'), findsWidgets);
-        });
+      expect(find.text('\$30.00'), findsWidgets);
+    });
 
-    testWidgets('displays formatted decimal amounts correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.5,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Dryer #3',
-              amount: 1.76, 
-            ),
-          ];
+    testWidgets('displays formatted decimal amounts correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.5),
+        createTransaction(monthsAgo: 1, description: 'Dryer #3', amount: 1.76),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$2.50'), findsWidgets);
-          expect(find.text('\$1.76'), findsWidgets);
-        });
+      expect(find.text('\$2.50'), findsWidgets);
+      expect(find.text('\$1.76'), findsWidgets);
+    });
 
-    testWidgets('multiple transactions in same month aggregate correctly',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #1',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #2',
-              amount: 3.00,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #3',
-              amount: 2.75,
-            ),
-          ];
+    testWidgets('multiple transactions in same month aggregate correctly', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #1', amount: 2.50),
+        createTransaction(monthsAgo: 1, description: 'Washer #2', amount: 3.00),
+        createTransaction(monthsAgo: 1, description: 'Washer #3', amount: 2.75),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$8.25'), findsWidgets);
-          expect(find.byType(Card), findsOneWidget);
-        });
+      expect(find.text('\$8.25'), findsWidgets);
+      expect(find.byType(Card), findsOneWidget);
+    });
 
-    testWidgets('ignores current month transactions',
-            (WidgetTester tester) async {
-          final now = DateTime.now();
-          final transactions = [
-            {
-              'created_at': DateTime(now.year, now.month, 15).toIso8601String(),
-              'description': 'Washer #5',
-              'amount': 2.50,
-            },
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 3.00,
-            ),
-          ];
+    testWidgets('ignores current month transactions', (
+      WidgetTester tester,
+    ) async {
+      final now = DateTime.now();
+      final transactions = [
+        {
+          'created_at': DateTime(now.year, now.month, 15).toIso8601String(),
+          'description': 'Washer #5',
+          'amount': 2.50,
+        },
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 3.00),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsOneWidget);
-          expect(find.text('\$3.00'), findsExactly(2));
-        });
+      expect(find.byType(Card), findsOneWidget);
+      expect(find.text('\$3.00'), findsExactly(2));
+    });
 
-    testWidgets('handles transactions from exactly 11 months ago',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 11,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-          ];
+    testWidgets('handles transactions from exactly 11 months ago', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(
+          monthsAgo: 11,
+          description: 'Washer #5',
+          amount: 2.50,
+        ),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsOneWidget);
-        });
+      expect(find.byType(Card), findsOneWidget);
+    });
 
-    testWidgets('handles mixed transaction types in same month',
-            (WidgetTester tester) async {
-          final transactions = [
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Washer #5',
-              amount: 2.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Loyalty Payment on Washer #3',
-              amount: 2.00,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Dryer #2',
-              amount: 1.75,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'Loyalty Payment on Dryer #1',
-              amount: 1.50,
-            ),
-            createTransaction(
-              monthsAgo: 1,
-              description: 'loyalty card',
-              amount: 10.00,
-            ),
-          ];
+    testWidgets('handles mixed transaction types in same month', (
+      WidgetTester tester,
+    ) async {
+      final transactions = [
+        createTransaction(monthsAgo: 1, description: 'Washer #5', amount: 2.50),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'Loyalty Payment on Washer #3',
+          amount: 2.00,
+        ),
+        createTransaction(monthsAgo: 1, description: 'Dryer #2', amount: 1.75),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'Loyalty Payment on Dryer #1',
+          amount: 1.50,
+        ),
+        createTransaction(
+          monthsAgo: 1,
+          description: 'loyalty card',
+          amount: 10.00,
+        ),
+      ];
 
-          await tester.pumpWidget(createTestWidget(transactions));
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
 
-          expect(find.text('\$14.25'), findsOneWidget);
-          expect(find.text('\$2.50'), findsWidgets);
-          expect(find.text('\$2.00'), findsWidgets);
-          expect(find.text('\$1.75'), findsWidgets);
-          expect(find.text('\$1.50'), findsWidgets);
-          expect(find.text('\$10.00'), findsWidgets);
-        });
+      expect(find.text('\$14.25'), findsOneWidget);
+      expect(find.text('\$2.50'), findsWidgets);
+      expect(find.text('\$2.00'), findsWidgets);
+      expect(find.text('\$1.75'), findsWidgets);
+      expect(find.text('\$1.50'), findsWidgets);
+      expect(find.text('\$10.00'), findsWidgets);
+    });
+
+    testWidgets('shows last years, this years, and last 12 months tab', (
+      WidgetTester tester,
+    ) async {
+      final now = DateTime.now();
+
+      await tester.pumpWidget(createTestWidget([]));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Year ${now.year - 1}'), findsOneWidget);
+      expect(find.text('Year ${now.year}'), findsOneWidget);
+      expect(find.text('Last 12 Months'), findsOneWidget);
+    });
+
+    testWidgets('previous year tab shows previous year data', (
+      WidgetTester tester,
+    ) async {
+      final now = DateTime.now();
+      final previousYearDate = DateTime(now.year - 1, now.month, 15);
+      final previousYearMonthLabel =
+          '${DateFormat('MMM').format(previousYearDate)} ${previousYearDate.year}';
+
+      final transactions = [
+        createTransaction(
+          monthsAgo: 12,
+          description: 'Washer #5',
+          amount: 2.50,
+        ),
+      ];
+
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Year ${now.year - 1}'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(previousYearMonthLabel), findsOneWidget);
+    });
+
+    testWidgets('can switch between tabs without errors', (
+      WidgetTester tester,
+    ) async {
+      final now = DateTime.now();
+
+      final transactions = [
+        createTransaction(monthsAgo: 12, description: 'Dryer #2', amount: 1.75),
+      ];
+
+      await tester.pumpWidget(createTestWidget(transactions));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Year ${now.year}'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('Last 12 Months'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
   });
 }
