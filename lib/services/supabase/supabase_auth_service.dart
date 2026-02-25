@@ -23,16 +23,13 @@ class SupabaseAuthService implements AuthService {
 
   @override
   Future<AuthenticationResponses> isLoggedIn() async {
-    AuthenticationResponses output = AuthenticationResponses.failure;
-    try {
-      await _client.auth.refreshSession();
-      if (_client.auth.currentUser != null) {
-        output = AuthenticationResponses.success;
-      }
-    } catch (e) {
-      print(e);
-      return output;
+    AuthenticationResponses output = AuthenticationResponses.success;
+    final session = _client.auth.currentSession;
+
+    if (!(session != null && session.user != null)) {
+      output = AuthenticationResponses.failure;
     }
+
     return output;
   }
 
@@ -228,7 +225,7 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> handleOAuthRedirect(Uri uri) async {
+  Future<void> getSessionFromURI(Uri uri) async {
     await _client.auth.getSessionFromUrl(uri);
   }
 

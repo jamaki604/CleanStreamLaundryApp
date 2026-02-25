@@ -35,7 +35,7 @@ class _ChangeEmailVerificationPageState
         await authService.getCurrentUser();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            context.go('/homePage');
+            context.go('/editProfile');
           }
         });
       }

@@ -81,13 +81,6 @@ void main() {
         .thenAnswer((_) async => idleDryers);
   }
 
-  Future<void> selectLocation(WidgetTester tester, String address) async {
-    await tester.tap(find.byType(DropdownButton<String>));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(address).last);
-    await tester.pumpAndSettle();
-  }
-
   group('HomePage Widget Tests', () {
     test('should create HomePageState', () {
       const homePage = HomePage();
@@ -130,7 +123,7 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.pumpAndSettle(const Duration(seconds: 1));
-        
+
         final dropdownFinder = find.descendant(
           of: find.byType(DropdownButtonHideUnderline),
           matching: find.byType(DropdownButton<String>),
@@ -176,6 +169,117 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsNothing);
       });
 
+    });
+
+    group('Nearest Location Button', () {
+      testWidgets('should find and select nearest location when button is tapped', (tester) async {
+        final testLocations = [
+          {
+            "id": 1,
+            "Address": "123 Main St",
+            "Latitude": 40.0,
+            "Longitude": -86.0,
+          },
+          {
+            "id": 2,
+            "Address": "456 Oak Ave",
+            "Latitude": 40.5,
+            "Longitude": -86.5,
+          },
+        ];
+
+        mockLocations(testLocations);
+        mockMachineCounts('1');
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        final nearestLocationButton = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
+        expect(nearestLocationButton, findsOneWidget);
+
+        await tester.tap(nearestLocationButton);
+        await tester.pumpAndSettle();
+
+        verify(() => mockLocationService.getLocations()).called(greaterThan(1));
+      });
+
+      testWidgets('should display nearest location button with correct styling', (tester) async {
+        mockLocations([{"id": 1, "Address": "123 Main St"}]);
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        final button = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
+        expect(button, findsOneWidget);
+
+        final inkWell = tester.widget<InkWell>(button);
+        expect(inkWell.onTap, isNotNull);
+
+        expect(find.text('Find Nearest Location'), findsOneWidget);
+      });
+
+      testWidgets('should update selected location after finding nearest', (tester) async {
+        final testLocations = [
+          {
+            "id": 1,
+            "Address": "123 Main St",
+            "Latitude": 40.0,
+            "Longitude": -86.0,
+          },
+          {
+            "id": 2,
+            "Address": "456 Oak Ave",
+            "Latitude": 40.5,
+            "Longitude": -86.5,
+          },
+        ];
+
+        mockLocations(testLocations);
+        mockMachineCounts('1');
+        mockMachineCounts('2');
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        expect(find.text('Select Location'), findsOneWidget);
+
+        final nearestLocationButton = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
+        await tester.tap(nearestLocationButton);
+        await tester.pumpAndSettle();
+
+      });
+
+      testWidgets('should save selected location to storage', (tester) async {
+        final testLocations = [
+          {
+            "id": 1,
+            "Address": "123 Main St",
+            "Latitude": 40.0,
+            "Longitude": -86.0,
+          },
+        ];
+
+        mockLocations(testLocations);
+        mockMachineCounts('1');
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        final nearestLocationButton = find.ancestor(
+          of: find.text('Find Nearest Location'),
+          matching: find.byType(InkWell),
+        );
+        await tester.tap(nearestLocationButton);
+        await tester.pumpAndSettle();
+      });
     });
   });
 

@@ -626,7 +626,7 @@ void main(){
 
     test("User is logged in",() async{
 
-      when(() => supabaseAuth.refreshSession()).thenAnswer((_) async => AuthResponse());
+      when(() => supabaseAuth.currentSession).thenReturn(Session(accessToken: 'test', tokenType: 'test', user: User(id: '', appMetadata: {}, userMetadata: {}, aud: '', createdAt: '')));
 
       final response = await authenticator.isLoggedIn();
       expect(response,AuthenticationResponses.success);
@@ -898,7 +898,7 @@ void main(){
       );
 
       final testUri = Uri.parse('https://example.com/callback?code=test123');
-      await authenticator.handleOAuthRedirect(testUri);
+      await authenticator.getSessionFromURI(testUri);
 
       verify(() => supabaseAuth.getSessionFromUrl(testUri)).called(1);
     });
@@ -917,7 +917,7 @@ void main(){
       
       when(() => supabaseAuth.getSessionFromUrl(any())).thenAnswer( (_) async => AuthSessionUrlResponse(session: Session(accessToken: "test", tokenType: "test", user: User(id: "1234", appMetadata: {}, userMetadata: {}, aud: "test", createdAt: "test")), redirectType: "test"));
       
-      await authenticator.handleOAuthRedirect(Uri());
+      await authenticator.getSessionFromURI(Uri());
       verify(() => client.auth.getSessionFromUrl(any()));
 
     });

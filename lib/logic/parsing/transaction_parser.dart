@@ -20,7 +20,7 @@ class TransactionParser {
       return "";
     }
 
-    final action = description == "Loyalty Card" ? "added to" : "used on";
+    final action = description == "Loyalty Card" ? "added to" : "-";
     return '$formattedAmount $action $description on $formattedDate';
   }
 
