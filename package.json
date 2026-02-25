@@ -19,7 +19,6 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "supabase:update-functions": "node scripts/update-functions.js",
     "test:coverage": "deno test --reload --coverage=coverage_deno supabase/functions"
   },
