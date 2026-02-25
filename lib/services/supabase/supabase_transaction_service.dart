@@ -4,7 +4,6 @@ import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseTransactionService extends TransactionService {
-
   late final SupabaseClient _client;
   RealtimeChannel? _paymentChannel;
   bool _channelSubscribed = false;
@@ -28,7 +27,8 @@ class SupabaseTransactionService extends TransactionService {
   }
 
   @override
-  Future<({List<String> transactions, List<int> ids})> getRefundableTransactionsForUser() async {
+  Future<({List<String> transactions, List<int> ids})>
+  getRefundableTransactionsForUser() async {
     final user = _client.auth.currentUser;
 
     final response = await _client
@@ -40,8 +40,10 @@ class SupabaseTransactionService extends TransactionService {
 
     final raw = List<Map<String, dynamic>>.from(response).take(100);
 
-    final transactions = TransactionParser.formatTransactionsList(raw, "refundHistory")
-    ..removeWhere((e) => e.isEmpty || e.contains("added to Loyalty Card"));
+    final transactions = TransactionParser.formatTransactionsList(
+      raw,
+      "refundHistory",
+    )..removeWhere((e) => e.isEmpty || e.contains("added to Loyalty Card"));
 
     final ids = TransactionParser.createTransactionIDList(raw)
       ..removeWhere((e) => e.isNegative);
@@ -96,7 +98,7 @@ class SupabaseTransactionService extends TransactionService {
       'user_id': user.id,
       'transaction_id': transaction_id,
       'description': description,
-      'amount': amount
+      'amount': amount,
     });
 
     await _client.rpc(
@@ -159,8 +161,9 @@ class SupabaseTransactionService extends TransactionService {
           if (status == RealtimeSubscribeStatus.subscribed) {
             if (!completer.isCompleted) completer.complete();
           } else if (status == RealtimeSubscribeStatus.channelError) {
-            if (!completer.isCompleted)
+            if (!completer.isCompleted) {
               completer.completeError('Channel subscription failed');
+            }
           }
         });
 
