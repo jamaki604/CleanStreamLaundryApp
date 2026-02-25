@@ -25,5 +25,8 @@
   },
   "dependencies": {
     "supabase": "^2.76.14"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0"
   }
 }
