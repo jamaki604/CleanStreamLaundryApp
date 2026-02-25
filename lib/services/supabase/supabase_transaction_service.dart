@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SupabaseTransactionService extends TransactionService{
+class SupabaseTransactionService extends TransactionService {
 
   late final SupabaseClient _client;
+  RealtimeChannel? _paymentChannel;
+  bool _channelSubscribed = false;
 
-  SupabaseTransactionService({required SupabaseClient client}){
+  SupabaseTransactionService({required SupabaseClient client}) {
     _client = client;
   }
 
@@ -89,14 +91,19 @@ class SupabaseTransactionService extends TransactionService{
       'amount': amount
     });
 
-    await _client.rpc('increment_user_refund_attempts', params: {'uid': user.id});
+    await _client.rpc(
+      'increment_user_refund_attempts',
+      params: {'uid': user.id},
+    );
 
     return amount;
   }
 
   @override
-  Future<void> subscribeForPaymentConfirmation( bool channelSubscribed,Completer<int>? paymentCompleter ) async {
-
+  Future<void> subscribeForPaymentConfirmation(
+    bool channelSubscribed,
+    Completer<int>? paymentCompleter,
+  ) async {
     if (_client.auth.currentUser == null) {
       final completer = Completer<void>();
       late final StreamSubscription authSub;
@@ -104,47 +111,51 @@ class SupabaseTransactionService extends TransactionService{
       authSub = _client.auth.onAuthStateChange.listen((data) {
         if (_client.auth.currentUser != null) {
           authSub.cancel();
-          completer.complete();
+          if (!completer.isCompleted) completer.complete();
         }
       });
-
       await completer.future;
     }
 
-    if (!channelSubscribed) {
+    if (!_channelSubscribed) {
       await _startPaymentChannel(paymentCompleter);
-      channelSubscribed = true;
+      _channelSubscribed = true;
     }
   }
 
   Future<void> _startPaymentChannel(Completer<int>? paymentCompleter) async {
+    if (_paymentChannel != null) {
+      await _client.removeChannel(_paymentChannel!);
+      _paymentChannel = null;
+    }
+
     final completer = Completer<void>();
 
-    _client.channel('payments')
+    _paymentChannel = _client
+        .channel('payments')
         .onBroadcast(
-      event: 'payment_success',
-      callback: (payload) {
-        final nestedPayload = payload['payload'];
-        if (nestedPayload is Map) {
-          final uid = nestedPayload['user_id'];
-          if (uid == _client.auth.currentUser?.id) {
-            if (paymentCompleter != null && !paymentCompleter.isCompleted) {
-              paymentCompleter.complete(200);
+          event: 'payment_success',
+          callback: (payload) {
+            final nestedPayload = payload['payload'];
+            if (nestedPayload is Map) {
+              final uid = nestedPayload['user_id'];
+              if (uid == _client.auth.currentUser?.id) {
+                if (paymentCompleter != null && !paymentCompleter.isCompleted) {
+                  paymentCompleter.complete(200);
+                }
+              }
             }
-          }
-        }
-      },
-    )
+          },
+        )
         .subscribe((status, [error]) {
-      if (status == RealtimeSubscribeStatus.subscribed) {
-        completer.complete();
-      } else if (status == RealtimeSubscribeStatus.closed ||
-          status == RealtimeSubscribeStatus.channelError) {
-        completer.completeError('Channel subscription failed');
-      }
-    });
+          if (status == RealtimeSubscribeStatus.subscribed) {
+            if (!completer.isCompleted) completer.complete();
+          } else if (status == RealtimeSubscribeStatus.channelError) {
+            if (!completer.isCompleted)
+              completer.completeError('Channel subscription failed');
+          }
+        });
 
     await completer.future;
   }
-
 }
