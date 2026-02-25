@@ -7,6 +7,7 @@ import {
     denyRefundInDb,
     getUserEmail,
     handleDenyRefund,
+    sendDenialEmail
   } from "./logic.ts";
   
   function makeUrl(params: Record<string, string>) {
@@ -52,6 +53,19 @@ import {
   
   function makeRequest(url: URL) {
     return new Request(url.toString(), { method: "GET" });
+  }
+
+  function mockFetch(ok: boolean, responseText = "") {
+    globalThis.fetch = () =>
+      Promise.resolve({
+        ok,
+        text: () => Promise.resolve(responseText),
+      } as Response);
+  }
+
+  function restoreFetch() {
+    // Deno's real fetch is on globalThis — reset after each test
+    globalThis.fetch = fetch;
   }
   
   Deno.test("extractParams — returns all three params when present", () => {
@@ -253,4 +267,85 @@ import {
       Error,
       "Email send failed"
     );
+  });
+
+  Deno.test("sendDenialEmail — resolves without error on success", async () => {
+    mockFetch(true);
+    try {
+      await sendDenialEmail("test-api-key", "user@example.com", "txn-abc", "25.00");
+    } finally {
+      restoreFetch();
+    }
+    // reaching here without throwing is the assertion
+  });
+  
+  Deno.test("sendDenialEmail — throws with error text when response is not ok", async () => {
+    mockFetch(false, "Invalid API key");
+    try {
+      await assertRejects(
+        () => sendDenialEmail("bad-key", "user@example.com", "txn-abc", "25.00"),
+        Error,
+        "Email send failed: Invalid API key"
+      );
+    } finally {
+      restoreFetch();
+    }
+  });
+  
+  Deno.test("sendDenialEmail — sends POST to the correct Resend endpoint", async () => {
+    let capturedUrl: string | undefined;
+    let capturedInit: RequestInit | undefined;
+  
+    globalThis.fetch = (url: string | URL | Request, init?: RequestInit) => {
+      capturedUrl = url.toString();
+      capturedInit = init;
+      return Promise.resolve({ ok: true, text: () => Promise.resolve("") } as Response);
+    };
+  
+    try {
+      await sendDenialEmail("test-key", "user@example.com", "txn-abc", "25.00");
+    } finally {
+      restoreFetch();
+    }
+  
+    assertEquals(capturedUrl, "https://api.resend.com/emails");
+    assertEquals(capturedInit?.method, "POST");
+  });
+  
+  Deno.test("sendDenialEmail — sends correct Authorization header", async () => {
+    let capturedHeaders: Record<string, string> | undefined;
+  
+    globalThis.fetch = (_url: string | URL | Request, init?: RequestInit) => {
+      capturedHeaders = init?.headers as Record<string, string>;
+      return Promise.resolve({ ok: true, text: () => Promise.resolve("") } as Response);
+    };
+  
+    try {
+      await sendDenialEmail("my-resend-key", "user@example.com", "txn-abc", "25.00");
+    } finally {
+      restoreFetch();
+    }
+  
+    assertEquals(capturedHeaders?.["Authorization"], "Bearer my-resend-key");
+    assertEquals(capturedHeaders?.["Content-Type"], "application/json");
+  });
+  
+  Deno.test("sendDenialEmail — sends correct recipient, transactionId, and amount in body", async () => {
+    let capturedBody: any;
+  
+    globalThis.fetch = (_url: string | URL | Request, init?: RequestInit) => {
+      capturedBody = JSON.parse(init?.body as string);
+      return Promise.resolve({ ok: true, text: () => Promise.resolve("") } as Response);
+    };
+  
+    try {
+      await sendDenialEmail("test-key", "customer@example.com", "txn-xyz", "49.99");
+    } finally {
+      restoreFetch();
+    }
+  
+    assertEquals(capturedBody.to, "customer@example.com");
+    assertEquals(capturedBody.html.includes("txn-xyz"), true);
+    assertEquals(capturedBody.html.includes("49.99"), true);
+    assertEquals(capturedBody.subject, "Refund Request Denied");
   });
