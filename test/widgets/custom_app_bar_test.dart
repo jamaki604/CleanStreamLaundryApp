@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-
   group("Custom App Bar Tests", () {
-
     test('CustomAppBar instantiates correctly', () {
       const customAppBar = CustomAppBar();
       expect(customAppBar, isA<CustomAppBar>());
@@ -18,27 +16,21 @@ void main() {
 
     testWidgets('CustomAppBar builds an AppBar widget', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            appBar: const CustomAppBar(),
-          ),
-        ),
+        MaterialApp(home: Scaffold(appBar: const CustomAppBar())),
       );
 
       expect(find.byType(AppBar), findsOneWidget);
     });
 
-    testWidgets('CustomAppBar uses theme primary color', (tester) async {
-      const testColor = Colors.green;
+    testWidgets('CustomAppBar has transparent background ', (tester) async {
+      const testColor = Colors.transparent;
 
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(
             colorScheme: const ColorScheme.light(primary: testColor),
           ),
-          home: Scaffold(
-            appBar: const CustomAppBar(),
-          ),
+          home: Scaffold(appBar: const CustomAppBar()),
         ),
       );
 
@@ -46,7 +38,9 @@ void main() {
       expect(appBar.backgroundColor, testColor);
     });
 
-    testWidgets('CustomAppBar renders correctly inside Scaffold', (tester) async {
+    testWidgets('CustomAppBar renders correctly inside Scaffold', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
