@@ -54,11 +54,13 @@ void main() {
     getIt.registerSingleton<RouterService>(mockRouterService);
     getIt.registerSingleton<NotificationService>(mockNotificationService);
 
-    when(() => mockNotificationService.scheduleEarlyMachineNotification(
-      id: any(named: 'id'),
-      machineTime: any(named: 'machineTime'),
-      machineName: any(named: 'machineName'),
-    )).thenAnswer((_) async {});
+    when(
+      () => mockNotificationService.scheduleEarlyMachineNotification(
+        id: any(named: 'id'),
+        machineTime: any(named: 'machineTime'),
+        machineName: any(named: 'machineName'),
+      ),
+    ).thenAnswer((_) async {});
 
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
     getIt.registerSingleton<LoyaltyViewModel>(mockLoyaltyViewModel);
@@ -286,6 +288,13 @@ void main() {
       when(
         () => mockMachineCommunicator.wakeDevice(any()),
       ).thenAnswer((_) async => false);
+      when(
+        () => mockTransactionService.recordTransaction(
+          amount: any(named: 'amount'),
+          description: any(named: 'description'),
+          type: any(named: 'type'),
+        ),
+      ).thenAnswer((_) async => {});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
@@ -295,7 +304,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Machine Error'), findsWidgets);
-      verifyNever(
+      verify(
         () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),
@@ -340,26 +349,33 @@ void main() {
       expect(find.text('Pay \$2.75'), findsOneWidget);
     });
 
-    testWidgets('sends notification after successful loyalty payment', (tester) async {
+    testWidgets('sends notification after successful loyalty payment', (
+      tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
 
-      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
-        'Name': 'Washer01',
-        'Price': 3.50,
-      });
+      when(
+        () => mockMachineService.getMachineById(any()),
+      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
 
-      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
-        'balance': 10.0,
-      });
+      when(
+        () => mockProfileService.getUserBalanceById(any()),
+      ).thenAnswer((_) async => {'balance': 10.0});
 
-      when(() => mockProfileService.updateBalanceById(any())).thenAnswer((_) async {});
-      when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
+      when(
+        () => mockProfileService.updateBalanceById(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockMachineCommunicator.wakeDevice(any()),
+      ).thenAnswer((_) async => true);
 
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async {});
+      when(
+        () => mockTransactionService.recordTransaction(
+          amount: any(named: 'amount'),
+          description: any(named: 'description'),
+          type: any(named: 'type'),
+        ),
+      ).thenAnswer((_) async {});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
@@ -368,11 +384,13 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      verify(() => mockNotificationService.scheduleEarlyMachineNotification(
-        id: 1,
-        machineTime: any(named: 'machineTime'),
-        machineName: any(named: 'machineName'),
-      )).called(1);
+      verify(
+        () => mockNotificationService.scheduleEarlyMachineNotification(
+          id: 1,
+          machineTime: any(named: 'machineTime'),
+          machineName: any(named: 'machineName'),
+        ),
+      ).called(1);
     });
   });
 }
