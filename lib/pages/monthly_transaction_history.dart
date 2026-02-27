@@ -153,6 +153,7 @@ class MonthlyTransactionHistory extends StatelessWidget {
 
     return DefaultTabController(
       length: 3,
+      initialIndex: 1,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
