@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
@@ -17,6 +18,7 @@ class StartPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SectionHeader(title: "Payment Options"),
                 Container(
                   height: 160,
                   margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
@@ -60,7 +62,7 @@ class StartPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 15),
+                const SizedBox(height: 10),
 
                 SizedBox(
                   height: 160,
@@ -74,7 +76,8 @@ class StartPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
+                const SectionHeader(title: "After Hours"),
 
                 SizedBox(
                   height: 160,
