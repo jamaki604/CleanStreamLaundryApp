@@ -4,12 +4,15 @@ import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
+import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final doorUnlocker = DoorUnlocker();
+
     return BasePage(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -85,10 +88,22 @@ class StartPage extends StatelessWidget {
                     headLineText: "Unlock Door",
                     descriptionText: "Unlock doors after hours",
                     icon: Icons.lock_open_rounded,
-                    onPressed: () {
-                      context.go("/home");
-                    },
-                  ),
+                      onPressed: () async {
+                        final success = await doorUnlocker.unlockNearestDoor();
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? "Nearest door unlocked!"
+                                    : "No access or no nearby doors found.",
+                              ),
+                            ),
+                          );
+                        };
+                      },
+                    ),
                 ),
               ],
             ),
