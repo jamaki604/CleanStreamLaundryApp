@@ -60,7 +60,7 @@ class StartPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 15),
 
                 SizedBox(
                   height: 160,
@@ -70,6 +70,20 @@ class StartPage extends StatelessWidget {
                     icon: Icons.qr_code_scanner,
                     onPressed: () {
                       context.go("/scanner");
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                SizedBox(
+                  height: 160,
+                  child: LargeButton(
+                    headLineText: "Unlock Door",
+                    descriptionText: "Unlock doors after hours",
+                    icon: Icons.lock_open_rounded,
+                    onPressed: () {
+                      context.go("/home");
                     },
                   ),
                 ),
