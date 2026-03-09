@@ -19,7 +19,7 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2024-06-20",
+      apiVersion: "2023-10-16",
     });
 
     const supabase = createClient(

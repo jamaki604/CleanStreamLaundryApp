@@ -19,7 +19,7 @@
     "test": "test"
   },
   "scripts": {
-    "supabase:update-functions": "node scripts/update-functions.js",
+    "supabase:update-functions": "node scripts/update-functions.cjs",
     "test:coverage": "deno test --reload --coverage=coverage_deno supabase/functions"
   },
   "dependencies": {

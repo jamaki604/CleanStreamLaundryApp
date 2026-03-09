@@ -1,5 +1,3 @@
-import Stripe from "npm:stripe@^14.0.0";
-
 export interface PaymentDeps {
   retrieveSession: (sessionId: string) => Promise<{ payment_status: string }>;
 }
