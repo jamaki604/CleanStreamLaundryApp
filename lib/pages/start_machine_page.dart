@@ -9,12 +9,13 @@ import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
 import '../widgets/status_dialog_box.dart';
 
 class StartPage extends StatelessWidget {
-  const StartPage({super.key});
+  final DoorUnlocker doorUnlocker;
+
+  StartPage({super.key, DoorUnlocker? doorUnlocker})
+      : doorUnlocker = doorUnlocker ?? DoorUnlocker();
 
   @override
   Widget build(BuildContext context) {
-    final doorUnlocker = DoorUnlocker();
-
     return BasePage(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
