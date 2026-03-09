@@ -1,9 +1,12 @@
 import '../../logic/services/door_unlock_service.dart';
 
 class DoorUnlocker implements DoorUnlockService {
+  bool cancelled = false;
+
   final _readerToDoor = {
     "Reader A": "Front Door",
-    "Reader B": "Broken Door",
+    //"Reader A": "Broken Door",
+    "Reader B": "Back Door",
   };
 
   @override
@@ -18,12 +21,27 @@ class DoorUnlocker implements DoorUnlockService {
     return doorId != "Broken Door"; // simulate access denied
   }
 
+  void cancelUnlockingDoor() {
+    cancelled = true;
+  }
+
   Future<bool> unlockNearestDoor() async {
+    cancelled = false;
+
     final doors = await getNearbyDoors();
-    if (doors.isEmpty) return false;
+
+    if (cancelled)
+      return false;
+    if (doors.isEmpty)
+      return false;
 
     final nearest = doors.first;
+
+    if (cancelled)
+      return false;
+
     return await unlockDoor(nearest);
   }
+
 
 }

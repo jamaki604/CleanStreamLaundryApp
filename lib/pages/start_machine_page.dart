@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
+import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
+import '../widgets/status_dialog_box.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
@@ -88,22 +90,10 @@ class StartPage extends StatelessWidget {
                     headLineText: "Unlock Door",
                     descriptionText: "Unlock doors after hours",
                     icon: Icons.lock_open_rounded,
-                      onPressed: () async {
-                        final success = await doorUnlocker.unlockNearestDoor();
-
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? "Nearest door unlocked!"
-                                    : "No access or no nearby doors found.",
-                              ),
-                            ),
-                          );
-                        };
-                      },
-                    ),
+                    onPressed: () async {
+                      await _processUnlocking(context, doorUnlocker);
+                    },
+                  ),
                 ),
               ],
             ),
@@ -112,4 +102,31 @@ class StartPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> _processUnlocking(BuildContext context, DoorUnlocker doorUnlocker,)
+async {
+  cancelSearch = false;
+
+  showSearchingDialog(context);
+
+  final success = await doorUnlocker.unlockNearestDoor();
+
+  if (cancelSearch) {
+    doorUnlocker.cancelUnlockingDoor();
+    return;
+  }
+
+  if (context.mounted) Navigator.of(context).pop();
+
+  if (!context.mounted) return;
+
+  statusDialog(
+    context,
+    title: success ? "Door Unlocked!" : "No Nearby Doors Found",
+    message: success
+        ? "The nearest door has been unlocked successfully"
+        : "We couldn't detect any nearby doors",
+    isSuccess: success,
+  );
 }
