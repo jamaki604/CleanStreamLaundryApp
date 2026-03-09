@@ -23,16 +23,18 @@ class MonthlyTransactionHistory extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color:  Colors.white,
-          ),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.transparent,
         title: Text(
           'Monthly Transaction History',
           style: TextStyle(color: Colors.white),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: Theme.of(context).colorScheme.primaryGradient,
+          ),
         ),
         elevation: 2,
         centerTitle: true,
@@ -59,85 +61,78 @@ class MonthlyTransactionHistory extends StatelessWidget {
                 final data = monthlySums[month]!;
                 final total =
                     data['directWasher']! +
-                        data['directDryer']! +
-                        data['loyaltyCard']!;
-                if (total == 0 && data['loyaltyWasher']==0 && data['loyaltyDryer']==0) {
-                  return SizedBox(width: 0, height: 0,);
+                    data['directDryer']! +
+                    data['loyaltyCard']!;
+                if (total == 0 &&
+                    data['loyaltyWasher'] == 0 &&
+                    data['loyaltyDryer'] == 0) {
+                  return SizedBox(width: 0, height: 0);
                 } else {
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  elevation: 2,
-                  color: Theme
-                      .of(context)
-                      .colorScheme
-                      .cardPrimary,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              month,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 2,
+                    color: Theme.of(context).colorScheme.cardPrimary,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                month,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '\$${total.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                              Text(
+                                '\$${total.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const Divider(height: 24),
-                        _buildTransactionRow(
-                          'Direct Washer Payments',
-                          data['directWasher']!,
-                          Colors.black,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildTransactionRow(
-                          'Loyalty Washer Payments',
-                          data['loyaltyWasher']!,
-                          Theme
-                              .of(context)
-                              .colorScheme
-                              .primary,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildTransactionRow(
-                          'Direct Dryer Payments',
-                          data['directDryer']!,
-                          Colors.black,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildTransactionRow(
-                          'Loyalty Dryer Payments',
-                          data['loyaltyDryer']!,
-                          Theme
-                              .of(context)
-                              .colorScheme
-                              .primary,
-                        ),
-                        const SizedBox(height: 8),
-                        _buildTransactionRow(
-                          'Loyalty Card Loads',
-                          data['loyaltyCard']!,
-                          Colors.black,
-                        ),
-                      ],
+                            ],
+                          ),
+                          const Divider(height: 24),
+                          _buildTransactionRow(
+                            'Direct Washer Payments',
+                            data['directWasher']!,
+                            Colors.black,
+                          ),
+                          const SizedBox(height: 8),
+                          _buildTransactionRow(
+                            'Loyalty Washer Payments',
+                            data['loyaltyWasher']!,
+                            Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(height: 8),
+                          _buildTransactionRow(
+                            'Direct Dryer Payments',
+                            data['directDryer']!,
+                            Colors.black,
+                          ),
+                          const SizedBox(height: 8),
+                          _buildTransactionRow(
+                            'Loyalty Dryer Payments',
+                            data['loyaltyDryer']!,
+                            Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(height: 8),
+                          _buildTransactionRow(
+                            'Loyalty Card Loads',
+                            data['loyaltyCard']!,
+                            Colors.black,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }
+                  );
+                }
               },
             ),
           ),

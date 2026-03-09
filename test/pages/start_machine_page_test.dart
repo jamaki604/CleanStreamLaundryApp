@@ -1,5 +1,5 @@
 import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
-import 'package:clean_stream_laundry_app/widgets/large_button.dart';
+import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -17,10 +17,7 @@ void main() {
     router = GoRouter(
       observers: [navigatorObserver],
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (_, __) => const StartPage(),
-        ),
+        GoRoute(path: '/', builder: (_, __) => const StartPage()),
         GoRoute(
           path: '/scanner',
           builder: (_, __) => const Scaffold(body: Text('Scanner Page')),
@@ -30,16 +27,14 @@ void main() {
   });
 
   Widget createTestApp() {
-    return MaterialApp.router(
-      routerConfig: router,
-    );
+    return MaterialApp.router(routerConfig: router);
   }
 
   testWidgets('Tapping QR button navigates to /scanner', (tester) async {
     await tester.pumpWidget(createTestApp());
     await tester.pumpAndSettle();
 
-    final qrButton = find.widgetWithText(LargeButton, "Scan QR code");
+    final qrButton = find.widgetWithText(QRButton, "Scan QR code");
 
     expect(qrButton, findsOneWidget);
 
