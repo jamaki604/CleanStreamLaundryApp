@@ -28,6 +28,9 @@ class DoorUnlocker implements DoorUnlockService {
   Future<bool> unlockNearestDoor() async {
     cancelled = false;
 
+    if (cancelled)
+      return false;
+
     final doors = await getNearbyDoors();
 
     if (cancelled || doors.isEmpty)
