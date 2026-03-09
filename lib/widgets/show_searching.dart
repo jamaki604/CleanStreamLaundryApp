@@ -8,7 +8,7 @@ void showSearchingDialog(BuildContext context) {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (_) => Dialog(
+    builder: (dialogContext) => Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -22,7 +22,7 @@ void showSearchingDialog(BuildContext context) {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.fontInverted,
+                color: Theme.of(dialogContext).colorScheme.fontInverted,
               ),
             ),
             const SizedBox(height: 10),
@@ -30,14 +30,14 @@ void showSearchingDialog(BuildContext context) {
               "Please wait while we search for the nearest door.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.fontInverted,
-              )
+                color: Theme.of(dialogContext).colorScheme.fontInverted,
+              ),
             ),
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
                 cancelSearch = true;
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
               style: TextButton.styleFrom(
                 backgroundColor: Colors.red,

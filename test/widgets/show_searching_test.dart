@@ -23,7 +23,7 @@ void main() {
         );
 
         await tester.tap(find.text('Open Dialog'));
-        
+
         await tester.pump(const Duration(milliseconds: 100));
 
         expect(find.byType(Dialog), findsOneWidget);
