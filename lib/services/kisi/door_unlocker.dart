@@ -11,7 +11,7 @@ class DoorUnlocker implements DoorUnlockService {
 
   @override
   Future<List<String>> getNearbyDoors() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(seconds: 1));
     return _readerToDoor.values.toList();
   }
 
@@ -30,16 +30,10 @@ class DoorUnlocker implements DoorUnlockService {
 
     final doors = await getNearbyDoors();
 
-    if (cancelled)
-      return false;
-    if (doors.isEmpty)
+    if (cancelled || doors.isEmpty)
       return false;
 
     final nearest = doors.first;
-
-    if (cancelled)
-      return false;
-
     return await unlockDoor(nearest);
   }
 
