@@ -5,13 +5,9 @@
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
-		<string>Scan your card to add it automatically</string>
-		<key>NSCameraUsageDescription</key>
-		<string>To scan cards</string>
+		<string>Camera permission is required for scanning QR codes and cards</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
-		<key>NSCameraUsageDescription</key>
-		<string>Camera permission is required for scanning QR codes</string>
 		<key>CFBundleDisplayName</key>
 		<string>Clean Stream Laundry App</string>
 		<key>CFBundleExecutable</key>
@@ -64,9 +60,7 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
-		<key>NSLocationAlwaysUsageDescription</key>
-        <string>Your location is required to find the nearest location</string>
-        <key>NSLocationWhenInUseUsageDescription</key>
-        <string>Your location is required to find the nearest location</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Your location is required to find the nearest Clean Stream Laundry location</string>
 	</dict>
 </plist>
