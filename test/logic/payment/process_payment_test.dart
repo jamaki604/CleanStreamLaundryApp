@@ -1,5 +1,3 @@
-import 'package:clean_stream_laundry_app/logic/exceptions/payment_canceled_exception.dart';
-import 'package:clean_stream_laundry_app/logic/exceptions/payment_failed_exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
@@ -68,7 +66,9 @@ void main() {
         const description = 'Test payment';
 
         when(() => mockPaymentService.makePayment(amount)).thenThrow(
-          PaymentCanceledException()
+          StripeException(
+            error: LocalizedErrorMessage(code: FailureCode.Canceled),
+          ),
         );
 
         // Act
@@ -99,7 +99,7 @@ void main() {
 
         when(
           () => mockPaymentService.makePayment(amount),
-        ).thenThrow(PaymentFailedException());
+        ).thenThrow(PlatformException('Platform not supported'));
 
         // Act
         final result = await paymentProcessor.processPayment(
@@ -129,7 +129,7 @@ void main() {
 
         when(
           () => mockPaymentService.makePayment(amount),
-        ).thenThrow(PaymentFailedException());
+        ).thenThrow(Exception('Unexpected error'));
 
         // Act
         final result = await paymentProcessor.processPayment(
@@ -156,7 +156,7 @@ void main() {
       const description = 'Test payment';
 
       when(() => mockPaymentService.makePayment(amount)).thenThrow(
-        PaymentCanceledException(),
+        StripeException(error: LocalizedErrorMessage(code: FailureCode.Failed)),
       );
 
       // Act
