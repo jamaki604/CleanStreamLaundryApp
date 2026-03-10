@@ -30,6 +30,8 @@ class PaymentProcessor {
       return PaymentResult.canceled;
     } on PaymentFailedException {
       return PaymentResult.failed;
+    } catch (_) {
+      return PaymentResult.failed;
     }
   }
 }
