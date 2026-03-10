@@ -1,3 +1,4 @@
+import 'package:clean_stream_laundry_app/logic/exceptions/payment_failed_exception.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/services/stripe/stripe_service_mobile.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -52,7 +53,7 @@ void main() {
         // Act & Assert (exception)
         await expectLater(
           stripeService.makePayment(2.60),
-          throwsA(isA<StripeConfigException>()),
+          throwsA(isA<PaymentFailedException>()),
         );
 
         // Assert (interaction)
@@ -114,7 +115,7 @@ void main() {
         //Assert
         expectLater(
               () => stripeService.makePayment(10.0),
-          throwsA(isA<StripeException>()),
+          throwsA(isA<PaymentFailedException>()),
         );
 
       });
