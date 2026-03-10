@@ -1,6 +1,7 @@
+import 'package:clean_stream_laundry_app/logic/exceptions/payment_canceled_exception.dart';
+import 'package:clean_stream_laundry_app/logic/exceptions/payment_failed_exception.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 
 class PaymentProcessor {
@@ -25,9 +26,9 @@ class PaymentProcessor {
         type: "Laundry",
       );
       return PaymentResult.success;
-    } on StripeException {
+    } on PaymentCanceledException {
       return PaymentResult.canceled;
-    } catch (_) {
+    } on PaymentFailedException {
       return PaymentResult.failed;
     }
   }

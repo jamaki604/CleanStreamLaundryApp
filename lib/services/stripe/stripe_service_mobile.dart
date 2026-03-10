@@ -1,3 +1,5 @@
+import 'package:clean_stream_laundry_app/logic/exceptions/payment_canceled_exception.dart';
+import 'package:clean_stream_laundry_app/logic/exceptions/payment_failed_exception.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,11 +47,14 @@ class StripeService implements PaymentService {
         ),
       );
       await _stripeInstance.presentPaymentSheet();
-    } on StripeException {
-      rethrow;
+    } on StripeException catch (e){
+      if (e.error.code == FailureCode.Canceled) {
+        throw PaymentCanceledException();
+      }
+
+      throw PaymentFailedException();
     } catch (e) {
-      print("payment error: $e");
-      rethrow;
+      throw PaymentFailedException();
     }
   }
 
