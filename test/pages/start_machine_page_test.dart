@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
 import 'package:clean_stream_laundry_app/widgets/large_button.dart';
+import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';

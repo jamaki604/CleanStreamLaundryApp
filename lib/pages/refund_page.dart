@@ -52,7 +52,8 @@ class RefundPageState extends State<RefundPage> {
 
   Future<void> _fetchTransactions() async {
     try {
-      final result = await transactionService.getRefundableTransactionsForUser();
+      final result = await transactionService
+          .getRefundableTransactionsForUser();
       setState(() {
         recentTransactions = result.transactions;
         recentTransactionIDs = result.ids;
@@ -62,6 +63,11 @@ class RefundPageState extends State<RefundPage> {
     } finally {
       if (mounted) setState(() => _isFetchingTransactions = false);
     }
+
+    //Filters out loyalty transactions
+    recentTransactions.removeWhere(
+      (transaction) => transaction.contains("added to Loyalty Card"),
+    );
   }
 
   String getTransactionID() {
@@ -86,11 +92,16 @@ class RefundPageState extends State<RefundPage> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        backgroundColor: colorScheme.primary,
-        title: const Text("Request Refund", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        title: Text("Request Refund", style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: Theme.of(context).colorScheme.primaryGradient,
+          ),
+        ),
       ),
       body: KeyboardListener(
         focusNode: _focusNode,
@@ -125,20 +136,25 @@ class RefundPageState extends State<RefundPage> {
                         color: colorScheme.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.receipt_long_rounded,
-                          color: colorScheme.primary, size: 28),
+                      child: Icon(
+                        Icons.receipt_long_rounded,
+                        color: colorScheme.primary,
+                        size: 28,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Submit a Refund Request",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: colorScheme.fontInverted,
-                              )),
+                          Text(
+                            "Submit a Refund Request",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: colorScheme.fontInverted,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             "Select a transaction and describe your issue. Our team will review it shortly.",
@@ -172,36 +188,42 @@ class RefundPageState extends State<RefundPage> {
                       _isFetchingTransactions
                           ? const Center(child: CircularProgressIndicator())
                           : GestureDetector(
-                        onTap: () async {
-                          final selected = await showModalBottomSheet<String>(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (_) => TransactionSearchSheet(
-                              transactions: recentTransactions,
-                            ),
-                          );
+                              onTap: () async {
+                                final selected =
+                                    await showModalBottomSheet<String>(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      builder: (_) => TransactionSearchSheet(
+                                        transactions: recentTransactions,
+                                      ),
+                                    );
 
-                          if (selected != null) {
-                            setState(() {
-                              selectedTransaction = selected;
-                              selectedTransactionIndex =
-                                  recentTransactions.indexOf(selected);
-                            });
-                          }
-                        },
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            decoration: _inputDecoration(context).copyWith(
-                              hintText: 'Select a transaction',
-                              hintStyle: TextStyle(color: colorScheme.fontSecondary),
+                                if (selected != null) {
+                                  setState(() {
+                                    selectedTransaction = selected;
+                                    selectedTransactionIndex =
+                                        recentTransactions.indexOf(selected);
+                                  });
+                                }
+                              },
+                              child: AbsorbPointer(
+                                child: TextFormField(
+                                  decoration: _inputDecoration(context)
+                                      .copyWith(
+                                        hintText: 'Select a transaction',
+                                        hintStyle: TextStyle(
+                                          color: colorScheme.fontSecondary,
+                                        ),
+                                      ),
+                                  controller: TextEditingController(
+                                    text: selectedTransaction,
+                                  ),
+                                  style: TextStyle(
+                                    color: colorScheme.fontInverted,
+                                  ),
+                                ),
+                              ),
                             ),
-                            controller: TextEditingController(
-                              text: selectedTransaction,
-                            ),
-                            style: TextStyle(color: colorScheme.fontInverted),
-                          ),
-                        ),
-                      ),
 
                       const SizedBox(height: 24),
 
@@ -214,8 +236,11 @@ class RefundPageState extends State<RefundPage> {
                         keyboardType: TextInputType.multiline,
                         style: TextStyle(color: colorScheme.fontInverted),
                         decoration: _inputDecoration(context).copyWith(
-                          hintText: 'Describe the issue with your transaction...',
-                          hintStyle: TextStyle(color: colorScheme.fontSecondary),
+                          hintText:
+                              'Describe the issue with your transaction...',
+                          hintStyle: TextStyle(
+                            color: colorScheme.fontSecondary,
+                          ),
                         ),
                       ),
 
@@ -224,10 +249,19 @@ class RefundPageState extends State<RefundPage> {
                           padding: const EdgeInsets.only(top: 12),
                           child: Row(
                             children: const [
-                              Icon(Icons.info_outline, color: Colors.red, size: 16),
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.red,
+                                size: 16,
+                              ),
                               SizedBox(width: 6),
-                              Text('Please fill in all fields',
-                                  style: TextStyle(color: Colors.red, fontSize: 13)),
+                              Text(
+                                'Please fill in all fields',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -245,12 +279,14 @@ class RefundPageState extends State<RefundPage> {
                   onPressed: _isLoading
                       ? null
                       : () {
-                    setState(() => _attemptedSubmit = true);
-                    if (!isFormValid()) return;
-                    _handleRefund();
-                  },
+                          setState(() => _attemptedSubmit = true);
+                          if (!isFormValid()) return;
+                          _handleRefund();
+                        },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isFormValid() ? colorScheme.primary : Colors.grey,
+                    backgroundColor: isFormValid()
+                        ? colorScheme.primary
+                        : Colors.grey,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -259,13 +295,20 @@ class RefundPageState extends State<RefundPage> {
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    height: 22,
-                    width: 22,
-                    child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2.5),
-                  )
-                      : const Text("Submit Refund Request",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text(
+                          "Submit Refund Request",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ],

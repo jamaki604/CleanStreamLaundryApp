@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/widgets/large_button.dart';
+import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +27,10 @@ class StartPage extends StatelessWidget {
                 const SectionHeader(title: "Payment Options"),
                 Container(
                   height: 160,
-                  margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 23,
+                    vertical: 10,
+                  ),
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 3),
@@ -53,7 +56,9 @@ class StartPage extends StatelessWidget {
                           Text(
                             "Tap phone to machine to pay",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.fontSecondary,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.fontSecondary,
                               fontSize: 16,
                             ),
                           ),
@@ -72,7 +77,7 @@ class StartPage extends StatelessWidget {
 
                 SizedBox(
                   height: 160,
-                  child: LargeButton(
+                  child: QRButton(
                     headLineText: "Scan QR code",
                     descriptionText: "Scan QR code on the machine",
                     icon: Icons.qr_code_scanner,
