@@ -14,6 +14,7 @@ import 'package:clean_stream_laundry_app/logic/services/edge_function_service.da
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 import 'package:clean_stream_laundry_app/logic/viewmodels/loyalty_view_model.dart';
+import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
 
 class MockAuthService extends Mock implements AuthService {}
 
@@ -22,6 +23,8 @@ class MockTransactionService extends Mock implements TransactionService {}
 class MockLocationService extends Mock implements LocationService {}
 
 class MockMachineService extends Mock implements MachineService {}
+
+class MockDoorUnlocker extends Mock implements DoorUnlocker {}
 
 class MockThemeManager extends Mock implements ThemeManager {}
 

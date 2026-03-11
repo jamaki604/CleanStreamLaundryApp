@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
+import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
+import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
+import '../widgets/status_dialog_box.dart';
 
 class StartPage extends StatelessWidget {
-  const StartPage({super.key});
+  final DoorUnlocker doorUnlocker;
+
+  StartPage({super.key, DoorUnlocker? doorUnlocker})
+      : doorUnlocker = doorUnlocker ?? DoorUnlocker();
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +24,7 @@ class StartPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SectionHeader(title: "Payment Options"),
                 Container(
                   height: 160,
                   margin: const EdgeInsets.symmetric(
@@ -65,7 +73,7 @@ class StartPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
 
                 SizedBox(
                   height: 160,
@@ -78,6 +86,21 @@ class StartPage extends StatelessWidget {
                     },
                   ),
                 ),
+
+                const SizedBox(height: 10),
+                const SectionHeader(title: "After Hours"),
+
+                SizedBox(
+                  height: 160,
+                  child: QRButton(
+                    headLineText: "Unlock Door",
+                    descriptionText: "Unlock doors after hours",
+                    icon: Icons.lock_open_rounded,
+                    onPressed: () async {
+                      await _processUnlocking(context, doorUnlocker);
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -85,4 +108,31 @@ class StartPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> _processUnlocking(BuildContext context, DoorUnlocker doorUnlocker,)
+async {
+  cancelSearch = false;
+
+  showSearchingDialog(context);
+
+  final success = await doorUnlocker.unlockNearestDoor();
+
+  if (cancelSearch) {
+    doorUnlocker.cancelUnlockingDoor();
+    return;
+  }
+
+  if (context.mounted) Navigator.of(context).pop();
+
+  if (!context.mounted) return;
+
+  statusDialog(
+    context,
+    title: success ? "Door Unlocked!" : "No Nearby Doors Found",
+    message: success
+        ? "The nearest door has been unlocked successfully"
+        : "We couldn't detect any nearby doors",
+    isSuccess: success,
+  );
 }
