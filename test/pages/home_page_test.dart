@@ -281,6 +281,30 @@ void main() {
         await tester.pumpAndSettle();
       });
     });
+
+    group("Tests navigation button", (){
+
+      testWidgets('Tests that icon button is visible', (tester) async {
+
+        final testLocations = [
+          {
+            "id": 1,
+            "Address": "123 Main St",
+            "Latitude": 40.0,
+            "Longitude": -86.0,
+          },
+        ];
+
+        mockLocations(testLocations);
+        mockMachineCounts('1');
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(IconButton), findsOneWidget);
+      });
+    });
+
   });
 
 }

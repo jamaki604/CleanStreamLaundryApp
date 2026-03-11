@@ -1,13 +1,13 @@
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-void statusDialog(
+Future<void> statusDialog(
   BuildContext context, {
   required String title,
   required String message,
   required bool isSuccess,
 }) {
-  showDialog(
+  return showDialog(
     context: context,
     builder: (dialogContext) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

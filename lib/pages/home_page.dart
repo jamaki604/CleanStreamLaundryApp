@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
@@ -7,11 +8,13 @@ import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -63,6 +66,41 @@ class HomePageState extends State<HomePage> {
     if (locationCoordinates.containsKey(locationName)) {
       final coords = locationCoordinates[locationName]!;
       _mapController.move(coords, 15.0);
+    }
+  }
+
+  Future<void> _openDirectionsFromAddress(String? address) async {
+    if (address == null) return;
+
+    final encodedAddress = Uri.encodeComponent(address);
+    Uri uri;
+
+    if (kIsWeb) {
+      // Web fallback
+      uri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$encodedAddress',
+      );
+    } else {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          uri = Uri.parse('google.navigation:q=$encodedAddress');
+          break;
+        case TargetPlatform.iOS:
+          uri = Uri.parse(
+            'http://maps.apple.com/?daddr=$encodedAddress&dirflg=d',
+          );
+          break;
+        default:
+          uri = Uri.parse(
+            'https://www.google.com/maps/dir/?api=1&destination=$encodedAddress',
+          );
+      }
+    }
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not open maps';
     }
   }
 
@@ -332,6 +370,16 @@ class HomePageState extends State<HomePage> {
                         },
                       ),
                     ),
+                    IconButton(
+                      onPressed: () async {
+                        if(selectedName != null){
+                          await _openDirectionsFromAddress(selectedName);
+                        }else{
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please select a location to get directions!")));
+                        }
+                      },
+                        icon: Icon(Icons.navigation,color:Theme.of(context).primaryColor)
+                    )
                   ],
                 ),
               ),
