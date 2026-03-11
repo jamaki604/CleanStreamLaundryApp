@@ -28,8 +28,12 @@ class StripeService implements PaymentService {
             colors: PaymentSheetAppearanceColors(
               primary: Color(0xFF2073A9),
               background: CupertinoColors.systemBackground,
+              componentBackground: CupertinoColors.secondarySystemBackground,
+              componentBorder: CupertinoColors.separator,
+              componentText: CupertinoColors.label,
+              placeholderText: CupertinoColors.separator
             ),
-            shapes: const PaymentSheetShape(borderRadius: 12),
+            shapes: const PaymentSheetShape(borderRadius: 20),
             primaryButton: PaymentSheetPrimaryButtonAppearance(
               colors: PaymentSheetPrimaryButtonTheme(
                 light: PaymentSheetPrimaryButtonThemeColors(
@@ -37,7 +41,7 @@ class StripeService implements PaymentService {
                   text: CupertinoColors.white,
                 ),
               ),
-              shapes: const PaymentSheetPrimaryButtonShape(blurRadius: 12),
+              shapes: const PaymentSheetPrimaryButtonShape(blurRadius: 20),
             ),
           ),
           applePay: const PaymentSheetApplePay(merchantCountryCode: 'US'),
@@ -73,8 +77,7 @@ class StripeService implements PaymentService {
   }
 
   @protected
-  String convertDollarsToCents(double amount) {
-    final calculatedAmount = (amount * 100).toInt();
-    return calculatedAmount.toString();
+  int convertDollarsToCents(double amount) {
+    return (amount * 100).toInt();
   }
 }
