@@ -58,7 +58,7 @@ void main() {
         // Assert (interaction)
         verify(() => mockEdgeFunctionService.runEdgeFunction(
           name: 'paymentIntent',
-          body: {'amount': '260', 'currency': 'usd'},
+          body: {'amount': 260, 'currency': 'usd'},
         )).called(1);
       });
 
@@ -191,7 +191,7 @@ void main() {
         expect(result, "testSecret123");
         verify(() => mockEdgeFunctionService.runEdgeFunction(
           name: 'paymentIntent',
-          body: {'amount': '2570', 'currency': 'usd'},
+          body: {'amount': 2570, 'currency': 'usd'},
         )).called(1);
       });
 
@@ -261,27 +261,27 @@ void main() {
 
     group("convertDollarsToCents", () {
       test("converts dollars to cents correctly", () {
-        expect(stripeService.convertDollarsToCents(2.75), "275");
+        expect(stripeService.convertDollarsToCents(2.75), 275);
       });
 
       test("handles zero amount", () {
-        expect(stripeService.convertDollarsToCents(0), "0");
+        expect(stripeService.convertDollarsToCents(0), 0);
       });
 
       test("handles whole dollar amounts", () {
-        expect(stripeService.convertDollarsToCents(10.00), "1000");
+        expect(stripeService.convertDollarsToCents(10.00), 1000);
       });
 
       test("handles large amounts", () {
-        expect(stripeService.convertDollarsToCents(1234.56), "123456");
+        expect(stripeService.convertDollarsToCents(1234.56), 123456);
       });
 
       test("handles small decimal amounts", () {
-        expect(stripeService.convertDollarsToCents(0.01), "1");
+        expect(stripeService.convertDollarsToCents(0.01), 1);
       });
 
       test("rounds down fractional cents", () {
-        expect(stripeService.convertDollarsToCents(1.999), "199");
+        expect(stripeService.convertDollarsToCents(1.999), 199);
       });
     });
   });

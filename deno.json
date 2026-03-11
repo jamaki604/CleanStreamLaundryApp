@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "lib": ["deno.ns", "dom", "esnext"]
+    },
+    "test": {
+      "include": ["supabase/functions/**/*.test.ts"],
+      "exclude": ["node_modules"]
+    },
+    "nodeModulesDir": "auto"
+  }

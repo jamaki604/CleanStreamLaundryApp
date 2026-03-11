@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get_it/get_it.dart';
 
@@ -9,6 +10,7 @@ class StripeService implements PaymentService {
 
   final _stripeInstance = GetIt.instance<Stripe>();
 
+  @override
   Future<void> makePayment(double amount) async {
     try {
       String? paymentIntentClientSecret = await createPaymentIntent(
@@ -22,6 +24,28 @@ class StripeService implements PaymentService {
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: paymentIntentClientSecret,
           merchantDisplayName: "Clean Stream Laundry Solutions",
+          appearance: PaymentSheetAppearance(
+            colors: PaymentSheetAppearanceColors(
+              primary: Color(0xFF2073A9),
+              background: CupertinoColors.systemBackground,
+              componentBackground: CupertinoColors.secondarySystemBackground,
+              componentBorder: CupertinoColors.separator,
+              componentText: CupertinoColors.label,
+              placeholderText: CupertinoColors.separator
+            ),
+            shapes: const PaymentSheetShape(borderRadius: 20),
+            primaryButton: PaymentSheetPrimaryButtonAppearance(
+              colors: PaymentSheetPrimaryButtonTheme(
+                light: PaymentSheetPrimaryButtonThemeColors(
+                  background: Color(0xFF2073A9),
+                  text: CupertinoColors.white,
+                ),
+              ),
+              shapes: const PaymentSheetPrimaryButtonShape(blurRadius: 20),
+            ),
+          ),
+          applePay: const PaymentSheetApplePay(merchantCountryCode: 'US'),
+          googlePay: const PaymentSheetGooglePay(merchantCountryCode: 'US'),
         ),
       );
       await _stripeInstance.presentPaymentSheet();
@@ -53,8 +77,7 @@ class StripeService implements PaymentService {
   }
 
   @protected
-  String convertDollarsToCents(double amount) {
-    final calculatedAmount = (amount * 100).toInt();
-    return calculatedAmount.toString();
+  int convertDollarsToCents(double amount) {
+    return (amount * 100).toInt();
   }
 }

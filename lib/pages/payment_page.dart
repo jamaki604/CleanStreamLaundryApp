@@ -331,6 +331,13 @@ class _PaymentPageState extends State<PaymentPage> {
     );
     Navigator.of(context, rootNavigator: true).pop();
 
+    await transactionService.recordTransaction(
+      amount: _price!,
+      description:
+      "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
+      type: "laundry",
+    );
+
     if (deviceAuthorized) {
       makeNotification(_machineName.toString());
       setState(() {
@@ -342,18 +349,11 @@ class _PaymentPageState extends State<PaymentPage> {
         message: "Machine $_machineName is now active.",
         isSuccess: true,
       );
-
-      await transactionService.recordTransaction(
-        amount: _price!,
-        description:
-        "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
-        type: "laundry",
-      );
     } else {
       statusDialog(
         context,
         title: "Machine Error",
-        message: "payment succeeded but machine did not wake up.",
+        message: "Payment succeeded but machine did not wake up. Please contact support",
         isSuccess: false,
       );
     }
