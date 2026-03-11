@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
-import 'package:clean_stream_laundry_app/widgets/large_button.dart';
+import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
 import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,7 +52,7 @@ void main() {
     await tester.pumpWidget(createRouterTestApp());
     await tester.pumpAndSettle();
 
-    final qrButton = find.widgetWithText(LargeButton, "Scan QR code");
+    final qrButton = find.widgetWithText(QRButton, "Scan QR code");
     expect(qrButton, findsOneWidget);
 
     await tester.tap(qrButton);
@@ -71,7 +71,7 @@ void main() {
     await tester.pumpWidget(createStartPageTestApp(mockUnlocker));
     await tester.pump();
 
-    final unlockButton = find.widgetWithText(LargeButton, "Unlock Door");
+    final unlockButton = find.widgetWithText(QRButton, "Unlock Door");
     await tester.ensureVisible(unlockButton);
     await tester.pump();
 
@@ -93,7 +93,7 @@ void main() {
         await tester.pumpWidget(createStartPageTestApp(mockUnlocker));
         await tester.pump();
 
-        final unlockButton = find.widgetWithText(LargeButton, "Unlock Door");
+        final unlockButton = find.widgetWithText(QRButton, "Unlock Door");
         await tester.ensureVisible(unlockButton);
         await tester.pump();
 
@@ -112,7 +112,7 @@ void main() {
     await tester.pumpWidget(createStartPageTestApp(mockUnlocker));
     await tester.pump();
 
-    final unlockButton = find.widgetWithText(LargeButton, "Unlock Door");
+    final unlockButton = find.widgetWithText(QRButton, "Unlock Door");
     await tester.ensureVisible(unlockButton);
     await tester.pump();
 

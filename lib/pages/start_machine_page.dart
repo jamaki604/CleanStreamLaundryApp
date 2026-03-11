@@ -92,7 +92,7 @@ class StartPage extends StatelessWidget {
 
                 SizedBox(
                   height: 160,
-                  child: LargeButton(
+                  child: QRButton(
                     headLineText: "Unlock Door",
                     descriptionText: "Unlock doors after hours",
                     icon: Icons.lock_open_rounded,
