@@ -2,16 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class NavBar extends StatelessWidget {
+  static const List<_NavDestination> _destinations = [
+    _NavDestination(
+      route: '/homePage',
+      label: 'Home',
+      icon: Icons.home,
+      routePrefixes: ['/homePage'],
+    ),
+    _NavDestination(
+      route: '/startPage',
+      label: 'Start',
+      icon: Icons.local_laundry_service_sharp,
+      routePrefixes: ['/start', '/startPage'],
+    ),
+    _NavDestination(
+      route: '/loyalty',
+      label: 'Wallet',
+      icon: Icons.wallet,
+      routePrefixes: ['/loyalty'],
+    ),
+    _NavDestination(
+      route: '/settings',
+      label: 'Settings',
+      icon: Icons.settings,
+      routePrefixes: ['/settings', '/monthlyTransactionHistory', '/refundPage'],
+    ),
+  ];
 
-  const NavBar({super.key,});
+  const NavBar({super.key});
 
   int _getIndex(String location) {
-    if (location.startsWith('/homePage')) return 0;
-    if (location.startsWith('/start')) return 1;
-    if (location.startsWith('/loyalty')) return 2;
-    if (location.startsWith('/settings')) return 3;
-    if (location.startsWith('/monthlyTransactionHistory')) return 3;
-    if (location.startsWith('/refundPage')) return 3;
+    for (var i = 0; i < _destinations.length; i++) {
+      final destination = _destinations[i];
+      if (destination.routePrefixes.any(location.startsWith)) {
+        return i;
+      }
+    }
     return 0;
   }
 
@@ -20,35 +46,42 @@ class NavBar extends StatelessWidget {
     final router = GoRouter.of(context);
     final location = router.routeInformationProvider.value.uri.toString();
     final currentIndex = _getIndex(location);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      selectedItemColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: colorScheme.surface,
+      selectedItemColor: colorScheme.primary,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
       onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go("/homePage");
-            break;
-          case 1:
-            context.go("/startPage");
-            break;
-          case 2:
-            context.go("/loyalty");
-            break;
-          case 3:
-            context.go("/settings");
-            break;
+        final route = _destinations[index].route;
+        if (!location.startsWith(route)) {
+          context.go(route);
         }
       },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.local_laundry_service_sharp), label: 'Start'),
-        BottomNavigationBarItem(icon: Icon(Icons.wallet), label: 'Wallet'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
+      items: _destinations
+          .map(
+            (destination) => BottomNavigationBarItem(
+              icon: Icon(destination.icon),
+              label: destination.label,
+            ),
+          )
+          .toList(),
     );
   }
+}
+
+class _NavDestination {
+  final String route;
+  final String label;
+  final IconData icon;
+  final List<String> routePrefixes;
+
+  const _NavDestination({
+    required this.route,
+    required this.label,
+    required this.icon,
+    required this.routePrefixes,
+  });
 }
