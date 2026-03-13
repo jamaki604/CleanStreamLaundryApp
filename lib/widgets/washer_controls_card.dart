@@ -15,7 +15,7 @@ class WasherControlsCard extends StatefulWidget {
 }
 
 class _WasherControlsCardState extends State<WasherControlsCard> {
-  String? selectedCycle = "Cold Normal";
+  String? selectedCycle;
 
   @override
   Widget build(BuildContext context) {

@@ -33,8 +33,8 @@ class _PaymentPageState extends State<PaymentPage> {
   double? _userBalance;
   bool _isLoading = true;
 
+  double _basePrice = 0;
   double _addedWasherCost = 0;
-  double _baseWasherPrice = 0;
   int _dryerMinutes = 5;
 
   final machineService = GetIt.instance<MachineService>();
@@ -65,21 +65,11 @@ class _PaymentPageState extends State<PaymentPage> {
 
     if (data != null && balance != null) {
       final name = data['Name'] as String?;
-      final isThisDryer =
-          name != null && name.toLowerCase().contains('dryer');
-      final isThisWasher =
-          name != null && name.toLowerCase().contains('washer');
-          _baseWasherPrice = (data['Price'] as num).toDouble();
+      _basePrice = (data['Price'] as num).toDouble();
 
       setState(() {
         _userBalance = (balance['balance'] as num).toDouble();
         _machineName = name;
-        _price = isThisDryer
-            ? (_dryerMinutes / 5) * 0.25
-            : (data['Price'] as num).toDouble();
-        _price = isThisWasher
-            ? (data['Price'] as num).toDouble()
-            : (data['Price'] as num).toDouble();
         _isLoading = false;
       });
     } else {
@@ -102,7 +92,7 @@ class _PaymentPageState extends State<PaymentPage> {
   void _onWasherCycleChanged(double addedCost) {
     setState(() {
       _addedWasherCost = addedCost;
-      _price = _baseWasherPrice + _addedWasherCost;
+      _price = _basePrice + _addedWasherCost;
     });
   }
 
