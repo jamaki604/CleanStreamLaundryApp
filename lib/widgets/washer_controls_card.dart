@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 
 class WasherControlsCard extends StatefulWidget {
-  const WasherControlsCard({super.key});
+  final void Function(double addedCost) onCycleChanged;
+
+  WasherControlsCard({
+    super.key,
+    required this.onCycleChanged,
+  });
+
 
   @override
   State<WasherControlsCard> createState() => _WasherControlsCardState();
@@ -10,7 +16,6 @@ class WasherControlsCard extends StatefulWidget {
 
 class _WasherControlsCardState extends State<WasherControlsCard> {
   String? selectedCycle = "Cold Normal";
-  double addedCost = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +56,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Hot Heavy",
                         onTap: () {
                           setState(() => selectedCycle = "Hot Heavy");
-                          addedCost = .5;
+                          widget.onCycleChanged(0.5);
                         },
                       ),
                     ),
@@ -62,7 +67,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Hot Normal",
                         onTap: () {
                           setState(() => selectedCycle = "Hot Normal");
-                          addedCost = .25;
+                          widget.onCycleChanged(0.25);
                         },
                       ),
                     ),
@@ -77,7 +82,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Cold Heavy",
                         onTap: () {
                           setState(() => selectedCycle = "Cold Heavy");
-                          addedCost = .25;
+                          widget.onCycleChanged(0.25);
                         },
                       ),
                     ),
@@ -88,7 +93,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Cold Normal",
                         onTap: () {
                           setState(() => selectedCycle = "Cold Normal");
-                          addedCost = 0;
+                          widget.onCycleChanged(0);
                         },
                       ),
                     ),
