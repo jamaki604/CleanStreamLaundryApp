@@ -215,9 +215,9 @@ class HomePageState extends State<HomePage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
                       height: 400,
-                      width: 400,
+                      width: 300,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.grey.shade400,
                           width: 1,
@@ -245,7 +245,7 @@ class HomePageState extends State<HomePage> {
                   double initialZoom = 7.2;
 
                   return Container(
-                    height: 400,
+                    height: 300,
                     width: 400,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
@@ -278,7 +278,7 @@ class HomePageState extends State<HomePage> {
                 margin: EdgeInsets.only(top: 20),
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Colors.grey.shade400, width: 1),
                   color: Theme.of(context).colorScheme.cardSecondary,
                 ),
@@ -416,7 +416,7 @@ class HomePageState extends State<HomePage> {
                       width: 520,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(14),
                         color: Colors.transparent,
                       ),
                       child: Column(
