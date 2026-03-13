@@ -147,7 +147,7 @@ class HomePageState extends State<HomePage> {
                 children: [
                   Flexible(
                     child: Text(
-                      "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                      'Current balance: \$${balance?["balance"] != null ? (balance!["balance"] as num).toStringAsFixed(2) : 'Loading...'}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
