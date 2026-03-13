@@ -127,7 +127,7 @@ class HomePageState extends State<HomePage> {
     return BasePage(
       key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
