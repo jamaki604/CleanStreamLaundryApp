@@ -253,7 +253,7 @@ class HomePageState extends State<HomePage> {
                     height: 300,
                     width: 400,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.grey.shade400, width: 1),
                     ),
                     clipBehavior: Clip.antiAlias,

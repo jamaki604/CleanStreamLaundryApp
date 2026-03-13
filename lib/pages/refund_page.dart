@@ -123,7 +123,7 @@ class RefundPageState extends State<RefundPage> {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: colorScheme.primary.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: colorScheme.primary.withOpacity(0.2),
                   ),
@@ -134,7 +134,7 @@ class RefundPageState extends State<RefundPage> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: Icon(
                         Icons.receipt_long_rounded,
@@ -176,7 +176,7 @@ class RefundPageState extends State<RefundPage> {
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -289,7 +289,7 @@ class RefundPageState extends State<RefundPage> {
                         : Colors.grey,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     elevation: isFormValid() ? 2 : 0,
                   ),
