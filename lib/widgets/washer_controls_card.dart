@@ -10,6 +10,7 @@ class WasherControlsCard extends StatefulWidget {
 
 class _WasherControlsCardState extends State<WasherControlsCard> {
   String? selectedCycle = "Cold Normal";
+  double addedCost = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +51,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Hot Heavy",
                         onTap: () {
                           setState(() => selectedCycle = "Hot Heavy");
+                          addedCost = .5;
                         },
                       ),
                     ),
@@ -60,6 +62,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Hot Normal",
                         onTap: () {
                           setState(() => selectedCycle = "Hot Normal");
+                          addedCost = .25;
                         },
                       ),
                     ),
@@ -74,6 +77,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Cold Heavy",
                         onTap: () {
                           setState(() => selectedCycle = "Cold Heavy");
+                          addedCost = .25;
                         },
                       ),
                     ),
@@ -84,6 +88,7 @@ class _WasherControlsCardState extends State<WasherControlsCard> {
                         selected: selectedCycle == "Cold Normal",
                         onTap: () {
                           setState(() => selectedCycle = "Cold Normal");
+                          addedCost = 0;
                         },
                       ),
                     ),
