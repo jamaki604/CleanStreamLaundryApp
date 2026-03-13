@@ -693,5 +693,40 @@ void main() {
         },
       ),
     ).called(1);
+
+  });
+
+  testWidgets('disclosure widget displays correctly', (tester) async {
+    when(
+          () => mockTransactionService.getRefundableTransactionsForUser(),
+    ).thenAnswer((_) async => (transactions: <String>[], ids: <int>[]));
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('Refund requests are reviewed within 3–5 business days.'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Approved refunds will be returned to your loyalty card balance.'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('We reserve the right to deny requests that do not meet our refund policy criteria.'),
+      findsOneWidget,
+    );
+
+    expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
+
+    final container = tester.widget<Container>(
+      find.ancestor(
+        of: find.byIcon(Icons.info_outline_rounded),
+        matching: find.byType(Container),
+      ).first,
+    );
+    final decoration = container.decoration as BoxDecoration;
+    expect(decoration.color, const Color(0xFFFFFDE7).withOpacity(0.8));
+    expect(decoration.borderRadius, BorderRadius.circular(14));
   });
 }
