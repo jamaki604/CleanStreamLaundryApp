@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
@@ -128,7 +127,7 @@ class HomePageState extends State<HomePage> {
     return BasePage(
       key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -185,7 +184,7 @@ class HomePageState extends State<HomePage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            "Find Nearest Location",
+                            "Nearest Location",
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -251,7 +250,7 @@ class HomePageState extends State<HomePage> {
 
                   return Container(
                     height: 300,
-                    width: 400,
+                    width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.grey.shade400, width: 1),
@@ -268,9 +267,9 @@ class HomePageState extends State<HomePage> {
                       children: [
                         TileLayer(
                           urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                           userAgentPackageName:
-                              'https://cleanstreamlaundry.com/',
+                          'https://cleanstreamlaundry.com/',
                           tileProvider: NetworkTileProvider(),
                         ),
                         MarkerLayer(markers: markers),
@@ -421,7 +420,7 @@ class HomePageState extends State<HomePage> {
                     final idleDryers = snapshot.data![3];
 
                     return Container(
-                      width: 520,
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
                         borderRadius: BorderRadius.circular(14),
@@ -463,7 +462,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           child: FittedBox(
@@ -499,7 +498,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           child: FittedBox(
