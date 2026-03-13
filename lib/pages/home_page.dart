@@ -127,7 +127,7 @@ class HomePageState extends State<HomePage> {
     return BasePage(
       key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +174,7 @@ class HomePageState extends State<HomePage> {
                         _zoomToLocation(address);
                       }
                     },
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(14),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -218,8 +218,8 @@ class HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
-                      height: 400,
-                      width: 300,
+                      height: 300,
+                      width: 400,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
@@ -279,7 +279,7 @@ class HomePageState extends State<HomePage> {
                 },
               ),
               Container(
-                margin: EdgeInsets.only(top: 20),
+                margin: EdgeInsets.only(top: 12),
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
@@ -391,7 +391,7 @@ class HomePageState extends State<HomePage> {
                 ),
               ),
 
-              SizedBox(height: 18),
+              SizedBox(height: 14),
 
               if (locationSelected)
                 FutureBuilder(
@@ -533,6 +533,9 @@ class HomePageState extends State<HomePage> {
                     );
                   },
                 ),
+
+              SizedBox(height: 12,)
+
             ],
           ),
         ),
