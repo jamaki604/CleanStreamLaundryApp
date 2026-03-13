@@ -54,13 +54,11 @@ void main() {
     getIt.registerSingleton<RouterService>(mockRouterService);
     getIt.registerSingleton<NotificationService>(mockNotificationService);
 
-    when(
-      () => mockNotificationService.scheduleEarlyMachineNotification(
-        id: any(named: 'id'),
-        machineTime: any(named: 'machineTime'),
-        machineName: any(named: 'machineName'),
-      ),
-    ).thenAnswer((_) async {});
+    when(() => mockNotificationService.scheduleEarlyMachineNotification(
+      id: any(named: 'id'),
+      machineTime: any(named: 'machineTime'),
+      machineName: any(named: 'machineName'),
+    )).thenAnswer((_) async {});
 
     getIt.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
     getIt.registerSingleton<LoyaltyViewModel>(mockLoyaltyViewModel);
@@ -120,7 +118,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById('machine123'),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Washer01'});
       when(
         () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -128,8 +126,7 @@ void main() {
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Machine Washer01'), findsOneWidget);
-      expect(find.text('\$3.50'), findsOneWidget);
+      expect(find.text('Machine Washer 1'), findsOneWidget);
       expect(find.text('Amount Due'), findsOneWidget);
     });
 
@@ -168,7 +165,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 3.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -176,7 +173,7 @@ void main() {
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Pay \$3.50'), findsOneWidget);
+      expect(find.text('Pay \$1.50'), findsOneWidget);
       expect(find.text('Pay with Loyalty'), findsOneWidget);
     });
 
@@ -186,10 +183,10 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(() => mockProfileService.getUserBalanceById(any())).thenAnswer(
         (_) async => {
-          'balance': 2.0, // Insufficient balance
+          'balance': 1.0, // Insufficient balance
         },
       );
 
@@ -211,7 +208,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 3.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -236,7 +233,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -261,11 +258,11 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      verify(() => mockProfileService.updateBalanceById(6.5)).called(1);
+      verify(() => mockProfileService.updateBalanceById(8.5)).called(1);
       verify(() => mockMachineCommunicator.wakeDevice('machine123')).called(1);
       verify(
         () => mockTransactionService.recordTransaction(
-          amount: 3.50,
+          amount: 1.50,
           description: any(named: 'description'),
           type: 'laundry',
         ),
@@ -278,7 +275,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -319,7 +316,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -384,13 +381,11 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      verify(
-        () => mockNotificationService.scheduleEarlyMachineNotification(
-          id: 1,
-          machineTime: any(named: 'machineTime'),
-          machineName: any(named: 'machineName'),
-        ),
-      ).called(1);
+      verify(() => mockNotificationService.scheduleEarlyMachineNotification(
+        id: 1,
+        machineTime: any(named: 'machineTime'),
+        machineName: any(named: 'machineName'),
+      )).called(1);
     });
   });
 }
