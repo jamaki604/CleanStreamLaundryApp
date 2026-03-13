@@ -345,8 +345,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Machine Dryer05'), findsOneWidget);
-      expect(find.text('\$2.75'), findsOneWidget);
-      expect(find.text('Pay \$2.75'), findsOneWidget);
+      expect(find.text('\$1.50'), findsOneWidget);
+      expect(find.text('Pay \$1.50'), findsOneWidget);
     });
 
     testWidgets('sends notification after successful loyalty payment', (

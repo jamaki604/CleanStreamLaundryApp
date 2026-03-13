@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
