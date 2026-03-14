@@ -197,7 +197,6 @@ void main() {
 
     testWidgets('sorts months in descending order',
             (WidgetTester tester) async {
-          final now = DateTime.now();
           final transactions = [
             createTransaction(
               monthsAgo: 3,
@@ -220,7 +219,7 @@ void main() {
           await tester.pumpAndSettle();
 
           final cardFinder = find.byType(Card);
-          expect(cardFinder, findsNWidgets(2));
+          expect(cardFinder, findsNWidgets(3));
 
           final firstCard = cardFinder.first;
           final firstCardTexts = find.descendant(

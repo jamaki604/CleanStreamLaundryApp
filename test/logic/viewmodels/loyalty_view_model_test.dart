@@ -47,10 +47,10 @@ void main() {
       // Arrange
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockProfileService.getUserBalanceById('user123'),
+            () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 100.0, 'full_name': 'Jane Doe'});
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       // Act
@@ -72,10 +72,10 @@ void main() {
       // Arrange
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockProfileService.getUserBalanceById('user123'),
+            () => mockProfileService.getUserBalanceById('user123'),
       ).thenThrow(Exception('Network error'));
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       // Act
@@ -102,15 +102,14 @@ void main() {
       verifyNever(() => mockProfileService.getUserBalanceById(any()));
     });
 
-
     test('should default to 0.0 balance when null', () async {
       // Arrange
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockProfileService.getUserBalanceById('user123'),
+            () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': null, 'full_name': 'Jane Doe'});
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       // Act
@@ -125,10 +124,10 @@ void main() {
       // Arrange
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockProfileService.getUserBalanceById('user123'),
+            () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 100.0, 'full_name': null});
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       // Act
@@ -143,7 +142,7 @@ void main() {
     test('should toggle showPastTransactions from false to true', () async {
       // Arrange
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       expect(viewModel.showPastTransactions, false);
@@ -159,7 +158,7 @@ void main() {
     test('should toggle showPastTransactions from true to false', () async {
       // Arrange
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       viewModel.showPastTransactions = true;
@@ -176,7 +175,7 @@ void main() {
     test('should call transaction service', () async {
       // Arrange
       when(
-        () => mockTransactionService.getTransactionsForUser(),
+            () => mockTransactionService.getTransactionsForUser(),
       ).thenAnswer((_) async => []);
 
       // Act
@@ -222,33 +221,39 @@ void main() {
   });
 
   group('loadCard', () {
-    test('loadCard should update balance and fetch transactions on success', () async {
-      // Arrange
-      when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+    test('loadCard should update balance and fetch transactions on success',
+            () async {
+          // Arrange
+          when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
 
-      viewModel.userBalance = 20.0;
+          viewModel.userBalance = 20.0;
 
-      when(() => mockPaymentProcessor.processPayment(
-        10.0,
-        'Loyalty Card',
-      )).thenAnswer((_) async => PaymentResult.success);
+          when(() => mockPaymentProcessor.processPayment(
+            10.0,
+            'Loyalty Card',
+          )).thenAnswer((_) async => PaymentResult.success);
 
-      when(() => mockProfileService.updateBalanceById('user123', 30))
-          .thenAnswer((_) async => Future.value());
+          when(() => mockProfileService.updateBalanceById('user123', 30))
+              .thenAnswer((_) async => Future.value());
 
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => []);
+          // Stub for checkRewards -> updateRewardsById called internally
+          when(() => mockProfileService.updateRewardsById(any(), any()))
+              .thenAnswer((_) async => Future.value());
 
-      // Act
-      final result = await viewModel.loadCard(10.0);
+          when(() => mockTransactionService.getTransactionsForUser())
+              .thenAnswer((_) async => []);
 
-      // Assert
-      expect(result, PaymentResult.success);
-      expect(viewModel.userBalance, 30);
+          // Act
+          final result = await viewModel.loadCard(10.0);
 
-      verify(() => mockProfileService.updateBalanceById('user123', 30)).called(1);
-      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
-    });
+          // Assert
+          expect(result, PaymentResult.success);
+          expect(viewModel.userBalance, 30);
+
+          verify(() => mockProfileService.updateBalanceById('user123', 30))
+              .called(1);
+          verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+        });
 
     test('loadCard should not update balance on failed payment', () async {
       // Arrange
@@ -270,7 +275,5 @@ void main() {
 
       verifyNever(() => mockProfileService.updateBalanceById(any(), any()));
     });
-
-
   });
 }

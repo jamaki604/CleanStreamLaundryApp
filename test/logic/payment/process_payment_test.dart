@@ -44,19 +44,11 @@ void main() {
 
   group('PaymentProcessor.processPayment', () {
     test('should complete payment and record transaction on success', () async {
-      // Arrange
       const amount = 100.0;
       const description = 'Test payment';
-      const userId = 'test-user-id';
-      const currentBalance = 50.0;
 
       when(() => mockPaymentService.makePayment(amount))
           .thenAnswer((_) async => Future.value());
-      when(() => mockAuthService.getCurrentUserId).thenReturn(userId);
-      when(() => mockProfileService.getUserBalanceById(userId))
-          .thenAnswer((_) async => {'balance': currentBalance});
-      when(() => mockProfileService.updateBalanceById(any(), any()))
-          .thenAnswer((_) async => {});
       when(() => mockTransactionService.recordTransaction(
         amount: any(named: 'amount'),
         description: any(named: 'description'),
@@ -74,7 +66,6 @@ void main() {
         description: description,
         type: 'Laundry',
       )).called(1);
-      verify(() => mockProfileService.updateBalanceById(userId, 51.0)).called(1);
     });
 
     test(

@@ -271,21 +271,31 @@ void main() {
     });
 
     testWidgets('handles machine wake failure in loyalty payment', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,
+        ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockMachineService.getMachineById(any()),
+            () => mockMachineService.getMachineById(any()),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-        () => mockProfileService.getUserBalanceById(any()),
+            () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-        () => mockProfileService.updateBalanceById(any(), any()),
+            () => mockProfileService.updateBalanceById(any(), any()),
       ).thenAnswer((_) async => {});
       when(
-        () => mockMachineCommunicator.wakeDevice(any()),
+            () => mockMachineCommunicator.wakeDevice(any()),
       ).thenAnswer((_) async => false);
+
+      // ADD THIS: mocktail returns null by default for unstubbed Future<void> methods,
+      // which causes a TypeError. Stub it even though it should never be called.
+      when(
+            () => mockTransactionService.recordTransaction(
+          amount: any(named: 'amount'),
+          description: any(named: 'description'),
+          type: any(named: 'type'),
+        ),
+      ).thenAnswer((_) async {});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
@@ -296,7 +306,7 @@ void main() {
 
       expect(find.text('Machine Error'), findsWidgets);
       verifyNever(
-        () => mockTransactionService.recordTransaction(
+            () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),
           type: any(named: 'type'),
