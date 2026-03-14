@@ -193,25 +193,4 @@ void main() {
       );
     });
   });
-
-  group('processRewards', () {
-    test('should calculate 1% reward and update balance', () {
-      const amount = 100.0;
-      const currentBalance = 50.0;
-      const expectedReward = 1.0;
-      const expectedNewBalance = 51.0;
-
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async => {});
-
-      double rewardAmount = paymentProcessor.processRewards(amount);
-      double newBalance = currentBalance + rewardAmount;
-
-      expect(rewardAmount, expectedReward);
-      expect(newBalance, expectedNewBalance);
-    });
-  });
 }

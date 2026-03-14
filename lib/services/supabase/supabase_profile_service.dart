@@ -36,7 +36,7 @@ class SupabaseProfileService extends ProfileService {
     try {
       final response = await _client
           .from('profiles')
-          .select("full_name, balance")
+          .select("full_name, balance, reward_tracker")
           .eq('id', userId)
           .single();
       return response;
@@ -71,6 +71,20 @@ class SupabaseProfileService extends ProfileService {
       await _client
           .from("profiles")
           .update({"balance": balance})
+          .eq("id", userId);
+    } on PostgrestException {
+      return;
+    } catch (e) {
+      return;
+    }
+  }
+
+  @override
+  Future<void> updateRewardsById(String userId, double amount) async {
+    try {
+      await _client
+          .from("profiles")
+          .update({"reward_tracker": amount})
           .eq("id", userId);
     } on PostgrestException {
       return;

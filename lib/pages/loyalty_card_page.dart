@@ -58,7 +58,16 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             color: Theme.of(context).colorScheme.fontSecondary,
           ),
         ),
-        const SizedBox(height: 20),
+        Text(
+          '\$${(20 - (viewModel.userReward ?? 0)).toStringAsFixed(2)} until next reward',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.fontSecondary,
+          ),
+        ),
+        const SizedBox(height: 15),
         ElevatedButton(
           onPressed: () => _loadCard(),
           style: ElevatedButton.styleFrom(

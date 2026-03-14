@@ -65,7 +65,7 @@ void main() {
       // Verify interactions
       verify(() => mockAuthService.getCurrentUserId).called(1);
       verify(() => mockProfileService.getUserBalanceById('user123')).called(1);
-      verify(() => mockTransactionService.getTransactionsForUser()).called(2);
+      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
     });
 
     test('should handle profile service error gracefully', () async {
@@ -219,39 +219,6 @@ void main() {
       // Assert
       expect(viewModel.recentTransactions.length, 1);
     });
-
-
-    test('fetchMonthlyRewards sums only recent reward transactions', () async {
-      // Arrange
-      final now = DateTime.now();
-      when(() => mockTransactionService.getTransactionsForUser()).thenAnswer(
-            (_) async => [
-          {
-            'created_at': now.toIso8601String(),
-            'type': 'Rewards',
-            'amount': 2.0,
-          },
-          {
-            'created_at': now.toIso8601String(),
-            'type': 'Rewards',
-            'amount': 3.0,
-          },
-          {
-            'created_at':
-            now.subtract(const Duration(days: 40)).toIso8601String(),
-            'type': 'Rewards',
-            'amount': 10.0,
-          },
-        ],
-      );
-
-      // Act
-      await viewModel.initialize();
-
-      // Assert
-      expect(viewModel.monthlyRewards, 5.0);
-    });
-
   });
 
   group('loadCard', () {
@@ -266,11 +233,7 @@ void main() {
         'Loyalty Card',
       )).thenAnswer((_) async => PaymentResult.success);
 
-      when(() => mockPaymentProcessor.processRewards(10.0))
-          .thenReturn(0.1);
-
-
-      when(() => mockProfileService.updateBalanceById('user123', 30.1))
+      when(() => mockProfileService.updateBalanceById('user123', 30))
           .thenAnswer((_) async => Future.value());
 
       when(() => mockTransactionService.getTransactionsForUser())
@@ -281,10 +244,9 @@ void main() {
 
       // Assert
       expect(result, PaymentResult.success);
-      expect(viewModel.userBalance, 30.1);
+      expect(viewModel.userBalance, 30);
 
-      verify(() => mockPaymentProcessor.processRewards(10.0)).called(1);
-      verify(() => mockProfileService.updateBalanceById('user123', 30.1)).called(1);
+      verify(() => mockProfileService.updateBalanceById('user123', 30)).called(1);
       verify(() => mockTransactionService.getTransactionsForUser()).called(1);
     });
 

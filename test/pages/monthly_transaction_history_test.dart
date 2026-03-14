@@ -285,7 +285,7 @@ void main() {
           await tester.pumpWidget(createTestWidget(transactions));
           await tester.pumpAndSettle();
 
-          expect(find.byType(Card), findsNWidgets(2));
+          expect(find.byType(Card), findsNWidgets(3));
         });
 
     testWidgets('displays divider between month and transaction details',

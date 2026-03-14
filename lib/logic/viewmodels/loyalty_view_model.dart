@@ -15,9 +15,9 @@ class LoyaltyViewModel extends ChangeNotifier {
   final _paymentProcessor = GetIt.instance<PaymentProcessor>();
 
   double? userBalance;
+  double? userReward;
   String? userName;
   String? errorMessage;
-  double? monthlyRewards;
   bool isLoading = true;
   bool showPastTransactions = false;
 
@@ -25,7 +25,7 @@ class LoyaltyViewModel extends ChangeNotifier {
 
   // Call once from loyalty page
   Future<void> initialize() async {
-    await Future.wait([_fetchBalance(), _fetchTransactions(), _fetchMonthlyRewards()]);
+    await Future.wait([_fetchBalance(), _fetchTransactions()]);
   }
 
   Future<void> _fetchBalance() async {
@@ -43,27 +43,13 @@ class LoyaltyViewModel extends ChangeNotifier {
 
       userBalance = (data?['balance'] as num?)?.toDouble() ?? 0.0;
       userName = data?['full_name'] ?? 'John Doe';
+      userReward = (data?["reward_tracker"] as num?)?.toDouble() ?? 0.0;
     } catch (_) {
       errorMessage = 'Failed to fetch balance';
     }
 
     isLoading = false;
     notifyListeners();
-  }
-
-  Future<void> _fetchMonthlyRewards() async {
-    final transactions = await _transactionService.getTransactionsForUser();
-    final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
-
-    final rewardTransactions = transactions.where((t) {
-      final createdAt = DateTime.parse(t['created_at'] as String);
-      final type = t['type'] as String?;
-      return createdAt.isAfter(thirtyDaysAgo) && type == 'Rewards';
-    });
-
-    monthlyRewards = rewardTransactions.fold<double>(
-      0.0, (sum, transaction) => sum + (transaction['amount'] as num).toDouble(),
-    );
   }
 
   Future<void> _fetchTransactions() async {
@@ -100,7 +86,8 @@ class LoyaltyViewModel extends ChangeNotifier {
     );
 
     if (result == PaymentResult.success) {
-      final newBalance = (userBalance ?? 0) + amount + _paymentProcessor.processRewards(amount);
+      amount = checkRewards(amount);
+      final newBalance = (userBalance ?? 0) + amount;
       await _profileService.updateBalanceById(userId!, newBalance);
       userBalance = newBalance;
       await _fetchTransactions();
@@ -112,5 +99,17 @@ class LoyaltyViewModel extends ChangeNotifier {
 
   Future<void> fetchTransactions() async {
     await _transactionService.getTransactionsForUser();
+  }
+
+  double checkRewards(double amount) {
+    double combined = (userReward ?? 0) + amount;
+    double remainder = combined % 20;
+    int rewardsEarned = combined ~/ 20;
+
+    if (remainder != (userReward ?? 0)) {
+      _profileService.updateRewardsById(_authService.getCurrentUserId!, remainder);
+    }
+
+    return amount + (rewardsEarned * 5);
   }
 }

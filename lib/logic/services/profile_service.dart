@@ -7,4 +7,5 @@ abstract class ProfileService {
   Future<void> updateName(String name);
   Future<int> getNotificationLeadTime();
   Future<void> setNotificationLeadTime(int value);
+  Future<void> updateRewardsById(String userId, double amount);
 }
