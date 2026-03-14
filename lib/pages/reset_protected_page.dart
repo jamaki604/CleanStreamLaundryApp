@@ -1,304 +1,305 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
-import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/parsing/password_parser.dart';
+
+import '../Logic/Theme/theme.dart';
 
 class ResetProtectedPage extends StatefulWidget {
-  final Uri? incomingUri;
-  const ResetProtectedPage({this.incomingUri, super.key});
+  const ResetProtectedPage({super.key});
 
   @override
   State<ResetProtectedPage> createState() => _ResetProtectedPageState();
 }
 
 class _ResetProtectedPageState extends State<ResetProtectedPage> {
+
+  final _passwordCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+
   final authService = GetIt.instance<AuthService>();
 
-  String? code;
-  bool loading = true;
-  bool valid = false;
-  String? lastReceivedUri;
-  Map<String, String>? lastParams;
-  final _pwController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
+  bool _isLoading = false;
+
+  var passwordText = "New Password";
+  var confirmText = "Confirm Password";
+  var iconColor;
+  var labelColor;
 
   @override
-  void initState() {
-    super.initState();
-    _initFromUri(widget.incomingUri);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    iconColor = Theme.of(context).colorScheme.primary;
+    labelColor = Theme.of(context).colorScheme.primary;
+
   }
 
-  Future<void> _initFromUri(Uri? uri) async {
+  void _changeColorsToRed(String reason) {
     setState(() {
-      loading = true;
-      valid = false;
+      passwordText = reason;
+      confirmText = reason;
+      iconColor = Colors.red;
+      labelColor = Colors.red;
     });
+  }
 
-    Uri effective = uri ?? Uri.base;
+  void _resetColors() {
+    setState(() {
+      passwordText = "New Password";
+      confirmText = "Confirm Password";
+      iconColor = Colors.blue;
+      labelColor = Colors.blue;
+    });
+  }
 
-    // Accept app links and in-app routes for reset-protected
-    final isResetUri =
-        (effective.scheme == 'clean-stream' &&
-            (effective.host == 'reset-protected' ||
-                effective.path.contains('reset-protected'))) ||
-        effective.path == '/reset-protected' ||
-        effective.path.contains('reset-protected');
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
 
-    if (!isResetUri) {
-      setState(() {
-        loading = false;
-        valid = false;
-      });
+  Future<void> _submit() async {
+    final password = _passwordCtrl.text.trim();
+    final confirm = _confirmCtrl.text.trim();
+
+    if (password.isEmpty || confirm.isEmpty) {
+      _showMessage("Please fill in all fields");
       return;
     }
 
-    // Merge query parameters and fragment parameters (Supabase may use fragment)
-    final Map<String, String> queryParams = effective.queryParameters;
-    final Map<String, String> fragmentParams = effective.fragment.isNotEmpty
-        ? Uri.splitQueryString(effective.fragment)
-        : {};
-
-    final params = {...queryParams, ...fragmentParams};
-
-    // Common code param names: code, oobCode
-    code = params['code'] ?? params['oobCode'];
-
-    if (code == null) {
-      setState(() {
-        loading = false;
-        valid = false;
-
-        // store raw values for on-screen debugging
-        lastReceivedUri = effective.toString();
-        lastParams = params;
-      });
+    if (password != confirm) {
+      _changeColorsToRed("Passwords don't match");
       return;
     }
+
+    final requirementError = PasswordParser.process(password);
+    if (requirementError != null) {
+      _changeColorsToRed(requirementError);
+      return;
+    }
+
+    setState(() => _isLoading = true);
 
     try {
-      final response = await authService.exchangeCodeForSession(code!);
-      if (response == AuthenticationResponses.success) {
-        setState(() {
-          valid = true;
-          loading = false;
-        });
-      } else {
-        setState(() {
-          valid = false;
-          loading = false;
-        });
-      }
+      await authService.updatePassword(password);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset successful')),
+      );
+
+      context.go("/login");
     } catch (e) {
-      setState(() {
-        valid = false;
-        loading = false;
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to reset password')),
+      );
+    } finally {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   void dispose() {
-    _pwController.dispose();
+    _passwordCtrl.dispose();
+    _confirmCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || code == null) return;
-    setState(() => loading = true);
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+    required bool obscure,
+    required VoidCallback toggle,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: labelColor),
 
-    try {
-      final response = await authService.updatePassword(
-        _pwController.text.trim(),
-      );
-      setState(() => loading = false);
-      if (response == AuthenticationResponses.success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Password reset successful')),
-          );
-          if (mounted) {
-            context.go('/login');
-          }
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to reset password')),
-          );
-        }
-      }
-    } catch (e) {
-      setState(() => loading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to reset password')),
-        );
-      }
-    }
-  }
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 16,
+      ),
 
-  String? _validatePw(String? v) {
-    if (v == null || v.isEmpty) return 'Please enter a password';
-    if (v.length < 8) return 'Password must be at least 8 characters';
-    return null;
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+        borderRadius: BorderRadius.circular(12),
+      ),
+
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.fontSecondary,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+
+      prefixIcon: Icon(icon, color: iconColor),
+
+      suffixIcon: IconButton(
+        icon: Icon(
+          obscure ? Icons.visibility_off : Icons.visibility,
+          color: Colors.blue,
+        ),
+        onPressed: toggle,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    if (loading) {
-      return Scaffold(
-        backgroundColor: scheme.surface,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 12),
-              if (lastReceivedUri != null)
-                Text(
-                  'Received: $lastReceivedUri',
-                  style: TextStyle(color: scheme.fontSecondary),
-                ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (!valid) {
-      return Scaffold(
-        backgroundColor: scheme.surface,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.lock_reset, size: 80, color: scheme.primary),
-              const SizedBox(height: 16),
-              Text(
-                'Invalid or expired reset link',
-                style: TextStyle(color: scheme.fontInverted),
-              ),
-              const SizedBox(height: 8),
-              if (lastReceivedUri != null)
-                Text(
-                  'Received: $lastReceivedUri',
-                  style: TextStyle(color: scheme.fontSecondary),
-                ),
-              if (lastParams != null) ...[
-                const SizedBox(height: 8),
-                Text('Params:', style: TextStyle(color: scheme.fontSecondary)),
-                for (final e in lastParams!.entries)
-                  Text(
-                    '${e.key}: ${e.value}',
-                    style: TextStyle(color: scheme.fontSecondary),
-                  ),
-              ],
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => context.go('/login'),
-                child: Text(
-                  'Back to Login',
-                  style: TextStyle(color: scheme.primary),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: scheme.surface,
-      appBar: AppBar(
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.fontInverted,
-        title: const Text('Reset Password'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 32),
-              Icon(Icons.lock_reset, size: 80, color: scheme.primary),
-              const SizedBox(height: 32),
-              Text(
-                'Set a new password',
-                style:
-                    Theme.of(context).textTheme.headlineSmall?.copyWith(
+      backgroundColor: theme.colorScheme.surface,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 20),
+
+                  // Title
+                  Text(
+                    "Reset Password",
+                    style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: scheme.fontInverted,
-                    ) ??
-                    TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: scheme.fontInverted,
                     ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Enter a new password for your account.',
-                style:
-                    Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: scheme.fontSecondary,
-                    ) ??
-                    TextStyle(color: scheme.fontSecondary),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-              TextFormField(
-                controller: _pwController,
-                obscureText: true,
-                style: TextStyle(color: scheme.fontInverted),
-                decoration: InputDecoration(
-                  labelText: 'New password',
-                  labelStyle: TextStyle(color: scheme.primary),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    textAlign: TextAlign.center,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: scheme.primary, width: 2.0),
-                    borderRadius: BorderRadius.circular(12),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "Enter your new password below",
+                    style: theme.textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: scheme.fontSecondary),
-                    borderRadius: BorderRadius.circular(12),
+
+                  const SizedBox(height: 30),
+
+                  /// Password requirements (same style as signup)
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _passwordCtrl,
+                    builder: (context, value, _) {
+                      final requirement = PasswordParser.process(value.text);
+
+                      if (requirement == null) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 10,
+                        ),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: Text(
+                          requirement,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  filled: true,
-                  fillColor: scheme.surface,
-                  prefixIcon: Icon(Icons.lock, color: scheme.primary),
-                ),
-                validator: _validatePw,
+
+                  /// Password field
+                  TextField(
+                    controller: _passwordCtrl,
+                    obscureText: _obscurePassword,
+                    decoration: _inputDecoration(
+                      label: passwordText,
+                      icon: Icons.lock,
+                      obscure: _obscurePassword,
+                      toggle: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
+                    onChanged: (_) {
+                      if (iconColor == Colors.red) _resetColors();
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Confirm field
+                  TextField(
+                    controller: _confirmCtrl,
+                    obscureText: _obscureConfirm,
+                    decoration: _inputDecoration(
+                      label: confirmText,
+                      icon: Icons.lock,
+                      obscure: _obscureConfirm,
+                      toggle: () {
+                        setState(() {
+                          _obscureConfirm = !_obscureConfirm;
+                        });
+                      },
+                    ),
+                    onChanged: (_) {
+                      if (_passwordCtrl.text != _confirmCtrl.text) {
+                        _changeColorsToRed("Passwords don't match");
+                      } else {
+                        _resetColors();
+                      }
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Button
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                          : const Text(
+                        "Reset Password",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: loading ? null : _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: scheme.primary,
-                  foregroundColor: scheme.onPrimary,
-                ),
-                child: loading
-                    ? const CircularProgressIndicator()
-                    : const Text('Set Password'),
-              ),
-              TextButton(
-                onPressed: loading ? null : () => context.go('/login'),
-                child: Text(
-                  'Back to Login',
-                  style: TextStyle(color: scheme.primary),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

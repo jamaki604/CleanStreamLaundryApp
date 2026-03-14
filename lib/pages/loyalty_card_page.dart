@@ -44,113 +44,43 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   Widget _buildContent(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          CreditCard(username: viewModel.userName ?? 'John Doe'),
-          const SizedBox(height: 50),
-          Text(
-            'Current Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
-            textAlign: TextAlign.center,
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        CreditCard(username: viewModel.userName ?? 'John Doe'),
+        const SizedBox(height: 25),
+        Text(
+          'Loyalty Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.fontSecondary,
+          ),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () => _loadCard(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            disabledBackgroundColor: Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 2,
+          ),
+          child: const Text(
+            "Load card",
             style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.fontSecondary,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          Text.rich(
-            TextSpan(
-              children: [
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  baseline: TextBaseline.alphabetic,
-                  child: Transform.translate(
-                    offset: const Offset(-1, -1),
-                    child: GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            title: Text(
-                              'Rewards Program',
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.fontSecondary,
-                              ),
-                            ),
-                            content: Text(
-                              'Earn 1% back on every purchase! Rewards are automatically added to your balance and can be used for future laundry services.',
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.fontSecondary,
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Got it'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 0.0),
-                        child: Icon(
-                          Icons.info_outline,
-                          size: 16,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.fontSecondary.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                TextSpan(
-                  text:
-                      'Rewards earned this month: \$${viewModel.monthlyRewards?.toStringAsFixed(2) ?? '0.00'}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.fontSecondary.withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () => _loadCard(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              disabledBackgroundColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              "Load card",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          _transactions(),
-        ],
-      ),
+        ),
+        const SizedBox(height: 15),
+        Expanded(child: _transactions()),
+      ],
     );
   }
 
@@ -194,34 +124,39 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             ],
           ),
           const SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: viewModel.recentTransactions.length,
-            itemBuilder: (context, index) {
-              final transaction = viewModel.recentTransactions[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 4.0,
-                  vertical: 6.0,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 4,
-                color: Theme.of(context).colorScheme.cardPrimary,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.receipt_long,
-                    color: Color(0xFF2073A9),
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: viewModel.recentTransactions.length,
+              itemBuilder: (context, index) {
+                final transaction = viewModel.recentTransactions[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 4.0,
+                    vertical: 6.0,
                   ),
-                  title: Text(
-                    transaction.toString(),
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-              );
-            },
+                  elevation: 4,
+                  color: Theme.of(context).colorScheme.cardPrimary,
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.receipt_long,
+                      color: Color(0xFF2073A9),
+                    ),
+                    title: Text(
+                      transaction.toString(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
