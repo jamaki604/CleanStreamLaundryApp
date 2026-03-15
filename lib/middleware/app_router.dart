@@ -1,6 +1,7 @@
 import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/pages/change_email_verification.dart';
 import 'package:clean_stream_laundry_app/pages/edit_profile_page.dart';
+import 'package:clean_stream_laundry_app/pages/verify_code_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
@@ -173,21 +174,33 @@ class RouterService {
       GoRoute(
         path: '/reset-protected',
         pageBuilder: (context, state) {
-          final uri = (state.extra as Uri?) ?? state.uri;
           return CustomTransitionPage(
             key: state.pageKey,
-            child: ResetProtectedPage(incomingUri: uri),
+            child: ResetProtectedPage(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
             transitionsBuilder: (_, _, _, child) => child,
           );
         },
       ),
+      GoRoute(
+        path: '/verify-code',
+        pageBuilder: (context, state) {
+          final email = state.extra as String;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: CodeVerificationPage(email: email),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            transitionsBuilder: (_, _, _, child) => child,
+          );
+        },
+      )
     ],
     errorBuilder: (context, state) {
       final uri = state.uri;
       if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
-        return ResetProtectedPage(incomingUri: uri);
+        return ResetProtectedPage();
       }
       return const NotFoundScreen();
     },

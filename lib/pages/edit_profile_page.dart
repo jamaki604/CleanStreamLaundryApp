@@ -21,7 +21,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late final StreamSubscription _authSub;
 
   final TextEditingController _nameController = TextEditingController(text: '');
-  final TextEditingController _emailController = TextEditingController(text: '');
+  final TextEditingController _emailController = TextEditingController(
+    text: '',
+  );
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
   final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
@@ -196,7 +198,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: Theme.of(context).colorScheme.primaryGradient,
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -216,290 +223,318 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: _isLoading
           ? Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      )
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
           : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Name Section
-                _buildSectionHeader('Full Name'),
-                const SizedBox(height: 12),
-
-                _buildInfoCard(
-                  label: 'Current',
-                  value: currentName.isNotEmpty ? currentName : 'Not set',
-                  icon: Icons.badge_outlined,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
                 ),
-
-                const SizedBox(height: 16),
-
-                TextFormField(
-                  controller: _nameController,
-                  enabled: !_isSaving,
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(36),
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'[a-zA-Z0-9 ]'),
-                    ),
-                  ],
-                  maxLength: 36,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.fontSecondary,
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'New Full Name',
-                    hintText: 'Enter your full name',
-                    hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.5),
-                    ),
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 14,
-                    ),
-                    counterStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.6),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.03),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.2),
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.person_outline,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Name cannot be empty';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 10),
-
-                // Email Section
-                _buildSectionHeader('Email Address'),
-                const SizedBox(height: 12),
-
-                _buildInfoCard(
-                  label: 'Current',
-                  value: currentEmail.isNotEmpty ? currentEmail : 'Not set',
-                  icon: Icons.email_outlined,
-                ),
-
-                const SizedBox(height: 16),
-
-                TextFormField(
-                  controller: _emailController,
-                  enabled: !_isSaving,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.fontSecondary,
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'New Email',
-                    hintText: 'Enter your email address',
-                    hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.5),
-                    ),
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 14,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.03),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.2),
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Email cannot be empty';
-                    }
-                    if (!value.trim().contains("@")) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Save Button
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: _isSaving ? null : _onSavePressed,
-                  child: _isSaving
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.check_circle_outline, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Save Changes',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Delete Account Section
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.red.withValues(alpha: 0.2),
-                      width: 1,
-                    ),
-                  ),
+                child: Form(
+                  key: _formKey,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            color: Colors.red,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Danger Zone',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      // Name Section
+                      _buildSectionHeader('Full Name'),
+                      const SizedBox(height: 12),
+
+                      _buildInfoCard(
+                        label: 'Current',
+                        value: currentName.isNotEmpty ? currentName : 'Not set',
+                        icon: Icons.badge_outlined,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      TextFormField(
+                        controller: _nameController,
+                        enabled: !_isSaving,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(36),
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z0-9 ]'),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Once you delete your account, there is no going back. Any loyalty points will be permanently lost.',
+                        maxLength: 36,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.7),
-                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.fontSecondary,
+                          fontSize: 16,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton(
-                        onPressed: _isSaving ? null : _deleteAccount,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.red, width: 1.5),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        decoration: InputDecoration(
+                          labelText: 'New Full Name',
+                          hintText: 'Enter your full name',
+                          hintStyle: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.fontSecondary.withValues(alpha: 0.5),
+                          ),
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                          counterStyle: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.fontSecondary.withValues(alpha: 0.6),
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.03),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.fontSecondary
+                                  .withValues(alpha: 0.2),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.person_outline,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
+                        textInputAction: TextInputAction.next,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Name cannot be empty';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // Email Section
+                      _buildSectionHeader('Email Address'),
+                      const SizedBox(height: 12),
+
+                      _buildInfoCard(
+                        label: 'Current',
+                        value: currentEmail.isNotEmpty
+                            ? currentEmail
+                            : 'Not set',
+                        icon: Icons.email_outlined,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      TextFormField(
+                        controller: _emailController,
+                        enabled: !_isSaving,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.fontSecondary,
+                          fontSize: 16,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'New Email',
+                          hintText: 'Enter your email address',
+                          hintStyle: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.fontSecondary.withValues(alpha: 0.5),
+                          ),
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 14,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.03),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.fontSecondary
+                                  .withValues(alpha: 0.2),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Email cannot be empty';
+                          }
+                          if (!value.trim().contains("@")) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Save Button
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: _isSaving ? null : _onSavePressed,
                         child: _isSaving
                             ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.red,
-                          ),
-                        )
-                            : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.delete_outline, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'Delete Account',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_circle_outline, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Save Changes',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      // Delete Account Section
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.red.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Danger Zone',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Once you delete your account, there is no going back. Any loyalty points will be permanently lost.',
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .fontSecondary
+                                    .withValues(alpha: 0.7),
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            OutlinedButton(
+                              onPressed: _isSaving ? null : _deleteAccount,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(
+                                  color: Colors.red,
+                                  width: 1.5,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.red,
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(Icons.delete_outline, size: 18),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Delete Account',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ],
                         ),
                       ),
+
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -531,11 +566,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: Theme.of(context).colorScheme.primary,
-            size: 20,
-          ),
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -545,7 +576,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(context).colorScheme.fontSecondary.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.fontSecondary.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -599,89 +632,97 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<bool> _confirmDeleteAccount() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Delete Account?',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontSecondary,
-                  fontWeight: FontWeight.bold,
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.red),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Delete Account?',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.fontSecondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
+              ],
+            ),
+            content: Text(
+              'Are you sure you want to delete your account? Any money on your loyalty card will be lost. This action cannot be undone.',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontSecondary,
               ),
             ),
-          ],
-        ),
-        content: Text(
-          'Are you sure you want to delete your account? Any money on your loyalty card will be lost. This action cannot be undone.',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.fontSecondary,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.fontSecondary,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Delete'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    ) ??
+        ) ??
         false;
   }
 
   Future<bool> _confirmSaveChanges() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Confirm Changes',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.fontSecondary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to save these changes to your profile?',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.fontSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
+            title: Text(
+              'Confirm Changes',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontSecondary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            child: const Text('Save'),
+            content: Text(
+              'Are you sure you want to save these changes to your profile?',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontSecondary,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.fontSecondary,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Save'),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ??
+        ) ??
         false;
   }
 }
