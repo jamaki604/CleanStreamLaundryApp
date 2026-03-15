@@ -18,6 +18,14 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final cardBackgroundColor = colorScheme.cardPrimary;
+    final cardTextColor =
+        ThemeData.estimateBrightnessForColor(cardBackgroundColor) ==
+            Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     final monthlySums = TransactionParser.getMonthlySums(widget.transactions);
     final sortedMonths = monthlySums.keys.toList()
       ..sort((a, b) {
@@ -50,7 +58,7 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
     Future<void> showYearPickerSheet() async {
       await showModalBottomSheet<void>(
         context: context,
-        backgroundColor: Theme.of(context).colorScheme.cardPrimary,
+        backgroundColor: cardBackgroundColor,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
@@ -64,19 +72,22 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
                   ListTile(
                     title: Text(
                       'Year: $selectedYear',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: cardTextColor,
+                      ),
                     ),
                   ),
                   const Divider(height: 1),
                   ...availableYears.map(
                     (year) => ListTile(
                       key: ValueKey('year-option-$year'),
-                      title: Text(year.toString()),
+                      title: Text(
+                        year.toString(),
+                        style: TextStyle(color: cardTextColor),
+                      ),
                       trailing: year == selectedYear
-                          ? Icon(
-                              Icons.check,
-                              color: Theme.of(context).colorScheme.primary,
-                            )
+                          ? Icon(Icons.check, color: colorScheme.primary)
                           : null,
                       onTap: () {
                         Navigator.of(sheetContext).pop();
@@ -110,22 +121,22 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
       return Theme(
         data: Theme.of(context).copyWith(
           scrollbarTheme: ScrollbarThemeData(
-            thumbColor: WidgetStateProperty.all(Colors.lightBlue),
+            thumbColor: WidgetStateProperty.all(colorScheme.primary),
             trackColor: WidgetStateProperty.all(Colors.transparent),
             thickness: WidgetStateProperty.all(8),
             radius: const Radius.circular(4),
           ),
         ),
         child: Scrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
-        interactive: true,
-        child: ListView.builder(
           controller: _scrollController,
-          padding: const EdgeInsets.all(16),
-          itemCount: visibleMonths.length,
-          itemBuilder: (context, index) {
-            final month = visibleMonths[index];
+          thumbVisibility: true,
+          interactive: true,
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(16),
+            itemCount: visibleMonths.length,
+            itemBuilder: (context, index) {
+              final month = visibleMonths[index];
               final data = monthlySums[month]!;
               final total =
                   data['directWasher']! +
@@ -139,7 +150,7 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
                   elevation: 2,
-                  color: Theme.of(context).colorScheme.cardPrimary,
+                  color: cardBackgroundColor,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -150,18 +161,18 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
                           children: [
                             Text(
                               month,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: cardTextColor,
                               ),
                             ),
                             Text(
                               '\$${total.toStringAsFixed(2)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: cardTextColor,
                               ),
                             ),
                           ],
@@ -170,31 +181,31 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
                         _buildTransactionRow(
                           'Direct Washer Payments',
                           data['directWasher']!,
-                          Colors.black,
+                          cardTextColor,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
                           'Loyalty Washer Payments',
                           data['loyaltyWasher']!,
-                          Theme.of(context).colorScheme.primary,
+                          colorScheme.primary,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
                           'Direct Dryer Payments',
                           data['directDryer']!,
-                          Colors.black,
+                          cardTextColor,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
                           'Loyalty Dryer Payments',
                           data['loyaltyDryer']!,
-                          Theme.of(context).colorScheme.primary,
+                          colorScheme.primary,
                         ),
                         const SizedBox(height: 8),
                         _buildTransactionRow(
                           'Loyalty Card Loads',
                           data['loyaltyCard']!,
-                          Colors.black,
+                          cardTextColor,
                         ),
                       ],
                     ),
@@ -210,16 +221,13 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).colorScheme.fontPrimary,
-          ),
+          icon: Icon(Icons.arrow_back, color: colorScheme.fontPrimary),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: colorScheme.primary,
         title: Text(
           'Monthly Transaction History',
-          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
+          style: TextStyle(color: colorScheme.fontPrimary),
         ),
         elevation: 2,
         centerTitle: true,
@@ -229,14 +237,11 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
             child: TextButton.icon(
               key: const ValueKey('year-filter-button'),
               onPressed: showYearPickerSheet,
-              icon: Icon(
-                Icons.arrow_drop_down,
-                color: Theme.of(context).colorScheme.fontPrimary,
-              ),
+              icon: Icon(Icons.arrow_drop_down, color: colorScheme.fontPrimary),
               label: Text(
                 'Year',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontPrimary,
+                  color: colorScheme.fontPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
