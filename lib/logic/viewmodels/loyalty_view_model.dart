@@ -110,6 +110,8 @@ class LoyaltyViewModel extends ChangeNotifier {
       _profileService.updateRewardsById(_authService.getCurrentUserId!, remainder);
     }
 
+    userReward = remainder;
+
     return amount + (rewardsEarned * 5);
   }
 }
