@@ -65,7 +65,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             backgroundColor: Colors.blue,
             disabledBackgroundColor: Colors.grey,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             elevation: 2,
           ),
@@ -137,7 +137,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     vertical: 6.0,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   elevation: 4,
                   color: Theme.of(context).colorScheme.cardPrimary,

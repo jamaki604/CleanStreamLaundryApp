@@ -122,4 +122,15 @@ void main() {
     verify(() => mockAuthService.updatePassword('Password123&')).called(1);
     expect(find.text('Failed to reset password'), findsWidgets);
   });
+
+  testWidgets('Verifies that the image is present', (tester) async {
+
+    await tester.pumpWidget(
+        createWidgetUnderTest()
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Image),findsOneWidget);
+  });
 }

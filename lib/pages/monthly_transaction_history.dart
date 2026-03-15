@@ -107,7 +107,7 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
     }
 
     Widget buildMonthList(List<String> visibleMonths) {
-      final ScrollController _scrollController = ScrollController();
+      final ScrollController scrollController = ScrollController();
 
       if (visibleMonths.isEmpty) {
         return const Center(
@@ -128,11 +128,11 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
           ),
         ),
         child: Scrollbar(
-          controller: _scrollController,
+          controller: scrollController,
           thumbVisibility: true,
           interactive: true,
           child: ListView.builder(
-            controller: _scrollController,
+            controller: scrollController,
             padding: const EdgeInsets.all(16),
             itemCount: visibleMonths.length,
             itemBuilder: (context, index) {
@@ -149,6 +149,9 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
               } else {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   elevation: 2,
                   color: cardBackgroundColor,
                   child: Padding(

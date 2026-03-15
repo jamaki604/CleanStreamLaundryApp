@@ -19,7 +19,7 @@ class CreditCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.cardPrimary,
         elevation: 10,
         margin: const EdgeInsets.symmetric(horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         child: Padding(
           padding: EdgeInsets.only(top: 10, bottom: 10),
           child: SizedBox(
