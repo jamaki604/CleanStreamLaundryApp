@@ -150,4 +150,20 @@ void main() {
     expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
   });
 
+  test("Tests that the logic was called correctly to update account rewards", () async {
+    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+    verify(() => supabaseMock.from("profiles")).called(1);
+    verify(() => queryBuilderMock.update({"reward_tracker": 10.50})).called(1);
+  });
+
+  test("Tests that updateRewardsById catches Postgrest exception", () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+  });
+
+  test("Tests that updateRewardsById catches unknown exception", () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+  });
+
 }
