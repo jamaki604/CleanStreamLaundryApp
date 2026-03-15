@@ -4,13 +4,21 @@ import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
-class MonthlyTransactionHistory extends StatelessWidget {
+class MonthlyTransactionHistory extends StatefulWidget {
   final List<Map<String, dynamic>> transactions;
   const MonthlyTransactionHistory({super.key, required this.transactions});
 
   @override
+  State<MonthlyTransactionHistory> createState() =>
+      _MonthlyTransactionHistoryState();
+}
+
+class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
+  int? _selectedYear;
+
+  @override
   Widget build(BuildContext context) {
-    final monthlySums = TransactionParser.getMonthlySums(transactions);
+    final monthlySums = TransactionParser.getMonthlySums(widget.transactions);
     final sortedMonths = monthlySums.keys.toList()
       ..sort((a, b) {
         final dateA = DateFormat('MMM yyyy').parse(a);
@@ -18,25 +26,74 @@ class MonthlyTransactionHistory extends StatelessWidget {
         return dateB.compareTo(dateA);
       });
 
-    final now = DateTime.now();
-    final currentYear = now.year;
-    final previousYear = currentYear - 1;
-    final twelveMonthCutoff = DateTime(now.year, now.month - 11, 1);
+    final availableYears =
+        sortedMonths
+            .map((month) => DateFormat('MMM yyyy').parse(month).year)
+            .toSet()
+            .toList()
+          ..sort((a, b) => b.compareTo(a));
 
-    final previousYearMonths = sortedMonths.where((month) {
+    if (availableYears.isEmpty) {
+      availableYears.add(DateTime.now().year);
+    }
+
+    final selectedYear =
+        (_selectedYear != null && availableYears.contains(_selectedYear))
+        ? _selectedYear!
+        : availableYears.first;
+
+    final filteredMonths = sortedMonths.where((month) {
       final date = DateFormat('MMM yyyy').parse(month);
-      return date.year == previousYear;
+      return date.year == selectedYear;
     }).toList();
 
-    final currentYearMonths = sortedMonths.where((month) {
-      final date = DateFormat('MMM yyyy').parse(month);
-      return date.year == currentYear;
-    }).toList();
-
-    final lastTwelveMonths = sortedMonths.where((month) {
-      final date = DateFormat('MMM yyyy').parse(month);
-      return !date.isBefore(twelveMonthCutoff);
-    }).toList();
+    Future<void> showYearPickerSheet() async {
+      await showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: Theme.of(context).colorScheme.cardPrimary,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (sheetContext) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: Text(
+                      'Year: $selectedYear',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ...availableYears.map(
+                    (year) => ListTile(
+                      key: ValueKey('year-option-$year'),
+                      title: Text(year.toString()),
+                      trailing: year == selectedYear
+                          ? Icon(
+                              Icons.check,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
+                          : null,
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        if (year == selectedYear) return;
+                        setState(() {
+                          _selectedYear = year;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
 
     Widget buildMonthList(List<String> visibleMonths) {
       final ScrollController _scrollController = ScrollController();
@@ -151,46 +208,44 @@ class MonthlyTransactionHistory extends StatelessWidget {
       );
     }
 
-    return DefaultTabController(
-      length: 3,
-      initialIndex: 1,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Theme.of(context).colorScheme.fontPrimary,
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.fontPrimary,
+          ),
+          onPressed: () => context.pop(),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Monthly Transaction History',
+          style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
+        ),
+        elevation: 2,
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              key: const ValueKey('year-filter-button'),
+              onPressed: showYearPickerSheet,
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Theme.of(context).colorScheme.fontPrimary,
+              ),
+              label: Text(
+                'Year',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            onPressed: () => context.pop(),
           ),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: Text(
-            'Monthly Transaction History',
-            style: TextStyle(color: Theme.of(context).colorScheme.fontPrimary),
-          ),
-          elevation: 2,
-          centerTitle: true,
-          bottom: TabBar(
-            labelColor: Theme.of(context).colorScheme.fontPrimary,
-            unselectedLabelColor: Theme.of(
-              context,
-            ).colorScheme.fontPrimary.withOpacity(0.7),
-            indicatorColor: Theme.of(context).colorScheme.fontPrimary,
-            tabs: [
-              Tab(text: 'Year $previousYear'),
-              Tab(text: 'Year $currentYear'),
-              const Tab(text: 'Last 12 Months'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            buildMonthList(previousYearMonths),
-            buildMonthList(currentYearMonths),
-            buildMonthList(lastTwelveMonths),
-          ],
-        ),
+        ],
       ),
+      body: buildMonthList(filteredMonths),
     );
   }
 
