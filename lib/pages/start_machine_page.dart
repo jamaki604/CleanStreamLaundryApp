@@ -171,7 +171,7 @@ class _StartPageState extends State<StartPage> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
-    
+
     statusDialog(
       context,
       title: success ? "Door Unlocked!" : "No Nearby Doors Found",
