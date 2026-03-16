@@ -12,12 +12,17 @@ class DoorUnlocker implements DoorUnlockService {
   @override
   Future<List<String>> getNearbyDoors() async {
     await Future.delayed(const Duration(seconds: 1));
+
+    if (cancelled) return [];
+
     return _readerToDoor.values.toList();
   }
 
-  @override
   Future<bool> unlockDoor(String doorId) async {
     await Future.delayed(const Duration(seconds: 1));
+
+    if (cancelled) return false;
+
     return doorId != "Broken Door"; // simulate access denied
   }
 
@@ -28,17 +33,20 @@ class DoorUnlocker implements DoorUnlockService {
   Future<bool> unlockNearestDoor() async {
     cancelled = false;
 
-    if (cancelled)
-      return false;
-
     final doors = await getNearbyDoors();
 
-    if (cancelled || doors.isEmpty)
+    if (cancelled || doors.isEmpty) {
       return false;
+    }
 
     final nearest = doors.first;
-    return await unlockDoor(nearest);
+
+    final success = await unlockDoor(nearest);
+
+    if (cancelled) {
+      return false;
+    }
+
+    return success;
   }
-
-
 }

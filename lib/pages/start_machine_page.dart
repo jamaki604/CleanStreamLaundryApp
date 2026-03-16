@@ -6,12 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
+import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
 import '../widgets/status_dialog_box.dart';
 
-bool cancelSearch = false;
 const double minimumBalance = 20;
 
 class StartPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _StartPageState extends State<StartPage> {
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
 
-  Map<String, dynamic>? balance; // <-- MATCHES HomePage
+  Map<String, dynamic>? balance;
 
   @override
   void initState() {
@@ -44,7 +44,7 @@ class _StartPageState extends State<StartPage> {
 
     if (mounted) {
       setState(() {
-        balance = fetchedBalance; // <-- MAP, not double
+        balance = fetchedBalance;
       });
     }
   }
@@ -63,7 +63,8 @@ class _StartPageState extends State<StartPage> {
 
                 Container(
                   height: 160,
-                  margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 23, vertical: 10),
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 3),
@@ -81,7 +82,10 @@ class _StartPageState extends State<StartPage> {
                           Text(
                             "Tap To Pay",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.fontInverted,
+                              color: Theme
+                                  .of(context)
+                                  .colorScheme
+                                  .fontInverted,
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
@@ -89,7 +93,10 @@ class _StartPageState extends State<StartPage> {
                           Text(
                             "Tap phone to machine to pay",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.fontSecondary,
+                              color: Theme
+                                  .of(context)
+                                  .colorScheme
+                                  .fontSecondary,
                               fontSize: 16,
                             ),
                           ),
@@ -150,19 +157,21 @@ class _StartPageState extends State<StartPage> {
   Future<void> _processUnlocking(BuildContext context) async {
     cancelSearch = false;
 
-    showSearchingDialog(context);
+    showSearchingDialog(
+      context,
+          () => widget.doorUnlocker.cancelUnlockingDoor(),
+    );
 
     final success = await widget.doorUnlocker.unlockNearestDoor();
 
-    if (cancelSearch) {
-      widget.doorUnlocker.cancelUnlockingDoor();
-      return;
-    }
-
-    if (context.mounted) Navigator.of(context).pop();
-
     if (!context.mounted) return;
 
+    if (cancelSearch) return;
+
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+    
     statusDialog(
       context,
       title: success ? "Door Unlocked!" : "No Nearby Doors Found",
