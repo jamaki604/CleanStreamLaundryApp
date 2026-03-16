@@ -6,19 +6,48 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
-import 'package:clean_stream_laundry_app/logic/viewmodels/loyalty_view_model.dart';
+import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
 import '../widgets/status_dialog_box.dart';
 
 bool cancelSearch = false;
-const double minimumBalance = 20.0;
+const double minimumBalance = 20;
 
-class StartPage extends StatelessWidget {
-  final viewModel = GetIt.instance<LoyaltyViewModel>();
+class StartPage extends StatefulWidget {
   final DoorUnlocker doorUnlocker;
 
   StartPage({super.key, DoorUnlocker? doorUnlocker})
       : doorUnlocker = doorUnlocker ?? DoorUnlocker();
+
+  @override
+  State<StartPage> createState() => _StartPageState();
+}
+
+class _StartPageState extends State<StartPage> {
+  final profileService = GetIt.instance<ProfileService>();
+  final authService = GetIt.instance<AuthService>();
+
+  Map<String, dynamic>? balance; // <-- MATCHES HomePage
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userId = authService.getCurrentUserId;
+    if (userId == null) return;
+
+    final fetchedBalance = await profileService.getUserBalanceById(userId);
+
+    if (mounted) {
+      setState(() {
+        balance = fetchedBalance; // <-- MAP, not double
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +60,7 @@ class StartPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SectionHeader(title: "Payment Options"),
+
                 Container(
                   height: 160,
                   margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
@@ -98,11 +128,14 @@ class StartPage extends StatelessWidget {
                     descriptionText: "Unlock doors after hours",
                     icon: Icons.lock_open_rounded,
                     onPressed: () async {
-                      if (viewModel.userBalance! < minimumBalance) {
+                      final bal = balance?["balance"];
+
+                      if (bal == null || bal < minimumBalance) {
                         _showLowBalanceDialog(context);
-                      } else {
-                        await _processUnlocking(context);
+                        return;
                       }
+
+                      await _processUnlocking(context);
                     },
                   ),
                 ),
@@ -119,10 +152,10 @@ class StartPage extends StatelessWidget {
 
     showSearchingDialog(context);
 
-    final success = await doorUnlocker.unlockNearestDoor();
+    final success = await widget.doorUnlocker.unlockNearestDoor();
 
     if (cancelSearch) {
-      doorUnlocker.cancelUnlockingDoor();
+      widget.doorUnlocker.cancelUnlockingDoor();
       return;
     }
 
@@ -149,14 +182,16 @@ void _showLowBalanceDialog(BuildContext context) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Error'),
-        content: const Text('You need at least \$20 to unlock a door'),
+        title: const Text('Low Balance'),
+        content: Text(
+          'You need at least ${minimumBalance.toStringAsFixed(2)} to unlock a door',
+        ),
         icon: const Icon(Icons.error),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
-              context.go("/start");
+              context.go("/startPage");
             },
             child: const Text('OK'),
           ),
