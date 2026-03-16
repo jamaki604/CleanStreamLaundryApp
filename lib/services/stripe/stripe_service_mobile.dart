@@ -44,7 +44,8 @@ class StripeService implements PaymentService {
               shapes: const PaymentSheetPrimaryButtonShape(blurRadius: 20),
             ),
           ),
-          applePay: const PaymentSheetApplePay(merchantCountryCode: 'US'),
+          // Commented out for testing until we get a merchant id from Apple Developer
+          //applePay: const PaymentSheetApplePay(merchantCountryCode: 'US'),
           googlePay: const PaymentSheetGooglePay(merchantCountryCode: 'US'),
         ),
       );

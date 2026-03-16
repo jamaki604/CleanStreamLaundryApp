@@ -70,6 +70,9 @@ class MonthlyTransactionHistory extends StatelessWidget {
                 } else {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     elevation: 2,
                     color: Theme.of(context).colorScheme.cardPrimary,
                     child: Padding(

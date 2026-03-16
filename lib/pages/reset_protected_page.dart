@@ -170,6 +170,14 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                 children: [
                   const SizedBox(height: 20),
 
+                  //Clean Stream Logo
+                  Image.asset(
+                    "assets/Logo.png",
+                    height: 250,
+                    width: 250,
+                    key: const Key('app_logo'),
+                  ),
+
                   // Title
                   Text(
                     "Reset Password",
@@ -189,7 +197,7 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
 
                   const SizedBox(height: 30),
 
-                  /// Password requirements (same style as signup)
+                  // Password requirements (same style as signup)
                   ValueListenableBuilder<TextEditingValue>(
                     valueListenable: _passwordCtrl,
                     builder: (context, value, _) {
@@ -222,7 +230,7 @@ class _ResetProtectedPageState extends State<ResetProtectedPage> {
                     },
                   ),
 
-                  /// Password field
+                  // Password field
                   TextField(
                     controller: _passwordCtrl,
                     obscureText: _obscurePassword,

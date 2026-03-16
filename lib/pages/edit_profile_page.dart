@@ -169,7 +169,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(
           'Error',
           style: TextStyle(
@@ -290,7 +290,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             horizontal: 16,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -298,14 +298,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               color: Theme.of(context).colorScheme.primary,
                               width: 2.0,
                             ),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.fontSecondary
                                   .withValues(alpha: 0.2),
                             ),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           prefixIcon: Icon(
                             Icons.person_outline,
@@ -365,7 +365,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             horizontal: 16,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide.none,
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -373,14 +373,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               color: Theme.of(context).colorScheme.primary,
                               width: 2.0,
                             ),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.fontSecondary
                                   .withValues(alpha: 0.2),
                             ),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           prefixIcon: Icon(
                             Icons.email_outlined,
@@ -411,7 +411,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           elevation: 2,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                         onPressed: _isSaving ? null : _onSavePressed,
@@ -447,7 +447,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: Colors.red.withValues(alpha: 0.2),
                             width: 1,
@@ -497,7 +497,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   vertical: 12,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
                               child: _isSaving
@@ -558,7 +558,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
           width: 1,
@@ -635,7 +635,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           context: context,
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
             ),
             title: Row(
               children: [
@@ -687,7 +687,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           context: context,
           builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
             ),
             title: Text(
               'Confirm Changes',
