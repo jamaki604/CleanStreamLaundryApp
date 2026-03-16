@@ -113,20 +113,20 @@ void main() {
     });
 
     testWidgets('displays machine information after loading', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,
+        ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockMachineService.getMachineById('machine123'),
-      ).thenAnswer((_) async => {'Name': 'Washer01'});
+            () => mockMachineService.getMachineById('machine123'),
+      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-        () => mockProfileService.getUserBalanceById('user123'),
+            () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Machine Washer 1'), findsOneWidget);
+      expect(find.text('Machine Washer01'), findsOneWidget);
       expect(find.text('Amount Due'), findsOneWidget);
     });
 
