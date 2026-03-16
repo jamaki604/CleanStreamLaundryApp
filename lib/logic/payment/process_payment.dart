@@ -2,16 +2,12 @@ import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
+import 'package:get_it/get_it.dart';
 
 class PaymentProcessor {
-  final PaymentService _paymentService;
-  final TransactionService _transactionService;
+  final PaymentService _paymentService = GetIt.instance<PaymentService>();
+  final TransactionService _transactionService = GetIt.instance<TransactionService>();
 
-  PaymentProcessor({
-    required PaymentService paymentService,
-    required TransactionService transactionService,
-  }) : _paymentService = paymentService,
-       _transactionService = transactionService;
 
   Future<PaymentResult> processPayment(
     double amount,
@@ -24,6 +20,7 @@ class PaymentProcessor {
         description: description,
         type: "Laundry",
       );
+
       return PaymentResult.success;
     } on StripeException {
       return PaymentResult.canceled;

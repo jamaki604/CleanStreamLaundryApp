@@ -314,55 +314,51 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _processLoyaltyPayment(BuildContext context) async {
-    final updatedBalance = _userBalance! - _price!;
-    profileService.updateBalanceById(updatedBalance);
-
-    setState(() {
-      _userBalance = updatedBalance;
-    });
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) =>
-          const Center(child: CircularProgressIndicator()),
+      const Center(child: CircularProgressIndicator()),
     );
+
     final deviceAuthorized = await machineCommunicator.wakeDevice(
       widget.machineId,
     );
+
     Navigator.of(context, rootNavigator: true).pop();
 
-    await transactionService.recordTransaction(
-      amount: _price!,
-      description:
-      "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
-      type: "laundry",
-    );
 
-    if (deviceAuthorized) {
-      makeNotification(_machineName.toString());
-      setState(() {
-        _paymentCompleted = true;
-      });
-      statusDialog(
-        context,
-        title: "Machine Ready!",
-        message: "Machine $_machineName is now active.",
-        isSuccess: true,
-      );
-    } else {
+    if (!deviceAuthorized) {
       statusDialog(
         context,
         title: "Machine Error",
-        message: "Payment succeeded but machine did not wake up. Please contact support",
+        message: "Machine did not respond. Your balance has not been charged. Please contact support.",
         isSuccess: false,
       );
+      return;
     }
+    
+    final userId = authService.getCurrentUserId;
+    final updatedBalance = _userBalance! - _price!;
+    await profileService.updateBalanceById(userId!, updatedBalance);
+
+    setState(() {
+      _userBalance = updatedBalance;
+      _paymentCompleted = true;
+    });
+
+    await transactionService.recordTransaction(
+      amount: _price!,
+      description: "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
+      type: "laundry",
+    );
+
+    makeNotification(_machineName.toString());
 
     statusDialog(
       context,
-      title: "Payment Successful!",
-      message:
-      "Thank you! \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
+      title: "Payment Successful! Machine Ready!",
+      message: "Machine $_machineName is now active. \$${_price?.toStringAsFixed(2)} was taken from your Loyalty Card.",
       isSuccess: true,
     );
   }
