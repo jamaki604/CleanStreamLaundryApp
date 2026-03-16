@@ -70,6 +70,7 @@ class _PaymentPageState extends State<PaymentPage> {
       setState(() {
         _userBalance = (balance['balance'] as num).toDouble();
         _machineName = name;
+        _price = _basePrice;
         _isLoading = false;
       });
     } else {
@@ -242,7 +243,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
                 if (deviceAuthorized) {
                   setState(() => _paymentCompleted = true);
-                  makeNotification(_machineName.toString());
+                  await makeNotification(_machineName.toString());
                   statusDialog(
                     context,
                     title: "Payment Processed! Machine Ready!",
@@ -364,7 +365,7 @@ class _PaymentPageState extends State<PaymentPage> {
     );
 
     if (deviceAuthorized) {
-      makeNotification(_machineName.toString());
+      await makeNotification(_machineName.toString());
       setState(() => _paymentCompleted = true);
       statusDialog(
         context,
