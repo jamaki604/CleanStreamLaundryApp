@@ -122,21 +122,19 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        await tester.pumpAndSettle(const Duration(seconds: 1));
+        // Find and tap the button that opens the BottomSheet
+        final openSheetButton = find.text('Select Location');
+        expect(openSheetButton, findsOneWidget);
 
-        final dropdownFinder = find.descendant(
-          of: find.byType(DropdownButtonHideUnderline),
-          matching: find.byType(DropdownButton<String>),
-        );
+        await tester.tap(openSheetButton);
+        await tester.pumpAndSettle();
 
-        expect(dropdownFinder, findsOneWidget);
+        // Now the BottomSheet should be visible with your location items
+        final location1 = find.text('123 Main St');
+        final location2 = find.text('456 Oak Ave');
 
-        final dropdown = tester.widget<DropdownButton<String>>(dropdownFinder);
-        expect(dropdown.items, isNotNull);
-        expect(dropdown.items!.length, equals(2));
-
-        expect(dropdown.items![0].value, equals('123 Main St'));
-        expect(dropdown.items![1].value, equals('456 Oak Ave'));
+        expect(location1, findsOneWidget);
+        expect(location2, findsOneWidget);
       });
 
       testWidgets('should restore last selected location from storage', (tester) async {
@@ -195,7 +193,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final nearestLocationButton = find.ancestor(
-          of: find.text('Find Nearest Location'),
+          of: find.text('Nearest Location'),
           matching: find.byType(InkWell),
         );
         expect(nearestLocationButton, findsOneWidget);
@@ -212,7 +210,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final button = find.ancestor(
-          of: find.text('Find Nearest Location'),
+          of: find.text('Nearest Location'),
           matching: find.byType(InkWell),
         );
         expect(button, findsOneWidget);
@@ -220,7 +218,7 @@ void main() {
         final inkWell = tester.widget<InkWell>(button);
         expect(inkWell.onTap, isNotNull);
 
-        expect(find.text('Find Nearest Location'), findsOneWidget);
+        expect(find.text('Nearest Location'), findsOneWidget);
       });
 
       testWidgets('should update selected location after finding nearest', (tester) async {
@@ -249,7 +247,7 @@ void main() {
         expect(find.text('Select Location'), findsOneWidget);
 
         final nearestLocationButton = find.ancestor(
-          of: find.text('Find Nearest Location'),
+          of: find.text('Nearest Location'),
           matching: find.byType(InkWell),
         );
         await tester.tap(nearestLocationButton);
@@ -274,7 +272,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final nearestLocationButton = find.ancestor(
-          of: find.text('Find Nearest Location'),
+          of: find.text('Nearest Location'),
           matching: find.byType(InkWell),
         );
         await tester.tap(nearestLocationButton);

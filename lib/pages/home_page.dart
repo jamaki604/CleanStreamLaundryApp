@@ -127,7 +127,7 @@ class HomePageState extends State<HomePage> {
     return BasePage(
       key: HomePage.pageKey,
       body: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +146,7 @@ class HomePageState extends State<HomePage> {
                 children: [
                   Flexible(
                     child: Text(
-                      "Current balance: \$${balance?["balance"] ?? 'Loading...'}",
+                      'Current balance: \$${balance?["balance"] != null ? (balance!["balance"] as num).toStringAsFixed(2) : 'Loading...'}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -174,20 +174,25 @@ class HomePageState extends State<HomePage> {
                         _zoomToLocation(address);
                       }
                     },
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(14),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            "Find Nearest Location",
+                            "Nearest Location",
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.primary,
                               decoration: TextDecoration.underline,
-                              decorationColor: Theme.of(context).colorScheme.primary
+                              decorationColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -213,10 +218,10 @@ class HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
-                      height: 400,
+                      height: 300,
                       width: 400,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.grey.shade400,
                           width: 1,
@@ -244,10 +249,10 @@ class HomePageState extends State<HomePage> {
                   double initialZoom = 7.2;
 
                   return Container(
-                    height: 400,
-                    width: 400,
+                    height: 300,
+                    width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.grey.shade400, width: 1),
                     ),
                     clipBehavior: Clip.antiAlias,
@@ -262,9 +267,9 @@ class HomePageState extends State<HomePage> {
                       children: [
                         TileLayer(
                           urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                           userAgentPackageName:
-                              'https://cleanstreamlaundry.com/',
+                          'https://cleanstreamlaundry.com/',
                           tileProvider: NetworkTileProvider(),
                         ),
                         MarkerLayer(markers: markers),
@@ -274,29 +279,29 @@ class HomePageState extends State<HomePage> {
                 },
               ),
               Container(
-                margin: EdgeInsets.only(top: 20),
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                margin: EdgeInsets.only(top: 12),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Colors.grey.shade400, width: 1),
                   color: Theme.of(context).colorScheme.cardSecondary,
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.location_on, color: Colors.blue, size: 28),
+                    Icon(Icons.location_on, color: Colors.blue, size: 24),
                     SizedBox(width: 8),
                     Expanded(
                       child: FutureBuilder(
-                        future: Future.wait([locationService.getLocations()]),
+                        future: locationService.getLocations(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const SizedBox(
+                              height: 24,
+                              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                             );
                           }
 
-                          final data = snapshot.data![0];
+                          final data = snapshot.data!;
                           for (var item in data) {
                             locationID[item["Address"]] = item["id"];
                           }
@@ -313,57 +318,56 @@ class HomePageState extends State<HomePage> {
                             });
                           }
 
-                          return DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              value: locationID.containsKey(selectedName)
-                                  ? selectedName
-                                  : null,
-                              hint: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Select Location",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.fontInverted,
-                                  ),
+                          return GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                                 ),
-                              ),
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  storage.setValue(
-                                    "lastSelectedLocation",
-                                    newValue,
-                                  );
-                                  _zoomToLocation(newValue);
-                                }
-                                setState(() {
-                                  selectedName = newValue;
-                                  locationSelected = true;
-                                  locationIDSelected = locationID[newValue];
-                                });
-                              },
-                              items: locationID.entries.map((entry) {
-                                return DropdownMenuItem<String>(
-                                  value: entry.key,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      entry.key,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.fontInverted,
+                                builder: (_) => ListView.separated(
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  itemCount: data.length,
+                                  separatorBuilder: (_, __) => Divider(height: 1),
+                                  itemBuilder: (_, index) {
+                                    final item = data[index];
+                                    return ListTile(
+                                      title: Text(
+                                        item["Address"],
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Theme.of(context).colorScheme.fontInverted,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                                      onTap: () {
+                                        setState(() {
+                                          selectedName = item["Address"];
+                                          locationSelected = true;
+                                          locationIDSelected = item["id"];
+                                        });
+                                        storage.setValue("lastSelectedLocation", selectedName!);
+                                        _zoomToLocation(selectedName!);
+                                        Navigator.pop(context);
+                                      },
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                selectedName ?? "Select Location",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: selectedName == null
+                                      ? Colors.grey
+                                      : Theme.of(context).colorScheme.fontInverted,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           );
                         },
@@ -371,19 +375,23 @@ class HomePageState extends State<HomePage> {
                     ),
                     IconButton(
                       onPressed: () async {
-                        if(selectedName != null){
+                        if (selectedName != null) {
                           await _openDirectionsFromAddress(selectedName);
-                        }else{
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please select a location to get directions!")));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Please select a location to get directions!")),
+                          );
                         }
                       },
-                        icon: Icon(Icons.navigation,color:Theme.of(context).primaryColor)
-                    )
+                      icon: Icon(Icons.navigation, color: Theme.of(context).primaryColor, size: 24),
+                      padding: EdgeInsets.zero, // remove extra padding
+                      constraints: BoxConstraints(),
+                    ),
                   ],
                 ),
               ),
 
-              SizedBox(height: 10),
+              SizedBox(height: 14),
 
               if (locationSelected)
                 FutureBuilder(
@@ -412,10 +420,10 @@ class HomePageState extends State<HomePage> {
                     final idleDryers = snapshot.data![3];
 
                     return Container(
-                      width: 520,
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 3),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(14),
                         color: Colors.transparent,
                       ),
                       child: Column(
@@ -454,7 +462,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           child: FittedBox(
@@ -490,7 +498,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           child: FittedBox(
@@ -525,6 +533,9 @@ class HomePageState extends State<HomePage> {
                     );
                   },
                 ),
+
+              SizedBox(height: 12,)
+
             ],
           ),
         ),

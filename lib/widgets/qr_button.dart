@@ -33,7 +33,7 @@ class QRButton extends StatelessWidget {
               shadowColor: colors.primary.withOpacity(0.4),
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
             child: Row(
