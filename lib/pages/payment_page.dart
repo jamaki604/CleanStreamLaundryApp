@@ -153,7 +153,7 @@ class _PaymentPageState extends State<PaymentPage> {
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.greyCard,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
@@ -341,21 +341,41 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _processLoyaltyPayment(BuildContext context) async {
+    final userId = authService.getCurrentUserId;
+
     final updatedBalance = _userBalance! - _price!;
-    profileService.updateBalanceById(updatedBalance);
+    profileService.updateBalanceById(userId!, updatedBalance);
     setState(() => _userBalance = updatedBalance);
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) =>
-      const Center(child: CircularProgressIndicator()),
+          const Center(child: CircularProgressIndicator()),
     );
 
     final deviceAuthorized =
     await machineCommunicator.wakeDevice(widget.machineId);
 
     Navigator.of(context, rootNavigator: true).pop();
+
+
+    if (!deviceAuthorized) {
+      statusDialog(
+        context,
+        title: "Machine Error",
+        message: "Machine did not respond. Your balance has not been charged. Please contact support.",
+        isSuccess: false,
+      );
+      return;
+    }
+
+    await profileService.updateBalanceById(userId!, updatedBalance);
+
+    setState(() {
+      _userBalance = updatedBalance;
+      _paymentCompleted = true;
+    });
 
     await transactionService.recordTransaction(
       amount: _price!,
