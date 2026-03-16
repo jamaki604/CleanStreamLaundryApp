@@ -1,14 +1,20 @@
 import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
+import 'package:clean_stream_laundry_app/logic/viewmodels/loyalty_view_model.dart';
 import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
 import '../widgets/status_dialog_box.dart';
 
+bool cancelSearch = false;
+const double minimumBalance = 20.0;
+
 class StartPage extends StatelessWidget {
+  final viewModel = GetIt.instance<LoyaltyViewModel>();
   final DoorUnlocker doorUnlocker;
 
   StartPage({super.key, DoorUnlocker? doorUnlocker})
@@ -27,10 +33,7 @@ class StartPage extends StatelessWidget {
                 const SectionHeader(title: "Payment Options"),
                 Container(
                   height: 160,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 23,
-                    vertical: 10,
-                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 3),
@@ -56,9 +59,7 @@ class StartPage extends StatelessWidget {
                           Text(
                             "Tap phone to machine to pay",
                             style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.fontSecondary,
+                              color: Theme.of(context).colorScheme.fontSecondary,
                               fontSize: 16,
                             ),
                           ),
@@ -97,7 +98,11 @@ class StartPage extends StatelessWidget {
                     descriptionText: "Unlock doors after hours",
                     icon: Icons.lock_open_rounded,
                     onPressed: () async {
-                      await _processUnlocking(context, doorUnlocker);
+                      if (viewModel.userBalance! < minimumBalance) {
+                        _showLowBalanceDialog(context);
+                      } else {
+                        await _processUnlocking(context);
+                      }
                     },
                   ),
                 ),
@@ -108,31 +113,56 @@ class StartPage extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _processUnlocking(BuildContext context) async {
+    cancelSearch = false;
+
+    showSearchingDialog(context);
+
+    final success = await doorUnlocker.unlockNearestDoor();
+
+    if (cancelSearch) {
+      doorUnlocker.cancelUnlockingDoor();
+      return;
+    }
+
+    if (context.mounted) Navigator.of(context).pop();
+
+    if (!context.mounted) return;
+
+    statusDialog(
+      context,
+      title: success ? "Door Unlocked!" : "No Nearby Doors Found",
+      message: success
+          ? "The nearest door has been unlocked successfully"
+          : "We couldn't detect any nearby doors",
+      isSuccess: success,
+    );
+  }
 }
 
-Future<void> _processUnlocking(BuildContext context, DoorUnlocker doorUnlocker,)
-async {
-  cancelSearch = false;
-
-  showSearchingDialog(context);
-
-  final success = await doorUnlocker.unlockNearestDoor();
-
-  if (cancelSearch) {
-    doorUnlocker.cancelUnlockingDoor();
-    return;
-  }
-
-  if (context.mounted) Navigator.of(context).pop();
-
-  if (!context.mounted) return;
-
-  statusDialog(
-    context,
-    title: success ? "Door Unlocked!" : "No Nearby Doors Found",
-    message: success
-        ? "The nearest door has been unlocked successfully"
-        : "We couldn't detect any nearby doors",
-    isSuccess: success,
+void _showLowBalanceDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text('Low Balance'),
+        content: Text('You need at least \$' + minimumBalance.toStringAsFixed(2)
+            + ' to unlock a door'),
+        icon: const Icon(Icons.error),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              context.go("/startPage");
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
   );
 }
