@@ -149,15 +149,14 @@ void _showLowBalanceDialog(BuildContext context) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Low Balance'),
-        content: Text('You need at least \$' + minimumBalance.toStringAsFixed(2)
-            + ' to unlock a door'),
+        title: const Text('Error'),
+        content: const Text('You need at least \$20 to unlock a door'),
         icon: const Icon(Icons.error),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
-              context.go("/startPage");
+              context.go("/start");
             },
             child: const Text('OK'),
           ),
