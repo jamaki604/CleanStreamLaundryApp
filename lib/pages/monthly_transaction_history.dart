@@ -4,13 +4,29 @@ import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
-class MonthlyTransactionHistory extends StatelessWidget {
+class MonthlyTransactionHistory extends StatefulWidget {
   final List<Map<String, dynamic>> transactions;
   const MonthlyTransactionHistory({super.key, required this.transactions});
 
   @override
+  State<MonthlyTransactionHistory> createState() =>
+      _MonthlyTransactionHistoryState();
+}
+
+class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
+  int? _selectedYear;
+
+  @override
   Widget build(BuildContext context) {
-    final monthlySums = TransactionParser.getMonthlySums(transactions);
+    final colorScheme = Theme.of(context).colorScheme;
+    final cardBackgroundColor = colorScheme.cardPrimary;
+    final cardTextColor =
+        ThemeData.estimateBrightnessForColor(cardBackgroundColor) ==
+            Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
+    final monthlySums = TransactionParser.getMonthlySums(widget.transactions);
     final sortedMonths = monthlySums.keys.toList()
       ..sort((a, b) {
         final dateA = DateFormat('MMM yyyy').parse(a);
@@ -18,129 +34,224 @@ class MonthlyTransactionHistory extends StatelessWidget {
         return dateB.compareTo(dateA);
       });
 
-    final ScrollController _scrollController = ScrollController();
+    final availableYears =
+        sortedMonths
+            .map((month) => DateFormat('MMM yyyy').parse(month).year)
+            .toSet()
+            .toList()
+          ..sort((a, b) => b.compareTo(a));
+
+    if (availableYears.isEmpty) {
+      availableYears.add(DateTime.now().year);
+    }
+
+    final selectedYear =
+        (_selectedYear != null && availableYears.contains(_selectedYear))
+        ? _selectedYear!
+        : availableYears.first;
+
+    final filteredMonths = sortedMonths.where((month) {
+      final date = DateFormat('MMM yyyy').parse(month);
+      return date.year == selectedYear;
+    }).toList();
+
+    Future<void> showYearPickerSheet() async {
+      await showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: cardBackgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (sheetContext) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: Text(
+                      'Year: $selectedYear',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: cardTextColor,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ...availableYears.map(
+                    (year) => ListTile(
+                      key: ValueKey('year-option-$year'),
+                      title: Text(
+                        year.toString(),
+                        style: TextStyle(color: cardTextColor),
+                      ),
+                      trailing: year == selectedYear
+                          ? Icon(Icons.check, color: colorScheme.primary)
+                          : null,
+                      onTap: () {
+                        Navigator.of(sheetContext).pop();
+                        if (year == selectedYear) return;
+                        setState(() {
+                          _selectedYear = year;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    Widget buildMonthList(List<String> visibleMonths) {
+      final ScrollController scrollController = ScrollController();
+
+      if (visibleMonths.isEmpty) {
+        return const Center(
+          child: Text(
+            'No transactions found for this time range.',
+            style: TextStyle(fontSize: 16),
+          ),
+        );
+      }
+
+      return Theme(
+        data: Theme.of(context).copyWith(
+          scrollbarTheme: ScrollbarThemeData(
+            thumbColor: WidgetStateProperty.all(colorScheme.primary),
+            trackColor: WidgetStateProperty.all(Colors.transparent),
+            thickness: WidgetStateProperty.all(8),
+            radius: const Radius.circular(4),
+          ),
+        ),
+        child: Scrollbar(
+          controller: scrollController,
+          thumbVisibility: true,
+          interactive: true,
+          child: ListView.builder(
+            controller: scrollController,
+            padding: const EdgeInsets.all(16),
+            itemCount: visibleMonths.length,
+            itemBuilder: (context, index) {
+              final month = visibleMonths[index];
+              final data = monthlySums[month]!;
+              final total =
+                  data['directWasher']! +
+                  data['directDryer']! +
+                  data['loyaltyCard']!;
+              if (total == 0 &&
+                  data['loyaltyWasher'] == 0 &&
+                  data['loyaltyDryer'] == 0) {
+                return const SizedBox(width: 0, height: 0);
+              } else {
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 2,
+                  color: cardBackgroundColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              month,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: cardTextColor,
+                              ),
+                            ),
+                            Text(
+                              '\$${total.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: cardTextColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 24),
+                        _buildTransactionRow(
+                          'Direct Washer Payments',
+                          data['directWasher']!,
+                          cardTextColor,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Loyalty Washer Payments',
+                          data['loyaltyWasher']!,
+                          colorScheme.primary,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Direct Dryer Payments',
+                          data['directDryer']!,
+                          cardTextColor,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Loyalty Dryer Payments',
+                          data['loyaltyDryer']!,
+                          colorScheme.primary,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildTransactionRow(
+                          'Loyalty Card Loads',
+                          data['loyaltyCard']!,
+                          cardTextColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(gradient: colorScheme.primaryGradient),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: Colors.transparent,
-        title: Text(
+        title: const Text(
           'Monthly Transaction History',
-          style: TextStyle(color: Colors.white),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: Theme.of(context).colorScheme.primaryGradient,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        elevation: 2,
         centerTitle: true,
-      ),
-      body: Scaffold(
-        body: Theme(
-          data: Theme.of(context).copyWith(
-            scrollbarTheme: ScrollbarThemeData(
-              thumbColor: WidgetStateProperty.all(Colors.lightBlue),
-              trackColor: WidgetStateProperty.all(Colors.transparent),
-              thickness: WidgetStateProperty.all(8),
-              radius: const Radius.circular(4),
-            ),
+        elevation: 2,
+        actions: [
+          IconButton(
+            key: const ValueKey('year-filter-button'),
+            onPressed: showYearPickerSheet,
+            icon: const Icon(Icons.filter_list, color: Colors.white),
+            tooltip: 'Filter by year',
           ),
-          child: Scrollbar(
-            controller: _scrollController,
-            thumbVisibility: true,
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: sortedMonths.length,
-              itemBuilder: (context, index) {
-                final month = sortedMonths[index];
-                final data = monthlySums[month]!;
-                final total =
-                    data['directWasher']! +
-                    data['directDryer']! +
-                    data['loyaltyCard']!;
-                if (total == 0 &&
-                    data['loyaltyWasher'] == 0 &&
-                    data['loyaltyDryer'] == 0) {
-                  return SizedBox(width: 0, height: 0);
-                } else {
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 2,
-                    color: Theme.of(context).colorScheme.cardPrimary,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                month,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                '\$${total.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Divider(height: 24),
-                          _buildTransactionRow(
-                            'Direct Washer Payments',
-                            data['directWasher']!,
-                            Colors.black,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildTransactionRow(
-                            'Loyalty Washer Payments',
-                            data['loyaltyWasher']!,
-                            Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildTransactionRow(
-                            'Direct Dryer Payments',
-                            data['directDryer']!,
-                            Colors.black,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildTransactionRow(
-                            'Loyalty Dryer Payments',
-                            data['loyaltyDryer']!,
-                            Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildTransactionRow(
-                            'Loyalty Card Loads',
-                            data['loyaltyCard']!,
-                            Colors.black,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-          ),
-        ),
+          const SizedBox(width: 8),
+        ],
       ),
+      body: buildMonthList(filteredMonths),
     );
   }
 
