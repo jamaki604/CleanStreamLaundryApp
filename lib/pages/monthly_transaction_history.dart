@@ -223,33 +223,32 @@ class _MonthlyTransactionHistoryState extends State<MonthlyTransactionHistory> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(gradient: colorScheme.primaryGradient),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: colorScheme.fontPrimary),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: colorScheme.primary,
-        title: Text(
+        title: const Text(
           'Monthly Transaction History',
-          style: TextStyle(color: colorScheme.fontPrimary),
-        ),
-        elevation: 2,
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton.icon(
-              key: const ValueKey('year-filter-button'),
-              onPressed: showYearPickerSheet,
-              icon: Icon(Icons.arrow_drop_down, color: colorScheme.fontPrimary),
-              label: Text(
-                'Year',
-                style: TextStyle(
-                  color: colorScheme.fontPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
+        ),
+        centerTitle: true,
+        elevation: 2,
+        actions: [
+          IconButton(
+            key: const ValueKey('year-filter-button'),
+            onPressed: showYearPickerSheet,
+            icon: const Icon(Icons.filter_list, color: Colors.white),
+            tooltip: 'Filter by year',
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: buildMonthList(filteredMonths),
