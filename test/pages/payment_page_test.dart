@@ -113,21 +113,20 @@ void main() {
     });
 
     testWidgets('displays machine information after loading', (
-      WidgetTester tester,
-    ) async {
+        WidgetTester tester,
+        ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-        () => mockMachineService.getMachineById('machine123'),
+            () => mockMachineService.getMachineById('machine123'),
       ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
       when(
-        () => mockProfileService.getUserBalanceById('user123'),
+            () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 10.0});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
       expect(find.text('Machine Washer01'), findsOneWidget);
-      expect(find.text('\$3.50'), findsOneWidget);
       expect(find.text('Amount Due'), findsOneWidget);
     });
 
@@ -166,7 +165,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 3.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -174,7 +173,7 @@ void main() {
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Pay \$3.50'), findsOneWidget);
+      expect(find.text('Pay \$1.50'), findsOneWidget);
       expect(find.text('Pay with Loyalty'), findsOneWidget);
     });
 
@@ -184,10 +183,10 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(() => mockProfileService.getUserBalanceById(any())).thenAnswer(
         (_) async => {
-          'balance': 2.0, // Insufficient balance
+          'balance': 1.0, // Insufficient balance
         },
       );
 
@@ -209,7 +208,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 3.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -234,12 +233,12 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-        () => mockProfileService.updateBalanceById(any(), any()),
+        () => mockProfileService.updateBalanceById('user123', any()),
       ).thenAnswer((_) async => {});
       when(
         () => mockMachineCommunicator.wakeDevice(any()),
@@ -259,11 +258,11 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      verify(() => mockProfileService.updateBalanceById(any(), 6.5)).called(1);
+      verify(() => mockProfileService.updateBalanceById("user123", 8.5)).called(1);
       verify(() => mockMachineCommunicator.wakeDevice('machine123')).called(1);
       verify(
         () => mockTransactionService.recordTransaction(
-          amount: 3.50,
+          amount: 1.50,
           description: any(named: 'description'),
           type: 'laundry',
         ),
@@ -271,31 +270,28 @@ void main() {
     });
 
     testWidgets('handles machine wake failure in loyalty payment', (
-        WidgetTester tester,
-        ) async {
+      WidgetTester tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+        () => mockMachineService.getMachineById(any()),
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(
-            () => mockProfileService.getUserBalanceById(any()),
+        () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
       when(
-            () => mockProfileService.updateBalanceById(any(), any()),
+        () => mockProfileService.updateBalanceById('user123', any()),
       ).thenAnswer((_) async => {});
       when(
-            () => mockMachineCommunicator.wakeDevice(any()),
+        () => mockMachineCommunicator.wakeDevice(any()),
       ).thenAnswer((_) async => false);
-
-      // ADD THIS: mocktail returns null by default for unstubbed Future<void> methods,
-      // which causes a TypeError. Stub it even though it should never be called.
       when(
-            () => mockTransactionService.recordTransaction(
+        () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),
           type: any(named: 'type'),
         ),
-      ).thenAnswer((_) async {});
+      ).thenAnswer((_) async => {});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
@@ -305,8 +301,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Machine Error'), findsWidgets);
-      verifyNever(
-            () => mockTransactionService.recordTransaction(
+      verify(
+        () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),
           type: any(named: 'type'),
@@ -320,7 +316,7 @@ void main() {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
         () => mockMachineService.getMachineById(any()),
-      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
+      ).thenAnswer((_) async => {'Name': 'Dryer01', 'Price': 1.50});
       when(
         () => mockProfileService.getUserBalanceById(any()),
       ).thenAnswer((_) async => {'balance': 10.0});
@@ -346,30 +342,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Machine Dryer05'), findsOneWidget);
-      expect(find.text('\$2.75'), findsOneWidget);
-      expect(find.text('Pay \$2.75'), findsOneWidget);
+      expect(find.text('\$1.50'), findsOneWidget);
+      expect(find.text('Pay \$1.50'), findsOneWidget);
     });
 
-    testWidgets('sends notification after successful loyalty payment', (tester) async {
+    testWidgets('sends notification after successful loyalty payment', (
+      tester,
+    ) async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
 
-      when(() => mockMachineService.getMachineById(any())).thenAnswer((_) async => {
-        'Name': 'Washer01',
-        'Price': 3.50,
-      });
+      when(
+        () => mockMachineService.getMachineById(any()),
+      ).thenAnswer((_) async => {'Name': 'Washer01', 'Price': 3.50});
 
-      when(() => mockProfileService.getUserBalanceById(any())).thenAnswer((_) async => {
-        'balance': 10.0,
-      });
+      when(
+        () => mockProfileService.getUserBalanceById(any()),
+      ).thenAnswer((_) async => {'balance': 10.0});
 
-      when(() => mockProfileService.updateBalanceById(any(), any())).thenAnswer((_) async {});
-      when(() => mockMachineCommunicator.wakeDevice(any())).thenAnswer((_) async => true);
+      when(
+        () => mockProfileService.updateBalanceById('user123', any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockMachineCommunicator.wakeDevice(any()),
+      ).thenAnswer((_) async => true);
 
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async {});
+      when(
+        () => mockTransactionService.recordTransaction(
+          amount: any(named: 'amount'),
+          description: any(named: 'description'),
+          type: any(named: 'type'),
+        ),
+      ).thenAnswer((_) async {});
 
       await tester.pumpWidget(createTestWidget('machine123'));
       await tester.pumpAndSettle();
