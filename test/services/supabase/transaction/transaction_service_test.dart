@@ -15,9 +15,19 @@ void main() {
   late RealtimeChannelMock channelMock;
 
   setUp(() {
+    final now = DateTime.now().toUtc();
+    final fmt = (DateTime d) => d.toIso8601String();
+
     supabaseMock = SupabaseMock();
     queryBuilderMock = QueryBuilderMock();
-    fakeFilterBuilder = FakeFilterBuilder([{"amount": 2.75, "description": "machine", "created_at": "2025-11-02T16:24:51.685419+00:00", "requested_refund": true}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-28T15:13:24.87605+00:00", "requested_refund": false}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-28T14:27:54.429939+00:00", "requested_refund": true}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-28T14:26:21.662999+00:00", "requested_refund": false}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-27T18:06:40.987278+00:00", "requested_refund": false}, {"amount": 2.75, "description": "machine", "created_at": "2025-10-27T00:17:18.01511+00:00", "requested_refund": false}]);
+    fakeFilterBuilder = FakeFilterBuilder([
+      {"id": 1, "amount": 2.75, "description": "machine", "created_at": fmt(now.subtract(Duration(days: 1))),  "requested_refund": true},
+      {"id": 2, "amount": 2.75, "description": "machine", "created_at": fmt(now.subtract(Duration(days: 2))),  "requested_refund": false},
+      {"id": 3, "amount": 2.75, "description": "machine", "created_at": fmt(now.subtract(Duration(days: 5))),  "requested_refund": true},
+      {"id": 4, "amount": 2.75, "description": "machine", "created_at": fmt(now.subtract(Duration(days: 7))),  "requested_refund": false},
+      {"id": 5, "amount": 2.75, "description": "machine", "created_at": fmt(now.subtract(Duration(days: 10))), "requested_refund": false},
+      {"id": 6, "amount": 2.75, "description": "machine", "created_at": fmt(now.subtract(Duration(days: 13))), "requested_refund": false},
+    ]);
     transactionHandler = SupabaseTransactionService(client: supabaseMock);
     supabaseAuth = GoTrueMock();
     channelMock = RealtimeChannelMock();
@@ -69,7 +79,7 @@ void main() {
 
     test("Get refundable transaction history data",() async {
       final result = await transactionHandler.getRefundableTransactionsForUser();
-      expect(result.length, 4);
+      expect(result.ids.length, 4);
     });
 
     test("Tests if the user is null",() async{

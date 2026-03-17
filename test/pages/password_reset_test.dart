@@ -123,4 +123,14 @@ void main() {
 
     expect(find.text('Login Page'), findsOneWidget);
   });
+
+  testWidgets('back arrow navigates to login page', (tester) async {
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Login Page'), findsOneWidget);
+  });
 }

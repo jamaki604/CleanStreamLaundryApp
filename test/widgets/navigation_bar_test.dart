@@ -23,6 +23,20 @@ void main() {
           ),
         ),
         GoRoute(
+          path: '/scanner',
+          builder: (_, __) => Scaffold(
+            body: const Text('Scanner Page'),
+            bottomNavigationBar: const NavBar(),
+          ),
+        ),
+        GoRoute(
+          path: '/paymentPage',
+          builder: (_, __) => Scaffold(
+            body: const Text('Payment Page'),
+            bottomNavigationBar: const NavBar(),
+          ),
+        ),
+        GoRoute(
           path: '/loyalty',
           builder: (_, __) => Scaffold(
             body: const Text('Loyalty Page'),
@@ -39,9 +53,7 @@ void main() {
       ],
     );
 
-    return MaterialApp.router(
-      routerConfig: router,
-    );
+    return MaterialApp.router(routerConfig: router);
   }
 
   group('NavBar Widget Tests', () {
@@ -104,8 +116,30 @@ void main() {
       await tester.pumpWidget(wrapWithRouter('/loyalty'));
       await tester.pumpAndSettle();
 
-      final bottomNav = tester.widget<BottomNavigationBar>(find.byType(BottomNavigationBar));
+      final bottomNav = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
       expect(bottomNav.currentIndex, 2);
+    });
+
+    testWidgets('Scanner route highlights Start tab', (tester) async {
+      await tester.pumpWidget(wrapWithRouter('/scanner'));
+      await tester.pumpAndSettle();
+
+      final bottomNav = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(bottomNav.currentIndex, 1);
+    });
+
+    testWidgets('Payment route highlights Start tab', (tester) async {
+      await tester.pumpWidget(wrapWithRouter('/paymentPage?machineId=abc'));
+      await tester.pumpAndSettle();
+
+      final bottomNav = tester.widget<BottomNavigationBar>(
+        find.byType(BottomNavigationBar),
+      );
+      expect(bottomNav.currentIndex, 1);
     });
   });
 }

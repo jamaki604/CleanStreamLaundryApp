@@ -44,45 +44,67 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   }
 
   Widget _buildContent(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          CreditCard(username: viewModel.userName ?? 'John Doe'),
-          const SizedBox(height: 50),
-          Text(
-            'Current Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.fontSecondary,
-            ),
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        CreditCard(username: viewModel.userName ?? 'John Doe'),
+        const SizedBox(height: 17),
+        Text(
+          'Loyalty Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.fontSecondary,
           ),
-          const SizedBox(height: 25),
-          ElevatedButton(
-            onPressed: () => _loadCard(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              disabledBackgroundColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              "Load card",
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '\$${(20 - (viewModel.userReward ?? 0)).toStringAsFixed(2)} until next reward',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.fontSecondary,
               ),
             ),
+            const SizedBox(width: 4),
+            IconButton(
+              onPressed: () => _showRewardInfoDialog(context),
+              icon: const Icon(Icons.info_outline),
+              iconSize: 18,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              color: Colors.blue,
+            ),
+          ],
+        ),
+        const SizedBox(height: 7),
+        ElevatedButton(
+          onPressed: () => _loadCard(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            disabledBackgroundColor: Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            elevation: 2,
           ),
-          const SizedBox(height: 20),
-          _transactions(),
-        ],
-      ),
+          child: const Text(
+            "Load card",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        Expanded(child: _transactions()),
+      ],
     );
   }
 
@@ -96,8 +118,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: ListView(
+        cacheExtent: 1000,
+        physics: const AlwaysScrollableScrollPhysics(),
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -125,36 +148,30 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: viewModel.recentTransactions.length,
-            itemBuilder: (context, index) {
-              final transaction = viewModel.recentTransactions[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 4.0,
-                  vertical: 6.0,
+          const SizedBox(height: 9),
+          ...viewModel.recentTransactions.map((transaction) {
+            return Card(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 4.0,
+                vertical: 6.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              elevation: 4,
+              color: Theme.of(context).colorScheme.cardPrimary,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.receipt_long,
+                  color: Color(0xFF2073A9),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                title: Text(
+                  transaction.toString(),
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
                 ),
-                elevation: 4,
-                color: Theme.of(context).colorScheme.cardPrimary,
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.receipt_long,
-                    color: Color(0xFF2073A9),
-                  ),
-                  title: Text(
-                    transaction.toString(),
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
-                ),
-              );
-            },
-          ),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -419,7 +436,6 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
     }
 
     if (result == PaymentResult.success) {
-
       viewModel.fetchTransactions();
 
       statusDialog(
@@ -445,5 +461,28 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         isSuccess: false,
       );
     }
+  }
+
+  void _showRewardInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Rewards program'),
+          content: const Text(
+            'For every \$20 you spend, you get an extra \$5 automatically added to your loyalty balance.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Got it'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

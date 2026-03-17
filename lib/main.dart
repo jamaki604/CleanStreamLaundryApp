@@ -101,9 +101,7 @@ Future<void> setupDependencies() async {
 
   getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
 
-  getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor(
-        paymentService: getIt<PaymentService>(),
-        transactionService: getIt<TransactionService>(),));
+  getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor());
 }
 
 class MyApp extends StatelessWidget {

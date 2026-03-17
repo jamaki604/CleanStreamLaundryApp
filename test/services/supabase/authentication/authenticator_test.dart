@@ -15,9 +15,10 @@ void main(){
     registerFallbackValue(Uri());
     registerFallbackValue(OAuthProvider.google);
     registerFallbackValue(UserAttributesFake());
+    registerFallbackValue(OtpType.recovery);
   });
 
-  group("authentication Tests", (){
+  group("authentication Tests", () {
 
     setUp((){
       client = SupabaseMock();
@@ -626,7 +627,7 @@ void main(){
 
     test("User is logged in",() async{
 
-      when(() => supabaseAuth.refreshSession()).thenAnswer((_) async => AuthResponse());
+      when(() => supabaseAuth.currentSession).thenReturn(Session(accessToken: 'test', tokenType: 'test', user: User(id: '', appMetadata: {}, userMetadata: {}, aud: '', createdAt: '')));
 
       final response = await authenticator.isLoggedIn();
       expect(response,AuthenticationResponses.success);
@@ -898,7 +899,7 @@ void main(){
       );
 
       final testUri = Uri.parse('https://example.com/callback?code=test123');
-      await authenticator.handleOAuthRedirect(testUri);
+      await authenticator.getSessionFromURI(testUri);
 
       verify(() => supabaseAuth.getSessionFromUrl(testUri)).called(1);
     });
@@ -917,7 +918,7 @@ void main(){
       
       when(() => supabaseAuth.getSessionFromUrl(any())).thenAnswer( (_) async => AuthSessionUrlResponse(session: Session(accessToken: "test", tokenType: "test", user: User(id: "1234", appMetadata: {}, userMetadata: {}, aud: "test", createdAt: "test")), redirectType: "test"));
       
-      await authenticator.handleOAuthRedirect(Uri());
+      await authenticator.getSessionFromURI(Uri());
       verify(() => client.auth.getSessionFromUrl(any()));
 
     });
@@ -946,6 +947,94 @@ void main(){
 
       expect(result,'testemail@test.com');
     });
-  });
 
+    test("Tests that code is verified correctly",() async {
+      when(() => supabaseAuth.verifyOTP(
+        email: any(named: 'email'),
+        token: any(named: 'token'),
+        type: any(named: 'type'),
+      )).thenAnswer((_) async => AuthResponse(
+        session: Session(
+          accessToken: "test",
+          tokenType: "test",
+          user: User(
+            id: '',
+            appMetadata: {},
+            userMetadata: {},
+            aud: '',
+            createdAt: '',
+          ),
+        ),
+      ));
+
+      AuthenticationResponses testResponse = await authenticator.verifyCode(email: "test", code: "testCode");
+
+      expect(testResponse, AuthenticationResponses.success);
+    });
+
+    test("Tests that failure is returned when exception is thrown",() async {
+      when(() => supabaseAuth.verifyOTP(
+        email: any(named: 'email'),
+        token: any(named: 'token'),
+        type: any(named: 'type'),
+      )).thenThrow(Exception());
+
+      AuthenticationResponses testResponse = await authenticator.verifyCode(email: "test", code: "testCode");
+
+      expect(testResponse, AuthenticationResponses.failure);
+    });
+    
+    test("Tests that exchange code for session runs correctly",() async {
+      when(() => supabaseAuth.exchangeCodeForSession(any())).thenAnswer((_) async => AuthSessionUrlResponse(session: Session(accessToken: "", tokenType: "", user: User(id: "", appMetadata: {}, userMetadata: {}, aud: "", createdAt: "")), redirectType:""));
+      AuthenticationResponses response = await authenticator.exchangeCodeForSession("testCode");
+      expect(response, AuthenticationResponses.success);
+    });
+
+    test("Tests that failure is sent with an exception",() async {
+      when(() => supabaseAuth.exchangeCodeForSession(any())).thenThrow(Exception());
+      AuthenticationResponses response = await authenticator.exchangeCodeForSession("testCode");
+      expect(response, AuthenticationResponses.failure);
+    });
+
+    test("Tests that update password runs correctly",() async {
+
+      when(() => supabaseAuth.updateUser(any())).thenAnswer((_) async => UserResponse.fromJson({}));
+
+      AuthenticationResponses response = await authenticator.updatePassword("password");
+
+      expect(response, AuthenticationResponses.success);
+    });
+
+    test("Tests that update password handles errors",() async {
+
+      when(() => supabaseAuth.updateUser(any())).thenThrow(Exception());
+
+      AuthenticationResponses response = await authenticator.updatePassword("password");
+
+      expect(response, AuthenticationResponses.failure);
+    });
+
+    test("Reset password runs correctly",() async {
+
+      when(() => supabaseAuth.resetPasswordForEmail(any()))
+          .thenAnswer((_) async {});
+
+
+      AuthenticationResponses response = await authenticator.resetPassword("testEmail");
+
+      expect(response, AuthenticationResponses.success);
+    });
+
+    test("Reset password handles errors",() async {
+
+      when(() => supabaseAuth.resetPasswordForEmail(any()))
+          .thenThrow(Exception());
+
+
+      AuthenticationResponses response = await authenticator.resetPassword("testEmail");
+
+      expect(response, AuthenticationResponses.failure);
+    });
+
+  });
 }

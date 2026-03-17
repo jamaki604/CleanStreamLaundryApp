@@ -81,21 +81,20 @@ void main() {
   });
 
   test("Tests that the logic was called correctly to update account balance", () async {
-    await profileHandler.updateBalanceById(47.20);
-    verify(() => supabaseMock.auth.currentUser).called(1);
+    await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
     verify(() => supabaseMock.from("profiles")).called(1);
     verify(() => queryBuilderMock.update({"balance": 47.20})).called(1);
   });
 
   test("Tests that updateBalanceID catches Postgrest exception", () async {
     when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
-    await profileHandler.updateBalanceById(47.20);
+    await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
     //Test will fail if exception was not caught
   });
 
   test("Tests that updateBalanceID catches unknown exception", () async {
     when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
-    await profileHandler.updateBalanceById(47.20);
+    await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
     //Test will fail if exception was not caught
   });
 
@@ -149,6 +148,22 @@ void main() {
     when(() => supabaseAuth.currentUser?.id).thenReturn(null);
     when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
     expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+  });
+
+  test("Tests that the logic was called correctly to update account rewards", () async {
+    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+    verify(() => supabaseMock.from("profiles")).called(1);
+    verify(() => queryBuilderMock.update({"reward_tracker": 10.50})).called(1);
+  });
+
+  test("Tests that updateRewardsById catches Postgrest exception", () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+  });
+
+  test("Tests that updateRewardsById catches unknown exception", () async {
+    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
   });
 
 }

@@ -11,5 +11,14 @@ services:
       - .env
     command: flutter run -d web-server --web-port=8080 --web-hostname=0.0.0.0
 
+  dev:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash
+    stdin_open: true
+    tty: true
+
 volumes:
   flutter_cache:

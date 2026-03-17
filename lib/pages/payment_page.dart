@@ -13,6 +13,8 @@ import 'package:clean_stream_laundry_app/logic/services/machine_communication_se
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:go_router/go_router.dart';
+import 'package:clean_stream_laundry_app/widgets/washer_controls_card.dart';
+import 'package:clean_stream_laundry_app/widgets/dryer_controls_card.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
@@ -31,6 +33,10 @@ class _PaymentPageState extends State<PaymentPage> {
   double? _userBalance;
   bool _isLoading = true;
 
+  double _basePrice = 0;
+  double _addedWasherCost = 0;
+  int _dryerMinutes = 5;
+
   final machineService = GetIt.instance<MachineService>();
   final profileService = GetIt.instance<ProfileService>();
   final authService = GetIt.instance<AuthService>();
@@ -38,6 +44,10 @@ class _PaymentPageState extends State<PaymentPage> {
   final machineCommunicator = GetIt.instance<MachineCommunicationService>();
   final notificationService = GetIt.instance<NotificationService>();
   final paymentProcessor = GetIt.instance<PaymentProcessor>();
+
+  bool get _isDryer =>
+      _machineName != null &&
+          _machineName!.toLowerCase().contains('dryer');
 
   @override
   void initState() {
@@ -49,20 +59,21 @@ class _PaymentPageState extends State<PaymentPage> {
     final data = await machineService.getMachineById(widget.machineId);
     final userId = authService.getCurrentUserId;
 
-    if (userId == null) {
-      return;
-    }
+    if (userId == null) return;
+
     final balance = await profileService.getUserBalanceById(userId);
 
     if (data != null && balance != null) {
+      final name = data['Name'] as String?;
+      _basePrice = (data['Price'] as num).toDouble();
+
       setState(() {
         _userBalance = (balance['balance'] as num).toDouble();
-        _machineName = data['Name'];
-        _price = (data['Price'] as num).toDouble();
+        _machineName = name;
+        _price = _basePrice;
         _isLoading = false;
       });
     } else {
-      // handle error / machine not found
       setState(() {
         _userBalance = 0;
         _machineName = 'Unknown';
@@ -72,13 +83,27 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
+  void _onDryerChanged(double price, int minutes) {
+    setState(() {
+      _price = price;
+      _dryerMinutes = minutes;
+    });
+  }
+
+  void _onWasherCycleChanged(double addedCost) {
+    setState(() {
+      _addedWasherCost = addedCost;
+      _price = _basePrice + _addedWasherCost;
+    });
+  }
+
   Future<void> makeNotification(String name) async {
     final notificationService = GetIt.instance<NotificationService>();
     await notificationService.scheduleEarlyMachineNotification(
       id: 1,
-      //This is where we would add code to get the machine finish time
-      //Use the machine finish time instead of hardcoding 5 mins
-      machineTime: const Duration(minutes: 5, seconds: 5),
+      machineTime: _isDryer
+          ? Duration(minutes: _dryerMinutes)
+          : const Duration(minutes: 5, seconds: 5),
       machineName: name,
     );
   }
@@ -89,33 +114,39 @@ class _PaymentPageState extends State<PaymentPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 20),
-                        const SizedBox(height: 40),
-                        _buildAmountCard(),
-                        const SizedBox(height: 30),
-                      ],
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildAmountCard(),
+
+                  const SizedBox(height: 20),
+
+                  if (_isDryer)
+                    DryerControlsCard(onChanged: _onDryerChanged)
+                  else
+                    WasherControlsCard(
+                      onCycleChanged: _onWasherCycleChanged,
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: _paymentCompleted
-                      ? _buildBackToHomeButton(
-                          context,
-                        ) // Show this when payment is complete
-                      : _buildPaymentButtons(context), // Show this otherwise
-                ),
-              ],
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: _paymentCompleted
+                ? _buildBackToHomeButton(context)
+                : _buildPaymentButtons(context),
+          ),
+        ],
+      ),
     );
   }
+
 
   Widget _buildAmountCard() {
     return Container(
@@ -126,7 +157,11 @@ class _PaymentPageState extends State<PaymentPage> {
       ),
       child: Column(
         children: [
-          Icon(Icons.local_laundry_service, size: 80, color: Color(0xFF2073A9)),
+          Icon(
+            Icons.local_laundry_service,
+            size: 80,
+            color: Color(0xFF2073A9),
+          ),
           const SizedBox(height: 20),
           Text(
             'Machine $_machineName',
@@ -157,13 +192,11 @@ class _PaymentPageState extends State<PaymentPage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          context.go('/homePage');
-        },
+        onPressed: () => context.go('/homePage'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue[700],
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
           elevation: 2,
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -183,7 +216,6 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget _buildPaymentButtons(BuildContext context) {
     return Row(
       children: [
-        // Stripe payment button
         Expanded(
           child: ElevatedButton(
             onPressed: (_isConfirmed || _price == null || _price == 0)
@@ -192,8 +224,7 @@ class _PaymentPageState extends State<PaymentPage> {
               final success = await paymentProcessor.processPayment(
                 _price!,
                 MachineFormatter.formatMachineType(
-                  _machineName.toString(),
-                ),
+                    _machineName.toString()),
               );
 
               if (success == PaymentResult.success) {
@@ -205,17 +236,14 @@ class _PaymentPageState extends State<PaymentPage> {
                 );
 
                 final deviceAuthorized =
-                await machineCommunicator.wakeDevice(widget.machineId);
+                await machineCommunicator.wakeDevice(
+                    widget.machineId);
 
                 Navigator.of(context, rootNavigator: true).pop();
 
                 if (deviceAuthorized) {
-                  setState(() {
-                    _paymentCompleted = true;
-                  });
-
-                  makeNotification(_machineName.toString());
-
+                  setState(() => _paymentCompleted = true);
+                  await makeNotification(_machineName.toString());
                   statusDialog(
                     context,
                     title: "Payment Processed! Machine Ready!",
@@ -226,7 +254,8 @@ class _PaymentPageState extends State<PaymentPage> {
                   statusDialog(
                     context,
                     title: "Machine Error",
-                    message: "Payment succeeded but machine did not wake up.",
+                    message:
+                    "Payment succeeded but machine did not wake up.",
                     isSuccess: false,
                   );
                 }
@@ -240,61 +269,59 @@ class _PaymentPageState extends State<PaymentPage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: (_isConfirmed || _price == null || _price == 0)
+              backgroundColor:
+              (_isConfirmed || _price == null || _price == 0)
                   ? Colors.grey
                   : Colors.blue[700],
               disabledBackgroundColor: Colors.grey,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               elevation: 2,
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             child: _isConfirmed
                 ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.5,
-                    ),
-                  )
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2.5,
+              ),
+            )
                 : Text(
-                    _price != null && _price! > 0
-                        ? 'Pay \$${_price!.toStringAsFixed(2)}'
-                        : 'Pay',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+              _price != null && _price! > 0
+                  ? 'Pay \$${_price!.toStringAsFixed(2)}'
+                  : 'Pay',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
 
         const SizedBox(width: 16),
 
-        // Loyalty payment button
         Expanded(
           child: ElevatedButton(
-            onPressed:
-                (_isConfirmed ||
-                    _price == null ||
-                    _price == 0 ||
-                    (_userBalance ?? 0) < (_price ?? 0))
+            onPressed: (_isConfirmed ||
+                _price == null ||
+                _price == 0 ||
+                (_userBalance ?? 0) < (_price ?? 0))
                 ? null
                 : () => _processLoyaltyPayment(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  (_isConfirmed ||
-                      _price == null ||
-                      _price == 0 ||
-                      (_userBalance ?? 0) < (_price ?? 0))
+              backgroundColor: (_isConfirmed ||
+                  _price == null ||
+                  _price == 0 ||
+                  (_userBalance ?? 0) < (_price ?? 0))
                   ? Colors.grey
                   : Colors.green[700],
               disabledBackgroundColor: Colors.grey,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               elevation: 2,
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -314,46 +341,63 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   void _processLoyaltyPayment(BuildContext context) async {
-    final updatedBalance = _userBalance! - _price!;
-    profileService.updateBalanceById(updatedBalance);
+    final userId = authService.getCurrentUserId;
 
-    setState(() {
-      _userBalance = updatedBalance;
-    });
+    final updatedBalance = _userBalance! - _price!;
+    setState(() => _userBalance = updatedBalance);
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) =>
           const Center(child: CircularProgressIndicator()),
     );
-    final deviceAuthorized = await machineCommunicator.wakeDevice(
-      widget.machineId,
-    );
+
+    final deviceAuthorized =
+    await machineCommunicator.wakeDevice(widget.machineId);
+
     Navigator.of(context, rootNavigator: true).pop();
 
+
+    if (!deviceAuthorized) {
+      statusDialog(
+        context,
+        title: "Machine Error",
+        message: "Machine did not respond. Your balance has not been charged. Please contact support.",
+        isSuccess: false,
+      );
+      return;
+    }
+
+    await profileService.updateBalanceById(userId!, updatedBalance);
+
+    setState(() {
+      _userBalance = updatedBalance;
+      _paymentCompleted = true;
+    });
+
+    await transactionService.recordTransaction(
+      amount: _price!,
+      description:
+      "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
+      type: "laundry",
+    );
+
     if (deviceAuthorized) {
-      makeNotification(_machineName.toString());
-      setState(() {
-        _paymentCompleted = true;
-      });
+      await makeNotification(_machineName.toString());
+      setState(() => _paymentCompleted = true);
       statusDialog(
         context,
         title: "Machine Ready!",
         message: "Machine $_machineName is now active.",
         isSuccess: true,
       );
-
-      await transactionService.recordTransaction(
-        amount: _price!,
-        description:
-        "Loyalty payment on ${MachineFormatter.formatMachineType(_machineName.toString())}",
-        type: "laundry",
-      );
     } else {
       statusDialog(
         context,
         title: "Machine Error",
-        message: "payment succeeded but machine did not wake up.",
+        message:
+        "Payment succeeded but machine did not wake up. Please contact support",
         isSuccess: false,
       );
     }

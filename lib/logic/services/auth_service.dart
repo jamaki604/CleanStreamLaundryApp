@@ -18,7 +18,7 @@ abstract class AuthService {
   Future<AuthenticationResponses> resetPassword(String email);
   Future<void> appleSignIn();
   Future<void> googleSignIn();
-  Future<void> handleOAuthRedirect(Uri uri);
+  Future<void> getSessionFromURI(Uri uri);
   Future<void> refreshSession();
   User? getCurrentUser();
   String? getCurrentUserEmail();
@@ -28,4 +28,5 @@ abstract class AuthService {
   });
   Future<AuthenticationResponses> exchangeCodeForSession(String code);
   Future<AuthenticationResponses> updatePassword(String newPassword);
+  Future<AuthenticationResponses> verifyCode({required String email, required String code});
 }

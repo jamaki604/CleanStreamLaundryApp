@@ -23,16 +23,13 @@ class SupabaseAuthService implements AuthService {
 
   @override
   Future<AuthenticationResponses> isLoggedIn() async {
-    AuthenticationResponses output = AuthenticationResponses.failure;
-    try {
-      await _client.auth.refreshSession();
-      if (_client.auth.currentUser != null) {
-        output = AuthenticationResponses.success;
-      }
-    } catch (e) {
-      print(e);
-      return output;
+    AuthenticationResponses output = AuthenticationResponses.success;
+    final session = _client.auth.currentSession;
+
+    if (!(session != null && session.user != null)) {
+      output = AuthenticationResponses.failure;
     }
+
     return output;
   }
 
@@ -228,7 +225,7 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> handleOAuthRedirect(Uri uri) async {
+  Future<void> getSessionFromURI(Uri uri) async {
     await _client.auth.getSessionFromUrl(uri);
   }
 
@@ -270,8 +267,7 @@ class SupabaseAuthService implements AuthService {
     try {
       // Send password reset email and redirect back to the app via deep link.
       await _client.auth.resetPasswordForEmail(
-        email,
-        redirectTo: 'clean-stream://reset-protected',
+        email
       );
       output = AuthenticationResponses.success;
     } catch (e) {
@@ -308,4 +304,26 @@ class SupabaseAuthService implements AuthService {
     }
     return output;
   }
+
+  @override
+  Future<AuthenticationResponses> verifyCode({required String email, required String code}) async {
+    AuthenticationResponses output = AuthenticationResponses.success;
+
+    try {
+      final response = await _client.auth.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.recovery,
+      );
+
+      if (response.session == null) {
+        output = AuthenticationResponses.failure;
+      }
+    }catch (e){
+      output = AuthenticationResponses.failure;
+    }
+
+    return output;
+  }
+
 }

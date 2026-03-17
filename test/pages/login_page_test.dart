@@ -389,7 +389,7 @@ void main() {
         await tester.pumpAndSettle();
 
         when(
-          () => mockAuthService.handleOAuthRedirect(any()),
+          () => mockAuthService.getSessionFromURI(any()),
         ).thenAnswer((_) async {});
         when(
           () => mockAuthService.isLoggedIn(),
@@ -414,7 +414,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Home Page'), findsOneWidget);
-        verify(() => mockAuthService.handleOAuthRedirect(any())).called(1);
+        verify(() => mockAuthService.getSessionFromURI(any())).called(1);
         verify(() => mockAuthService.isLoggedIn()).called(1);
         verify(() => mockAuthService.getCurrentUser()).called(1);
         verify(

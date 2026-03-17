@@ -20,7 +20,7 @@ class TransactionParser {
       return "";
     }
 
-    final action = description == "Loyalty Card" ? "added to" : "used on";
+    final action = description == "Loyalty Card" ? "added to" : "-";
     return '$formattedAmount $action $description on $formattedDate';
   }
 
@@ -68,6 +68,7 @@ class TransactionParser {
         'directDryer': 0.0,
         'loyaltyDryer': 0.0,
         'loyaltyCard': 0.0,
+        'Rewards': 0.0
       };
     }
 
@@ -100,6 +101,9 @@ class TransactionParser {
       } else if (description == 'loyalty card') {
         result[monthKey]!['loyaltyCard'] =
             result[monthKey]!['loyaltyCard']! + amount;
+      } else if (description == 'reward from payment') {
+        result[monthKey]!['Rewards'] =
+            result[monthKey]!['Rewards']! + amount;
       }
     }
     return result;

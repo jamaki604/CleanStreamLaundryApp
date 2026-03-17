@@ -12,6 +12,22 @@ import 'mocks.dart';
 
 void main() {
   late MockLoyaltyViewModel mockViewModel;
+  const singleTransaction = 'Test transaction';
+  const firstTransaction = 'Test transaction 1';
+  const secondTransaction = 'Test transaction 2';
+  const thirdTransaction = 'Test transaction 3';
+  const transactionHistory = [
+    firstTransaction,
+    secondTransaction,
+    thirdTransaction,
+  ];
+
+  Finder findTransactionScrollable() {
+    return find.descendant(
+      of: find.byType(ListView),
+      matching: find.byType(Scrollable),
+    );
+  }
 
   setUpAll(() {
     // Register fallback values for mocktail
@@ -129,7 +145,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$42.75'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$42.75'), findsOneWidget);
     });
 
     testWidgets('should display balance with two decimal places', (
@@ -140,7 +156,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$100.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$100.00'), findsOneWidget);
     });
 
     testWidgets('should display default balance when userBalance is null', (
@@ -151,7 +167,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
 
     testWidgets('should display Load card button with correct styling', (
@@ -167,13 +183,6 @@ void main() {
       );
 
       expect(button.onPressed, isNotNull);
-    });
-
-    testWidgets('should have scrollable content', (tester) async {
-      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
-      await tester.pump();
-
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
   });
 
@@ -195,7 +204,7 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
@@ -204,18 +213,23 @@ void main() {
     });
 
     testWidgets('should display all transactions in list', (tester) async {
-      when(() => mockViewModel.recentTransactions).thenReturn([
-        'Loaded \$10.00 on 01/10/2025',
-        'Used \$2.50 on 01/09/2025',
-        'Loaded \$25.00 on 01/08/2025',
-      ]);
+      when(
+        () => mockViewModel.recentTransactions,
+      ).thenReturn(transactionHistory);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('Loaded \$10.00 on 01/10/2025'), findsOneWidget);
-      expect(find.text('Used \$2.50 on 01/09/2025'), findsOneWidget);
-      expect(find.text('Loaded \$25.00 on 01/08/2025'), findsOneWidget);
+      expect(find.text(firstTransaction, skipOffstage: false), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text(secondTransaction),
+        100,
+        scrollable: findTransactionScrollable(),
+      );
+      expect(find.text(secondTransaction), findsOneWidget);
+
+      expect(find.text(thirdTransaction, skipOffstage: false), findsOneWidget);
     });
 
     testWidgets(
@@ -223,7 +237,7 @@ void main() {
       (tester) async {
         when(
           () => mockViewModel.recentTransactions,
-        ).thenReturn(['Transaction 1']);
+        ).thenReturn([singleTransaction]);
         when(() => mockViewModel.showPastTransactions).thenReturn(false);
 
         await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -239,7 +253,7 @@ void main() {
       (tester) async {
         when(
           () => mockViewModel.recentTransactions,
-        ).thenReturn(['Transaction 1']);
+        ).thenReturn([singleTransaction]);
         when(() => mockViewModel.showPastTransactions).thenReturn(true);
 
         await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -255,7 +269,7 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
       when(() => mockViewModel.showPastTransactions).thenReturn(false);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -272,7 +286,7 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
       when(() => mockViewModel.showPastTransactions).thenReturn(true);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -289,13 +303,16 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.byType(Card), findsWidgets);
-      expect(find.byIcon(Icons.receipt_long), findsOneWidget);
+      expect(find.byType(Card, skipOffstage: false), findsWidgets);
+      expect(
+        find.byIcon(Icons.receipt_long, skipOffstage: false),
+        findsOneWidget,
+      );
     });
   });
 
@@ -792,7 +809,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
 
     testWidgets('should handle empty transaction list', (tester) async {
@@ -811,7 +828,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$9999.99'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$9999.99'), findsOneWidget);
     });
 
     testWidgets('should handle zero balance', (tester) async {
@@ -820,7 +837,52 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.text('Current Balance: \$0.00'), findsOneWidget);
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
+    });
+  });
+  group('Reward Info Dialog', () {
+    testWidgets('should display info button next to reward text', (
+      tester,
+    ) async {
+      when(() => mockViewModel.userReward).thenReturn(5.0);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.info_outline), findsOneWidget);
+    });
+
+    testWidgets('should open reward info dialog when info button is tapped', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards program'), findsOneWidget);
+      expect(
+        find.text(
+          'For every \$20 you spend, you get an extra \$5 automatically added to your loyalty balance.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should close reward info dialog when Got it is tapped', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Got it'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards program'), findsNothing);
     });
   });
 }
