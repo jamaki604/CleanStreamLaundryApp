@@ -46,9 +46,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
   Widget _buildContent(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         CreditCard(username: viewModel.userName ?? 'John Doe'),
-        const SizedBox(height: 25),
+        const SizedBox(height: 17),
         Text(
           'Loyalty Balance: \$${viewModel.userBalance?.toStringAsFixed(2) ?? '0.00'}',
           textAlign: TextAlign.center,
@@ -58,14 +58,38 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             color: Theme.of(context).colorScheme.fontSecondary,
           ),
         ),
-        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '\$${(20 - (viewModel.userReward ?? 0)).toStringAsFixed(2)} until next reward',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.fontSecondary,
+              ),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
+              onPressed: () => _showRewardInfoDialog(context),
+              icon: const Icon(Icons.info_outline),
+              iconSize: 18,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              color: Colors.blue,
+            ),
+          ],
+        ),
+        const SizedBox(height: 7),
         ElevatedButton(
           onPressed: () => _loadCard(),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             disabledBackgroundColor: Colors.grey,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             elevation: 2,
           ),
@@ -123,7 +147,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 9),
           Expanded(
             child: ListView.builder(
               shrinkWrap: true,
@@ -137,7 +161,7 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
                     vertical: 6.0,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   elevation: 4,
                   color: Theme.of(context).colorScheme.cardPrimary,
@@ -447,5 +471,28 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
         isSuccess: false,
       );
     }
+  }
+
+  void _showRewardInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Rewards program'),
+          content: const Text(
+            'For every \$20 you spend, you get an extra \$5 automatically added to your loyalty balance.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Got it'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

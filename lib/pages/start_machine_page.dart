@@ -68,7 +68,7 @@ class _StartPageState extends State<StartPage> {
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 3),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(14),
                     color: Colors.transparent,
                   ),
                   child: Row(

@@ -197,7 +197,6 @@ void main() {
 
     testWidgets('sorts months in descending order',
             (WidgetTester tester) async {
-          final now = DateTime.now();
           final transactions = [
             createTransaction(
               monthsAgo: 3,
