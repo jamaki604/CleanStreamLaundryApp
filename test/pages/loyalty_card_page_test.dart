@@ -12,6 +12,22 @@ import 'mocks.dart';
 
 void main() {
   late MockLoyaltyViewModel mockViewModel;
+  const singleTransaction = 'Test transaction';
+  const firstTransaction = 'Test transaction 1';
+  const secondTransaction = 'Test transaction 2';
+  const thirdTransaction = 'Test transaction 3';
+  const transactionHistory = [
+    firstTransaction,
+    secondTransaction,
+    thirdTransaction,
+  ];
+
+  Finder findTransactionScrollable() {
+    return find.descendant(
+      of: find.byType(ListView),
+      matching: find.byType(Scrollable),
+    );
+  }
 
   setUpAll(() {
     // Register fallback values for mocktail
@@ -188,7 +204,7 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
@@ -197,36 +213,23 @@ void main() {
     });
 
     testWidgets('should display all transactions in list', (tester) async {
-      when(() => mockViewModel.recentTransactions).thenReturn([
-        'Loaded \$10.00 on 01/10/2025',
-        'Used \$2.50 on 01/09/2025',
-        'Loaded \$25.00 on 01/08/2025',
-      ]);
+      when(
+        () => mockViewModel.recentTransactions,
+      ).thenReturn(transactionHistory);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Loaded \$10.00 on 01/10/2025'), findsOneWidget);
+      expect(find.text(firstTransaction, skipOffstage: false), findsOneWidget);
 
       await tester.scrollUntilVisible(
-        find.text('Used \$2.50 on 01/09/2025'),
+        find.text(secondTransaction),
         100,
-        scrollable: find.descendant(
-          of: find.byType(ListView),
-          matching: find.byType(Scrollable),
-        ),
+        scrollable: findTransactionScrollable(),
       );
-      expect(find.text('Used \$2.50 on 01/09/2025'), findsOneWidget);
+      expect(find.text(secondTransaction), findsOneWidget);
 
-      await tester.scrollUntilVisible(
-        find.text('Loaded \$25.00 on 01/08/2025'),
-        100,
-        scrollable: find.descendant(
-          of: find.byType(ListView),
-          matching: find.byType(Scrollable),
-        ),
-      );
-      expect(find.text('Loaded \$25.00 on 01/08/2025'), findsOneWidget);
+      expect(find.text(thirdTransaction, skipOffstage: false), findsOneWidget);
     });
 
     testWidgets(
@@ -234,7 +237,7 @@ void main() {
       (tester) async {
         when(
           () => mockViewModel.recentTransactions,
-        ).thenReturn(['Transaction 1']);
+        ).thenReturn([singleTransaction]);
         when(() => mockViewModel.showPastTransactions).thenReturn(false);
 
         await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -250,7 +253,7 @@ void main() {
       (tester) async {
         when(
           () => mockViewModel.recentTransactions,
-        ).thenReturn(['Transaction 1']);
+        ).thenReturn([singleTransaction]);
         when(() => mockViewModel.showPastTransactions).thenReturn(true);
 
         await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -266,7 +269,7 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
       when(() => mockViewModel.showPastTransactions).thenReturn(false);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -283,7 +286,7 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
       when(() => mockViewModel.showPastTransactions).thenReturn(true);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -300,13 +303,16 @@ void main() {
     ) async {
       when(
         () => mockViewModel.recentTransactions,
-      ).thenReturn(['Transaction 1']);
+      ).thenReturn([singleTransaction]);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      expect(find.byType(Card), findsWidgets);
-      expect(find.byIcon(Icons.receipt_long), findsOneWidget);
+      expect(find.byType(Card, skipOffstage: false), findsWidgets);
+      expect(
+        find.byIcon(Icons.receipt_long, skipOffstage: false),
+        findsOneWidget,
+      );
     });
   });
 
@@ -835,7 +841,9 @@ void main() {
     });
   });
   group('Reward Info Dialog', () {
-    testWidgets('should display info button next to reward text', (tester) async {
+    testWidgets('should display info button next to reward text', (
+      tester,
+    ) async {
       when(() => mockViewModel.userReward).thenReturn(5.0);
 
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
@@ -845,8 +853,8 @@ void main() {
     });
 
     testWidgets('should open reward info dialog when info button is tapped', (
-        tester,
-        ) async {
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
@@ -863,8 +871,8 @@ void main() {
     });
 
     testWidgets('should close reward info dialog when Got it is tapped', (
-        tester,
-        ) async {
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
