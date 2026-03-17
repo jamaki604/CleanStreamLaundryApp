@@ -834,4 +834,47 @@ void main() {
       expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
     });
   });
+  group('Reward Info Dialog', () {
+    testWidgets('should display info button next to reward text', (tester) async {
+      when(() => mockViewModel.userReward).thenReturn(5.0);
+
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.info_outline), findsOneWidget);
+    });
+
+    testWidgets('should open reward info dialog when info button is tapped', (
+        tester,
+        ) async {
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards program'), findsOneWidget);
+      expect(
+        find.text(
+          'For every \$20 you spend, you get an extra \$5 automatically added to your loyalty balance.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should close reward info dialog when Got it is tapped', (
+        tester,
+        ) async {
+      await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Got it'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rewards program'), findsNothing);
+    });
+  });
 }
