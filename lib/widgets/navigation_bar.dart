@@ -13,7 +13,7 @@ class NavBar extends StatelessWidget {
       route: '/startPage',
       label: 'Start',
       icon: Icons.local_laundry_service_sharp,
-      routePrefixes: ['/start', '/startPage'],
+      routePrefixes: ['/start', '/startPage', '/scanner', '/paymentPage'],
     ),
     _NavDestination(
       route: '/loyalty',
@@ -48,26 +48,29 @@ class NavBar extends StatelessWidget {
     final currentIndex = _getIndex(location);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      backgroundColor: colorScheme.surface,
-      selectedItemColor: colorScheme.primary,
-      unselectedItemColor: Colors.grey,
-      type: BottomNavigationBarType.fixed,
-      onTap: (index) {
-        final route = _destinations[index].route;
-        if (!location.startsWith(route)) {
-          context.go(route);
-        }
-      },
-      items: _destinations
-          .map(
-            (destination) => BottomNavigationBarItem(
-              icon: Icon(destination.icon),
-              label: destination.label,
-            ),
-          )
-          .toList(),
+    return SizedBox(
+      height: 82,
+      child: BottomNavigationBar(
+        currentIndex: currentIndex,
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          final route = _destinations[index].route;
+          if (!location.startsWith(route)) {
+            context.go(route);
+          }
+        },
+        items: _destinations
+            .map(
+              (destination) => BottomNavigationBarItem(
+                icon: Icon(destination.icon),
+                label: destination.label,
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 }
