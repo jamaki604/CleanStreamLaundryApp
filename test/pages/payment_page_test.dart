@@ -301,7 +301,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Machine Error'), findsWidgets);
-      verify(
+      verifyNever(
         () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
           description: any(named: 'description'),

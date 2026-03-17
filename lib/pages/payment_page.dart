@@ -344,7 +344,6 @@ class _PaymentPageState extends State<PaymentPage> {
     final userId = authService.getCurrentUserId;
 
     final updatedBalance = _userBalance! - _price!;
-    profileService.updateBalanceById(userId!, updatedBalance);
     setState(() => _userBalance = updatedBalance);
 
     showDialog(

@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 
 late bool cancelSearch = false;
 
-void showSearchingDialog(BuildContext context) {
+void showSearchingDialog(
+    BuildContext context,
+    VoidCallback onCancel,
+    ) {
   cancelSearch = false;
+
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -37,6 +41,7 @@ void showSearchingDialog(BuildContext context) {
             TextButton(
               onPressed: () {
                 cancelSearch = true;
+                onCancel();
                 Navigator.of(dialogContext).pop();
               },
               style: TextButton.styleFrom(
