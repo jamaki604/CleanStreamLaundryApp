@@ -118,8 +118,9 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: ListView(
+        cacheExtent: 1000,
+        physics: const AlwaysScrollableScrollPhysics(),
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -148,40 +149,29 @@ class LoyaltyCardPage extends State<LoyaltyPage> {
             ],
           ),
           const SizedBox(height: 9),
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: viewModel.recentTransactions.length,
-              itemBuilder: (context, index) {
-                final transaction = viewModel.recentTransactions[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 4.0,
-                    vertical: 6.0,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 4,
-                  color: Theme.of(context).colorScheme.cardPrimary,
-                  child: ListTile(
-                    leading: const Icon(
-                      Icons.receipt_long,
-                      color: Color(0xFF2073A9),
-                    ),
-                    title: Text(
-                      transaction.toString(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          ...viewModel.recentTransactions.map((transaction) {
+            return Card(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 4.0,
+                vertical: 6.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              elevation: 4,
+              color: Theme.of(context).colorScheme.cardPrimary,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.receipt_long,
+                  color: Color(0xFF2073A9),
+                ),
+                title: Text(
+                  transaction.toString(),
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
