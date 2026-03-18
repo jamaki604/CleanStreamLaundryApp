@@ -211,6 +211,14 @@ class _SettingsState extends State<Settings> {
                   ),
                   const SizedBox(height: 14),
                   SettingsCard(
+                    icon: Icons.menu_book,
+                    title: "Terms of Service",
+                    onTap: () {
+                      // TODO: Opens link to website when clicked. Check out navigation button
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  SettingsCard(
                     icon: Icons.logout,
                     title: "Sign Out",
                     onTap: () {

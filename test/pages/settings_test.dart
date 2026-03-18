@@ -84,13 +84,14 @@ void main() {
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.byType(SettingsCard), findsNWidgets(6));
+      expect(find.byType(SettingsCard), findsNWidgets(7));
       expect(find.text('Sign Out'), findsOneWidget);
       expect(find.text('Monthly Report'), findsOneWidget);
       expect(find.text('Request Refund'), findsOneWidget);
       expect(find.text('Dark Mode'), findsOneWidget);
       expect(find.text('Edit Profile'), findsOneWidget);
       expect(find.text('Notify Before Finish'), findsOneWidget);
+      expect(find.text('Terms of Service'), findsOneWidget);
     });
 
     testWidgets(
