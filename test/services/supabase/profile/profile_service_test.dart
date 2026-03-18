@@ -166,4 +166,15 @@ void main() {
     await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
   });
 
+  test("setNotificationLeadTime runs correctly",() async{
+    await profileHandler.setNotificationLeadTime(5);
+    verify(() => supabaseMock.from("profiles")).called(1);
+  });
+
+  test("setNotificationLeadTime does not run if user is null",() async{
+    when(() => supabaseAuth.currentUser).thenReturn(null);
+    await profileHandler.setNotificationLeadTime(5);
+    verifyNever(() => supabaseMock.from("profiles"));
+  });
+
 }

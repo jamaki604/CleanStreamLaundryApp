@@ -167,5 +167,15 @@ void main() {
       final result = await machineCommunicator.checkAvailability('10000000');
       expect(result, equals('Could not find that machine, please try again.'));
     });
+
+    test('Exception is thrown when testing avaibility', () async {
+      when(() =>
+          edgeFunctionMock.runEdgeFunction(
+              name: any(named: 'name'),
+              body: any(named: 'body'))).thenThrow(Exception());
+
+      final result = await machineCommunicator.checkAvailability('10000000');
+      expect(result, equals("Ping Server Error"));
+    });
   });
 }

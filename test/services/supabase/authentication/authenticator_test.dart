@@ -1036,5 +1036,50 @@ void main(){
       expect(response, AuthenticationResponses.failure);
     });
 
+    test("Tests that the right userID is returned",(){
+
+      final testUser = User(
+        id: '11111111-1111-1111-1111-111111111111',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'example@email.com',
+        emailConfirmedAt: '2024-01-01T00:00:00Z',
+        phone: '',
+        lastSignInAt: '2024-01-01T00:00:00Z',
+        appMetadata: {
+          'provider': 'email',
+          'providers': ['email']
+        },
+        userMetadata: {},
+        identities: [
+          UserIdentity(
+            identityId: '22222222-2222-2222-2222-222222222222',
+            id: '11111111-1111-1111-1111-111111111111',
+            userId: '11111111-1111-1111-1111-111111111111',
+            identityData: {
+              'email': 'example@email.com',
+              'email_verified': false,
+              'phone_verified': false,
+              'sub': '11111111-1111-1111-1111-111111111111'
+            },
+            provider: 'email',
+            lastSignInAt: '2024-01-01T00:00:00Z',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+          ),
+        ],
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      );
+
+      when(() => supabaseAuth.currentUser).thenReturn(testUser);
+      expect(authenticator.getCurrentUserId, "11111111-1111-1111-1111-111111111111");
+    });
+
+    test("Tests that the last signedUpUserId is returned correctly",(){
+      authenticator.lastSignedUpUserId = "testID";
+      expect(authenticator.getLastSignedUpUserId(), "testID");
+    });
+
   });
 }

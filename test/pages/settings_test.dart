@@ -214,6 +214,7 @@ void main() {
       expect(find.byIcon(Icons.request_page), findsOneWidget);
       expect(find.byIcon(Icons.logout), findsOneWidget);
       expect(find.byIcon(Icons.person), findsOneWidget);
+      expect(find.byIcon(Icons.menu_book),findsOneWidget);
     });
 
     testWidgets('should center content properly', (WidgetTester tester) async {
