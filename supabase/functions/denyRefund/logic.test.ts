@@ -64,7 +64,6 @@ import {
   }
 
   function restoreFetch() {
-    // Deno's real fetch is on globalThis — reset after each test
     globalThis.fetch = fetch;
   }
   
@@ -119,7 +118,6 @@ import {
   
   Deno.test("denyRefundInDb — resolves without error on success", async () => {
     const supabase = makeSupabaseMock();
-    // should not throw
     await denyRefundInDb(supabase, "txn-abc");
   });
   
@@ -178,7 +176,7 @@ import {
   });
   
   Deno.test("getUserEmail — throws when user has no email", async () => {
-    const supabase = makeSupabaseMock({ user: { id: "user-123" } }); // no email field
+    const supabase = makeSupabaseMock({ user: { id: "user-123" } }); 
   
     await assertRejects(
       () => getUserEmail(supabase, "user-123"),
@@ -276,7 +274,6 @@ import {
     } finally {
       restoreFetch();
     }
-    // reaching here without throwing is the assertion
   });
   
   Deno.test("sendDenialEmail — throws with error text when response is not ok", async () => {
