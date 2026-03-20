@@ -2,9 +2,12 @@ import 'package:clean_stream_laundry_app/features/loading/controller.dart';
 import 'package:clean_stream_laundry_app/features/loading/widgets/error_view.dart';
 import 'package:clean_stream_laundry_app/features/loading/widgets/logo.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoadingPage extends StatefulWidget {
-  const LoadingPage({super.key});
+  const LoadingPage({super.key, this.controller});
+
+  final LoadingPageController? controller;
 
   @override
   State<LoadingPage> createState() => _LoadingPageState();
@@ -16,8 +19,11 @@ class _LoadingPageState extends State<LoadingPage> {
   @override
   void initState() {
     super.initState();
-    _controller = LoadingPageController();
-    _controller.init(context);
+    _controller = widget.controller ?? LoadingPageController();
+    _controller.init(
+      navigate: (route, {extra}) => context.go(route, extra: extra),
+      isMounted: () => mounted,
+    );
     _controller.addListener(() {
       if (mounted) setState(() {});
     });

@@ -1,9 +1,8 @@
 import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
 
 class LoadingPageController extends ChangeNotifier {
   final AuthService authService;
@@ -17,70 +16,78 @@ class LoadingPageController extends ChangeNotifier {
 
   String? error;
 
-  Future<void> init(BuildContext context) async {
+  Future<void> init({
+    required void Function(String route, {Object? extra}) navigate,
+    required ValueGetter<bool> isMounted,
+  }) async {
     await Future.wait([
-      _automaticLogIn(context),
-      _coldStartRedirect(context),
+      _automaticLogIn(navigate: navigate, isMounted: isMounted),
+      _coldStartRedirect(navigate: navigate, isMounted: isMounted),
     ]);
   }
 
-  Future<void> _automaticLogIn(BuildContext context) async {
+  Future<void> _automaticLogIn({
+    required void Function(String route, {Object? extra}) navigate,
+    required ValueGetter<bool> isMounted,
+  }) async {
     await Future.delayed(Duration.zero);
 
     try {
-      if (await authService.isLoggedIn() == AuthenticationResponses.success) {
-        if (!context.mounted) return;
-        context.go('/homePage');
+      final response = await authService.isLoggedIn();
+      if (!isMounted()) return;
+
+      if (response == AuthenticationResponses.success) {
+        navigate('/homePage');
       } else {
-        if (!context.mounted) return;
-        context.go('/login');
+        navigate('/login');
       }
     } catch (e) {
-      if (!context.mounted) return;
+      if (!isMounted()) return;
       error = e.toString();
       notifyListeners();
     }
   }
 
-  Future<void> _coldStartRedirect(BuildContext context) async {
+  Future<void> _coldStartRedirect({
+    required void Function(String route, {Object? extra}) navigate,
+    required ValueGetter<bool> isMounted,
+  }) async {
     try {
-      final AppLinks appLinks = AppLinks();
       final Uri? initialUri = await appLinks.getInitialAppLink();
 
       if (initialUri == null) return;
 
       if (initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'reset-protected') {
-        if (!context.mounted) return;
-        context.go('/reset-protected', extra: initialUri);
+        if (!isMounted()) return;
+        navigate('/reset-protected', extra: initialUri);
         return;
       }
 
       if (initialUri.scheme == 'clean-stream' &&
           initialUri.host == 'email-verification') {
-        if (!context.mounted) return;
-        context.go('/homePage');
+        if (!isMounted()) return;
+        navigate('/homePage');
         return;
       }
 
       if (initialUri.host == 'change-email') {
-        if (!context.mounted) return;
-        context.go('/email-verification');
+        if (!isMounted()) return;
+        navigate('/email-verification');
         return;
       }
 
-      if (initialUri.scheme == 'clean-stream' &&
-          initialUri.host == 'oauth') {
+      if (initialUri.scheme == 'clean-stream' && initialUri.host == 'oauth') {
         await authService.getSessionFromURI(initialUri);
-        if (!context.mounted) return;
+        if (!isMounted()) return;
         if (await authService.isLoggedIn() == AuthenticationResponses.success) {
-          context.go('/homePage');
+          navigate('/homePage');
         } else {
-          context.go('/login');
+          navigate('/login');
         }
       }
-    } catch (e) {
-
+    } catch (_) {
+      // cold-start failures are silent — same as original
     }
   }
 
