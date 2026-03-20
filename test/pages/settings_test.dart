@@ -84,7 +84,7 @@ void main() {
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.byType(SettingsCard), findsNWidgets(7));
+      expect(find.byType(SettingsCard), findsNWidgets(8));
       expect(find.text('Sign Out'), findsOneWidget);
       expect(find.text('Monthly Report'), findsOneWidget);
       expect(find.text('Request Refund'), findsOneWidget);
@@ -92,6 +92,7 @@ void main() {
       expect(find.text('Edit Profile'), findsOneWidget);
       expect(find.text('Notify Before Finish'), findsOneWidget);
       expect(find.text('Terms of Service'), findsOneWidget);
+      expect(find.text('Privacy Policy'), findsOneWidget);
     });
 
     testWidgets(
@@ -215,6 +216,7 @@ void main() {
       expect(find.byIcon(Icons.logout), findsOneWidget);
       expect(find.byIcon(Icons.person), findsOneWidget);
       expect(find.byIcon(Icons.menu_book),findsOneWidget);
+      expect(find.byIcon(Icons.shield),findsOneWidget);
     });
 
     testWidgets('should center content properly', (WidgetTester tester) async {
