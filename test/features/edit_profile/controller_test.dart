@@ -44,10 +44,6 @@ void main() {
     GetIt.instance.reset();
   });
 
-  // ---------------------------------------------------------------------------
-  // loadUserData
-  // ---------------------------------------------------------------------------
-
   group('loadUserData', () {
     test('populates currentName and currentEmail from services', () async {
       await controller.init();
@@ -93,10 +89,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // hasChanges
-  // ---------------------------------------------------------------------------
-
   group('hasChanges', () {
     setUp(() async {
       await controller.init();
@@ -119,7 +111,6 @@ void main() {
     });
 
     test('returns false when text matches after trimming', () {
-      // Text controllers already hold the trimmed current values
       controller.nameController.text = controller.currentName;
       controller.emailController.text = controller.currentEmail;
 
@@ -127,16 +118,12 @@ void main() {
     });
 
     test('returns true when only whitespace differs', () {
-      // Whitespace-only changes still register as a change before trimming
       controller.nameController.text = '  ${controller.currentName}  ';
 
       expect(controller.hasChanges, isFalse);
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // saveChanges
-  // ---------------------------------------------------------------------------
 
   group('saveChanges', () {
     setUp(() async {
@@ -281,10 +268,6 @@ void main() {
       )).called(1);
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // deleteAccount
-  // ---------------------------------------------------------------------------
 
   group('deleteAccount', () {
     setUp(() async {

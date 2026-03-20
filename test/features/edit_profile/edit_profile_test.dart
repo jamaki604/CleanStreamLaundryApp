@@ -68,10 +68,6 @@ void main() {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Static UI
-  // ---------------------------------------------------------------------------
-
   group('Static UI', () {
     testWidgets('displays page title', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -120,10 +116,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Loading state
-  // ---------------------------------------------------------------------------
-
   group('Loading state', () {
     testWidgets('displays loading indicator while fetching data',
             (tester) async {
@@ -168,10 +160,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Navigation
-  // ---------------------------------------------------------------------------
-
   group('Navigation', () {
     testWidgets('back button navigates to settings', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -206,10 +194,6 @@ void main() {
           expect(find.text('Verify Email'), findsOneWidget);
         });
   });
-
-  // ---------------------------------------------------------------------------
-  // Confirmation dialog
-  // ---------------------------------------------------------------------------
 
   group('Confirmation dialog', () {
     testWidgets('shows confirmation dialog before saving changes',
@@ -273,9 +257,6 @@ void main() {
         });
   });
 
-  // ---------------------------------------------------------------------------
-  // Form validation
-  // ---------------------------------------------------------------------------
 
   group('Form validation', () {
     testWidgets('validates empty name', (tester) async {
@@ -361,10 +342,6 @@ void main() {
       expect(textField.controller!.text, 'Test');
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // Save behavior
-  // ---------------------------------------------------------------------------
 
   group('Save behavior', () {
     testWidgets('updates name and shows success message', (tester) async {
@@ -471,12 +448,8 @@ void main() {
         });
   });
 
-  // ---------------------------------------------------------------------------
-  // Delete account
-  // ---------------------------------------------------------------------------
 
   group('Delete account', () {
-    // Scrolls to and taps the delete button, then taps Confirm Delete
     Future<void> openDeleteDialog(WidgetTester tester) async {
       await tester.drag(
         find.byType(SingleChildScrollView),
