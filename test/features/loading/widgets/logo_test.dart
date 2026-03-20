@@ -23,7 +23,6 @@ void main() {
           await tester.pumpWidget(_buildLogo());
 
           expect(find.byType(TweenAnimationBuilder<double>), findsOneWidget);
-          // Transform.scale is a Transform widget under the hood
           expect(find.byType(Transform), findsAtLeastNWidgets(1));
         });
 
@@ -36,15 +35,11 @@ void main() {
     testWidgets('scale swaps begin/end after animation completes', (tester) async {
       await tester.pumpWidget(_buildLogo());
 
-      // Advance past the 1-second animation
       await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(milliseconds: 50)); // trigger onEnd
+      await tester.pump(const Duration(milliseconds: 50));
 
-      // A second TweenAnimationBuilder cycle starts — no exception means the
-      // begin/end swap in setState() worked correctly.
       expect(tester.takeException(), isNull);
 
-      // Advance through the reversed animation too
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(milliseconds: 50));
 

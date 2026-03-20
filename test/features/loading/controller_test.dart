@@ -5,7 +5,6 @@ import 'package:mocktail/mocktail.dart';
 
 import 'mocks.dart';
 
-/// Convenience: run init() with a controllable mounted flag and collect routes.
 Future<List<String>> _runInit(
     LoadingPageController controller, {
       bool mounted = true,
@@ -23,8 +22,6 @@ void main() {
   late MockAppLinks mockAppLinks;
 
   setUpAll(() {
-    // Mocktail needs fallback values for any non-nullable custom types used
-    // with any() matchers. Uri is a Dart core type so no fallback needed.
     registerFallbackValue(Uri());
   });
 
@@ -32,13 +29,8 @@ void main() {
     mockAuth = MockAuthService();
     mockAppLinks = MockAppLinks();
 
-    // Default: no deep link
     when(() => mockAppLinks.getInitialAppLink()).thenAnswer((_) async => null);
   });
-
-  // ─────────────────────────────────────────────
-  // _automaticLogIn
-  // ─────────────────────────────────────────────
 
   group('_automaticLogIn', () {
     test('navigates to /homePage when auth returns success', () async {
@@ -115,10 +107,6 @@ void main() {
     });
   });
 
-  // ─────────────────────────────────────────────
-  // _coldStartRedirect – no deep link
-  // ─────────────────────────────────────────────
-
   group('_coldStartRedirect with no deep link', () {
     test('does not produce a cold-start navigation when initialUri is null',
             () async {
@@ -133,14 +121,9 @@ void main() {
 
           final routes = await _runInit(controller);
 
-          // Only the auth navigation should fire
           expect(routes, equals(['/homePage']));
         });
   });
-
-  // ─────────────────────────────────────────────
-  // _coldStartRedirect – reset-protected
-  // ─────────────────────────────────────────────
 
   group('_coldStartRedirect – reset-protected URI', () {
     test('navigates to /reset-protected and passes URI as extra', () async {
@@ -170,10 +153,6 @@ void main() {
     });
   });
 
-  // ─────────────────────────────────────────────
-  // _coldStartRedirect – email-verification
-  // ─────────────────────────────────────────────
-
   group('_coldStartRedirect – email-verification URI', () {
     test('navigates to /homePage for email-verification deep link', () async {
       final uri = Uri.parse('clean-stream://email-verification');
@@ -191,10 +170,6 @@ void main() {
       expect(routes, contains('/homePage'));
     });
   });
-
-  // ─────────────────────────────────────────────
-  // _coldStartRedirect – change-email
-  // ─────────────────────────────────────────────
 
   group('_coldStartRedirect – change-email URI', () {
     test('navigates to /email-verification for change-email deep link',
@@ -214,10 +189,6 @@ void main() {
           expect(routes, contains('/email-verification'));
         });
   });
-
-  // ─────────────────────────────────────────────
-  // _coldStartRedirect – oauth
-  // ─────────────────────────────────────────────
 
   group('_coldStartRedirect – oauth URI', () {
     test('calls getSessionFromURI and navigates to /homePage when logged in',
@@ -274,10 +245,6 @@ void main() {
     });
   });
 
-  // ─────────────────────────────────────────────
-  // _coldStartRedirect – swallows exceptions silently
-  // ─────────────────────────────────────────────
-
   group('_coldStartRedirect error handling', () {
     test('swallows exceptions silently and does not expose error', () async {
       when(() => mockAppLinks.getInitialAppLink())
@@ -294,10 +261,6 @@ void main() {
       expect(controller.error, isNull);
     });
   });
-
-  // ─────────────────────────────────────────────
-  // disposeController
-  // ─────────────────────────────────────────────
 
   group('disposeController', () {
     test('can be called without throwing', () {

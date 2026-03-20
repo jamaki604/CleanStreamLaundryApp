@@ -52,7 +52,6 @@ void main() {
       await tester.tap(find.text('Return to Login'));
       await tester.pumpAndSettle();
 
-      // After navigation, the login scaffold (with its Key) should be present
       expect(find.byKey(const Key('login')), findsOneWidget);
     });
 
@@ -67,7 +66,6 @@ void main() {
       final longError = 'E' * 300;
       await tester.pumpWidget(_buildErrorView(longError));
 
-      // pumpAndSettle ensures no overflow exceptions are thrown in frame render
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
