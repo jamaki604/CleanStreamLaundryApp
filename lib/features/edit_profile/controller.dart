@@ -13,13 +13,17 @@ class EditProfileController extends ChangeNotifier {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
 
-  late StreamSubscription authSub;
+  StreamSubscription? authSub;
 
   String currentName = '';
   String currentEmail = '';
 
   bool isLoading = true;
   bool isSaving = false;
+
+  bool get hasChanges =>
+      nameController.text.trim() != currentName ||
+          emailController.text.trim() != currentEmail;
 
   Future<void> init() async {
     await loadUserData();
@@ -32,7 +36,7 @@ class EditProfileController extends ChangeNotifier {
   Future<void> disposeController() async {
     nameController.dispose();
     emailController.dispose();
-    await authSub.cancel();
+    await authSub?.cancel();
   }
 
   Future<void> loadUserData() async {
@@ -62,15 +66,15 @@ class EditProfileController extends ChangeNotifier {
   Future<bool> saveChanges() async {
     if (isSaving) return false;
 
+    if (!hasChanges) {
+      throw Exception("No changes made");
+    }
+
     final newName = nameController.text.trim();
     final newEmail = emailController.text.trim();
 
     final nameChanged = newName != currentName;
     final emailChanged = newEmail != currentEmail;
-
-    if (!nameChanged && !emailChanged) {
-      throw Exception("No changes made");
-    }
 
     isSaving = true;
     notifyListeners();
@@ -84,7 +88,7 @@ class EditProfileController extends ChangeNotifier {
       currentName = newName;
       currentEmail = newEmail;
 
-      return emailChanged; 
+      return emailChanged;
     } finally {
       isSaving = false;
       notifyListeners();
