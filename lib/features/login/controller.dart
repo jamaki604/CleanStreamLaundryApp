@@ -8,8 +8,14 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginController extends ChangeNotifier {
-  final AuthService authService = GetIt.instance<AuthService>();
-  final ProfileService profileService = GetIt.instance<ProfileService>();
+  final AuthService authService;
+  final ProfileService profileService;
+
+  LoginController({
+    AuthService? authService,
+    ProfileService? profileService,
+  })  : authService = authService ?? GetIt.instance<AuthService>(),
+        profileService = profileService ?? GetIt.instance<ProfileService>();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
