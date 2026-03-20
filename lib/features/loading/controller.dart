@@ -6,7 +6,14 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoadingPageController extends ChangeNotifier {
-  final AuthService authService = GetIt.instance<AuthService>();
+  final AuthService authService;
+  final AppLinks appLinks;
+
+  LoadingPageController({
+    AuthService? authService,
+    AppLinks? appLinks,
+  })  : authService = authService ?? GetIt.instance<AuthService>(),
+        appLinks = appLinks ?? AppLinks();
 
   String? error;
 
@@ -73,7 +80,7 @@ class LoadingPageController extends ChangeNotifier {
         }
       }
     } catch (e) {
-      // cold start redirect failures are silent — _automaticLogIn covers nav
+
     }
   }
 
