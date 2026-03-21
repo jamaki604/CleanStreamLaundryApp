@@ -13,8 +13,8 @@ import 'package:clean_stream_laundry_app/logic/services/machine_communication_se
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:go_router/go_router.dart';
-import 'package:clean_stream_laundry_app/widgets/washer_controls_card.dart';
-import 'package:clean_stream_laundry_app/widgets/dryer_controls_card.dart';
+import 'package:clean_stream_laundry_app/features/payment_page/widgets/washer_controls_card.dart';
+import 'package:clean_stream_laundry_app/features/payment_page/widgets/dryer_controls_card.dart';
 
 class PaymentPage extends StatefulWidget {
   final String machineId;
