@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/widgets/washer_controls_card.dart';
+import 'package:clean_stream_laundry_app/features/machine_payment/widgets/washer_controls_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/widgets/dryer_controls_card.dart';
+import 'package:clean_stream_laundry_app/features/machine_payment/widgets/dryer_controls_card.dart';
 
 ThemeData _testTheme() => ThemeData.light();
 
