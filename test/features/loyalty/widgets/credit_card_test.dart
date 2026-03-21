@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/widgets/credit_card.dart';
+import 'package:clean_stream_laundry_app/features/loyalty/widgets/credit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
