@@ -1,0 +1,168 @@
+import 'package:clean_stream_laundry_app/features/password_reset/controller.dart';
+import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+class PasswordResetPage extends StatefulWidget {
+  const PasswordResetPage({super.key});
+
+  @override
+  State<PasswordResetPage> createState() => _PasswordResetPageState();
+}
+
+class _PasswordResetPageState extends State<PasswordResetPage> {
+  late final PasswordResetController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PasswordResetController();
+    _controller.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.disposeController();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _showMessage(String text) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  Future<void> _onSendPressed() async {
+    try {
+      final response = await _controller.sendResetEmail();
+
+      if (!mounted) return;
+
+      if (response == null) return; 
+
+      if (response == AuthenticationResponses.success) {
+        _showMessage('Password reset email sent! Check your email.');
+        context.go(
+          '/verify-code',
+          extra: _controller.emailController.text.trim(),
+        );
+      } else {
+        _showMessage('Failed to send reset email.');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Error: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      backgroundColor: scheme.surface,
+      appBar: AppBar(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.fontInverted,
+        title: const Text('Reset Password'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/login'),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _controller.formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 32),
+              Icon(Icons.lock_reset, size: 80, color: scheme.primary),
+              const SizedBox(height: 32),
+              Text(
+                'Forgot your password?',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: scheme.fontInverted,
+                ) ??
+                    TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: scheme.fontInverted,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Enter your email address and we\'ll send you a reset link.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.fontSecondary,
+                ) ??
+                    TextStyle(color: scheme.fontSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              TextFormField(
+                controller: _controller.emailController,
+                style: TextStyle(color: scheme.fontInverted),
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(color: scheme.primary),
+                  hintText: 'Enter your email address',
+                  hintStyle: TextStyle(
+                    color: scheme.fontInverted.withOpacity(0.6),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                    BorderSide(color: scheme.primary, width: 2.0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: scheme.fontSecondary),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: scheme.surface,
+                  prefixIcon: Icon(Icons.email, color: scheme.primary),
+                ),
+                validator: _controller.validateEmail,
+                enabled: !_controller.isLoading,
+              ),
+              const SizedBox(height: 24),
+              _controller.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _onSendPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: scheme.primary,
+                    foregroundColor: scheme.onPrimary,
+                  ),
+                  child: const Text('Send Reset Link'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed:
+                _controller.isLoading ? null : () => context.go('/login'),
+                child: Text(
+                  'Back to Login',
+                  style: TextStyle(color: scheme.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
