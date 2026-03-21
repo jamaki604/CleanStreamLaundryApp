@@ -19,11 +19,13 @@ class PasswordResetController extends ChangeNotifier {
   }
 
   String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
+    final trimmed = value?.trim();
+
+    if (trimmed == null || trimmed.isEmpty) {
       return 'Please enter your email';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
+    if (!emailRegex.hasMatch(trimmed)) {
       return 'Please enter a valid email address';
     }
     return null;
