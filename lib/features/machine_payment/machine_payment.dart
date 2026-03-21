@@ -8,16 +8,16 @@ import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'widgets/washer_controls_card.dart';
 import 'package:flutter/material.dart';
 
-class PaymentPage extends StatefulWidget {
+class MachinePayment extends StatefulWidget {
   final String machineId;
 
-  const PaymentPage({super.key, required this.machineId});
+  const MachinePayment({super.key, required this.machineId});
 
   @override
-  State<PaymentPage> createState() => _PaymentPageState();
+  State<MachinePayment> createState() => _MachinePaymentState();
 }
 
-class _PaymentPageState extends State<PaymentPage> {
+class _MachinePaymentState extends State<MachinePayment> {
   late final PaymentController _controller;
 
   @override
