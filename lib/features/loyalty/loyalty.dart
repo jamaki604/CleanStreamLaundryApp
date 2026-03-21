@@ -6,7 +6,6 @@ import 'widgets/transaction_list.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class LoyaltyPage extends StatefulWidget {
@@ -17,11 +16,12 @@ class LoyaltyPage extends StatefulWidget {
 }
 
 class _LoyaltyPageState extends State<LoyaltyPage> {
-  final controller = GetIt.instance<LoyaltyController>();
+  late final controller;
 
   @override
   void initState() {
     super.initState();
+    controller = LoyaltyController();
     controller.addListener(_rebuild);
     controller.initialize();
   }

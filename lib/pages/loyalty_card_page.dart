@@ -4,7 +4,7 @@ import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import '../Logic/Theme/theme.dart';
-import 'package:clean_stream_laundry_app/widgets/credit_card.dart';
+import 'package:clean_stream_laundry_app/features/loyalty/widgets/credit_card.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
 
