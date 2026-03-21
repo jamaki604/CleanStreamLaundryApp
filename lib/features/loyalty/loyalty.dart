@@ -9,19 +9,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class LoyaltyPage extends StatefulWidget {
-  const LoyaltyPage({super.key});
+  final LoyaltyController? controller;
+  const LoyaltyPage({super.key, this.controller});
 
   @override
   State<LoyaltyPage> createState() => _LoyaltyPageState();
 }
 
 class _LoyaltyPageState extends State<LoyaltyPage> {
-  late final controller;
+  late LoyaltyController controller;
 
   @override
   void initState() {
     super.initState();
-    controller = LoyaltyController();
+    controller = widget.controller ??LoyaltyController();
     controller.addListener(_rebuild);
     controller.initialize();
   }

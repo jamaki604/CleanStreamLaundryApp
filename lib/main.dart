@@ -99,7 +99,7 @@ Future<void> setupDependencies() async {
     FlutterLocalNotificationsPlugin(),
   );
 
-  getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
+  //getIt.registerLazySingleton<LoyaltyViewModel>(() => LoyaltyViewModel());
 
   getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor());
 }
