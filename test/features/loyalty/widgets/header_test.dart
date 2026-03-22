@@ -28,7 +28,7 @@ void main() {
 
   group('LoyaltyHeader', () {
     group('Rendering', () {
-      testWidgets('shows CreditCard widget', (tester) async {
+      testWidgets('shows CreditCard widgets', (tester) async {
         await tester.pumpWidget(buildWidget());
         expect(find.byType(CreditCard), findsOneWidget);
       });

@@ -14,7 +14,7 @@ void main() {
       expect(customAppBar is PreferredSizeWidget, true);
     });
 
-    testWidgets('CustomAppBar builds an AppBar widget', (tester) async {
+    testWidgets('CustomAppBar builds an AppBar widgets', (tester) async {
       await tester.pumpWidget(
         MaterialApp(home: Scaffold(appBar: const CustomAppBar())),
       );

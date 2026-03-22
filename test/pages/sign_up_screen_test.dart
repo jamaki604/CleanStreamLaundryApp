@@ -384,7 +384,7 @@ void main() {
     testWidgets('Handle sign up is run when enter is clicked', (tester) async {
       setupViewport(tester);
 
-      // Pump the widget
+      // Pump the widgets
       await tester.pumpWidget(createWidgetUnderTest());
 
       // Find the KeyboardListener and grab its FocusNode

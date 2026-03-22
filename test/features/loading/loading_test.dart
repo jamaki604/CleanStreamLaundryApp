@@ -76,7 +76,7 @@ void main() {
           expect(find.byType(Logo), findsNothing);
         });
 
-    testWidgets('dispose does not throw when widget is removed', (tester) async {
+    testWidgets('dispose does not throw when widgets is removed', (tester) async {
       final controller = _FakeController();
 
       await tester.pumpWidget(_withRouter(LoadingPage(controller: controller)));

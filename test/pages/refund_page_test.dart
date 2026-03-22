@@ -696,7 +696,7 @@ void main() {
 
   });
 
-  testWidgets('disclosure widget displays correctly', (tester) async {
+  testWidgets('disclosure widgets displays correctly', (tester) async {
     when(
           () => mockTransactionService.getRefundableTransactionsForUser(),
     ).thenAnswer((_) async => (transactions: <String>[], ids: <int>[]));

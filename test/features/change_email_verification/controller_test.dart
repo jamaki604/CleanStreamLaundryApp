@@ -27,13 +27,13 @@ void main() {
     GetIt.instance.reset();
   });
 
-  /// Minimal widget tree
+  /// Minimal widgets tree
   Widget buildWithContext(
       Widget Function(BuildContext context) builder) {
     return MaterialApp(home: Builder(builder: builder));
   }
 
-  /// GoRouter widget tree - initial route creates and inits controller,
+  /// GoRouter widgets tree - initial route creates and inits controller,
   /// use for deep-link and nav tests.
   Widget buildWithRouter({
     required FakeAppLinks appLinks,

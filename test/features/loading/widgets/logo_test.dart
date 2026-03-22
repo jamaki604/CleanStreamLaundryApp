@@ -26,7 +26,7 @@ void main() {
           expect(find.byType(Transform), findsAtLeastNWidgets(1));
         });
 
-    testWidgets('renders an Image widget for the logo asset', (tester) async {
+    testWidgets('renders an Image widgets for the logo asset', (tester) async {
       await tester.pumpWidget(_buildLogo());
 
       expect(find.byType(Image), findsOneWidget);

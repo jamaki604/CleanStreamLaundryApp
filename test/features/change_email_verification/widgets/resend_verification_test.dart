@@ -27,7 +27,7 @@ void main() {
     GetIt.instance.reset();
   });
 
-  /// builds minimal widget tree
+  /// builds minimal widgets tree
   Widget buildWidget({
     required ChangeEmailVerificationController controller,
     VoidCallback? onStateChange,
@@ -160,7 +160,7 @@ void main() {
   });
 
   group('Failure state', () {
-    testWidgets('shows VerificationError widget on failure', (tester) async {
+    testWidgets('shows VerificationError widgets on failure', (tester) async {
       when(() => mockAuthService.resendVerification())
           .thenAnswer((_) async => AuthenticationResponses.failure);
 

@@ -333,7 +333,7 @@ void main() {
   });
 
   group('State Management Tests', () {
-    testWidgets('does not navigate if widget is unmounted', (WidgetTester tester) async {
+    testWidgets('does not navigate if widgets is unmounted', (WidgetTester tester) async {
       when(() => mockAuthService.isLoggedIn())
           .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));

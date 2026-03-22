@@ -41,7 +41,7 @@ void main() {
       expect(result[0].height, 50);
     });
 
-    test('parseLocations creates MapMarker widget as child', () {
+    test('parseLocations creates MapMarker widgets as child', () {
       final locations = [
         {'Latitude': 40.7128, 'Longitude': -74.0060},
       ];

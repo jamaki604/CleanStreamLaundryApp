@@ -155,7 +155,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('renders trailing widget when provided', (WidgetTester tester) async {
+    testWidgets('renders trailing widgets when provided', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

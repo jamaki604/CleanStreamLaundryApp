@@ -785,7 +785,7 @@ void main() {
       await tester.pumpWidget(createTestWidget(const LoyaltyPage()));
       await tester.pump();
 
-      // Navigate away to dispose the widget
+      // Navigate away to dispose the widgets
       await tester.pumpWidget(const MaterialApp(home: Scaffold()));
 
       verify(() => mockViewModel.removeListener(any())).called(1);

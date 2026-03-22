@@ -28,7 +28,7 @@ void main() {
       expect(basePage, isA<BasePage>());
     });
 
-    testWidgets('renders provided body widget', (tester) async {
+    testWidgets('renders provided body widgets', (tester) async {
       await tester.pumpWidget(
         wrapWithRouter(const BasePage(body: Text("Hello"))),
       );

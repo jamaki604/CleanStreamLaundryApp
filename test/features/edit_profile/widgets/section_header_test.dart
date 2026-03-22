@@ -24,7 +24,7 @@ void main() {
       expect(find.text('Email Address'), findsOneWidget);
     });
 
-    testWidgets('renders as a Text widget', (tester) async {
+    testWidgets('renders as a Text widgets', (tester) async {
       await tester.pumpWidget(buildWidget(title: 'Full Name'));
 
       expect(find.byType(Text), findsOneWidget);
