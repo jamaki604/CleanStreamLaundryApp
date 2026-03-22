@@ -7,7 +7,7 @@ import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
-import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
+import 'package:clean_stream_laundry_app/features/settings/widgets/settings_card.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 
 class Settings extends StatefulWidget {
