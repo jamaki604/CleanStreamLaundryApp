@@ -1,9 +1,9 @@
 import 'package:clean_stream_laundry_app/middleware/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/pages/root_app.dart';
+import 'package:clean_stream_laundry_app/root_app.dart';
 import 'package:go_router/go_router.dart';
-import 'mocks.dart';
+import 'pages/mocks.dart';
 import 'package:clean_stream_laundry_app/main.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
