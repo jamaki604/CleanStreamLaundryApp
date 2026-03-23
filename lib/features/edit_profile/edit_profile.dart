@@ -289,7 +289,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const SectionHeader(title: 'Full Name'),
                 const SizedBox(height: 12),
                 InfoCard(
-                  label: 'Current',
+                  label: 'Current:',
                   value: _controller.currentName.isNotEmpty
                       ? _controller.currentName
                       : 'Not set',
@@ -304,7 +304,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const SectionHeader(title: 'Email Address'),
                 const SizedBox(height: 12),
                 InfoCard(
-                  label: 'Current',
+                  label: 'Current:',
                   value: _controller.currentEmail.isNotEmpty
                       ? _controller.currentEmail
                       : 'Not set',

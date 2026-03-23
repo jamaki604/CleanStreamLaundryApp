@@ -82,7 +82,7 @@ void main() {
 
       expect(find.text('Full Name'), findsOneWidget);
       expect(find.text('Email Address'), findsOneWidget);
-      expect(find.text('Current'), findsNWidgets(2));
+      expect(find.text('Current:'), findsNWidgets(2));
       expect(find.text('John Doe'), findsNWidgets(2));
       expect(find.text('test@example.com'), findsNWidgets(2));
       expect(find.text('Save Changes'), findsOneWidget);
