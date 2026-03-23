@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'mocks.dart';
-import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
+import 'package:clean_stream_laundry_app/features/settings/widgets/settings_card.dart';
 
 void main() {
   late MockAuthService mockAuthService;

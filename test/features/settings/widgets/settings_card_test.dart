@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/widgets/settings_card.dart';
+import 'package:clean_stream_laundry_app/features/settings/widgets/settings_card.dart';
 
 void main() {
   group('SettingsCard Widget Tests', () {
