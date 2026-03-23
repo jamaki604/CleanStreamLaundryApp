@@ -19,17 +19,20 @@ class ScannerController extends ChangeNotifier {
     cameraController.dispose();
   }
 
-  void handleQRCode(BarcodeCapture capture) {
+  void handleQRCode(
+      BarcodeCapture capture, {
+        required void Function(String route) onNavigate,
+        required void Function(String title, String message) onError,
+      }) async {
     for (final barcode in capture.barcodes) {
       if (barcode.rawValue != null) {
         scannedCode = barcode.rawValue;
         notifyListeners();
-
         final parser = QrScannerParser(scannedCode!);
-        processNayaxCode(
+        await processNayaxCode(
           parser.getNayaxDeviceID(),
-          onNavigate: (_) {}, 
-          onError: (_, __) {},
+          onNavigate: onNavigate,
+          onError: onError,
         );
         break;
       }

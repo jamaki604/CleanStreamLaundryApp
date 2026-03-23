@@ -50,7 +50,17 @@ class _ScannerPageState extends State<ScannerPage> {
         children: [
           MobileScanner(
             controller: _controller.cameraController,
-            onDetect: (capture) => _controller.handleQRCode(capture),
+            onDetect: (capture) => _controller.handleQRCode(
+              capture,
+              onNavigate: (route) {
+                if (mounted) context.go(route);
+              },
+              onError: (title, message) {
+                if (mounted) {
+                  statusDialog(context, title: title, message: message, isSuccess: false);
+                }
+              },
+            ),
           ),
           ScannerOverlay(
             onCancel: () => context.go('/startPage'),
