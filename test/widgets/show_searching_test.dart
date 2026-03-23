@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
+import 'package:clean_stream_laundry_app/features/start_machine/widgets/searching_dialog.dart';
 
 void main() {
 

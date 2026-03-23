@@ -3,7 +3,7 @@ import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/viewmodels/loyalty_view_model.dart';
 import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
-import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
+import 'package:clean_stream_laundry_app/features/start_machine/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';

@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/widgets/qr_button.dart';
+import 'package:clean_stream_laundry_app/features/start_machine/widgets/qr_button.dart';
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
 import 'package:get_it/get_it.dart';
@@ -6,10 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
-import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
+import 'package:clean_stream_laundry_app/features/start_machine/widgets/searching_dialog.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/widgets/show_searching.dart';
 import '../widgets/status_dialog_box.dart';
 
 const double minimumBalance = 20;
