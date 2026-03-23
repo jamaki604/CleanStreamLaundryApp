@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 
 class WasherControlsCard extends StatefulWidget {
   final void Function(double addedCost) onCycleChanged;

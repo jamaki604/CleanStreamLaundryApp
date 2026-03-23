@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';

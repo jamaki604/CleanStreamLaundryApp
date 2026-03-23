@@ -1,7 +1,7 @@
 import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/features/email_verification/controller.dart';
 import 'package:clean_stream_laundry_app/features/email_verification/widgets/resend_verification.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class EmailVerificationPage extends StatefulWidget {

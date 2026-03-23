@@ -1,5 +1,5 @@
 import 'package:clean_stream_laundry_app/features/home/controller.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

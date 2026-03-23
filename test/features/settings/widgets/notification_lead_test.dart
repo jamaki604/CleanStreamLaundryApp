@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clean_stream_laundry_app/features/settings/widgets/notification_lead.dart';

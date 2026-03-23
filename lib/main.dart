@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'root_app.dart';
 import 'core/di/di.dart';
-import 'logic/theme/theme_manager.dart';
+import 'core/theme/theme_manager.dart';
 
 late final GoRouter pageRouter;
 

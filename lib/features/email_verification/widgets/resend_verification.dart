@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/features/email_verification/controller.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class ResendVerificationWidget extends StatefulWidget {

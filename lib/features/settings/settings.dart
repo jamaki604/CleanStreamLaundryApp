@@ -1,7 +1,7 @@
 import 'controller.dart';
 import 'widgets/notification_lead.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
-import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
+import 'package:clean_stream_laundry_app/core/theme/theme_manager.dart';
 import 'widgets/settings_card.dart';
 import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
 import 'package:flutter/material.dart';
