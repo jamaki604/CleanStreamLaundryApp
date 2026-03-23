@@ -1,27 +1,25 @@
-import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/middleware/app_router.dart';
-import 'package:get_it/get_it.dart';
+import 'package:clean_stream_laundry_app/logic/theme/theme_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-class RootApp extends StatefulWidget {
-  final ThemeData theme;
-  const RootApp({super.key, required this.theme});
+class RootApp extends StatelessWidget {
+  final GoRouter router;
 
-  @override
-  State<RootApp> createState() => _RootAppState();
-}
-
-class _RootAppState extends State<RootApp> {
-  late final AuthService _authenticator = GetIt.instance<AuthService>();
-  late final RouterService _routerService = GetIt.instance<RouterService>();
+  const RootApp({
+    super.key,
+    required this.router,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<ThemeManager>().themeData;
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Clean Stream Laundry Solutions',
-      theme: widget.theme,
-      routerConfig: _routerService.createRouter(_authenticator),
+      theme: theme,
+      routerConfig: router,
     );
   }
 }

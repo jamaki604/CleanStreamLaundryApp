@@ -2,9 +2,9 @@ import 'controller.dart';
 import 'widgets/amount_card.dart';
 import 'widgets/back_to_home.dart';
 import 'widgets/payment_buttons.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
 import 'widgets/dryer_controls_card.dart';
-import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
+import 'package:clean_stream_laundry_app/features/widgets/status_dialog_box.dart';
 import 'widgets/washer_controls_card.dart';
 import 'package:flutter/material.dart';
 

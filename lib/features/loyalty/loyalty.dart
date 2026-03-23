@@ -3,8 +3,8 @@ import 'controller.dart';
 import 'widgets/load_card_dialog.dart';
 import 'widgets/header.dart';
 import 'widgets/transaction_list.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
+import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/features/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

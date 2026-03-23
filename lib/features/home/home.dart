@@ -3,7 +3,7 @@ import 'package:clean_stream_laundry_app/features/home/widgets/availability_card
 import 'package:clean_stream_laundry_app/features/home/widgets/map.dart';
 import 'package:clean_stream_laundry_app/features/home/widgets/location_selector.dart';
 import 'package:clean_stream_laundry_app/features/home/widgets/header.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 

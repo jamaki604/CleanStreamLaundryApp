@@ -3,9 +3,9 @@ import 'widgets/qr_button.dart';
 import 'widgets/searching_dialog.dart';
 import 'widgets/tap_card.dart';
 import 'package:clean_stream_laundry_app/services/kisi/door_unlocker.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/widgets/section_banner.dart';
-import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
+import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/features/widgets/section_banner.dart';
+import 'package:clean_stream_laundry_app/features/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/features/loyalty/loyalty.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
-import 'package:clean_stream_laundry_app/widgets/base_page.dart';
+import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
 import 'package:clean_stream_laundry_app/features/loyalty/widgets/credit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

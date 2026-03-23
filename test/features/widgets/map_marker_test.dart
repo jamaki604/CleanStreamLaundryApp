@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/widgets/map_marker.dart';
+import 'package:clean_stream_laundry_app/features/widgets/map_marker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 

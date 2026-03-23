@@ -1,4 +1,4 @@
-import 'package:clean_stream_laundry_app/widgets/custom_app_bar.dart';
+import 'package:clean_stream_laundry_app/features/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

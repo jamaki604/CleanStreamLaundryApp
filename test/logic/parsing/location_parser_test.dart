@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/widgets/map_marker.dart';
+import 'package:clean_stream_laundry_app/features/widgets/map_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';

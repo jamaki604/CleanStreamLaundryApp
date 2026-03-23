@@ -3,7 +3,7 @@ import 'widgets/disclaimer_card.dart';
 import 'widgets/refund_form.dart';
 import 'widgets/header.dart';
 import 'package:clean_stream_laundry_app/logic/theme/theme.dart';
-import 'package:clean_stream_laundry_app/widgets/status_dialog_box.dart';
+import 'package:clean_stream_laundry_app/features/widgets/status_dialog_box.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
