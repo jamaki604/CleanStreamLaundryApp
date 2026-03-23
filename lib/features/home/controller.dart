@@ -3,7 +3,7 @@ import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/core/storage/storage_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';

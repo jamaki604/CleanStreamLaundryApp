@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
-import 'package:clean_stream_laundry_app/middleware/storage_service.dart';
+import 'package:clean_stream_laundry_app/core/storage/storage_service.dart';
 
 class ThemeManager with ChangeNotifier {
   ThemeData _themeData = lightMode;
