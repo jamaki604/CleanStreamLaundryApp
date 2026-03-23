@@ -3,7 +3,7 @@ import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/features/change_email_verification/change_email_verification.dart';
-import 'package:clean_stream_laundry_app/pages/home_page.dart';
+import 'package:clean_stream_laundry_app/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -136,7 +136,9 @@ void main() {
           final context =
           tester.element(find.byType(ChangeEmailVerificationPage));
           GoRouter.of(context).go('/homePage');
-          await tester.pumpAndSettle();
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 300));
+          await tester.pump(const Duration(milliseconds: 300));
 
           expect(find.byType(ChangeEmailVerificationPage), findsNothing);
         });

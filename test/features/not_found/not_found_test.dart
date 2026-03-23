@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/pages/not_found_page.dart';
+import 'package:clean_stream_laundry_app/features/not_found/not_found.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -49,7 +49,7 @@ void main() {
   Widget createWidgetUnderTest() {
     final router = GoRouter(
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const NotFoundScreen()),
+        GoRoute(path: '/', builder: (context, state) => const NotFound()),
         GoRoute(
           path: '/homePage',
           builder: (context, state) => const Scaffold(body: Text('Home Page')),
