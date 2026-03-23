@@ -26,7 +26,7 @@ import 'package:clean_stream_laundry_app/services/stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/services/nayax/machine_communicator.dart';
 
 // misc
-import 'package:clean_stream_laundry_app/middleware/app_router.dart';
+import 'package:clean_stream_laundry_app/core/router/app_router.dart';
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 
