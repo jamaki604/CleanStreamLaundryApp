@@ -1,24 +1,24 @@
 import 'package:app_links/app_links.dart';
-import 'package:clean_stream_laundry_app/pages/change_email_verification.dart';
-import 'package:clean_stream_laundry_app/pages/edit_profile_page.dart';
-import 'package:clean_stream_laundry_app/pages/verify_code_page.dart';
-import 'package:go_router/go_router.dart';
+import 'package:clean_stream_laundry_app/features/change_email_verification/change_email_verification.dart';
+import 'package:clean_stream_laundry_app/features/edit_profile/edit_profile.dart';
+import 'package:clean_stream_laundry_app/features/verify_code/verify_code.dart';
+import 'package:clean_stream_laundry_app/features/email_verification/email_verification.dart';
+import 'package:clean_stream_laundry_app/features/home/home.dart';
+import 'package:clean_stream_laundry_app/features/loading/loading.dart';
+import 'package:clean_stream_laundry_app/features/loyalty/loyalty.dart';
+import 'package:clean_stream_laundry_app/features/scanner/scanner.dart';
+import 'package:clean_stream_laundry_app/features/sign_up/sign_up.dart';
+import 'package:clean_stream_laundry_app/features/login/login.dart';
+import 'package:clean_stream_laundry_app/features/not_found/not_found.dart';
+import 'package:clean_stream_laundry_app/features/settings/settings.dart';
+import 'package:clean_stream_laundry_app/features/start_machine/start_machine.dart';
+import 'package:clean_stream_laundry_app/features/machine_payment/machine_payment.dart';
+import 'package:clean_stream_laundry_app/features/monthly_report/monthly_report.dart';
+import 'package:clean_stream_laundry_app/features/refund_request/refund_request.dart';
+import 'package:clean_stream_laundry_app/features/password_reset/password_reset.dart';
+import 'package:clean_stream_laundry_app/features/reset_protected/reset_protected.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/pages/email_verification_page.dart';
-import 'package:clean_stream_laundry_app/pages/home_page.dart';
-import 'package:clean_stream_laundry_app/pages/loading_page.dart';
-import 'package:clean_stream_laundry_app/pages/loyalty_card_page.dart';
-import 'package:clean_stream_laundry_app/pages/scanner_widget.dart';
-import 'package:clean_stream_laundry_app/pages/sign_up_screen.dart';
-import 'package:clean_stream_laundry_app/pages/login_page.dart';
-import 'package:clean_stream_laundry_app/pages/not_found_page.dart';
-import 'package:clean_stream_laundry_app/pages/settings.dart';
-import 'package:clean_stream_laundry_app/pages/start_machine_page.dart';
-import 'package:clean_stream_laundry_app/pages/payment_page.dart';
-import 'package:clean_stream_laundry_app/pages/monthly_transaction_history.dart';
-import 'package:clean_stream_laundry_app/pages/refund_page.dart';
-import 'package:clean_stream_laundry_app/pages/password_reset.dart';
-import 'package:clean_stream_laundry_app/pages/reset_protected_page.dart';
+import 'package:go_router/go_router.dart';
 
 class RouterService {
   GoRouter createRouter(AuthService authenticator) => GoRouter(
@@ -28,7 +28,7 @@ class RouterService {
         path: '/login',
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: LoginScreen(appLinks: AppLinks()),
+          child: Login(appLinks: AppLinks()),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,
@@ -38,7 +38,7 @@ class RouterService {
         path: '/signup',
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: SignUpScreen(),
+          child: SignUpPage(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,
@@ -48,7 +48,7 @@ class RouterService {
         path: '/scanner',
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: ScannerWidget(),
+          child: ScannerPage(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,
@@ -81,7 +81,7 @@ class RouterService {
           final machineId = state.uri.queryParameters['machineId'] ?? '';
           return CustomTransitionPage(
             key: state.pageKey,
-            child: PaymentPage(machineId: machineId),
+            child: MachinePayment(machineId: machineId),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
             transitionsBuilder: (_, _, _, child) => child,
@@ -134,7 +134,7 @@ class RouterService {
           final transactions = state.extra as List<Map<String, dynamic>>? ?? [];
           return CustomTransitionPage(
             key: state.pageKey,
-            child: MonthlyTransactionHistory(transactions: transactions),
+            child: MonthlyReport(transactions: transactions),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
             transitionsBuilder: (_, _, _, child) => child,
@@ -202,7 +202,7 @@ class RouterService {
       if (uri.scheme == 'clean-stream' && uri.host == 'reset-protected') {
         return ResetProtectedPage();
       }
-      return const NotFoundScreen();
+      return const NotFound();
     },
     redirect: (context, state) {
       final uri = state.uri;
