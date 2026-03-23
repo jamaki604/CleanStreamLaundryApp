@@ -10,7 +10,7 @@ void main() {
         routes: [
           GoRoute(path: '/', builder: (_, __) => const Scaffold(body: LoginLinks())),
           GoRoute(
-            path: '/sign_up',
+            path: '/signup',
             builder: (_, __) => const Scaffold(body: Text('Sign Up Page')),
           ),
           GoRoute(

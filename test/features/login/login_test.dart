@@ -54,7 +54,7 @@ void main() {
             const Scaffold(body: Text('Email Verification')),
           ),
           GoRoute(
-            path: '/sign_up',
+            path: '/signup',
             builder: (_, __) => const Scaffold(body: Text('Sign Up Page')),
           ),
           GoRoute(
