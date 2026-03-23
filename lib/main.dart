@@ -26,7 +26,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_transaction_service.dart';
-import 'package:clean_stream_laundry_app/logic/viewmodels/loyalty_view_model.dart';
 
 final getIt = GetIt.instance;
 
