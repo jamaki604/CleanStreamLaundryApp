@@ -10,7 +10,7 @@ void main() {
         routes: [
           GoRoute(path: '/', builder: (_, __) => const Scaffold(body: LoginLinks())),
           GoRoute(
-            path: '/signup',
+            path: '/sign_up',
             builder: (_, __) => const Scaffold(body: Text('Sign Up Page')),
           ),
           GoRoute(
@@ -52,7 +52,7 @@ void main() {
       expect(text.style?.decoration, TextDecoration.underline);
     });
 
-    testWidgets('Create Account navigates to /signup', (tester) async {
+    testWidgets('Create Account navigates to /sign_up', (tester) async {
       await tester.pumpWidget(buildWidget());
 
       await tester.tap(find.text('Create Account'));

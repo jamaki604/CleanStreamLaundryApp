@@ -54,7 +54,7 @@ void main() {
             const Scaffold(body: Text('Email Verification')),
           ),
           GoRoute(
-            path: '/signup',
+            path: '/sign_up',
             builder: (_, __) => const Scaffold(body: Text('Sign Up Page')),
           ),
           GoRoute(
@@ -350,7 +350,7 @@ void main() {
 
 
   group('Navigation', () {
-    testWidgets('navigates to signup on Create Account tap', (tester) async {
+    testWidgets('navigates to sign_up on Create Account tap', (tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
