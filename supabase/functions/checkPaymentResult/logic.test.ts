@@ -15,7 +15,7 @@ Deno.test("throws if sessionId is missing", async () => {
       retrieveSession: async (id) => ({ payment_status: "paid" }),
     };
   
-    await assertRejects(  // await + assertRejects
+    await assertRejects(  
       () => getPaymentStatusLogic({ sessionId: "" }, fakeDeps),
       Error,
       "Missing sessionId"

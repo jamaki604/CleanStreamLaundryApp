@@ -38,8 +38,6 @@ import {
   });
   
   Deno.test("returns success when random < 0.95", async () => {
-    // First random for success = 0.1 (success)
-    // Second random for delay = 0.5
     const { deps, getDelay } = createDeps({
       randomValues: [0.1, 0.5],
     });
@@ -54,7 +52,6 @@ import {
     assertEquals(result.body.deviceId, "abc123");
     assertEquals(result.body.timestamp, "2024-01-01T00:00:00.000Z");
   
-    // delay = floor(0.5 * 150) + 50 = 125
     assertEquals(getDelay(), 125);
     assertEquals(result.body.responseTime, "125ms");
   });
@@ -76,7 +73,7 @@ import {
   
   Deno.test("delay is awaited with correct ms", async () => {
     const { deps, getDelay } = createDeps({
-      randomValues: [0.1, 0.0], // minimum delay
+      randomValues: [0.1, 0.0], 
     });
   
     await handleWakeDevice(
@@ -84,6 +81,5 @@ import {
       deps
     );
   
-    // floor(0 * 150) + 50 = 50
     assertEquals(getDelay(), 50);
   });
