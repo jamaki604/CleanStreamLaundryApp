@@ -1,10 +1,12 @@
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
-import 'package:get_it/get_it.dart';
-import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 
 class MachineCommunicator implements MachineCommunicationService {
 
-  final edgeFunctionService = GetIt.instance<EdgeFunctionService>();
+  final edgeFunctionService;
+
+  MachineCommunicator({
+    required this.edgeFunctionService,
+  });
 
   @override
   Future<bool> wakeDevice(String deviceId) async {

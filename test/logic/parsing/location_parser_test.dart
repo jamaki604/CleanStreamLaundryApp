@@ -1,6 +1,6 @@
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clean_stream_laundry_app/widgets/map_marker.dart';
+import 'package:clean_stream_laundry_app/features/widgets/map_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
@@ -41,7 +41,7 @@ void main() {
       expect(result[0].height, 50);
     });
 
-    test('parseLocations creates MapMarker widget as child', () {
+    test('parseLocations creates MapMarker widgets as child', () {
       final locations = [
         {'Latitude': 40.7128, 'Longitude': -74.0060},
       ];

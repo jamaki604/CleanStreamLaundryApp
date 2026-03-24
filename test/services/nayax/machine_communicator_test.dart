@@ -1,6 +1,4 @@
-import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/services/nayax/machine_communicator.dart';
-import 'package:clean_stream_laundry_app/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,13 +10,11 @@ void main() {
 
   group("Awake machine Tests", () {
     setUp(() {
-      getIt.reset();
       edgeFunctionMock = EdgeFunctionMock();
 
-      getIt.registerLazySingleton<EdgeFunctionService>(
-              () => edgeFunctionMock);
-
-      machineCommunicator = MachineCommunicator();
+      machineCommunicator = MachineCommunicator(
+        edgeFunctionService: edgeFunctionMock,
+      );
     });
 
     test("machine successfully wakes up", () async {
@@ -69,13 +65,11 @@ void main() {
 
   group("Check Availability Tests", () {
     setUp(() {
-      getIt.reset();
       edgeFunctionMock = EdgeFunctionMock();
 
-      getIt.registerLazySingleton<EdgeFunctionService>(
-              () => edgeFunctionMock);
-
-      machineCommunicator = MachineCommunicator();
+      machineCommunicator = MachineCommunicator(
+        edgeFunctionService: edgeFunctionMock,
+      );
     });
 
     test('Check idle availability', () async {
