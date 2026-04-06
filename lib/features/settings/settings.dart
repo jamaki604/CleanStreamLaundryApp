@@ -114,6 +114,12 @@ class _SettingsState extends State<Settings> {
                   ),
                   const SizedBox(height: 14),
                   SettingsCard(
+                    icon: Icons.handyman_outlined,
+                    title: 'Request Facility Maintenance',
+                    onTap: () => context.push('/maintenancePage'),
+                  ),
+                  const SizedBox(height: 14),
+                  SettingsCard(
                     icon: Icons.person,
                     title: 'Edit Profile',
                     onTap: () => context.go('/editProfile'),
