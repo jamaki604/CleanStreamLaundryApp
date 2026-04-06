@@ -1,5 +1,4 @@
 import 'controller.dart';
-import 'widgets/disclaimer_card.dart';
 import 'widgets/maintenance_form.dart';
 import 'widgets/header.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
@@ -142,7 +141,6 @@ class MaintenancePageState extends State<MaintenancePage> {
                 ),
               ),
               const SizedBox(height: 12),
-              const DisclaimerCard(),
               const SizedBox(height: 4),
             ],
           ),
