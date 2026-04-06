@@ -3,41 +3,36 @@ import 'dart:io';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 class MaintenanceController extends ChangeNotifier {
-  final TransactionService transactionService;
   final EdgeFunctionService edgeFunctionService;
   final ProfileService profileService;
   final AuthService authService;
 
   MaintenanceController({
-    TransactionService? transactionService,
     EdgeFunctionService? edgeFunctionService,
     ProfileService? profileService,
     AuthService? authService,
-  })  : transactionService =
-      transactionService ?? GetIt.instance<TransactionService>(),
-        edgeFunctionService =
-            edgeFunctionService ?? GetIt.instance<EdgeFunctionService>(),
+  })  : edgeFunctionService =
+      edgeFunctionService ?? GetIt.instance<EdgeFunctionService>(),
         profileService = profileService ?? GetIt.instance<ProfileService>(),
         authService = authService ?? GetIt.instance<AuthService>();
 
   final TextEditingController descriptionController = TextEditingController();
 
-  List<String> recentTransactions = [];
-  List<int> recentTransactionIDs = [];
+  final List<String> categories = const [
+    'Washer/Dryer Maintenance',
+    'App Maintenance',
+    'Other',
+  ];
 
-  String? selectedTransaction;
-  int? selectedTransactionIndex;
+  String? selectedCategory;
+  File? selectedImage;
 
   bool attemptedSubmit = false;
   bool isLoading = false;
-  bool isFetchingTransactions = true;
-
-  File? selectedImage;
 
   Future<void> pickImage(BuildContext context) async {
     final picker = ImagePicker();
@@ -78,48 +73,20 @@ class MaintenanceController extends ChangeNotifier {
     }
   }
 
-  void disposeController() {
-    descriptionController.dispose();
-  }
-
-  bool get isFormValid =>
-      selectedTransaction != null &&
-          descriptionController.text.trim().isNotEmpty;
-
-  Future<void> fetchTransactions() async {
-    try {
-      final result =
-      await transactionService.getRefundableTransactionsForUser();
-      recentTransactions = result.transactions;
-      recentTransactionIDs = result.ids;
-
-      recentTransactions.removeWhere(
-            (t) => t.contains('added to Loyalty Card'),
-      );
-    } catch (e) {
-      // silently ignore — page stays usable with empty list
-    } finally {
-      isFetchingTransactions = false;
-      notifyListeners();
-    }
-  }
-
-  void selectTransaction(String transaction) {
-    selectedTransaction = transaction;
-    selectedTransactionIndex = recentTransactions.indexOf(transaction);
+  void selectCategory(String category) {
+    selectedCategory = category;
     notifyListeners();
   }
 
-  String getTransactionID() {
-    return recentTransactionIDs[selectedTransactionIndex!].toString();
+  bool get isFormValid =>
+      selectedCategory != null &&
+          descriptionController.text.trim().isNotEmpty;
+
+  void markAttemptedSubmit() {
+    attemptedSubmit = true;
+    notifyListeners();
   }
 
-  Future<String?> getUserName() async {
-    final userId = authService.getCurrentUserId;
-    if (userId == null) return null;
-    return profileService.getUserNameById(userId);
-  }
-  
   Future<bool> submitMaintenance() async {
     final userId = authService.getCurrentUserId;
     if (userId == null) return false;
@@ -128,23 +95,17 @@ class MaintenanceController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final transactionId = getTransactionID();
       final description = descriptionController.text;
       final username = await getUserName();
 
-      final amount = await transactionService.recordRefundRequest(
-        transaction_id: transactionId,
-        description: description,
-      );
-
       await edgeFunctionService.runEdgeFunction(
-        name: 'refund-email',
+        name: 'maintenance-request',
         body: {
           'username': username,
           'user_id': userId,
-          'transaction_id': transactionId,
-          'amount': amount,
+          'category': selectedCategory,
           'description': description,
+          'has_image': selectedImage != null,
         },
       );
 
@@ -154,9 +115,13 @@ class MaintenanceController extends ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<String?> getUserName() async {
+    final userId = authService.getCurrentUserId;
+    if (userId == null) return null;
+    return profileService.getUserNameById(userId);
+  }
 
-  void markAttemptedSubmit() {
-    attemptedSubmit = true;
-    notifyListeners();
+  void disposeController() {
+    descriptionController.dispose();
   }
 }

@@ -30,7 +30,6 @@ class MaintenancePageState extends State<MaintenancePage> {
     _controller.descriptionController.addListener(() {
       if (mounted) setState(() {});
     });
-    _controller.fetchTransactions();
   }
 
   @override

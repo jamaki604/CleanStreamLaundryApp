@@ -1,6 +1,5 @@
 import '../controller.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
-import 'package:clean_stream_laundry_app/features/maintenance_request/widgets/transactions_search_sheet.dart';
 import 'package:flutter/material.dart';
 
 class MaintenanceForm extends StatelessWidget {
@@ -41,7 +40,7 @@ class MaintenanceForm extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Select a Transaction',
+              'Select a Category',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -50,35 +49,29 @@ class MaintenanceForm extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            controller.isFetchingTransactions
-                ? const Center(child: CircularProgressIndicator())
-                : GestureDetector(
-              onTap: () async {
-                final selected =
-                await showModalBottomSheet<String>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => TransactionSearchSheet(
-                    transactions: controller.recentTransactions,
-                  ),
-                );
-                if (selected != null) {
-                  controller.selectTransaction(selected);
-                }
-              },
-              child: AbsorbPointer(
-                child: TextFormField(
-                  decoration: _inputDecoration(context).copyWith(
-                    hintText: 'Select a category',
-                    hintStyle:
-                    TextStyle(color: colorScheme.fontSecondary),
-                  ),
-                  controller: TextEditingController(
-                    text: controller.selectedTransaction,
-                  ),
-                  style: TextStyle(color: colorScheme.fontInverted),
-                ),
+            DropdownButtonFormField<String>(
+              value: controller.selectedCategory,
+              decoration: _inputDecoration(context),
+              dropdownColor: Theme.of(context).colorScheme.surface,
+              iconEnabledColor: colorScheme.fontSecondary,
+              style: TextStyle(color: colorScheme.fontInverted),
+              hint: Text(
+                'Select a category',
+                style: TextStyle(color: colorScheme.fontSecondary),
               ),
+
+              items: controller.categories
+                  .map(
+                    (cat) => DropdownMenuItem(
+                  value: cat,
+                  child: Text(cat),
+                ),
+              )
+                  .toList(),
+
+              onChanged: (value) {
+                controller.selectCategory(value!);
+              },
             ),
 
             const SizedBox(height: 24),
