@@ -69,7 +69,7 @@ class MaintenanceForm extends StatelessWidget {
               child: AbsorbPointer(
                 child: TextFormField(
                   decoration: _inputDecoration(context).copyWith(
-                    hintText: 'Select a transaction',
+                    hintText: 'Select a category',
                     hintStyle:
                     TextStyle(color: colorScheme.fontSecondary),
                   ),
@@ -99,8 +99,56 @@ class MaintenanceForm extends StatelessWidget {
               keyboardType: TextInputType.multiline,
               style: TextStyle(color: colorScheme.fontInverted),
               decoration: _inputDecoration(context).copyWith(
-                hintText: 'Describe the issue with your transaction...',
+                hintText: 'Describe the issue...',
                 hintStyle: TextStyle(color: colorScheme.fontSecondary),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            Text(
+              'Attach a Photo (Optional)',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: colorScheme.fontInverted,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap: () => controller.pickImage(context),
+                child: Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: colorScheme.fontSecondary,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: controller.selectedImage == null
+                      ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt,
+                          size: 40, color: colorScheme.fontSecondary),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tap to take or upload a photo',
+                        style: TextStyle(color: colorScheme.fontSecondary),
+                      ),
+                    ],
+                  )
+                      : ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      controller.selectedImage!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  ),
+                ),
               ),
             ),
 
