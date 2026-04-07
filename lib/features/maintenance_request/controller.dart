@@ -5,6 +5,7 @@ import 'package:clean_stream_laundry_app/logic/services/edge_function_service.da
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MaintenanceController extends ChangeNotifier {
   final EdgeFunctionService edgeFunctionService;
@@ -34,9 +35,17 @@ class MaintenanceController extends ChangeNotifier {
   bool attemptedSubmit = false;
   bool isLoading = false;
 
-  Future<void> pickImage(BuildContext context) async {
-    final picker = ImagePicker();
+  Future<bool> _ensurePermissions() async {
+    final camera = await Permission.camera.request();
+    final photos = await Permission.photos.request();
+    return camera.isGranted && photos.isGranted;
+  }
 
+  Future<void> pickImage(BuildContext context) async {
+    // Ensure permissions first
+    if (!await _ensurePermissions()) return;
+
+    // Ask user for source
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -65,6 +74,7 @@ class MaintenanceController extends ChangeNotifier {
 
     if (source == null) return;
 
+    final picker = ImagePicker();
     final picked = await picker.pickImage(source: source);
 
     if (picked != null) {
