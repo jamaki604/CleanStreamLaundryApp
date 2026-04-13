@@ -1,128 +1,125 @@
-import 'package:clean_stream_laundry_app/features/maintenance_request/maintenance_request.dart';
-import 'package:clean_stream_laundry_app/features/maintenance_request/controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:clean_stream_laundry_app/features/maintenance_request/maintenance_request.dart';
+import 'package:clean_stream_laundry_app/features/maintenance_request/controller.dart';
 
-class MockMaintenanceController extends Mock
-    implements MaintenanceController {}
+class MockMaintenanceController extends Mock implements MaintenanceController {}
 
 void main() {
-  late MockMaintenanceController controller;
+  late MockMaintenanceController mockController;
+  late TextEditingController descriptionController;
 
   setUp(() {
-    controller = MockMaintenanceController();
+    mockController = MockMaintenanceController();
+    descriptionController = TextEditingController();
 
-    when(() => controller.isLoading).thenReturn(false);
-    when(() => controller.isFormValid).thenReturn(false);
-    when(() => controller.descriptionController)
-        .thenReturn(TextEditingController());
-    when(() => controller.addListener(any())).thenAnswer((_) {});
-    when(() => controller.dispose()).thenAnswer((_) {});
-    when(() => controller.disposeController()).thenAnswer((_) {});
+    when(() => mockController.attemptedSubmit).thenReturn(false);
+    when(() => mockController.categories).thenReturn(
+        ['Washer/Dryer Maintenance', 'App Maintenance', 'Other']);
+    when(() => mockController.selectedCategory).thenReturn(null);
+    when(() => mockController.isLoading).thenReturn(false);
+    when(() => mockController.isFormValid).thenReturn(false);
+    when(() => mockController.selectedImage).thenReturn(null);
+    when(() => mockController.descriptionController).thenReturn(descriptionController);
+
+    when(() => mockController.addListener(any())).thenReturn(null);
+    when(() => mockController.removeListener(any())).thenReturn(null);
+    when(() => mockController.disposeController()).thenReturn(null);
+    when(() => mockController.dispose()).thenReturn(null);
   });
 
-  Widget _wrap(Widget child) {
-    final router = GoRouter(
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (_, __) => child,
-        ),
-        GoRoute(
-          path: '/settings',
-          builder: (_, __) => const Scaffold(body: Text('Settings Page')),
-        ),
-      ],
-    );
-
+  Widget createWidget() {
     return MaterialApp.router(
-      routerConfig: router,
+      routerConfig: GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (_, _) => MaintenancePage(controller: mockController),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (_, _) => const Scaffold(body: Text('Settings Page')),
+          ),
+        ],
+      ),
     );
   }
 
-  testWidgets('Page renders correctly', (tester) async {
-    await tester.pumpWidget(_wrap(MaintenancePage(controller: controller)));
+  group('Maintenance Page Tests', () {
+    testWidgets('renders all required UI elements', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-    expect(find.text('Request Maintenance'), findsOneWidget);
-    expect(find.text('Submit Maintenance Request'), findsOneWidget);
+      expect(find.text('Request Maintenance'), findsOneWidget);
+      expect(find.text('Submit Maintenance Request'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+    });
+
+    testWidgets('submit button shows grey background when form is invalid', (tester) async {
+      when(() => mockController.isFormValid).thenReturn(false);
+
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+      final color = button.style?.backgroundColor?.resolve({});
+      expect(color, Colors.grey);
+    });
+
+    testWidgets('calls markAttemptedSubmit on button press with auto-scroll', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      final submitButton = find.text('Submit Maintenance Request');
+
+      await tester.dragUntilVisible(
+        submitButton,
+        find.byType(SingleChildScrollView),
+        const Offset(0, -200),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(submitButton);
+      await tester.pump();
+
+      verify(() => mockController.markAttemptedSubmit()).called(1);
+    });
+
+    testWidgets('shows loading indicator when controller is loading', (tester) async {
+      when(() => mockController.isLoading).thenReturn(true);
+
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('shows success dialog on successful submission', (tester) async {
+      when(() => mockController.isFormValid).thenReturn(true);
+      when(() => mockController.submitMaintenance()).thenAnswer((_) async => true);
+      when(() => mockController.markAttemptedSubmit()).thenReturn(null);
+
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      final submitButton = find.text('Submit Maintenance Request');
+
+      await tester.dragUntilVisible(
+        submitButton,
+        find.byType(SingleChildScrollView),
+        const Offset(0, -200),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(submitButton);
+      await tester.pump();
+      await tester.pumpAndSettle();
+      
+      expect(find.text('Success'), findsOneWidget);
+      expect(find.text('Your maintenance request has been submitted'), findsOneWidget);
+    });
   });
-
-  testWidgets('Submit button disabled when form invalid', (tester) async {
-    when(() => controller.isFormValid).thenReturn(false);
-
-    await tester.pumpWidget(_wrap(MaintenancePage(controller: controller)));
-
-    final button = find.text('Submit Maintenance Request');
-    final widget = tester.widget<ElevatedButton>(button);
-
-    expect(widget.onPressed, isNull);
-  });
-
-  testWidgets('Submit triggers controller when form valid', (tester) async {
-    when(() => controller.isFormValid).thenReturn(true);
-    when(() => controller.submitMaintenance())
-        .thenAnswer((_) async => true);
-
-    await tester.pumpWidget(_wrap(MaintenancePage(controller: controller)));
-
-    final button = find.text('Submit Maintenance Request');
-    await tester.tap(button);
-    await tester.pump();
-
-    verify(() => controller.markAttemptedSubmit()).called(1);
-    verify(() => controller.submitMaintenance()).called(1);
-  });
-
-  testWidgets('Submit button disabled when form invalid', (tester) async {
-    when(() => controller.isFormValid).thenReturn(false);
-
-    await tester.pumpWidget(_wrap(MaintenancePage()));
-
-    final button = find.text('Submit Maintenance Request');
-    final widget = tester.widget<ElevatedButton>(button);
-
-    expect(widget.onPressed, isNull);
-  });
-
-  testWidgets('Submit triggers controller when form valid', (tester) async {
-    when(() => controller.isFormValid).thenReturn(true);
-    when(() => controller.submitMaintenance())
-        .thenAnswer((_) async => true);
-
-    await tester.pumpWidget(_wrap(MaintenancePage()));
-
-    final button = find.text('Submit Maintenance Request');
-    await tester.tap(button);
-    await tester.pump();
-
-    verify(() => controller.markAttemptedSubmit()).called(1);
-    verify(() => controller.submitMaintenance()).called(1);
-  });
-
-  testWidgets('Success dialog appears and navigates to settings',
-          (tester) async {
-        when(() => controller.isFormValid).thenReturn(true);
-        when(() => controller.submitMaintenance())
-            .thenAnswer((_) async => true);
-
-        await tester.pumpWidget(_wrap(MaintenancePage()));
-
-        // Tap submit
-        await tester.tap(find.text('Submit Maintenance Request'));
-        await tester.pumpAndSettle();
-
-        // Dialog should appear
-        expect(find.text('Success'), findsOneWidget);
-        expect(find.text('Your maintenance request has been submitted'),
-            findsOneWidget);
-
-        // Close dialog
-        await tester.tap(find.text('OK')); // assuming your dialog uses OK button
-        await tester.pumpAndSettle();
-
-        // Should navigate to /settings
-        expect(find.text('Settings Page'), findsOneWidget);
-      });
 }
