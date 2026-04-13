@@ -9,7 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class MaintenancePage extends StatefulWidget {
-  const MaintenancePage({super.key});
+  final MaintenanceController? controller;
+  const MaintenancePage({super.key, this.controller});
 
   @override
   State<MaintenancePage> createState() => MaintenancePageState();
@@ -22,7 +23,7 @@ class MaintenancePageState extends State<MaintenancePage> {
   @override
   void initState() {
     super.initState();
-    _controller = MaintenanceController();
+    _controller = widget.controller ?? MaintenanceController();
     _controller.addListener(() {
       if (mounted) setState(() {});
     });
