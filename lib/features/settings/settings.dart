@@ -85,7 +85,7 @@ class _SettingsState extends State<Settings> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/Logo.png', width: 230, height: 230),
+                  Image.asset('assets/Logo.png', width: 150, height: 150),
                   SettingsCard(
                     icon: Icons.lightbulb,
                     title: Theme.of(context).colorScheme.modeChangerText,
