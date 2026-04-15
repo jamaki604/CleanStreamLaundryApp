@@ -38,8 +38,7 @@ class SignUpPageState extends State<SignUpPage> {
   }
 
   void _showMessage(String text) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
   Future<void> _onSubmit() async {
@@ -49,7 +48,10 @@ class SignUpPageState extends State<SignUpPage> {
 
       if (result.success) {
         _showMessage('Account created successfully.');
-        context.go('/email-verification');
+        context.go(
+          '/email-verification',
+          extra: _controller.emailController.text.trim(),
+        );
         return;
       }
 

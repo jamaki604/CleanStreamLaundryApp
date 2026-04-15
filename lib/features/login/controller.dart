@@ -11,11 +11,9 @@ class LoginController extends ChangeNotifier {
   final AuthService authService;
   final ProfileService profileService;
 
-  LoginController({
-    AuthService? authService,
-    ProfileService? profileService,
-  })  : authService = authService ?? GetIt.instance<AuthService>(),
-        profileService = profileService ?? GetIt.instance<ProfileService>();
+  LoginController({AuthService? authService, ProfileService? profileService})
+    : authService = authService ?? GetIt.instance<AuthService>(),
+      profileService = profileService ?? GetIt.instance<ProfileService>();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -49,11 +47,11 @@ class LoginController extends ChangeNotifier {
           if (!context.mounted) return;
           final currentUser = authService.getCurrentUser();
           if (currentUser != null) {
-            final name = currentUser.userMetadata?['full_name'] ??
+            final name =
+                currentUser.userMetadata?['full_name'] ??
                 currentUser.userMetadata?['name'] ??
                 currentUser.userMetadata?['given_name'];
-            await profileService.createAccount(
-                id: currentUser.id, name: name);
+            await profileService.createAccount(id: currentUser.id, name: name);
           }
           if (!context.mounted) return;
           context.go('/homePage');
@@ -72,8 +70,10 @@ class LoginController extends ChangeNotifier {
     scrollController.dispose();
   }
 
-  Future<void> handleLogin(BuildContext context,
-      void Function(String) showMessage) async {
+  Future<void> handleLogin(
+    BuildContext context,
+    void Function(String) showMessage,
+  ) async {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
@@ -90,7 +90,7 @@ class LoginController extends ChangeNotifier {
       showMessage('Logged in as $email');
       context.go('/homePage');
     } else if (response == AuthenticationResponses.emailNotVerified) {
-      context.go('/email-Verification');
+      context.go('/email-verification', extra: email);
     } else {
       setErrorColors();
     }
