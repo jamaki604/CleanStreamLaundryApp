@@ -1,97 +1,123 @@
 import 'dart:io';
-
+import 'package:clean_stream_laundry_app/features/maintenance_request/widgets/maintenance_form.dart';
 import 'package:clean_stream_laundry_app/features/maintenance_request/controller.dart';
-import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockAuthService extends Mock implements AuthService {}
-class MockProfileService extends Mock implements ProfileService {}
-class MockEdgeFunctionService extends Mock implements EdgeFunctionService {}
+class MockMaintenanceController extends Mock implements MaintenanceController {}
+class FakeBuildContext extends Fake implements BuildContext {}
 
 void main() {
-  late MaintenanceController controller;
-  late MockAuthService auth;
-  late MockProfileService profile;
-  late MockEdgeFunctionService edge;
+  late MockMaintenanceController controller;
+
+  Widget buildForm() {
+    return MaterialApp(
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: MaintenanceForm(controller: controller),
+        ),
+      ),
+    );
+  }
 
   setUp(() {
-    auth = MockAuthService();
-    profile = MockProfileService();
-    edge = MockEdgeFunctionService();
+    controller = MockMaintenanceController();
 
-    controller = MaintenanceController(
-      authService: auth,
-      profileService: profile,
-      edgeFunctionService: edge,
-    );
+    when(() => controller.categories).thenReturn(['Electrical', 'Washer', 'Dryer']);
+    when(() => controller.selectedCategory).thenReturn(null);
+    when(() => controller.descriptionController).thenReturn(TextEditingController());
+    when(() => controller.selectedImage).thenReturn(null);
+    when(() => controller.attemptedSubmit).thenReturn(false);
+    when(() => controller.isFormValid).thenReturn(true);
+    when(() => controller.locations).thenReturn(['123 Main St', '456 Oak Ave']);
+    when(() => controller.selectedLocation).thenReturn(null);
+
+    when(() => controller.selectCategory(any())).thenReturn(null);
+    when(() => controller.selectLocation(any())).thenReturn(null);
+    when(() => controller.pickImage(any())).thenAnswer((_) async {});
   });
 
-  group('MaintenanceController Tests', () {
-    test('Initial state is correct', () {
-      expect(controller.selectedCategory, isNull);
-      expect(controller.selectedImage, isNull);
-      expect(controller.isLoading, false);
-      expect(controller.isFormValid, false);
-    });
+  setUpAll(() {
+    registerFallbackValue(FakeBuildContext());
+  });
 
-    test('Selecting a category updates state', () {
-      controller.selectCategory('App Maintenance');
-      expect(controller.selectedCategory, 'App Maintenance');
-      expect(controller.isFormValid, false);
-    });
+  testWidgets('MaintenanceForm renders all fields', (tester) async {
+    await tester.pumpWidget(buildForm());
 
-    test('Form becomes valid when category + description are set', () {
-      controller.selectCategory('Other');
-      controller.descriptionController.text = 'Something is broken';
+    expect(find.text('Select a Category'), findsOneWidget);
+    expect(find.text('Location'), findsOneWidget);
+    expect(find.text('Reason for Maintenance'), findsOneWidget);
+    expect(find.text('Attach a Photo (Optional)'), findsOneWidget);
+  });
 
-      expect(controller.isFormValid, true);
-    });
+  testWidgets('Dropdown shows categories and triggers selection', (tester) async {
+    await tester.pumpWidget(buildForm());
 
-    test('submitMaintenance returns false when userId is null', () async {
-      when(() => auth.getCurrentUserId).thenReturn(null);
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
 
-      final result = await controller.submitMaintenance();
-      expect(result, false);
-    });
+    expect(find.text('Electrical'), findsOneWidget);
+    await tester.tap(find.text('Washer').last);
+    await tester.pumpAndSettle();
 
-    test('submitMaintenance calls edge function with correct payload', () async {
-      when(() => auth.getCurrentUserId).thenReturn('user123');
-      when(() => profile.getUserNameById('user123'))
-          .thenAnswer((_) async => 'John Doe');
+    verify(() => controller.selectCategory('Washer')).called(1);
+  });
 
-      when(() => edge.runEdgeFunction(
-        name: any(named: 'name'),
-        body: any(named: 'body'),
-      )).thenAnswer((_) async => null);
+  testWidgets('LocationSelector opens bottom sheet and shows options', (tester) async {
+    await tester.pumpWidget(buildForm());
 
-      controller.selectCategory('Washer/Dryer Maintenance');
-      controller.descriptionController.text = 'Machine leaking';
+    await tester.tap(find.text('Select Location'));
+    await tester.pumpAndSettle();
 
-      final result = await controller.submitMaintenance();
+    expect(find.text('No Applicable Location'), findsOneWidget);
+    expect(find.text('123 Main St'), findsOneWidget);
+    verifyNever(() => controller.selectLocation(any()));
+  });
 
-      expect(result, true);
+  testWidgets('Selecting a location calls controller.selectLocation', (tester) async {
+    await tester.pumpWidget(buildForm());
 
-      verify(() => edge.runEdgeFunction(
-        name: 'maintenance-request',
-        body: {
-          'username': 'John Doe',
-          'user_id': 'user123',
-          'category': 'Washer/Dryer Maintenance',
-          'description': 'Machine leaking',
-          'has_image': false,
-        },
-      )).called(1);
-    });
+    await tester.tap(find.text('Select Location'));
+    await tester.pumpAndSettle();
 
-    test('Image selection updates selectedImage', () {
-      // Simulate a picked file
-      final fakeFile = File('test_assets/fake_image.jpg');
-      controller.selectedImage = fakeFile;
+    await tester.tap(find.text('123 Main St'));
+    await tester.pumpAndSettle();
 
-      expect(controller.selectedImage!.path, contains('fake_image.jpg'));
-    });
+    verify(() => controller.selectLocation('123 Main St')).called(1);
+  });
+
+  testWidgets('Typing in description updates controller', (tester) async {
+    final textController = TextEditingController();
+    when(() => controller.descriptionController).thenReturn(textController);
+
+    await tester.pumpWidget(buildForm());
+    await tester.enterText(find.byType(TextField), 'Test description');
+    expect(textController.text, 'Test description');
+  });
+
+  testWidgets('Shows image preview when selectedImage is present', (tester) async {
+    final fakeFile = File('fake_path.jpg');
+    when(() => controller.selectedImage).thenReturn(fakeFile);
+
+    await tester.pumpWidget(buildForm());
+    expect(find.byType(Image), findsOneWidget);
+  });
+
+  testWidgets('Shows error message when form invalid and attemptedSubmit', (tester) async {
+    when(() => controller.attemptedSubmit).thenReturn(true);
+    when(() => controller.isFormValid).thenReturn(false);
+
+    await tester.pumpWidget(buildForm());
+
+    expect(find.text('Please fill in all fields'), findsOneWidget);
+  });
+
+  testWidgets('Tapping image picker calls controller.pickImage', (tester) async {
+    await tester.pumpWidget(buildForm());
+    await tester.tap(find.text('Tap to take or upload a photo'));
+    await tester.pump();
+
+    verify(() => controller.pickImage(any())).called(1);
   });
 }

@@ -24,7 +24,9 @@ void main() {
     when(() => mockController.isFormValid).thenReturn(false);
     when(() => mockController.selectedImage).thenReturn(null);
     when(() => mockController.descriptionController).thenReturn(descriptionController);
-
+    when(() => mockController.locations).thenReturn(['Address 1', 'Address 2']);
+    when(() => mockController.selectedLocation).thenReturn(null);
+    when(() => mockController.init()).thenAnswer((_) async => {});
     when(() => mockController.addListener(any())).thenReturn(null);
     when(() => mockController.removeListener(any())).thenReturn(null);
     when(() => mockController.disposeController()).thenReturn(null);
@@ -56,6 +58,12 @@ void main() {
       expect(find.text('Request Maintenance'), findsOneWidget);
       expect(find.text('Submit Maintenance Request'), findsOneWidget);
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+    });
+
+    testWidgets('calls init on page load to fetch locations', (tester) async {
+      await tester.pumpWidget(createWidget());
+
+      verify(() => mockController.init()).called(1);
     });
 
     testWidgets('submit button shows grey background when form is invalid', (tester) async {
@@ -117,7 +125,7 @@ void main() {
       await tester.tap(submitButton);
       await tester.pump();
       await tester.pumpAndSettle();
-      
+
       expect(find.text('Success'), findsOneWidget);
       expect(find.text('Your maintenance request has been submitted'), findsOneWidget);
     });

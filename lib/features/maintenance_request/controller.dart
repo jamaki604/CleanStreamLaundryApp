@@ -2,6 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -12,6 +13,7 @@ class MaintenanceController extends ChangeNotifier {
   final EdgeFunctionService edgeFunctionService;
   final ProfileService profileService;
   final AuthService authService;
+  final LocationService locationService = GetIt.instance<LocationService>();
 
   MaintenanceController({
     EdgeFunctionService? edgeFunctionService,
@@ -31,10 +33,32 @@ class MaintenanceController extends ChangeNotifier {
   ];
 
   String? selectedCategory;
+  List<dynamic> locations = [];
+  String? selectedLocation;
   File? selectedImage;
 
   bool attemptedSubmit = false;
   bool isLoading = false;
+
+  Future<void> init() async {
+    isLoading = true;
+    await _loadLocations();
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> _loadLocations() async {
+    try {
+      final List<dynamic> fetchedLocations = await locationService.getLocations();
+
+      locations = fetchedLocations
+          .map((loc) => loc['Address']?.toString() ?? '')
+          .where((address) => address.isNotEmpty)
+          .toList();
+    } catch (e) {
+      locations = [];
+    }
+  }
 
   Future<bool> _ensurePermissions() async {
     final camera = await Permission.camera.request();
@@ -88,7 +112,14 @@ class MaintenanceController extends ChangeNotifier {
   }
 
   bool get isFormValid =>
-      selectedCategory != null && descriptionController.text.trim().isNotEmpty;
+      selectedCategory != null &&
+          selectedLocation != null &&
+          descriptionController.text.trim().isNotEmpty;
+
+  void selectLocation(String location) {
+    selectedLocation = location;
+    notifyListeners();
+  }
 
   void markAttemptedSubmit() {
     attemptedSubmit = true;
@@ -106,41 +137,29 @@ class MaintenanceController extends ChangeNotifier {
       String? imageUrl;
 
       if (selectedImage != null) {
-        print("Step 1: Image detected, starting upload...");
-
-        // Use a more unique name to avoid conflicts
         final fileName = '${DateTime.now().millisecondsSinceEpoch}_${userId.hashCode}.jpg';
         final path = 'requests/$fileName';
-
-        // Attempt the upload
         await Supabase.instance.client.storage
             .from('maintenance-images')
             .upload(path, selectedImage!);
 
-        print("Step 2: Upload successful, getting URL...");
-
         imageUrl = Supabase.instance.client.storage
             .from('maintenance-images')
             .getPublicUrl(path);
-
-        print("Step 3: URL generated: $imageUrl");
       }
 
-      print("Step 4: Calling Edge Function...");
       await edgeFunctionService.runEdgeFunction(
         name: 'maintenance-request',
         body: {
           'user_id': userId,
           'category': selectedCategory,
+          'location': selectedLocation,
           'description': descriptionController.text,
           'image': imageUrl,
         },
       );
-
-      print("Step 5: Submission Complete!");
       return true;
     } catch (e) {
-      print("FATAL ERROR during submission: $e");
       return false;
     } finally {
       isLoading = false;

@@ -4,7 +4,6 @@ import 'widgets/header.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:clean_stream_laundry_app/features/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class MaintenancePage extends StatefulWidget {
@@ -23,18 +22,24 @@ class MaintenancePageState extends State<MaintenancePage> {
   void initState() {
     super.initState();
     _controller = widget.controller ?? MaintenanceController();
-    _controller.addListener(() {
-      if (mounted) setState(() {});
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.init();
     });
-    _controller.descriptionController.addListener(() {
-      if (mounted) setState(() {});
-    });
+    _controller.addListener(_onControllerChanged);
+  }
+
+  void _onControllerChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_onControllerChanged);
     _controller.disposeController();
-    _controller.dispose();
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
     _focusNode.dispose();
     super.dispose();
   }

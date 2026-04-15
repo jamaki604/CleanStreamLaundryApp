@@ -1,3 +1,4 @@
+import '../widgets/location_selector.dart';
 import '../controller.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,7 @@ class MaintenanceForm extends StatelessWidget {
             const SizedBox(height: 8),
 
             DropdownButtonFormField<String>(
-              value: controller.selectedCategory,
+              initialValue: controller.selectedCategory,
               decoration: _inputDecoration(context),
               dropdownColor: Theme.of(context).colorScheme.surface,
               iconEnabledColor: colorScheme.fontSecondary,
@@ -73,6 +74,19 @@ class MaintenanceForm extends StatelessWidget {
                 controller.selectCategory(value!);
               },
             ),
+
+            const SizedBox(height: 24),
+
+            Text(
+              'Location',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: colorScheme.fontInverted,
+              ),
+            ),
+            const SizedBox(height: 8),
+            LocationSelector(controller: controller),
 
             const SizedBox(height: 24),
 
