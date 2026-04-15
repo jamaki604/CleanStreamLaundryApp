@@ -6,6 +6,7 @@ import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MaintenanceController extends ChangeNotifier {
   final EdgeFunctionService edgeFunctionService;
@@ -42,10 +43,8 @@ class MaintenanceController extends ChangeNotifier {
   }
 
   Future<void> pickImage(BuildContext context) async {
-    // Ensure permissions first
     if (!await _ensurePermissions()) return;
 
-    // Ask user for source
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -89,8 +88,7 @@ class MaintenanceController extends ChangeNotifier {
   }
 
   bool get isFormValid =>
-      selectedCategory != null &&
-          descriptionController.text.trim().isNotEmpty;
+      selectedCategory != null && descriptionController.text.trim().isNotEmpty;
 
   void markAttemptedSubmit() {
     attemptedSubmit = true;
@@ -105,30 +103,49 @@ class MaintenanceController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final description = descriptionController.text;
-      final username = await getUserName();
+      String? imageUrl;
 
+      if (selectedImage != null) {
+        print("Step 1: Image detected, starting upload...");
+
+        // Use a more unique name to avoid conflicts
+        final fileName = '${DateTime.now().millisecondsSinceEpoch}_${userId.hashCode}.jpg';
+        final path = 'requests/$fileName';
+
+        // Attempt the upload
+        await Supabase.instance.client.storage
+            .from('maintenance-images')
+            .upload(path, selectedImage!);
+
+        print("Step 2: Upload successful, getting URL...");
+
+        imageUrl = Supabase.instance.client.storage
+            .from('maintenance-images')
+            .getPublicUrl(path);
+
+        print("Step 3: URL generated: $imageUrl");
+      }
+
+      print("Step 4: Calling Edge Function...");
       await edgeFunctionService.runEdgeFunction(
         name: 'maintenance-request',
         body: {
-          'username': username,
           'user_id': userId,
           'category': selectedCategory,
-          'description': description,
-          'has_image': selectedImage != null,
+          'description': descriptionController.text,
+          'image': imageUrl,
         },
       );
 
+      print("Step 5: Submission Complete!");
       return true;
+    } catch (e) {
+      print("FATAL ERROR during submission: $e");
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
     }
-  }
-  Future<String?> getUserName() async {
-    final userId = authService.getCurrentUserId;
-    if (userId == null) return null;
-    return profileService.getUserNameById(userId);
   }
 
   void disposeController() {
