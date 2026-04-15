@@ -1,6 +1,5 @@
 import 'controller.dart';
 import 'widgets/maintenance_form.dart';
-import 'widgets/header.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:clean_stream_laundry_app/features/widgets/status_dialog_box.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +98,6 @@ class MaintenancePageState extends State<MaintenancePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Header(),
             const SizedBox(height: 28),
             MaintenanceForm(controller: _controller),
             const SizedBox(height: 24),

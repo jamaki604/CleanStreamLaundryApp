@@ -48,7 +48,7 @@ class MaintenanceForm extends StatelessWidget {
                 color: colorScheme.fontInverted,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
             DropdownButtonFormField<String>(
               initialValue: controller.selectedCategory,
@@ -75,7 +75,7 @@ class MaintenanceForm extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
 
             Text(
               'Location',
@@ -85,10 +85,10 @@ class MaintenanceForm extends StatelessWidget {
                 color: colorScheme.fontInverted,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             LocationSelector(controller: controller),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
 
             Text(
               'Reason for Maintenance',
@@ -98,11 +98,12 @@ class MaintenanceForm extends StatelessWidget {
                 color: colorScheme.fontInverted,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             TextField(
               controller: controller.descriptionController,
-              minLines: 4,
-              maxLines: null,
+              maxLength: 200,
+              minLines: 2,
+              maxLines: 4,
               keyboardType: TextInputType.multiline,
               style: TextStyle(color: colorScheme.fontInverted),
               decoration: _inputDecoration(context).copyWith(
@@ -111,7 +112,7 @@ class MaintenanceForm extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
             Text(
               'Attach a Photo (Optional)',
               style: TextStyle(
