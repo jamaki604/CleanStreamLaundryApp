@@ -29,6 +29,7 @@ class MaintenanceController extends ChangeNotifier {
   final List<String> categories = const [
     'Washer/Dryer Maintenance',
     'App Maintenance',
+    'Location Maintenance',
     'Other',
   ];
 
