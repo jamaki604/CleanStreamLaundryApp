@@ -54,6 +54,10 @@ void main() {
           path: '/refundPage',
           builder: (_, __) => const Scaffold(body: Text('Refund Page')),
         ),
+        GoRoute(
+          path: '/maintenancePage',
+          builder: (_, __) => const Scaffold(body: Text('Maintenance Page')),
+        ),
       ],
     );
   });
@@ -85,15 +89,16 @@ void main() {
       );
     });
 
-    testWidgets('displays all six SettingsCard widgets', (tester) async {
+    testWidgets('displays all seven SettingsCard widgets', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      expect(find.byType(SettingsCard), findsNWidgets(6));
+      expect(find.byType(SettingsCard), findsNWidgets(7));
       expect(find.text('Sign Out'), findsOneWidget);
       expect(find.text('Monthly Report'), findsOneWidget);
       expect(find.text('Request Refund'), findsOneWidget);
       expect(find.text('Edit Profile'), findsOneWidget);
       expect(find.text('Notify Before Finish'), findsOneWidget);
+      expect(find.text('Request Facility Maintenance'), findsOneWidget);
     });
 
     testWidgets('displays correct icons for each card', (tester) async {
@@ -105,6 +110,7 @@ void main() {
       expect(find.byIcon(Icons.logout), findsOneWidget);
       expect(find.byIcon(Icons.person), findsOneWidget);
       expect(find.byIcon(Icons.timer), findsOneWidget);
+      expect(find.byIcon(Icons.handyman_outlined), findsOneWidget);
     });
 
     testWidgets('centers content inside SingleChildScrollView', (tester) async {
@@ -298,6 +304,19 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(find.text('Refund Page'), findsOneWidget);
+        });
+
+    testWidgets('navigates to /maintenancePage when Request Refund is tapped',
+            (tester) async {
+          await tester.pumpWidget(createWidget());
+          await tester.pumpAndSettle();
+
+          await tester.ensureVisible(
+              find.widgetWithText(SettingsCard, 'Request Facility Maintenance'));
+          await tester.tap(find.widgetWithText(SettingsCard, 'Request Facility Maintenance'));
+          await tester.pumpAndSettle();
+
+          expect(find.text('Maintenance Page'), findsOneWidget);
         });
   });
 }

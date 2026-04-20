@@ -15,6 +15,7 @@ import 'package:clean_stream_laundry_app/features/start_machine/start_machine.da
 import 'package:clean_stream_laundry_app/features/machine_payment/machine_payment.dart';
 import 'package:clean_stream_laundry_app/features/monthly_report/monthly_report.dart';
 import 'package:clean_stream_laundry_app/features/refund_request/refund_request.dart';
+import 'package:clean_stream_laundry_app/features/maintenance_request/maintenance_request.dart';
 import 'package:clean_stream_laundry_app/features/password_reset/password_reset.dart';
 import 'package:clean_stream_laundry_app/features/reset_protected/reset_protected.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
@@ -146,6 +147,16 @@ class RouterService {
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
           child: RefundPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/maintenancePage',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: MaintenancePage(),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,

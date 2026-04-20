@@ -85,7 +85,7 @@ class _SettingsState extends State<Settings> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/Logo.png', width: 230, height: 230),
+                  Image.asset('assets/Logo.png', width: 150, height: 150),
                   SettingsCard(
                     icon: Icons.lightbulb,
                     title: Theme.of(context).colorScheme.modeChangerText,
@@ -111,6 +111,12 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.request_page,
                     title: 'Request Refund',
                     onTap: () => context.push('/refundPage'),
+                  ),
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.handyman_outlined,
+                    title: 'Request Facility Maintenance',
+                    onTap: () => context.push('/maintenancePage'),
                   ),
                   const SizedBox(height: 14),
                   SettingsCard(
