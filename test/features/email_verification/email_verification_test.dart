@@ -1,10 +1,6 @@
-import 'dart:async';
 import 'package:clean_stream_laundry_app/features/email_verification/email_verification.dart';
+import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import 'package:clean_stream_laundry_app/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -14,61 +10,41 @@ import 'mocks.dart';
 
 void main() {
   late MockAuthService mockAuthService;
-  late StreamController<bool> authChangeController;
-  late MockMachineService mockMachineService;
-  late MockLocationService mockLocationService;
-  late MockProfileService mockProfileService;
-  late FakeAppLinks fakeAppLinks;
 
   setUpAll(() {
     registerFallbackValue(FakeAuthService());
-    registerFallbackValue(FakeUri());
+    registerFallbackValue('');
   });
 
   setUp(() {
     mockAuthService = MockAuthService();
-    authChangeController = StreamController<bool>.broadcast();
-    mockMachineService = MockMachineService();
-    mockLocationService = MockLocationService();
-    mockProfileService = MockProfileService();
-    fakeAppLinks = FakeAppLinks();
 
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
-    GetIt.instance.registerSingleton<MachineService>(mockMachineService);
-    GetIt.instance.registerSingleton<LocationService>(mockLocationService);
-    GetIt.instance.registerSingleton<ProfileService>(mockProfileService);
-
-    when(() => mockAuthService.onAuthChange)
-        .thenAnswer((_) => authChangeController.stream);
-    when(() => mockAuthService.isEmailVerified()).thenReturn(false);
-    when(() => mockLocationService.getLocations())
-        .thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(() => mockAuthService.getCurrentUserEmail()).thenReturn(null);
   });
 
   tearDown(() {
-    authChangeController.close();
-    fakeAppLinks.dispose();
     GetIt.instance.reset();
   });
 
-  Widget createTestWidget() {
+  Widget createTestWidget({String? email}) {
     return MaterialApp.router(
       routerConfig: GoRouter(
         initialLocation: '/email-verification',
         routes: [
           GoRoute(
             path: '/email-verification',
-            builder: (context, state) =>
-                EmailVerificationPage(appLinks: fakeAppLinks),
+            builder: (context, state) => EmailVerificationPage(email: email),
           ),
           GoRoute(
             path: '/homePage',
-            builder: (context, state) => HomePage(),
+            builder: (context, state) =>
+                const Scaffold(body: Text('Home Page')),
           ),
           GoRoute(
-            path: '/scanner',
+            path: '/login',
             builder: (context, state) =>
-            const Scaffold(body: Text('Scanner Page')),
+                const Scaffold(body: Text('Login Page')),
           ),
         ],
       ),
@@ -77,125 +53,194 @@ void main() {
 
   group('Static UI', () {
     testWidgets('displays all required UI elements', (tester) async {
-      await tester.pumpWidget(createTestWidget());
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.email), findsOneWidget);
-      expect(find.text('Please verify your email address'), findsOneWidget);
+      expect(find.byIcon(Icons.mark_email_read_outlined), findsOneWidget);
+      expect(find.text('Verify your email'), findsOneWidget);
       expect(
-        find.text('Check your inbox and click the verification link.'),
+        find.text(
+          'Enter the 6-digit verification code we sent to your email address.',
+        ),
         findsOneWidget,
       );
-      expect(find.text('Resend Verification'), findsOneWidget);
+      expect(find.text('Verify Email'), findsNWidgets(2));
+      expect(find.text('Resend code'), findsOneWidget);
+      expect(find.text('Back to Login'), findsOneWidget);
     });
 
-    testWidgets('email icon has correct styling', (tester) async {
-      await tester.pumpWidget(createTestWidget());
+    testWidgets('email icon has correct sizing', (tester) async {
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
       await tester.pumpAndSettle();
 
-      final icon = tester.widget<Icon>(find.byIcon(Icons.email));
+      final icon = tester.widget<Icon>(
+        find.byIcon(Icons.mark_email_read_outlined),
+      );
       expect(icon.size, equals(80));
-      expect(icon.color, equals(Colors.blueAccent));
     });
 
-    testWidgets('text uses center alignment', (tester) async {
-      await tester.pumpWidget(createTestWidget());
+    testWidgets('shows route email when provided', (tester) async {
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
       await tester.pumpAndSettle();
 
-      final titleText = tester.widget<Text>(
-        find.text('Please verify your email address'),
-      );
-      final descText = tester.widget<Text>(
-        find.text('Check your inbox and click the verification link.'),
-      );
-
-      expect(titleText.textAlign, equals(TextAlign.center));
-      expect(descText.textAlign, equals(TextAlign.center));
+      expect(find.text('route@example.com'), findsOneWidget);
     });
 
-    testWidgets('uses theme surface color as scaffold background',
-            (tester) async {
-          await tester.pumpWidget(createTestWidget());
-          await tester.pumpAndSettle();
-
-          final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-          expect(scaffold.backgroundColor, isNotNull);
-        });
-  });
-
-  group('Navigation', () {
-    testWidgets('verifies email verification check called', (tester) async {
-      when(() => mockAuthService.isEmailVerified()).thenReturn(true);
+    testWidgets('shows current user email when route email is missing', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.getCurrentUserEmail(),
+      ).thenReturn('session@example.com');
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
-      authChangeController.add(true);
-      await tester.pumpAndSettle();
-
-      verify(() => mockAuthService.isEmailVerified()).called(1);
+      expect(find.text('session@example.com'), findsOneWidget);
     });
 
-    testWidgets('stays on page when email not verified', (tester) async {
-      when(() => mockAuthService.isEmailVerified()).thenReturn(false);
-
+    testWidgets('shows fallback email placeholder when none available', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
-      authChangeController.add(true);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please verify your email address'), findsOneWidget);
-    });
-
-    testWidgets('stays on page when auth emits false (logout)', (tester) async {
-      when(() => mockAuthService.isEmailVerified()).thenReturn(true);
-
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      authChangeController.add(false);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please verify your email address'), findsOneWidget);
-    });
-
-    testWidgets('verifies deeplink gets session', (tester) async {
-      when(() => mockAuthService.getSessionFromURI(any()))
-          .thenAnswer((_) async {});
-
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      fakeAppLinks.emit(Uri.parse('clean-stream://email-verification'));
-      await tester.pumpAndSettle();
-
-      verify(() => mockAuthService.getSessionFromURI(any())).called(1);
-    });
-
-    testWidgets('ignores deep link with wrong host', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      fakeAppLinks.emit(Uri.parse('clean-stream://other-host'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Please verify your email address'), findsOneWidget);
+      expect(find.text('your email'), findsOneWidget);
     });
   });
 
-  group('Lifecycle', () {
-    testWidgets('properly disposes controller on navigation away',
-            (tester) async {
-          await tester.pumpWidget(createTestWidget());
-          await tester.pumpAndSettle();
+  group('Actions', () {
+    testWidgets(
+      'shows missing email message when verify is pressed without email',
+      (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
 
-          final context =
-          tester.element(find.byType(EmailVerificationPage));
-          GoRouter.of(context).go('/scanner');
-          await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Verify Email'));
+        await tester.pumpAndSettle();
 
-          expect(find.byType(EmailVerificationPage), findsNothing);
-        });
+        expect(
+          find.text('Missing account email. Please log in and try again.'),
+          findsOneWidget,
+        );
+        verifyNever(
+          () => mockAuthService.verifyEmailCode(
+            email: any(named: 'email'),
+            code: any(named: 'code'),
+          ),
+        );
+      },
+    );
+
+    testWidgets('navigates to home after successful code verification', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.verifyEmailCode(
+          email: 'route@example.com',
+          code: '123456',
+        ),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '123456');
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Verify Email'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home Page'), findsOneWidget);
+    });
+
+    testWidgets('shows invalid code error when verification fails', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.verifyEmailCode(
+          email: 'route@example.com',
+          code: '123456',
+        ),
+      ).thenAnswer((_) async => AuthenticationResponses.failure);
+
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '123456');
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Verify Email'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Invalid or expired code'), findsWidgets);
+    });
+
+    testWidgets('resends code and shows success snackbar', (tester) async {
+      when(
+        () => mockAuthService.resendVerification(email: 'route@example.com'),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
+
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Resend code'));
+      await tester.pumpAndSettle();
+
+      verify(
+        () => mockAuthService.resendVerification(email: 'route@example.com'),
+      ).called(1);
+      expect(
+        find.text('Verification code sent! Check your email.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows resend failure message', (tester) async {
+      when(
+        () => mockAuthService.resendVerification(email: 'route@example.com'),
+      ).thenAnswer((_) async => AuthenticationResponses.failure);
+
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Resend code'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Failed to send verification code.'), findsOneWidget);
+    });
+
+    testWidgets('navigates to login when back to login is tapped', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      await tester.dragUntilVisible(
+        find.text('Back to Login'),
+        find.byType(SingleChildScrollView),
+        const Offset(0, -200),
+      );
+      await tester.tap(find.text('Back to Login'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Login Page'), findsOneWidget);
+    });
+  });
+
+  group('Layout', () {
+    testWidgets('uses theme surface color as scaffold background', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+      expect(scaffold.backgroundColor, isNotNull);
+    });
+
+    testWidgets('title text is centered', (tester) async {
+      await tester.pumpWidget(createTestWidget(email: 'route@example.com'));
+      await tester.pumpAndSettle();
+
+      final titleText = tester.widget<Text>(find.text('Verify your email'));
+      expect(titleText.textAlign, TextAlign.center);
+    });
   });
 }

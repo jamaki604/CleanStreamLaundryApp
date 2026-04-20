@@ -10,40 +10,33 @@ import '../mocks.dart';
 
 void main() {
   late MockAuthService mockAuthService;
-  late FakeAppLinks fakeAppLinks;
 
   setUpAll(() {
-    registerFallbackValue(FakeAuthService());
-    registerFallbackValue(FakeUri());
+    registerFallbackValue('');
   });
 
   setUp(() {
     mockAuthService = MockAuthService();
-    fakeAppLinks = FakeAppLinks();
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
-
-    when(() => mockAuthService.onAuthChange)
-        .thenAnswer((_) => const Stream.empty());
   });
 
   tearDown(() {
-    fakeAppLinks.dispose();
     GetIt.instance.reset();
   });
 
   Future<EmailVerificationController> buildController(
-      WidgetTester tester) async {
+    WidgetTester tester,
+  ) async {
     late EmailVerificationController controller;
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Builder(builder: (context) {
-          controller = EmailVerificationController(
-            appLinks: fakeAppLinks,
-            context: context,
-          );
-          return const SizedBox();
-        }),
+        home: Builder(
+          builder: (context) {
+            controller = EmailVerificationController();
+            return const SizedBox();
+          },
+        ),
       ),
     );
 
@@ -98,25 +91,28 @@ void main() {
   });
 
   group('Success state', () {
-    testWidgets('shows check_circle icon after successful resend',
-            (tester) async {
-          when(() => mockAuthService.resendVerification())
-              .thenAnswer((_) async => AuthenticationResponses.success);
+    testWidgets('shows check_circle icon after successful resend', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
-          final controller = await buildController(tester);
-          await tester.pumpWidget(buildWidget(controller: controller));
-          await tester.pumpAndSettle();
+      final controller = await buildController(tester);
+      await tester.pumpWidget(buildWidget(controller: controller));
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Resend Verification'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('Resend Verification'));
+      await tester.pumpAndSettle();
 
-          expect(find.byIcon(Icons.check_circle), findsOneWidget);
-          expect(find.text('Resend Verification'), findsNothing);
-        });
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      expect(find.text('Resend Verification'), findsNothing);
+    });
 
     testWidgets('check_circle icon has correct styling', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       final controller = await buildController(tester);
       await tester.pumpWidget(buildWidget(controller: controller));
@@ -130,31 +126,34 @@ void main() {
       expect(icon.color, equals(Colors.green));
     });
 
-    testWidgets('tapping check_circle does not trigger another resend',
-            (tester) async {
-          when(() => mockAuthService.resendVerification())
-              .thenAnswer((_) async => AuthenticationResponses.success);
+    testWidgets('tapping check_circle does not trigger another resend', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
-          final controller = await buildController(tester);
-          await tester.pumpWidget(buildWidget(controller: controller));
-          await tester.pumpAndSettle();
+      final controller = await buildController(tester);
+      await tester.pumpWidget(buildWidget(controller: controller));
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Resend Verification'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('Resend Verification'));
+      await tester.pumpAndSettle();
 
-          verify(() => mockAuthService.resendVerification()).called(1);
+      verify(() => mockAuthService.resendVerification()).called(1);
 
-          await tester.tap(find.byIcon(Icons.check_circle));
-          await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.check_circle));
+      await tester.pumpAndSettle();
 
-          verifyNever(() => mockAuthService.resendVerification());
-        });
+      verifyNever(() => mockAuthService.resendVerification());
+    });
   });
 
   group('Failure state', () {
     testWidgets('shows close icon and error text on failure', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.failure);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.failure);
 
       final controller = await buildController(tester);
       await tester.pumpWidget(buildWidget(controller: controller));
@@ -171,8 +170,9 @@ void main() {
     });
 
     testWidgets('error container has red circular decoration', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.failure);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.failure);
 
       final controller = await buildController(tester);
       await tester.pumpWidget(buildWidget(controller: controller));
@@ -184,9 +184,9 @@ void main() {
       final container = tester.widget<Container>(
         find
             .ancestor(
-          of: find.byIcon(Icons.close),
-          matching: find.byType(Container),
-        )
+              of: find.byIcon(Icons.close),
+              matching: find.byType(Container),
+            )
             .first,
       );
 
@@ -195,9 +195,12 @@ void main() {
       expect(decoration.shape, equals(BoxShape.circle));
     });
 
-    testWidgets('does not trigger another resend after failure', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.failure);
+    testWidgets('does not trigger another resend after failure', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.failure);
 
       final controller = await buildController(tester);
       await tester.pumpWidget(buildWidget(controller: controller));
@@ -217,8 +220,9 @@ void main() {
 
   group('InkWell interaction', () {
     testWidgets('tapping InkWell calls resendVerification', (tester) async {
-      when(() => mockAuthService.resendVerification())
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.resendVerification(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       final controller = await buildController(tester);
       await tester.pumpWidget(buildWidget(controller: controller));
