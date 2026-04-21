@@ -49,9 +49,8 @@ void main() {
             builder: (_, __) => const Scaffold(body: Text('Home Page')),
           ),
           GoRoute(
-            path: '/email-Verification',
-            builder: (_, __) =>
-            const Scaffold(body: Text('Email Verification')),
+            path: '/email-verification',
+            builder: (_, __) => const Scaffold(body: Text('Verify your email')),
           ),
           GoRoute(
             path: '/signup',
@@ -60,7 +59,7 @@ void main() {
           GoRoute(
             path: '/password-reset',
             builder: (_, __) =>
-            const Scaffold(body: Text('Password Reset Page')),
+                const Scaffold(body: Text('Password Reset Page')),
           ),
           GoRoute(
             path: '/login',
@@ -72,18 +71,21 @@ void main() {
   }
 
   void mockLoginResponse(AuthenticationResponses response) {
-    when(() => mockAuthService.login(any(), any()))
-        .thenAnswer((_) async => response);
+    when(
+      () => mockAuthService.login(any(), any()),
+    ).thenAnswer((_) async => response);
   }
 
   Future<void> enterCredentials(
-      WidgetTester tester, {
-        String email = 'test@example.com',
-        String password = 'password123',
-      }) async {
+    WidgetTester tester, {
+    String email = 'test@example.com',
+    String password = 'password123',
+  }) async {
     await tester.enterText(find.widgetWithText(TextField, 'Email'), email);
     await tester.enterText(
-        find.widgetWithText(TextField, 'Password'), password);
+      find.widgetWithText(TextField, 'Password'),
+      password,
+    );
   }
 
   group('Static UI', () {
@@ -172,23 +174,26 @@ void main() {
   });
 
   group('Login functionality', () {
-    testWidgets('shows error snackbar when both fields are empty',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('shows error snackbar when both fields are empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
-          await tester.pump();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
+      await tester.pump();
 
-          expect(find.text('Please fill in both fields.'), findsOneWidget);
-        });
+      expect(find.text('Please fill in both fields.'), findsOneWidget);
+    });
 
     testWidgets('shows error snackbar when email is empty', (tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
       await tester.enterText(
-          find.widgetWithText(TextField, 'Password'), 'password123');
+        find.widgetWithText(TextField, 'Password'),
+        'password123',
+      );
       await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
       await tester.pump();
 
@@ -200,26 +205,29 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(
-          find.widgetWithText(TextField, 'Email'), 'test@example.com');
+        find.widgetWithText(TextField, 'Email'),
+        'test@example.com',
+      );
       await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
       await tester.pump();
 
       expect(find.text('Please fill in both fields.'), findsOneWidget);
     });
 
-    testWidgets('shows logging in snackbar when credentials entered',
-            (tester) async {
-          mockLoginResponse(AuthenticationResponses.success);
+    testWidgets('shows logging in snackbar when credentials entered', (
+      tester,
+    ) async {
+      mockLoginResponse(AuthenticationResponses.success);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await enterCredentials(tester);
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
-          await tester.pump();
+      await enterCredentials(tester);
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
+      await tester.pump();
 
-          expect(find.text('Logging in as test@example.com...'), findsOneWidget);
-        });
+      expect(find.text('Logging in as test@example.com...'), findsOneWidget);
+    });
 
     testWidgets('navigates to home page on successful login', (tester) async {
       mockLoginResponse(AuthenticationResponses.success);
@@ -232,23 +240,25 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Home Page'), findsOneWidget);
-      verify(() => mockAuthService.login('test@example.com', 'password123'))
-          .called(1);
+      verify(
+        () => mockAuthService.login('test@example.com', 'password123'),
+      ).called(1);
     });
 
-    testWidgets('navigates to email verification on unverified email',
-            (tester) async {
-          mockLoginResponse(AuthenticationResponses.emailNotVerified);
+    testWidgets('navigates to email verification on unverified email', (
+      tester,
+    ) async {
+      mockLoginResponse(AuthenticationResponses.emailNotVerified);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await enterCredentials(tester);
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
-          await tester.pumpAndSettle();
+      await enterCredentials(tester);
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Log In'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Email Verification'), findsOneWidget);
-        });
+      expect(find.text('Verify your email'), findsOneWidget);
+    });
 
     testWidgets('shows error colors on failed login', (tester) async {
       mockLoginResponse(AuthenticationResponses.failure);
@@ -304,30 +314,33 @@ void main() {
   });
 
   group('Password visibility', () {
-    testWidgets('toggles password visibility when suffix icon tapped',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('toggles password visibility when suffix icon tapped', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          expect(
-            tester
-                .widget<TextField>(find.widgetWithText(TextField, 'Password'))
-                .obscureText,
-            isTrue,
-          );
+      expect(
+        tester
+            .widget<TextField>(find.widgetWithText(TextField, 'Password'))
+            .obscureText,
+        isTrue,
+      );
 
-          await tester.tap(find.byIcon(Icons.visibility_off));
-          await tester.pump();
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pump();
 
-          expect(
-            tester
-                .widget<TextField>(find.widgetWithText(TextField, 'Password'))
-                .obscureText,
-            isFalse,
-          );
-        });
+      expect(
+        tester
+            .widget<TextField>(find.widgetWithText(TextField, 'Password'))
+            .obscureText,
+        isFalse,
+      );
+    });
 
-    testWidgets('shows visibility icon when password is hidden', (tester) async {
+    testWidgets('shows visibility icon when password is hidden', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
@@ -335,19 +348,19 @@ void main() {
       expect(find.byIcon(Icons.visibility), findsNothing);
     });
 
-    testWidgets('shows visibility_off icon when password is shown',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('shows visibility_off icon when password is shown', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.byIcon(Icons.visibility_off));
-          await tester.pump();
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pump();
 
-          expect(find.byIcon(Icons.visibility), findsOneWidget);
-          expect(find.byIcon(Icons.visibility_off), findsNothing);
-        });
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+    });
   });
-
 
   group('Navigation', () {
     testWidgets('navigates to sign_up on Create Account tap', (tester) async {
@@ -361,29 +374,30 @@ void main() {
       expect(find.text('Sign Up Page'), findsOneWidget);
     });
 
-    testWidgets('navigates to password reset on Reset Password tap',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('navigates to password reset on Reset Password tap', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.ensureVisible(find.text('Reset Password'));
-          await tester.tap(find.text('Reset Password'));
-          await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Reset Password'));
+      await tester.tap(find.text('Reset Password'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Password Reset Page'), findsOneWidget);
-        });
+      expect(find.text('Password Reset Page'), findsOneWidget);
+    });
   });
 
   group('Keyboard enter', () {
     testWidgets('pressing Enter triggers login', (tester) async {
-      when(() => mockAuthService.login(any(), any()))
-          .thenAnswer((_) async => AuthenticationResponses.success);
+      when(
+        () => mockAuthService.login(any(), any()),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
 
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      await tester.enterText(
-          find.byType(TextField).first, 'test@example.com');
+      await tester.enterText(find.byType(TextField).first, 'test@example.com');
       await tester.enterText(find.byType(TextField).last, 'password123');
       await tester.pump();
 
@@ -398,68 +412,76 @@ void main() {
   });
 
   group('Deep links', () {
-    testWidgets('navigates to home on email-verification deep link',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('navigates to home on email-verification deep link', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          fakeAppLinks.emit(Uri.parse('clean-stream://email-verification'));
-          await tester.pumpAndSettle();
+      fakeAppLinks.emit(Uri.parse('clean-stream://email-verification'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Home Page'), findsOneWidget);
-        });
+      expect(find.text('Home Page'), findsOneWidget);
+    });
 
-    testWidgets('handles oauth deep link with successful session',
-            (tester) async {
-          when(() => mockAuthService.getSessionFromURI(any()))
-              .thenAnswer((_) async {});
-          when(() => mockAuthService.isLoggedIn())
-              .thenAnswer((_) async => AuthenticationResponses.success);
-          when(() => mockAuthService.getCurrentUser()).thenReturn(
-            User(
-              id: 'testId',
-              appMetadata: {},
-              userMetadata: {'full_name': 'Test User'},
-              aud: '',
-              createdAt: '',
-            ),
-          );
-          when(() => mockProfileService.createAccount(
-            id: any(named: 'id'),
-            name: any(named: 'name'),
-          )).thenAnswer((_) async {});
+    testWidgets('handles oauth deep link with successful session', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.getSessionFromURI(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockAuthService.isLoggedIn(),
+      ).thenAnswer((_) async => AuthenticationResponses.success);
+      when(() => mockAuthService.getCurrentUser()).thenReturn(
+        User(
+          id: 'testId',
+          appMetadata: {},
+          userMetadata: {'full_name': 'Test User'},
+          aud: '',
+          createdAt: '',
+        ),
+      );
+      when(
+        () => mockProfileService.createAccount(
+          id: any(named: 'id'),
+          name: any(named: 'name'),
+        ),
+      ).thenAnswer((_) async {});
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          fakeAppLinks.emit(Uri.parse('clean-stream://oauth'));
-          await tester.pumpAndSettle();
+      fakeAppLinks.emit(Uri.parse('clean-stream://oauth'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Home Page'), findsOneWidget);
-          verify(() => mockAuthService.getSessionFromURI(any())).called(1);
-          verify(() => mockAuthService.isLoggedIn()).called(1);
-          verify(() => mockAuthService.getCurrentUser()).called(1);
-          verify(() => mockProfileService.createAccount(
-            id: 'testId',
-            name: 'Test User',
-          )).called(1);
-        });
+      expect(find.text('Home Page'), findsOneWidget);
+      verify(() => mockAuthService.getSessionFromURI(any())).called(1);
+      verify(() => mockAuthService.isLoggedIn()).called(1);
+      verify(() => mockAuthService.getCurrentUser()).called(1);
+      verify(
+        () => mockProfileService.createAccount(id: 'testId', name: 'Test User'),
+      ).called(1);
+    });
 
-    testWidgets('navigates to login on oauth deep link with failed session',
-            (tester) async {
-          when(() => mockAuthService.getSessionFromURI(any()))
-              .thenAnswer((_) async {});
-          when(() => mockAuthService.isLoggedIn())
-              .thenAnswer((_) async => AuthenticationResponses.failure);
+    testWidgets('navigates to login on oauth deep link with failed session', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthService.getSessionFromURI(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockAuthService.isLoggedIn(),
+      ).thenAnswer((_) async => AuthenticationResponses.failure);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          fakeAppLinks.emit(Uri.parse('clean-stream://oauth'));
-          await tester.pumpAndSettle();
+      fakeAppLinks.emit(Uri.parse('clean-stream://oauth'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Login Page'), findsOneWidget);
-        });
+      expect(find.text('Login Page'), findsOneWidget);
+    });
 
     testWidgets('ignores deep link with null uri', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -469,19 +491,19 @@ void main() {
     });
   });
 
-
   group('Styling', () {
-    testWidgets('Log In button has blue background and white text',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('Log In button has blue background and white text', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          final button = tester.widget<ElevatedButton>(
-            find.widgetWithText(ElevatedButton, 'Log In'),
-          );
-          expect(button.style?.backgroundColor?.resolve({}), Colors.blue);
-          expect(button.style?.foregroundColor?.resolve({}), Colors.white);
-        });
+      final button = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Log In'),
+      );
+      expect(button.style?.backgroundColor?.resolve({}), Colors.blue);
+      expect(button.style?.foregroundColor?.resolve({}), Colors.white);
+    });
 
     testWidgets('Create Account text is blue and underlined', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -500,7 +522,7 @@ void main() {
         find.widgetWithText(TextField, 'Email'),
       );
       final border =
-      (field.decoration as InputDecoration).border as OutlineInputBorder;
+          (field.decoration as InputDecoration).border as OutlineInputBorder;
       expect(border.borderRadius, BorderRadius.circular(12));
     });
   });

@@ -1,65 +1,86 @@
-import 'dart:async';
-import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/logic/enums/authentication_response_enum.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
+
+enum EmailVerifyResult { success, invalid, error }
+
+enum EmailResendResult { success, failed, error }
 
 class EmailVerificationController {
   final AuthService _authService = GetIt.instance<AuthService>();
-  final AppLinks appLinks;
-  final BuildContext context;
 
-  StreamSubscription? _authSub;
-  StreamSubscription? _linkSub;
+  final TextEditingController codeController = TextEditingController();
 
   bool resent = false;
   bool isLoading = false;
   AuthenticationResponses? lastResponse;
+  String? error;
 
-  EmailVerificationController({
-    required this.appLinks,
-    required this.context,
-  });
-
-  void init() {
-    _authSub = _authService.onAuthChange.listen((isLoggedIn) {
-      if (isLoggedIn && _authService.isEmailVerified()) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) context.go('/homePage');
-        });
-      }
-    });
-
-    _linkSub = appLinks.uriLinkStream.listen(_handleUri);
-  }
+  EmailVerificationController();
 
   void dispose() {
-    _authSub?.cancel();
-    _linkSub?.cancel();
+    codeController.dispose();
   }
 
-  Future<void> _handleUri(Uri? uri) async {
-    if (uri != null &&
-        uri.scheme == 'clean-stream' &&
-        uri.host == 'email-verification') {
-      await _authService.getSessionFromURI(uri);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) context.go('/homePage');
-      });
-    }
-  }
-
-  Future<void> resendVerification() async {
+  Future<void> resendVerification({String? email}) async {
     if (resent) return;
 
     isLoading = true;
-    lastResponse = await _authService.resendVerification();
+    lastResponse = await _authService.resendVerification(email: email);
     isLoading = false;
 
     if (lastResponse == AuthenticationResponses.success) {
       resent = true;
+    }
+  }
+
+  String? get currentEmail => _authService.getCurrentUserEmail();
+
+  void clearError() {
+    error = null;
+  }
+
+  Future<EmailVerifyResult> verifyEmailCode(String email) async {
+    final code = codeController.text.trim();
+
+    if (code.length != 6) {
+      error = 'Please enter the 6-digit code';
+      return EmailVerifyResult.invalid;
+    }
+
+    isLoading = true;
+    error = null;
+
+    try {
+      final response = await _authService.verifyEmailCode(
+        email: email,
+        code: code,
+      );
+
+      if (response == AuthenticationResponses.success) {
+        return EmailVerifyResult.success;
+      }
+
+      error = 'Invalid or expired code';
+      return EmailVerifyResult.invalid;
+    } catch (_) {
+      error = 'Something went wrong. Try again';
+      return EmailVerifyResult.error;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  Future<EmailResendResult> resendVerificationEmail(String email) async {
+    try {
+      await resendVerification(email: email);
+      if (lastResponse == AuthenticationResponses.success) {
+        return EmailResendResult.success;
+      }
+      return EmailResendResult.failed;
+    } catch (_) {
+      return EmailResendResult.error;
     }
   }
 }

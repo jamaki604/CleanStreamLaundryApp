@@ -91,13 +91,16 @@ class RouterService {
       ),
       GoRoute(
         path: '/email-verification',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: EmailVerificationPage(appLinks: AppLinks()),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-          transitionsBuilder: (_, _, _, child) => child,
-        ),
+        pageBuilder: (context, state) {
+          final email = state.extra is String ? state.extra as String : null;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: EmailVerificationPage(email: email),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            transitionsBuilder: (_, _, _, child) => child,
+          );
+        },
       ),
       GoRoute(
         path: '/homePage',
@@ -206,7 +209,7 @@ class RouterService {
             transitionsBuilder: (_, _, _, child) => child,
           );
         },
-      )
+      ),
     ],
     errorBuilder: (context, state) {
       final uri = state.uri;

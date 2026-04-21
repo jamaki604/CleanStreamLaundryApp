@@ -12,7 +12,7 @@ abstract class AuthService {
   Future<AuthenticationResponses> isLoggedIn();
   String? get getCurrentUserId;
   String getLastSignedUpUserId();
-  Future<AuthenticationResponses> resendVerification();
+  Future<AuthenticationResponses> resendVerification({String? email});
   Stream<bool> get onAuthChange;
   bool isEmailVerified();
   Future<AuthenticationResponses> resetPassword(String email);
@@ -28,5 +28,12 @@ abstract class AuthService {
   });
   Future<AuthenticationResponses> exchangeCodeForSession(String code);
   Future<AuthenticationResponses> updatePassword(String newPassword);
-  Future<AuthenticationResponses> verifyCode({required String email, required String code});
+  Future<AuthenticationResponses> verifyCode({
+    required String email,
+    required String code,
+  });
+  Future<AuthenticationResponses> verifyEmailCode({
+    required String email,
+    required String code,
+  });
 }
