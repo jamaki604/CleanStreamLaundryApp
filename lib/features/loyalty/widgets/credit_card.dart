@@ -41,23 +41,18 @@ class CreditCard extends StatelessWidget {
                   top: 65,
                   child: SvgPicture.asset("assets/CardChip.svg", width: 60, height: 45,key: Key("cardChip")),
                 ),
-                Positioned(
-                    left: -4,
-                    right: 0,
-                    top: 120,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      color: Theme.of(context).colorScheme.cardSecondary,
-                      child: Text(
-                        "1234   5678   9012   3456",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w400,
-                          color: Theme.of(context).colorScheme.fontInverted,
-                        ),
-                      ),
-                    )
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.center,
+                  child: Text(
+                    "1234   5678   9012   3456",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).colorScheme.fontInverted,
+                    ),
+                  ),
                 ),
                 Positioned(
                   left: 15,
@@ -68,14 +63,17 @@ class CreditCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(
-                          (username == null || username!.isEmpty) ? 'John Doe' : username!,
-                          textAlign: TextAlign.left,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            (username == null || username!.isEmpty) ? 'John Doe' : username!,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ),
