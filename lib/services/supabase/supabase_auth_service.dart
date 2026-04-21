@@ -82,12 +82,16 @@ class SupabaseAuthService implements AuthService {
       final AuthResponse response = await _client.auth.signUp(
         email: email,
         password: password,
-        emailRedirectTo: 'clean-stream://email-verification',
         data: {"full_name": name},
       );
 
       if (response.user != null) {
         lastSignedUpUserId = response.user!.id;
+        try {
+          await _client.auth.resend(type: OtpType.signup, email: email);
+        } catch (e) {
+          print('Error sending verification OTP: $e');
+        }
         output = AuthenticationResponses.success;
       }
     } else {
@@ -157,10 +161,11 @@ class SupabaseAuthService implements AuthService {
     return output;
   }
 
-  Future<AuthenticationResponses> resendVerification() async {
+  @override
+  Future<AuthenticationResponses> resendVerification({String? email}) async {
     AuthenticationResponses output = AuthenticationResponses.success;
 
-    final userEmail = _client.auth.currentUser?.email;
+    final userEmail = email ?? _client.auth.currentUser?.email;
 
     try {
       if (userEmail != null) {
@@ -266,9 +271,7 @@ class SupabaseAuthService implements AuthService {
     AuthenticationResponses output = AuthenticationResponses.failure;
     try {
       // Send password reset email and redirect back to the app via deep link.
-      await _client.auth.resetPasswordForEmail(
-        email
-      );
+      await _client.auth.resetPasswordForEmail(email);
       output = AuthenticationResponses.success;
     } catch (e) {
       print('resetPassword error: $e');
@@ -306,7 +309,10 @@ class SupabaseAuthService implements AuthService {
   }
 
   @override
-  Future<AuthenticationResponses> verifyCode({required String email, required String code}) async {
+  Future<AuthenticationResponses> verifyCode({
+    required String email,
+    required String code,
+  }) async {
     AuthenticationResponses output = AuthenticationResponses.success;
 
     try {
@@ -319,11 +325,34 @@ class SupabaseAuthService implements AuthService {
       if (response.session == null) {
         output = AuthenticationResponses.failure;
       }
-    }catch (e){
+    } catch (e) {
       output = AuthenticationResponses.failure;
     }
 
     return output;
   }
 
+  @override
+  Future<AuthenticationResponses> verifyEmailCode({
+    required String email,
+    required String code,
+  }) async {
+    AuthenticationResponses output = AuthenticationResponses.success;
+
+    try {
+      final response = await _client.auth.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.signup,
+      );
+
+      if (response.session == null) {
+        output = AuthenticationResponses.failure;
+      }
+    } catch (e) {
+      output = AuthenticationResponses.failure;
+    }
+
+    return output;
+  }
 }

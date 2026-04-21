@@ -4,32 +4,41 @@ export interface DenyRefundParams {
   userId: string;
   transactionId: string;
   amount: string;
+  note: string;
 }
 
 export interface DenyRefundDeps {
   supabase: SupabaseClient;
-  sendEmail: (to: string, transactionId: string, amount: string) => Promise<void>;
+  sendEmail: (to: string, transactionId: string, amount: string, note: string) => Promise<void>;
 }
 
-export function extractParams(url: URL): DenyRefundParams {
-  const userId = url.searchParams.get("user_id");
-  const transactionId = url.searchParams.get("transaction_id");
-  const amount = url.searchParams.get("amount");
+export async function extractParams(req: Request): Promise<DenyRefundParams> {
+  try {
+    const body = await req.json();
 
-  if (!userId || !transactionId || !amount) {
-    throw new Error("Missing params");
+    const userId = body.customerId || body.user_id;
+    const transactionId = body.id || body.transactionId || body.transaction_id;
+    const amount = body.amount;
+    const note = body.note;
+
+    if (!userId || !transactionId || !amount) {
+      throw new Error("Missing params");
+    }
+
+    return { userId, transactionId, amount, note };
+  } catch (err) {
+    throw new Error("Invalid JSON body");
   }
-
-  return { userId, transactionId, amount };
 }
 
 export async function denyRefundInDb(
   supabase: SupabaseClient,
-  transactionId: string
+  transactionId: string,
+  note: string
 ): Promise<void> {
   const { error } = await supabase
     .from("Refunds")
-    .update({ status: "denied" })
+    .update({ status: "denied", "admin-note": note })
     .eq("transaction_id", transactionId);
 
   if (error) {
@@ -61,7 +70,8 @@ export async function sendDenialEmail(
   resendApiKey: string,
   to: string,
   transactionId: string,
-  amount: string
+  amount: string,
+  note: string,
 ): Promise<void> {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -78,6 +88,7 @@ export async function sendDenialEmail(
         <p>Unfortunately, your refund request for transaction <strong>${transactionId}</strong> has been denied.</p>
         <p><strong>Amount:</strong> $${amount}</p>
         <p>If you have questions about this decision, please contact support.</p>
+        <p> ${note ? `Note: ${note}` : ""} </p>
       `,
     }),
   });
@@ -92,21 +103,19 @@ export async function handleDenyRefund(
   req: Request,
   deps: DenyRefundDeps
 ): Promise<Response> {
-  const url = new URL(req.url);
-  const { userId, transactionId, amount } = extractParams(url);
+  const { userId, transactionId, amount, note } = await extractParams(req);
 
-  await denyRefundInDb(deps.supabase, transactionId);
+  await denyRefundInDb(deps.supabase, transactionId, note);
 
   const userEmail = await getUserEmail(deps.supabase, userId);
 
-  await deps.sendEmail(userEmail, transactionId, amount);
+  await deps.sendEmail(userEmail, transactionId, amount, note);
 
   const html = `Refund Denied
-    The refund request has been denied and
-    the customer has been notified via email.
-    Transaction: ${transactionId}
-    Amount: $${amount}
-  `;
+The refund request has been denied and
+the customer has been notified via email.
+Transaction: ${transactionId}
+Amount: $${amount}`;
 
   return new Response(html, {
     status: 200,
