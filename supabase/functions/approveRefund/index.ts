@@ -5,19 +5,29 @@ import { processRefund } from "./logic.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-client-info",
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
+let userId: string, transactionId: string, amount: string, note: string;
+
   try {
-    const url = new URL(req.url);
-    const userId = url.searchParams.get("user_id") || "";
-    const transactionId = url.searchParams.get("transaction_id") || "";
-    const amount = url.searchParams.get("amount") || "";
+    const body = await req.json();
+    userId = body.customerId || body.user_id; 
+    transactionId = body.id || body.transactionId || body.transaction_id;
+    amount = body.amount;
+    note = body.note;
+
+    if (!userId || !transactionId || !amount) {
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -35,10 +45,10 @@ serve(async (req) => {
     });
 
     const deps = {
-      updateRefund: async (transactionId: string) => {
+      updateRefund: async (transactionId: string, note: string) => {
         const { error } = await supabase
           .from("Refunds")
-          .update({ status: "approved" })
+          .update({ status: "approved", "admin-note": note })
           .eq("transaction_id", transactionId);
 
         if (error) throw new Error(error.message);
@@ -70,7 +80,8 @@ serve(async (req) => {
       sendEmail: async (
         email: string,
         transactionId: string,
-        amount: string
+        amount: string,
+        note: string
       ) => {
         const response = await fetch(
           "https://api.resend.com/emails",
@@ -89,6 +100,7 @@ serve(async (req) => {
                 <p>Your refund for transaction 
                 <strong>${transactionId}</strong> was approved.</p>
                 <p>$${amount} has been added to your loyalty card.</p>
+                <p>${note ? `Note: ${note}` : ""} </p>
               `,
             }),
           }
@@ -101,7 +113,7 @@ serve(async (req) => {
     };
 
     const result = await processRefund(
-      { userId, transactionId, amount },
+      { userId, transactionId, amount, note },
       deps
     );
 
@@ -115,6 +127,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
+    console.log(error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

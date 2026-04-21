@@ -7,34 +7,35 @@ import {
   
   function createMockDeps(overrides: Partial<any> = {}) {
     return {
-      updateRefund: async (_: string) => {},
+      updateRefund: async (_: string, __: string) => {},
       getUserEmail: async (_: string) => "test@example.com",
       incrementLoyalty: async (_: string, __: number) => {},
-      sendEmail: async (_: string, __: string, ___: string) => {},
+      sendEmail: async (_: string, __: string, ___: string, ____: string) => {},
       ...overrides,
     };
   }
-  
+
   Deno.test("processRefund succeeds with valid input", async () => {
     const deps = createMockDeps();
-  
+
     const result = await processRefund(
       {
         userId: "user1",
         transactionId: "tx1",
         amount: "25",
+        note: "Approved by admin",
       },
       deps
     );
-  
+
     assertEquals(result.success, true);
     assertEquals(result.transactionId, "tx1");
     assertEquals(result.amount, "25");
   });
-  
+
   Deno.test("throws if params are missing", async () => {
     const deps = createMockDeps();
-  
+
     await assertRejects(
       () =>
         processRefund(
@@ -42,6 +43,7 @@ import {
             userId: "",
             transactionId: "tx1",
             amount: "25",
+            note: "Test note",
           },
           deps
         ),
@@ -49,14 +51,14 @@ import {
       "Missing params"
     );
   });
-  
+
   Deno.test("propagates updateRefund error", async () => {
     const deps = createMockDeps({
       updateRefund: async () => {
         throw new Error("DB failure");
       },
     });
-  
+
     await assertRejects(
       () =>
         processRefund(
@@ -64,6 +66,7 @@ import {
             userId: "user1",
             transactionId: "tx1",
             amount: "25",
+            note: "Test note",
           },
           deps
         ),
@@ -71,12 +74,12 @@ import {
       "DB failure"
     );
   });
-  
+
   Deno.test("throws if user email not found", async () => {
     const deps = createMockDeps({
       getUserEmail: async () => "",
     });
-  
+
     await assertRejects(
       () =>
         processRefund(
@@ -84,6 +87,7 @@ import {
             userId: "user1",
             transactionId: "tx1",
             amount: "25",
+            note: "Test note",
           },
           deps
         ),
@@ -91,14 +95,14 @@ import {
       "User email not found"
     );
   });
-  
+
   Deno.test("propagates incrementLoyalty error", async () => {
     const deps = createMockDeps({
       incrementLoyalty: async () => {
         throw new Error("RPC failed");
       },
     });
-  
+
     await assertRejects(
       () =>
         processRefund(
@@ -106,6 +110,7 @@ import {
             userId: "user1",
             transactionId: "tx1",
             amount: "25",
+            note: "Test note",
           },
           deps
         ),
@@ -113,14 +118,14 @@ import {
       "RPC failed"
     );
   });
-  
+
   Deno.test("propagates sendEmail error", async () => {
     const deps = createMockDeps({
       sendEmail: async () => {
         throw new Error("Email failed");
       },
     });
-  
+
     await assertRejects(
       () =>
         processRefund(
@@ -128,6 +133,7 @@ import {
             userId: "user1",
             transactionId: "tx1",
             amount: "25",
+            note: "Test note",
           },
           deps
         ),

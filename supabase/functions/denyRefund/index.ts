@@ -5,8 +5,9 @@ import { handleDenyRefund, sendDenialEmail } from "./logic.ts";
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-client-info",
 };
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,8 +32,8 @@ serve(async (req) => {
 
     const response = await handleDenyRefund(req, {
       supabase,
-      sendEmail: (to, transactionId, amount) =>
-        sendDenialEmail(resendKey!, to, transactionId, amount),
+      sendEmail: (to, transactionId, amount, note) =>
+        sendDenialEmail(resendKey!, to, transactionId, amount, note),
     });
 
     return new Response(response.body, {
