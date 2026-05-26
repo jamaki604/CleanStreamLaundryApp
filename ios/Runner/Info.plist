@@ -5,7 +5,9 @@
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
-		<string>Camera permission is required for scanning QR codes and cards</string>
+		<string>Clean Stream uses the camera to scan laundry machine QR codes and attach maintenance request photos.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Clean Stream lets you choose a photo from your library to include with a maintenance request.</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
@@ -62,7 +64,5 @@
 		<false/>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>Your location is required to find the nearest Clean Stream Laundry location</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>Your location is used to find nearby Clean Stream Laundry locations and improve location-based services in the app.</string>
 	</dict>
 </plist>

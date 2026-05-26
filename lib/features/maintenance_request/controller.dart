@@ -61,15 +61,12 @@ class MaintenanceController extends ChangeNotifier {
     }
   }
 
-  Future<bool> _ensurePermissions() async {
+  Future<bool> _ensureCameraPermission() async {
     final camera = await Permission.camera.request();
-    final photos = await Permission.photos.request();
-    return camera.isGranted && photos.isGranted;
+    return camera.isGranted;
   }
 
   Future<void> pickImage(BuildContext context) async {
-    if (!await _ensurePermissions()) return;
-
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -97,6 +94,9 @@ class MaintenanceController extends ChangeNotifier {
     );
 
     if (source == null) return;
+    if (source == ImageSource.camera && !await _ensureCameraPermission()) {
+      return;
+    }
 
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: source);

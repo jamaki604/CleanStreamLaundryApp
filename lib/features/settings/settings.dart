@@ -7,6 +7,7 @@ import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatefulWidget {
   static const int maxNotificationLeadTime =
@@ -19,6 +20,15 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  // TODO: Replace placeholder URLs with the final Clean Stream legal pages
+  // before submitting to App Store Connect or Google Play.
+  static final Uri _privacyPolicyUrl = Uri.parse(
+    'https://example.com/clean-stream/privacy-policy',
+  );
+  static final Uri _termsOfServiceUrl = Uri.parse(
+    'https://example.com/clean-stream/terms-of-service',
+  );
+
   late final SettingsController _controller;
 
   @override
@@ -43,13 +53,11 @@ class _SettingsState extends State<Settings> {
       builder: (ctx) => AlertDialog(
         title: Text(
           'Sign Out',
-          style: TextStyle(
-              color: Theme.of(ctx).colorScheme.fontInverted),
+          style: TextStyle(color: Theme.of(ctx).colorScheme.fontInverted),
         ),
         content: Text(
           'Are you sure you want to sign out?',
-          style: TextStyle(
-              color: Theme.of(ctx).colorScheme.fontInverted),
+          style: TextStyle(color: Theme.of(ctx).colorScheme.fontInverted),
         ),
         actions: [
           TextButton(
@@ -74,6 +82,10 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  Future<void> _openLegalLink(Uri url) async {
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
@@ -96,14 +108,14 @@ class _SettingsState extends State<Settings> {
                     icon: Icons.money,
                     title: 'Monthly Report',
                     onTap: () async {
-                      final transactions =
-                      await _controller.getTransactions();
-                      if (mounted) {
-                        context.push(
-                          '/monthlyTransactionHistory',
-                          extra: transactions,
-                        );
+                      final transactions = await _controller.getTransactions();
+                      if (!context.mounted) {
+                        return;
                       }
+                      context.push(
+                        '/monthlyTransactionHistory',
+                        extra: transactions,
+                      );
                     },
                   ),
                   const SizedBox(height: 14),
@@ -128,25 +140,36 @@ class _SettingsState extends State<Settings> {
                   SettingsCard(
                     icon: Icons.timer,
                     title: 'Notify Before Finish',
-                    subtitle:
-                    "Minutes you're notified before machine finish",
+                    subtitle: "Minutes you're notified before machine finish",
                     trailing: _controller.isLoadingDelay
                         ? const SizedBox(
-                      height: 110,
-                      width: 110,
-                      child: CircularProgressIndicator(strokeWidth: 4),
-                    )
+                            height: 110,
+                            width: 110,
+                            child: CircularProgressIndicator(strokeWidth: 4),
+                          )
                         : NotificationLead(
-                      value: _controller.notificationLeadTime,
-                      onIncrement: _controller.increment,
-                      onDecrement: _controller.decrement,
-                    ),
+                            value: _controller.notificationLeadTime,
+                            onIncrement: _controller.increment,
+                            onDecrement: _controller.decrement,
+                          ),
                   ),
                   const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.logout,
                     title: 'Sign Out',
                     onTap: _showSignOutConfirmation,
+                  ),
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.privacy_tip_outlined,
+                    title: 'Privacy Policy',
+                    onTap: () => _openLegalLink(_privacyPolicyUrl),
+                  ),
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.description_outlined,
+                    title: 'Terms of Service',
+                    onTap: () => _openLegalLink(_termsOfServiceUrl),
                   ),
                 ],
               ),
