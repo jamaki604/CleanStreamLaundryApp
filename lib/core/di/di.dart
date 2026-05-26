@@ -14,6 +14,8 @@ import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/wallet_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/admin_wallet_service.dart';
 
 // implementations
 import 'package:clean_stream_laundry_app/services/supabase/supabase_auth_service.dart';
@@ -22,6 +24,8 @@ import 'package:clean_stream_laundry_app/services/supabase/supabase_location_ser
 import 'package:clean_stream_laundry_app/services/supabase/supabase_machine_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_profile_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_transaction_service.dart';
+import 'package:clean_stream_laundry_app/services/supabase/supabase_wallet_service.dart';
+import 'package:clean_stream_laundry_app/services/supabase/supabase_admin_wallet_service.dart';
 import 'package:clean_stream_laundry_app/services/stripe/stripe_service.dart';
 import 'package:clean_stream_laundry_app/services/nayax/machine_communicator.dart';
 
@@ -45,52 +49,58 @@ Future<void> setupDependencies() async {
   Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
 
   getIt.registerLazySingleton<TransactionService>(
-        () => SupabaseTransactionService(client: supabase),
+    () => SupabaseTransactionService(client: supabase),
   );
 
   getIt.registerLazySingleton<ProfileService>(
-        () => SupabaseProfileService(client: supabase),
+    () => SupabaseProfileService(client: supabase),
   );
 
   getIt.registerLazySingleton<MachineService>(
-        () => SupabaseMachineService(client: supabase),
+    () => SupabaseMachineService(client: supabase),
   );
 
   getIt.registerLazySingleton<LocationService>(
-        () => SupabaseLocationHandler(client: supabase),
+    () => SupabaseLocationHandler(client: supabase),
   );
 
   getIt.registerLazySingleton<EdgeFunctionService>(
-        () => SupabaseEdgeFunctionService(client: supabase),
+    () => SupabaseEdgeFunctionService(client: supabase),
   );
 
   getIt.registerLazySingleton<AuthService>(
-        () => SupabaseAuthService(client: supabase),
+    () => SupabaseAuthService(client: supabase),
   );
 
   getIt.registerLazySingleton<PaymentService>(() => StripeService());
 
+  getIt.registerLazySingleton<WalletService>(
+    () => SupabaseWalletService(
+      client: supabase,
+      paymentService: getIt<PaymentService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<AdminWalletService>(
+    () => SupabaseAdminWalletService(client: supabase),
+  );
+
   getIt.registerLazySingleton<Stripe>(() => Stripe.instance);
 
   getIt.registerLazySingleton<MachineCommunicationService>(
-        () => MachineCommunicator(
-      edgeFunctionService: getIt<EdgeFunctionService>(),
-    ),
+    () =>
+        MachineCommunicator(edgeFunctionService: getIt<EdgeFunctionService>()),
   );
 
   getIt.registerLazySingleton<RouterService>(() => RouterService());
 
-  getIt.registerLazySingleton<NotificationService>(
-        () => NotificationService(),
-  );
+  getIt.registerLazySingleton<NotificationService>(() => NotificationService());
 
   getIt.registerSingleton<FlutterLocalNotificationsPlugin>(
     FlutterLocalNotificationsPlugin(),
   );
 
-  getIt.registerLazySingleton<PaymentProcessor>(
-        () => PaymentProcessor(),
-  );
+  getIt.registerLazySingleton<PaymentProcessor>(() => PaymentProcessor());
 
   getIt.registerLazySingleton<GoRouter>(() {
     final authService = getIt<AuthService>();

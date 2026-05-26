@@ -39,6 +39,26 @@ serve(async (req) => {
           payload,
         });
       },
+
+      recordWalletLoad: async (payload) => {
+        const supabase = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        );
+
+        const { error } = await supabase.rpc("record_wallet_load_from_stripe", {
+          target_user_id: payload.user_id,
+          amount_cents: payload.amount_cents,
+          stripe_payment_intent_id: payload.stripe_payment_intent_id ?? null,
+          stripe_checkout_session_id: payload.stripe_checkout_session_id ?? null,
+          stripe_charge_id: payload.stripe_charge_id ?? null,
+          stripe_event_id: payload.stripe_event_id ?? null,
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+      },
     }
   );
 

@@ -4,10 +4,10 @@ import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:clean_stream_laundry_app/core/theme/theme_manager.dart';
 import 'widgets/settings_card.dart';
 import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatefulWidget {
   static const int maxNotificationLeadTime =
@@ -20,15 +20,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  // TODO: Replace placeholder URLs with the final Clean Stream legal pages
-  // before submitting to App Store Connect or Google Play.
-  static final Uri _privacyPolicyUrl = Uri.parse(
-    'https://example.com/clean-stream/privacy-policy',
-  );
-  static final Uri _termsOfServiceUrl = Uri.parse(
-    'https://example.com/clean-stream/terms-of-service',
-  );
-
   late final SettingsController _controller;
 
   @override
@@ -82,10 +73,6 @@ class _SettingsState extends State<Settings> {
     }
   }
 
-  Future<void> _openLegalLink(Uri url) async {
-    await launchUrl(url, mode: LaunchMode.externalApplication);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
@@ -136,6 +123,14 @@ class _SettingsState extends State<Settings> {
                     title: 'Edit Profile',
                     onTap: () => context.go('/editProfile'),
                   ),
+                  if (kIsWeb && _controller.canUseAdminWallets) ...[
+                    const SizedBox(height: 14),
+                    SettingsCard(
+                      icon: Icons.admin_panel_settings_outlined,
+                      title: 'Admin Wallets',
+                      onTap: () => context.go('/admin/wallets'),
+                    ),
+                  ],
                   const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.timer,
@@ -163,13 +158,19 @@ class _SettingsState extends State<Settings> {
                   SettingsCard(
                     icon: Icons.privacy_tip_outlined,
                     title: 'Privacy Policy',
-                    onTap: () => _openLegalLink(_privacyPolicyUrl),
+                    onTap: () => context.push('/legal/privacy'),
                   ),
                   const SizedBox(height: 14),
                   SettingsCard(
                     icon: Icons.description_outlined,
                     title: 'Terms of Service',
-                    onTap: () => _openLegalLink(_termsOfServiceUrl),
+                    onTap: () => context.push('/legal/terms'),
+                  ),
+                  const SizedBox(height: 14),
+                  SettingsCard(
+                    icon: Icons.card_membership_outlined,
+                    title: 'Loyalty Card Terms',
+                    onTap: () => context.push('/legal/loyalty-card'),
                   ),
                 ],
               ),

@@ -11,11 +11,15 @@ class StripeService implements PaymentService {
   final _stripeInstance = GetIt.instance<Stripe>();
 
   @override
-  Future<void> makePayment(double amount) async {
+  Future<void> makePayment(
+    double amount, {
+    PaymentPurpose purpose = PaymentPurpose.directMachinePayment,
+  }) async {
     try {
       String? paymentIntentClientSecret = await createPaymentIntent(
         amount,
         "usd",
+        purpose,
       );
       if (paymentIntentClientSecret == null) {
         throw StripeConfigException("Failed to create payment intent");
@@ -31,7 +35,7 @@ class StripeService implements PaymentService {
               componentBackground: CupertinoColors.secondarySystemBackground,
               componentBorder: CupertinoColors.separator,
               componentText: CupertinoColors.label,
-              placeholderText: CupertinoColors.separator
+              placeholderText: CupertinoColors.separator,
             ),
             shapes: const PaymentSheetShape(borderRadius: 20),
             primaryButton: PaymentSheetPrimaryButtonAppearance(
@@ -59,11 +63,19 @@ class StripeService implements PaymentService {
   }
 
   @protected
-  Future<String?> createPaymentIntent(double amount, String currency) async {
+  Future<String?> createPaymentIntent(
+    double amount,
+    String currency, [
+    PaymentPurpose purpose = PaymentPurpose.directMachinePayment,
+  ]) async {
     try {
       final response = await edgeFunctionService.runEdgeFunction(
         name: 'paymentIntent',
-        body: {'amount': convertDollarsToCents(amount), 'currency': currency},
+        body: {
+          'amount': convertDollarsToCents(amount),
+          'currency': currency,
+          'purpose': purpose.name,
+        },
       );
 
       if (response?.data != null && response?.data['clientSecret'] != null) {

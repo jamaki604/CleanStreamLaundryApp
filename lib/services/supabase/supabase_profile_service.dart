@@ -21,10 +21,10 @@ class SupabaseProfileService extends ProfileService {
         await _client
             .from('profiles')
             .upsert(
-          {'id': id, 'full_name': name},
-          onConflict: 'id',
-          ignoreDuplicates: true,
-        );
+              {'id': id, 'full_name': name},
+              onConflict: 'id',
+              ignoreDuplicates: true,
+            );
       }
     } catch (e) {
       print(e);
@@ -102,6 +102,25 @@ class SupabaseProfileService extends ProfileService {
           .eq('id', userId)
           .single();
       return response["full_name"];
+    } on PostgrestException {
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> getCurrentUserRole() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return null;
+
+    try {
+      final response = await _client
+          .from('profiles')
+          .select('roles')
+          .eq('id', userId)
+          .single();
+      return response['roles'] as String?;
     } on PostgrestException {
       return null;
     } catch (e) {

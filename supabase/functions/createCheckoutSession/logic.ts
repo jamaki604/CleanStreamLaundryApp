@@ -4,12 +4,15 @@ import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 export interface CheckoutDeps {
   stripe: Stripe;
   supabase: SupabaseClient;
+  supabaseAdmin?: SupabaseClient;
 }
 
 export interface CheckoutResult {
   url: string | null;
   session_id: string;
 }
+
+export type PaymentPurpose = "walletLoad" | "directMachinePayment";
 
 export async function getAuthenticatedUser(supabase: SupabaseClient) {
   const {
@@ -28,10 +31,22 @@ export async function createCheckoutSession(
   stripe: Stripe,
   amount: number,
   userId: string,
+  purposeOrBaseUrl: PaymentPurpose | string = "directMachinePayment",
+  walletAccountId?: string,
   baseUrl = "http://localhost:8080"
 ): Promise<CheckoutResult> {
   if (!amount || typeof amount !== "number" || amount <= 0) {
     throw new Error("Invalid amount");
+  }
+
+  const metadata: Record<string, string> = {
+    user_id: userId,
+    purpose: purpose === "walletLoad" ? "wallet_load" : "direct_machine_payment",
+    amount_cents: String(amount),
+  };
+
+  if (walletAccountId) {
+    metadata.wallet_account_id = walletAccountId;
   }
 
   const session = await stripe.checkout.sessions.create({
@@ -41,13 +56,18 @@ export async function createCheckoutSession(
       {
         price_data: {
           currency: "usd",
-          product_data: { name: "Laundry Service" },
+          product_data: {
+            name: purpose === "walletLoad"
+              ? "Clean Stream Loyalty Card"
+              : "Clean Stream Laundry Service",
+          },
           unit_amount: amount,
         },
         quantity: 1,
       },
     ],
-    metadata: { user_id: userId },
+    metadata,
+    payment_intent_data: { metadata },
     success_url: `${baseUrl}/homePage`,
     cancel_url: `${baseUrl}/homePage`,
   });
@@ -61,12 +81,47 @@ export async function handleCheckout(
   deps: CheckoutDeps,
   baseUrl?: string
 ): Promise<Response> {
-  const { amount } = await req.json();
+  const { amount, purpose: rawPurpose } = await req.json();
+  const purpose = rawPurpose === "walletLoad"
+    ? "walletLoad"
+    : "directMachinePayment";
 
   const user = await getAuthenticatedUser(deps.supabase);
-  const result = await createCheckoutSession(deps.stripe, amount, user.id, baseUrl);
+  let walletAccountId: string | undefined;
+
+  if (purpose === "walletLoad") {
+    if (!deps.supabaseAdmin) {
+      throw new Error("Supabase admin client required");
+    }
+
+    const { data, error } = await deps.supabaseAdmin.rpc(
+      "get_or_create_wallet_account",
+      { target_user_id: user.id },
+    );
+
+    if (error || !data) {
+      throw new Error(error?.message ?? "Unable to create wallet account");
+    }
+
+    walletAccountId = data as string;
+  }
+
+  const result = await createCheckoutSession(
+    deps.stripe,
+    amount,
+    user.id,
+    purpose,
+    walletAccountId,
+    baseUrl
+  );
 
   return new Response(JSON.stringify(result), {
     headers: { "Content-Type": "application/json" },
   });
 }
+  const purpose: PaymentPurpose =
+    purposeOrBaseUrl === "walletLoad" ? "walletLoad" : "directMachinePayment";
+  if (purposeOrBaseUrl !== "walletLoad" &&
+      purposeOrBaseUrl !== "directMachinePayment") {
+    baseUrl = purposeOrBaseUrl;
+  }

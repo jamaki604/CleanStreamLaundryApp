@@ -13,7 +13,10 @@ class StripeService implements PaymentService {
   bool channelSubscribed = false;
 
   @override
-  Future<void> makePayment(double amount) async {
+  Future<void> makePayment(
+    double amount, {
+    PaymentPurpose purpose = PaymentPurpose.directMachinePayment,
+  }) async {
     _paymentCompleter = Completer<int>();
 
     try {
@@ -24,7 +27,7 @@ class StripeService implements PaymentService {
 
       final response = await edgeFunctionService.runEdgeFunction(
         name: 'createCheckoutSession',
-        body: {'amount': (amount * 100).toInt()},
+        body: {'amount': (amount * 100).toInt(), 'purpose': purpose.name},
       );
 
       final url = response?.data['url'];

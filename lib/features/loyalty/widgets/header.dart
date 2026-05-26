@@ -7,11 +7,7 @@ class Header extends StatelessWidget {
   final LoyaltyController controller;
   final VoidCallback onInfoTap;
 
-  const Header({
-    super.key,
-    required this.controller,
-    required this.onInfoTap,
-  });
+  const Header({super.key, required this.controller, required this.onInfoTap});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +20,15 @@ class Header extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 26,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.fontSecondary,
+          ),
+        ),
+        Text(
+          'Paid \$${controller.paidBalance?.toStringAsFixed(2) ?? '0.00'} | Promo \$${controller.promoBalance?.toStringAsFixed(2) ?? '0.00'}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13,
             fontWeight: FontWeight.w500,
             color: Theme.of(context).colorScheme.fontSecondary,
           ),

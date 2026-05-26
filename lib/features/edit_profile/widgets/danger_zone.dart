@@ -18,16 +18,17 @@ class DangerZoneSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.red.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Danger Zone',
@@ -41,12 +42,11 @@ class DangerZoneSection extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Once you delete your account, there is no going back. Any loyalty points will be permanently lost.',
+            'Deleting your account permanently removes app access. Loyalty Card loads are final and not redeemable for cash except where required by law; Clean Stream may retain limited anonymized wallet and transaction records for legal, tax, accounting, dispute, fraud-prevention, and compliance purposes.',
             style: TextStyle(
-              color: Theme.of(context)
-                  .colorScheme
-                  .fontSecondary
-                  .withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.fontSecondary.withValues(alpha: 0.7),
               fontSize: 13,
             ),
           ),
@@ -63,27 +63,27 @@ class DangerZoneSection extends StatelessWidget {
             ),
             child: isSaving
                 ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.red,
-              ),
-            )
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.red,
+                    ),
+                  )
                 : const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.delete_outline, size: 18),
-                SizedBox(width: 8),
-                Text(
-                  'Delete Account',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.delete_outline, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Delete Account',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

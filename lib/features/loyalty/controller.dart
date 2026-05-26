@@ -3,18 +3,21 @@ import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/wallet_service.dart';
 import 'package:clean_stream_laundry_app/logic/parsing/transaction_parser.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
-
 
 class LoyaltyController extends ChangeNotifier {
   final _authService = GetIt.instance<AuthService>();
   final _profileService = GetIt.instance<ProfileService>();
   final _transactionService = GetIt.instance<TransactionService>();
   final _paymentProcessor = GetIt.instance<PaymentProcessor>();
+  final _walletService = GetIt.instance<WalletService>();
 
   double? userBalance;
+  double? paidBalance;
+  double? promoBalance;
   double? userReward;
   String? userName;
   String? errorMessage;
@@ -38,11 +41,14 @@ class LoyaltyController extends ChangeNotifier {
     }
 
     try {
-      final data = await _profileService.getUserBalanceById(userId);
+      final profile = await _profileService.getUserBalanceById(userId);
+      final balance = await _walletService.getBalance();
 
-      userBalance = (data?['balance'] as num?)?.toDouble() ?? 0.0;
-      userName = data?['full_name'] ?? 'John Doe';
-      userReward = (data?["reward_tracker"] as num?)?.toDouble() ?? 0.0;
+      userBalance = balance.totalBalance;
+      paidBalance = balance.paidBalance;
+      promoBalance = balance.promoBalance;
+      userName = profile?['full_name'] ?? 'John Doe';
+      userReward = (profile?["reward_tracker"] as num?)?.toDouble() ?? 0.0;
     } catch (_) {
       errorMessage = 'Failed to fetch balance';
     }
@@ -78,17 +84,14 @@ class LoyaltyController extends ChangeNotifier {
   }
 
   Future<PaymentResult> loadCard(double amount) async {
-    final userId = _authService.getCurrentUserId;
     final result = await _paymentProcessor.processPayment(
       amount,
       "Loyalty Card",
     );
 
     if (result == PaymentResult.success) {
-      amount = checkRewards(amount);
-      final newBalance = (userBalance ?? 0) + amount;
-      await _profileService.updateBalanceById(userId!, newBalance);
-      userBalance = newBalance;
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      await _fetchBalance();
       await _fetchTransactions();
     }
 
@@ -100,14 +103,11 @@ class LoyaltyController extends ChangeNotifier {
     await _transactionService.getTransactionsForUser();
   }
 
+  @Deprecated('Rewards are now calculated by the server wallet ledger.')
   double checkRewards(double amount) {
     double combined = (userReward ?? 0) + amount;
     double remainder = combined % 20;
     int rewardsEarned = combined ~/ 20;
-
-    if (remainder != (userReward ?? 0)) {
-      _profileService.updateRewardsById(_authService.getCurrentUserId!, remainder);
-    }
 
     userReward = remainder;
 

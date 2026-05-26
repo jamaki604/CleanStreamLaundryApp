@@ -21,6 +21,18 @@ export async function deleteUser(
   supabaseAdmin: SupabaseClient,
   user_id: string
 ): Promise<DeleteUserResult> {
+  const { error: anonymizeError } = await supabaseAdmin.rpc(
+    "anonymize_wallet_for_deleted_user",
+    {
+      target_user_id: user_id,
+      deletion_note: "User requested account deletion",
+    },
+  );
+
+  if (anonymizeError) {
+    throw new Error(anonymizeError.message);
+  }
+
   const { data, error } = await supabaseAdmin.auth.admin.deleteUser(user_id);
 
   if (error) {

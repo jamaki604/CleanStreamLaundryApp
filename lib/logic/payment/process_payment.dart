@@ -6,15 +6,20 @@ import 'package:get_it/get_it.dart';
 
 class PaymentProcessor {
   final PaymentService _paymentService = GetIt.instance<PaymentService>();
-  final TransactionService _transactionService = GetIt.instance<TransactionService>();
-
+  final TransactionService _transactionService =
+      GetIt.instance<TransactionService>();
 
   Future<PaymentResult> processPayment(
     double amount,
     String description,
   ) async {
     try {
-      await _paymentService.makePayment(amount);
+      await _paymentService.makePayment(
+        amount,
+        purpose: description == "Loyalty Card"
+            ? PaymentPurpose.walletLoad
+            : PaymentPurpose.directMachinePayment,
+      );
       _transactionService.recordTransaction(
         amount: amount,
         description: description,

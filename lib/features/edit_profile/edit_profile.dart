@@ -150,97 +150,125 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<bool> _confirmSaveChanges() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        title: Text(
-          'Confirm Changes',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.fontSecondary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to save these changes to your profile?',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.fontSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancel',
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            title: Text(
+              'Confirm Changes',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.fontSecondary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(
+              'Are you sure you want to save these changes to your profile?',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.fontSecondary,
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.fontSecondary,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Save'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    ) ??
+        ) ??
         false;
   }
 
   Future<bool> _confirmDeleteAccount() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        title: Row(
-          children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.red),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Delete Account?',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontSecondary,
-                  fontWeight: FontWeight.bold,
+          context: context,
+          builder: (context) {
+            var acknowledged = false;
+
+            return StatefulBuilder(
+              builder: (context, setDialogState) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
+                title: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Delete Account?',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.fontSecondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Deleting your account is permanent and removes app access to your Loyalty Card balance. Clean Stream may retain limited anonymized transaction and balance records for legal, tax, accounting, dispute, fraud-prevention, and compliance purposes.',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.fontSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      value: acknowledged,
+                      onChanged: (value) {
+                        setDialogState(() => acknowledged = value ?? false);
+                      },
+                      title: Text(
+                        'I understand deletion is permanent.',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.fontSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.fontSecondary,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: acknowledged
+                        ? () => Navigator.of(context).pop(true)
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Delete'),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          'Are you sure you want to delete your account? Any money on your loyalty card will be lost. This action cannot be undone.',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.fontSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.fontSecondary,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    ) ??
+            );
+          },
+        ) ??
         false;
   }
 
@@ -271,67 +299,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: _controller.isLoading
           ? Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      )
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
           : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 24,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SectionHeader(title: 'Full Name'),
-                const SizedBox(height: 12),
-                InfoCard(
-                  label: 'Current:',
-                  value: _controller.currentName.isNotEmpty
-                      ? _controller.currentName
-                      : 'Not set',
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
                 ),
-                const SizedBox(height: 16),
-                NameFormField(
-                  controller: _controller.nameController,
-                  enabled: !_controller.isSaving,
-                ),
-                const SizedBox(height: 10),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(title: 'Full Name'),
+                      const SizedBox(height: 12),
+                      InfoCard(
+                        label: 'Current:',
+                        value: _controller.currentName.isNotEmpty
+                            ? _controller.currentName
+                            : 'Not set',
+                      ),
+                      const SizedBox(height: 16),
+                      NameFormField(
+                        controller: _controller.nameController,
+                        enabled: !_controller.isSaving,
+                      ),
+                      const SizedBox(height: 10),
 
-                const SectionHeader(title: 'Email Address'),
-                const SizedBox(height: 12),
-                InfoCard(
-                  label: 'Current:',
-                  value: _controller.currentEmail.isNotEmpty
-                      ? _controller.currentEmail
-                      : 'Not set',
-                ),
-                const SizedBox(height: 16),
-                EmailFormField(
-                  controller: _controller.emailController,
-                  enabled: !_controller.isSaving,
-                ),
-                const SizedBox(height: 20),
+                      const SectionHeader(title: 'Email Address'),
+                      const SizedBox(height: 12),
+                      InfoCard(
+                        label: 'Current:',
+                        value: _controller.currentEmail.isNotEmpty
+                            ? _controller.currentEmail
+                            : 'Not set',
+                      ),
+                      const SizedBox(height: 16),
+                      EmailFormField(
+                        controller: _controller.emailController,
+                        enabled: !_controller.isSaving,
+                      ),
+                      const SizedBox(height: 20),
 
-                SaveButton(
-                  isSaving: _controller.isSaving,
-                  onPressed: _onSavePressed,
-                ),
-                const SizedBox(height: 30),
+                      SaveButton(
+                        isSaving: _controller.isSaving,
+                        onPressed: _onSavePressed,
+                      ),
+                      const SizedBox(height: 30),
 
-                DangerZoneSection(
-                  isSaving: _controller.isSaving,
-                  onDeletePressed: _onDeletePressed,
+                      DangerZoneSection(
+                        isSaving: _controller.isSaving,
+                        onDeletePressed: _onDeletePressed,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

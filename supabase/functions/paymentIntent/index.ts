@@ -1,4 +1,5 @@
 import Stripe from "npm:stripe";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleCreatePaymentIntent } from "./logic.ts";
 
 const CORS_HEADERS = {
@@ -10,6 +11,11 @@ const CORS_HEADERS = {
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2024-06-20",
 });
+
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -24,7 +30,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const response = await handleCreatePaymentIntent(req, { stripe });
+    const response = await handleCreatePaymentIntent(req, {
+      stripe,
+      supabaseAdmin,
+    });
 
     return new Response(response.body, {
       status: response.status,

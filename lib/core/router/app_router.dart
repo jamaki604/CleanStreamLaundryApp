@@ -1,6 +1,8 @@
 import 'package:app_links/app_links.dart';
+import 'package:clean_stream_laundry_app/features/admin_wallets/admin_wallets.dart';
 import 'package:clean_stream_laundry_app/features/change_email_verification/change_email_verification.dart';
 import 'package:clean_stream_laundry_app/features/edit_profile/edit_profile.dart';
+import 'package:clean_stream_laundry_app/features/legal/legal_page.dart';
 import 'package:clean_stream_laundry_app/features/verify_code/verify_code.dart';
 import 'package:clean_stream_laundry_app/features/email_verification/email_verification.dart';
 import 'package:clean_stream_laundry_app/features/home/home.dart';
@@ -71,6 +73,46 @@ class RouterService {
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
           child: LoyaltyPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/wallets',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const AdminWalletsPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/legal/privacy',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const LegalPage(type: LegalPageType.privacy),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/legal/terms',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const LegalPage(type: LegalPageType.terms),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/legal/loyalty-card',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const LegalPage(type: LegalPageType.loyaltyCard),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,

@@ -28,7 +28,16 @@ serve(async (req) => {
       { global: { headers: token ? { Authorization: `Bearer ${token}` } : {} } }
     );
 
-    const response = await handleCheckout(req, { stripe, supabase });
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const response = await handleCheckout(req, {
+      stripe,
+      supabase,
+      supabaseAdmin,
+    });
 
     return new Response(response.body, {
       status: response.status,

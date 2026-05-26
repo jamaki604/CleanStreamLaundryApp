@@ -15,17 +15,24 @@ class SettingsController extends ChangeNotifier {
     AuthService? authService,
     ProfileService? profileService,
     TransactionService? transactionService,
-  })  : authService = authService ?? GetIt.instance<AuthService>(),
-        profileService = profileService ?? GetIt.instance<ProfileService>(),
-        transactionService =
-            transactionService ?? GetIt.instance<TransactionService>();
+  }) : authService = authService ?? GetIt.instance<AuthService>(),
+       profileService = profileService ?? GetIt.instance<ProfileService>(),
+       transactionService =
+           transactionService ?? GetIt.instance<TransactionService>();
 
   int notificationLeadTime = 5;
   bool isLoadingDelay = true;
+  bool canUseAdminWallets = false;
 
   Future<void> loadNotificationLeadTime() async {
-    final value = await profileService.getNotificationLeadTime();
+    final results = await Future.wait([
+      profileService.getNotificationLeadTime(),
+      profileService.getCurrentUserRole(),
+    ]);
+    final value = results[0] as int;
+    final role = results[1] as String?;
     notificationLeadTime = value;
+    canUseAdminWallets = role == 'Admin' || role == 'Owner';
     isLoadingDelay = false;
     notifyListeners();
   }
