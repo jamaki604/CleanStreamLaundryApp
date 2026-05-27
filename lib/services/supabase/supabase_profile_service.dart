@@ -26,8 +26,8 @@ class SupabaseProfileService extends ProfileService {
               ignoreDuplicates: true,
             );
       }
-    } catch (e) {
-      print(e);
+    } catch (_) {
+      return;
     }
   }
 
@@ -149,13 +149,22 @@ class SupabaseProfileService extends ProfileService {
     final user = _client.auth.currentUser;
     if (user == null) return 5;
 
-    final response = await _client
-        .from('profiles')
-        .select('notif_lead_time')
-        .eq('id', user.id)
-        .single();
+    try {
+      final response = await _client
+          .from('profiles')
+          .select('notif_lead_time')
+          .eq('id', user.id)
+          .maybeSingle();
 
-    return (response['notif_lead_time'] as int?) ?? 5;
+      final value = response?['notif_lead_time'];
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      return 5;
+    } on PostgrestException {
+      return 5;
+    } catch (_) {
+      return 5;
+    }
   }
 
   @override

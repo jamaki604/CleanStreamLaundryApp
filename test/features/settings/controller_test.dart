@@ -62,6 +62,18 @@ void main() {
 
       expect(notified, isTrue);
     });
+
+    test('falls back and clears loading when lead time load fails', () async {
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenThrow(Exception('missing profile'));
+
+      final controller = buildController();
+      await controller.loadNotificationLeadTime();
+
+      expect(controller.notificationLeadTime, 5);
+      expect(controller.isLoadingDelay, isFalse);
+    });
   });
 
   group('increment', () {

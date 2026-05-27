@@ -25,13 +25,22 @@ class SettingsController extends ChangeNotifier {
   bool canUseAdminWallets = false;
 
   Future<void> loadNotificationLeadTime() async {
-    final results = await Future.wait([
-      profileService.getNotificationLeadTime(),
-      profileService.getCurrentUserRole(),
-    ]);
-    final value = results[0] as int;
-    final role = results[1] as String?;
-    notificationLeadTime = value;
+    var value = notificationLeadTime;
+    String? role;
+
+    try {
+      value = await profileService.getNotificationLeadTime();
+    } catch (_) {
+      value = 5;
+    }
+
+    try {
+      role = await profileService.getCurrentUserRole();
+    } catch (_) {
+      role = null;
+    }
+
+    notificationLeadTime = value.clamp(0, maxNotificationLeadTime).toInt();
     canUseAdminWallets = role == 'Admin' || role == 'Owner';
     isLoadingDelay = false;
     notifyListeners();

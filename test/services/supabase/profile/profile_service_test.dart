@@ -14,13 +14,22 @@ void main() {
   setUp(() {
     supabaseMock = SupabaseMock();
     queryBuilderMock = QueryBuilderMock();
-    fakeFilterBuilder = FakeFilterBuilderList({"full_name": "Nolan Meyer", "balance": 0});
+    fakeFilterBuilder = FakeFilterBuilderList({
+      "full_name": "Nolan Meyer",
+      "balance": 0,
+    });
     profileHandler = SupabaseProfileService(client: supabaseMock);
     supabaseAuth = GoTrueMock();
 
-    when(() => supabaseMock.from('profiles')).thenAnswer((_) => queryBuilderMock);
-    when(() => queryBuilderMock.select(any())).thenAnswer((_) => fakeFilterBuilder);
-    when(() => queryBuilderMock.update(any())).thenAnswer((_) => fakeFilterBuilder);
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenAnswer((_) => queryBuilderMock);
+    when(
+      () => queryBuilderMock.select(any()),
+    ).thenAnswer((_) => fakeFilterBuilder);
+    when(
+      () => queryBuilderMock.update(any()),
+    ).thenAnswer((_) => fakeFilterBuilder);
     when(() => supabaseMock.auth).thenReturn(supabaseAuth);
 
     final mockUser = User(
@@ -47,65 +56,98 @@ void main() {
   });
 
   test('getUserBalanceById throws Postgres exception', () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(PostgrestException(message: "Test exception"));
     final result = await profileHandler.getUserBalanceById("1");
     expect(result, null);
   });
 
   test('getUserBalanceById throws unknown exception', () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test execption"));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test execption"));
     final result = await profileHandler.getUserBalanceById("1");
     expect(result, null);
   });
 
-  test("Tests that the logic was called correctly to create an account", () async {
-    final selectFilterBuilder = FakeFilterBuilderList(null);
-    final upsertFilterBuilder = FakeFilterBuilderList([]);
+  test(
+    "Tests that the logic was called correctly to create an account",
+    () async {
+      final selectFilterBuilder = FakeFilterBuilderList(null);
+      final upsertFilterBuilder = FakeFilterBuilderList([]);
 
-    when(() => queryBuilderMock.select('id')).thenAnswer((_) => selectFilterBuilder);
-    when(() => queryBuilderMock.upsert(
-        any(),
-        onConflict: any(named: 'onConflict'),
-        ignoreDuplicates: any(named: 'ignoreDuplicates')
-    )).thenAnswer((_) => upsertFilterBuilder);
+      when(
+        () => queryBuilderMock.select('id'),
+      ).thenAnswer((_) => selectFilterBuilder);
+      when(
+        () => queryBuilderMock.upsert(
+          any(),
+          onConflict: any(named: 'onConflict'),
+          ignoreDuplicates: any(named: 'ignoreDuplicates'),
+        ),
+      ).thenAnswer((_) => upsertFilterBuilder);
 
-    await profileHandler.createAccount(name: "Bill", id: "1");
+      await profileHandler.createAccount(name: "Bill", id: "1");
 
-    verify(() => supabaseMock.from("profiles")).called(2);
-    verify(() => queryBuilderMock.select('id')).called(1);
-    verify(() => queryBuilderMock.upsert(
-        {'id': "1", 'full_name': "Bill"},
-        onConflict: 'id',
-        ignoreDuplicates: true
-    )).called(1);
-  });
+      verify(() => supabaseMock.from("profiles")).called(2);
+      verify(() => queryBuilderMock.select('id')).called(1);
+      verify(
+        () => queryBuilderMock.upsert(
+          {'id': "1", 'full_name': "Bill"},
+          onConflict: 'id',
+          ignoreDuplicates: true,
+        ),
+      ).called(1);
+    },
+  );
 
-  test("Tests that the logic was called correctly to update account balance", () async {
-    await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
-    verify(() => supabaseMock.from("profiles")).called(1);
-    verify(() => queryBuilderMock.update({"balance": 47.20})).called(1);
-  });
+  test(
+    "Tests that the logic was called correctly to update account balance",
+    () async {
+      await profileHandler.updateBalanceById(
+        '11111111-1111-1111-1111-111111111111',
+        47.20,
+      );
+      verify(() => supabaseMock.from("profiles")).called(1);
+      verify(() => queryBuilderMock.update({"balance": 47.20})).called(1);
+    },
+  );
 
   test("Tests that updateBalanceID catches Postgrest exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
-    await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(PostgrestException(message: "Test exception"));
+    await profileHandler.updateBalanceById(
+      '11111111-1111-1111-1111-111111111111',
+      47.20,
+    );
     //Test will fail if exception was not caught
   });
 
   test("Tests that updateBalanceID catches unknown exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
-    await profileHandler.updateBalanceById('11111111-1111-1111-1111-111111111111', 47.20);
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test exception"));
+    await profileHandler.updateBalanceById(
+      '11111111-1111-1111-1111-111111111111',
+      47.20,
+    );
     //Test will fail if exception was not caught
   });
 
   test("Tests that getUserNameById catches Postgrest exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(PostgrestException(message: "Test exception"));
     await profileHandler.getUserNameById("1234");
     //Test will fail if exception was not caught
   });
 
   test("Tests that getUserNameById catches unknown exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test exception"));
     await profileHandler.getUserNameById("1234");
     //Test will fail if exception was not caught
   });
@@ -116,54 +158,129 @@ void main() {
   });
 
   test("Tests that getUserRefundAttempts catches unknown exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test exception"));
     await profileHandler.getUserRefundAttempts("1234");
     //Test will fail if exception was not caught
   });
 
-  test("Tests that getUserRefundAttempts catches Postgrest exception", () async {
-    fakeFilterBuilder = FakeFilterBuilderList({"refund_attempts": 0});
-    var result = await profileHandler.getUserRefundAttempts("1234");
-    expect(result, "0");
-  });
+  test(
+    "Tests that getUserRefundAttempts catches Postgrest exception",
+    () async {
+      fakeFilterBuilder = FakeFilterBuilderList({"refund_attempts": 0});
+      var result = await profileHandler.getUserRefundAttempts("1234");
+      expect(result, "0");
+    },
+  );
 
-  test("Tests that the logic was called correctly to update account name", () async {
-    await profileHandler.updateName("testName");
-    verify(() => supabaseMock.auth.currentUser).called(1);
-    verify(() => supabaseMock.from("profiles")).called(1);
-    verify(() => queryBuilderMock.update({"full_name": "testName"})).called(1);
-  });
+  test(
+    "Tests that the logic was called correctly to update account name",
+    () async {
+      await profileHandler.updateName("testName");
+      verify(() => supabaseMock.auth.currentUser).called(1);
+      verify(() => supabaseMock.from("profiles")).called(1);
+      verify(
+        () => queryBuilderMock.update({"full_name": "testName"}),
+      ).called(1);
+    },
+  );
 
   test("Tests that updateName catches Postgrest exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
-    expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(PostgrestException(message: "Test exception"));
+    expect(
+      () async => await profileHandler.updateName("testName"),
+      throwsA(isA<Exception>()),
+    );
   });
 
   test("Tests that updateName throws unknown exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
-    expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test exception"));
+    expect(
+      () async => await profileHandler.updateName("testName"),
+      throwsA(isA<Exception>()),
+    );
   });
 
   test("Tests that updateName throws exception when userID is null ", () async {
     when(() => supabaseAuth.currentUser?.id).thenReturn(null);
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
-    expect(() async => await profileHandler.updateName("testName"), throwsA(isA<Exception>()));
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test exception"));
+    expect(
+      () async => await profileHandler.updateName("testName"),
+      throwsA(isA<Exception>()),
+    );
   });
 
-  test("Tests that the logic was called correctly to update account rewards", () async {
-    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
-    verify(() => supabaseMock.from("profiles")).called(1);
-    verify(() => queryBuilderMock.update({"reward_tracker": 10.50})).called(1);
-  });
+  test(
+    "Tests that the logic was called correctly to update account rewards",
+    () async {
+      await profileHandler.updateRewardsById(
+        '11111111-1111-1111-1111-111111111111',
+        10.50,
+      );
+      verify(() => supabaseMock.from("profiles")).called(1);
+      verify(
+        () => queryBuilderMock.update({"reward_tracker": 10.50}),
+      ).called(1);
+    },
+  );
 
   test("Tests that updateRewardsById catches Postgrest exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(PostgrestException(message: "Test exception"));
-    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(PostgrestException(message: "Test exception"));
+    await profileHandler.updateRewardsById(
+      '11111111-1111-1111-1111-111111111111',
+      10.50,
+    );
   });
 
   test("Tests that updateRewardsById catches unknown exception", () async {
-    when(() => supabaseMock.from('profiles')).thenThrow(Exception("Test exception"));
-    await profileHandler.updateRewardsById('11111111-1111-1111-1111-111111111111', 10.50);
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(Exception("Test exception"));
+    await profileHandler.updateRewardsById(
+      '11111111-1111-1111-1111-111111111111',
+      10.50,
+    );
   });
 
+  test("getNotificationLeadTime returns saved value", () async {
+    when(
+      () => queryBuilderMock.select('notif_lead_time'),
+    ).thenAnswer((_) => FakeFilterBuilderList({'notif_lead_time': 12}));
+
+    final result = await profileHandler.getNotificationLeadTime();
+
+    expect(result, 12);
+  });
+
+  test(
+    "getNotificationLeadTime defaults when profile row is missing",
+    () async {
+      when(
+        () => queryBuilderMock.select('notif_lead_time'),
+      ).thenAnswer((_) => FakeFilterBuilderList(null));
+
+      final result = await profileHandler.getNotificationLeadTime();
+
+      expect(result, 5);
+    },
+  );
+
+  test("getNotificationLeadTime catches Postgrest exception", () async {
+    when(
+      () => supabaseMock.from('profiles'),
+    ).thenThrow(PostgrestException(message: "Test exception"));
+
+    final result = await profileHandler.getNotificationLeadTime();
+
+    expect(result, 5);
+  });
 }

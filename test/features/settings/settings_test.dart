@@ -177,6 +177,20 @@ void main() {
       expect(find.text('7'), findsOneWidget);
     });
 
+    testWidgets('shows default notification lead time when loading fails', (
+      tester,
+    ) async {
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenThrow(Exception('missing profile'));
+
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('5'), findsOneWidget);
+    });
+
     testWidgets('increments notification lead time when + is tapped', (
       tester,
     ) async {
