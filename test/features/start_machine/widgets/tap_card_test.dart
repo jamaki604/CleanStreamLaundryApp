@@ -4,18 +4,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('TapToPayCard', () {
-    Widget buildWidget() => const MaterialApp(
-      home: Scaffold(body: TapToPayCard()),
-    );
+    Widget buildWidget() =>
+        const MaterialApp(home: Scaffold(body: TapToPayCard()));
 
-    testWidgets('displays Tap To Pay heading', (tester) async {
+    testWidgets('displays Tap to Pay heading', (tester) async {
       await tester.pumpWidget(buildWidget());
-      expect(find.text('Tap To Pay'), findsOneWidget);
+      expect(find.text('Tap to Pay'), findsOneWidget);
     });
 
     testWidgets('displays description text', (tester) async {
       await tester.pumpWidget(buildWidget());
-      expect(find.text('Tap phone to machine to pay'), findsOneWidget);
+      expect(
+        find.text('Pay at the machine reader with your mobile wallet.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays tap_and_play icon', (tester) async {
@@ -23,17 +25,17 @@ void main() {
       expect(find.byIcon(Icons.tap_and_play), findsOneWidget);
     });
 
-    testWidgets('has blue border', (tester) async {
-      await tester.pumpWidget(buildWidget());
-      final container = tester.widget<Container>(
-        find.ancestor(
-          of: find.text('Tap To Pay'),
-          matching: find.byType(Container),
-        ).first,
+    testWidgets('invokes onTap when pressed', (tester) async {
+      var didTap = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: TapToPayCard(onTap: () => didTap = true)),
+        ),
       );
-      final decoration = container.decoration as BoxDecoration;
-      final border = decoration.border as Border?;
-      expect(border?.top.color, Colors.blue);
+
+      await tester.tap(find.text('Tap to Pay'));
+
+      expect(didTap, isTrue);
     });
   });
 }

@@ -18,28 +18,24 @@ class NotificationLead extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _ControlButton(
-          icon: Icons.add,
-          onPressed: onIncrement,
-        ),
+        _ControlButton(icon: Icons.remove, onPressed: onDecrement),
+        const SizedBox(width: 8),
         SizedBox(
-          width: 40,
+          width: 30,
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              '  $value',
+              '$value',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
                 color: Theme.of(context).colorScheme.fontSecondary,
               ),
             ),
           ),
         ),
-        const SizedBox(width: 12),
-        _ControlButton(
-          icon: Icons.remove,
-          onPressed: onDecrement,
-        ),
+        const SizedBox(width: 8),
+        _ControlButton(icon: Icons.add, onPressed: onIncrement),
       ],
     );
   }
@@ -54,16 +50,16 @@ class _ControlButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 32,
-      height: 32,
+      width: 34,
+      height: 34,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: IconButton(
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(),
-        icon: Icon(icon, color: Colors.white, size: 20),
+        icon: Icon(icon, color: Colors.white, size: 19),
         onPressed: onPressed,
       ),
     );

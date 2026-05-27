@@ -2,46 +2,89 @@ import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class TapToPayCard extends StatelessWidget {
-  const TapToPayCard({super.key});
+  final VoidCallback? onTap;
+
+  const TapToPayCard({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue, width: 3),
-        borderRadius: BorderRadius.circular(14),
-        color: Colors.transparent,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+    final colors = Theme.of(context).colorScheme;
+    final cardColor = colors.brightness == Brightness.dark
+        ? const Color(0xFF262626)
+        : Colors.white;
+
+    return Material(
+      color: cardColor,
+      elevation: 4,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 84),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          decoration: BoxDecoration(
+            border: Border.all(color: colors.primary.withValues(alpha: 0.72)),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Tap To Pay',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontInverted,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colors.primary.withValues(alpha: 0.09),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  Icons.tap_and_play,
+                  color: colors.primary,
+                  size: 28,
                 ),
               ),
-              Text(
-                'Tap phone to machine to pay',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.fontSecondary,
-                  fontSize: 16,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Tap to Pay',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: colors.fontInverted,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Pay at the machine reader with your mobile wallet.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colors.fontSecondary,
+                        height: 1.1,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.primary,
+                  size: 26,
+                ),
+              ],
             ],
           ),
-          const Icon(Icons.tap_and_play, color: Colors.blue, size: 40),
-        ],
+        ),
       ),
     );
   }

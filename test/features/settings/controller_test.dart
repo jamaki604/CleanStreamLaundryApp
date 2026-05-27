@@ -12,6 +12,10 @@ void main() {
     mockAuthService = MockAuthService();
     mockProfileService = MockProfileService();
     mockTransactionService = MockTransactionService();
+
+    when(
+      () => mockProfileService.getCurrentUserRole(),
+    ).thenAnswer((_) async => null);
   });
 
   SettingsController buildController() => SettingsController(
@@ -20,11 +24,11 @@ void main() {
     transactionService: mockTransactionService,
   );
 
-
   group('loadNotificationLeadTime', () {
     test('sets notificationLeadTime from service', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer((_) async => 12);
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => 12);
 
       final controller = buildController();
       await controller.loadNotificationLeadTime();
@@ -33,8 +37,9 @@ void main() {
     });
 
     test('sets isLoadingDelay to false after loading', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer((_) async => 5);
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => 5);
 
       final controller = buildController();
       expect(controller.isLoadingDelay, isTrue);
@@ -45,8 +50,9 @@ void main() {
     });
 
     test('notifies listeners after loading', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer((_) async => 5);
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => 5);
 
       final controller = buildController();
       var notified = false;
@@ -58,13 +64,14 @@ void main() {
     });
   });
 
-
   group('increment', () {
     test('increases notificationLeadTime by 1', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer((_) async => 5);
-      when(() => mockProfileService.setNotificationLeadTime(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => 5);
+      when(
+        () => mockProfileService.setNotificationLeadTime(any()),
+      ).thenAnswer((_) async {});
 
       final controller = buildController();
       await controller.loadNotificationLeadTime();
@@ -76,30 +83,34 @@ void main() {
     });
 
     test('does not exceed maxNotificationLeadTime', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer(
-              (_) async => SettingsController.maxNotificationLeadTime);
-      when(() => mockProfileService.setNotificationLeadTime(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => SettingsController.maxNotificationLeadTime);
+      when(
+        () => mockProfileService.setNotificationLeadTime(any()),
+      ).thenAnswer((_) async {});
 
       final controller = buildController();
       await controller.loadNotificationLeadTime();
 
       await controller.increment();
 
-      expect(controller.notificationLeadTime,
-          SettingsController.maxNotificationLeadTime);
-      verifyNever(
-              () => mockProfileService.setNotificationLeadTime(any()));
+      expect(
+        controller.notificationLeadTime,
+        SettingsController.maxNotificationLeadTime,
+      );
+      verifyNever(() => mockProfileService.setNotificationLeadTime(any()));
     });
   });
 
   group('decrement', () {
     test('decreases notificationLeadTime by 1', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer((_) async => 5);
-      when(() => mockProfileService.setNotificationLeadTime(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => 5);
+      when(
+        () => mockProfileService.setNotificationLeadTime(any()),
+      ).thenAnswer((_) async {});
 
       final controller = buildController();
       await controller.loadNotificationLeadTime();
@@ -111,10 +122,12 @@ void main() {
     });
 
     test('does not go below 0', () async {
-      when(() => mockProfileService.getNotificationLeadTime())
-          .thenAnswer((_) async => 0);
-      when(() => mockProfileService.setNotificationLeadTime(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockProfileService.getNotificationLeadTime(),
+      ).thenAnswer((_) async => 0);
+      when(
+        () => mockProfileService.setNotificationLeadTime(any()),
+      ).thenAnswer((_) async {});
 
       final controller = buildController();
       await controller.loadNotificationLeadTime();
@@ -122,19 +135,18 @@ void main() {
       await controller.decrement();
 
       expect(controller.notificationLeadTime, 0);
-      verifyNever(
-              () => mockProfileService.setNotificationLeadTime(any()));
+      verifyNever(() => mockProfileService.setNotificationLeadTime(any()));
     });
   });
-
 
   group('getTransactions', () {
     test('returns transactions from service', () async {
       final expected = [
         {'id': '1', 'amount': 10},
       ];
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => expected);
+      when(
+        () => mockTransactionService.getTransactionsForUser(),
+      ).thenAnswer((_) async => expected);
 
       final controller = buildController();
       final result = await controller.getTransactions();
