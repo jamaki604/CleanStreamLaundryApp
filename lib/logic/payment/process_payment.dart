@@ -14,19 +14,24 @@ class PaymentProcessor {
     String description,
   ) async {
     try {
-      await _paymentService.makePayment(
+      final purpose = description == "Loyalty Card"
+          ? PaymentPurpose.walletLoad
+          : PaymentPurpose.directMachinePayment;
+      final result = await _paymentService.makePayment(
         amount,
-        purpose: description == "Loyalty Card"
-            ? PaymentPurpose.walletLoad
-            : PaymentPurpose.directMachinePayment,
-      );
-      _transactionService.recordTransaction(
-        amount: amount,
-        description: description,
-        type: "Laundry",
+        purpose: purpose,
       );
 
-      return PaymentResult.success;
+      if (result == PaymentResult.success &&
+          purpose == PaymentPurpose.directMachinePayment) {
+        _transactionService.recordTransaction(
+          amount: amount,
+          description: description,
+          type: "Laundry",
+        );
+      }
+
+      return result;
     } on StripeException {
       return PaymentResult.canceled;
     } catch (_) {

@@ -39,7 +39,6 @@ void main() {
     getIt.registerSingleton<ProfileService>(mockProfileService);
 
     paymentProcessor = PaymentProcessor();
-
   });
 
   group('PaymentProcessor.processPayment', () {
@@ -47,25 +46,38 @@ void main() {
       const amount = 100.0;
       const description = 'Test payment';
 
-      when(() => mockPaymentService.makePayment(amount))
-          .thenAnswer((_) async => Future.value());
-      when(() => mockTransactionService.recordTransaction(
-        amount: any(named: 'amount'),
-        description: any(named: 'description'),
-        type: any(named: 'type'),
-      )).thenAnswer((_) async => {});
+      when(
+        () => mockPaymentService.makePayment(
+          amount,
+          purpose: PaymentPurpose.directMachinePayment,
+        ),
+      ).thenAnswer((_) async => PaymentResult.success);
+      when(
+        () => mockTransactionService.recordTransaction(
+          amount: any(named: 'amount'),
+          description: any(named: 'description'),
+          type: any(named: 'type'),
+        ),
+      ).thenAnswer((_) async => {});
 
       // Act
       final result = await paymentProcessor.processPayment(amount, description);
 
       // Assert
       expect(result, PaymentResult.success);
-      verify(() => mockPaymentService.makePayment(amount)).called(1);
-      verify(() => mockTransactionService.recordTransaction(
-        amount: amount,
-        description: description,
-        type: 'Laundry',
-      )).called(1);
+      verify(
+        () => mockPaymentService.makePayment(
+          amount,
+          purpose: PaymentPurpose.directMachinePayment,
+        ),
+      ).called(1);
+      verify(
+        () => mockTransactionService.recordTransaction(
+          amount: amount,
+          description: description,
+          type: 'Laundry',
+        ),
+      ).called(1);
     });
 
     test(
@@ -75,7 +87,12 @@ void main() {
         const amount = 50.0;
         const description = 'Test payment';
 
-        when(() => mockPaymentService.makePayment(amount)).thenThrow(
+        when(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.directMachinePayment,
+          ),
+        ).thenThrow(
           StripeException(
             error: LocalizedErrorMessage(code: FailureCode.Canceled),
           ),
@@ -89,7 +106,12 @@ void main() {
 
         // Assert
         expect(result, PaymentResult.canceled);
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verify(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.directMachinePayment,
+          ),
+        ).called(1);
         verifyNever(
           () => mockTransactionService.recordTransaction(
             amount: any(named: 'amount'),
@@ -108,7 +130,10 @@ void main() {
         const description = 'Test payment';
 
         when(
-          () => mockPaymentService.makePayment(amount),
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.directMachinePayment,
+          ),
         ).thenThrow(PlatformException('Platform not supported'));
 
         // Act
@@ -119,7 +144,12 @@ void main() {
 
         // Assert
         expect(result, PaymentResult.failed);
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verify(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.directMachinePayment,
+          ),
+        ).called(1);
         verifyNever(
           () => mockTransactionService.recordTransaction(
             amount: any(named: 'amount'),
@@ -138,7 +168,10 @@ void main() {
         const description = 'Test payment';
 
         when(
-          () => mockPaymentService.makePayment(amount),
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.directMachinePayment,
+          ),
         ).thenThrow(Exception('Unexpected error'));
 
         // Act
@@ -149,7 +182,12 @@ void main() {
 
         // Assert
         expect(result, PaymentResult.failed);
-        verify(() => mockPaymentService.makePayment(amount)).called(1);
+        verify(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.directMachinePayment,
+          ),
+        ).called(1);
         verifyNever(
           () => mockTransactionService.recordTransaction(
             amount: any(named: 'amount'),
@@ -165,7 +203,12 @@ void main() {
       const amount = 60.0;
       const description = 'Test payment';
 
-      when(() => mockPaymentService.makePayment(amount)).thenThrow(
+      when(
+        () => mockPaymentService.makePayment(
+          amount,
+          purpose: PaymentPurpose.directMachinePayment,
+        ),
+      ).thenThrow(
         StripeException(error: LocalizedErrorMessage(code: FailureCode.Failed)),
       );
 
@@ -174,7 +217,12 @@ void main() {
 
       // Assert
       expect(result, PaymentResult.canceled);
-      verify(() => mockPaymentService.makePayment(amount)).called(1);
+      verify(
+        () => mockPaymentService.makePayment(
+          amount,
+          purpose: PaymentPurpose.directMachinePayment,
+        ),
+      ).called(1);
       verifyNever(
         () => mockTransactionService.recordTransaction(
           amount: any(named: 'amount'),
@@ -183,5 +231,69 @@ void main() {
         ),
       );
     });
+
+    test(
+      'should not record a legacy transaction for wallet load success',
+      () async {
+        const amount = 40.0;
+        const description = 'Loyalty Card';
+
+        when(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.walletLoad,
+          ),
+        ).thenAnswer((_) async => PaymentResult.success);
+
+        final result = await paymentProcessor.processPayment(
+          amount,
+          description,
+        );
+
+        expect(result, PaymentResult.success);
+        verify(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.walletLoad,
+          ),
+        ).called(1);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
+            amount: any(named: 'amount'),
+            description: any(named: 'description'),
+            type: any(named: 'type'),
+          ),
+        );
+      },
+    );
+
+    test(
+      'should return pending and not record transaction while processing',
+      () async {
+        const amount = 40.0;
+        const description = 'Loyalty Card';
+
+        when(
+          () => mockPaymentService.makePayment(
+            amount,
+            purpose: PaymentPurpose.walletLoad,
+          ),
+        ).thenAnswer((_) async => PaymentResult.pending);
+
+        final result = await paymentProcessor.processPayment(
+          amount,
+          description,
+        );
+
+        expect(result, PaymentResult.pending);
+        verifyNever(
+          () => mockTransactionService.recordTransaction(
+            amount: any(named: 'amount'),
+            description: any(named: 'description'),
+            type: any(named: 'type'),
+          ),
+        );
+      },
+    );
   });
 }

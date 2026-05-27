@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:clean_stream_laundry_app/logic/exceptions/null_url_exception.dart';
 import 'package:clean_stream_laundry_app/logic/services/payment_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
@@ -13,7 +14,7 @@ class StripeService implements PaymentService {
   bool channelSubscribed = false;
 
   @override
-  Future<void> makePayment(
+  Future<PaymentResult> makePayment(
     double amount, {
     PaymentPurpose purpose = PaymentPurpose.directMachinePayment,
   }) async {
@@ -48,12 +49,18 @@ class StripeService implements PaymentService {
         }
       });
 
-      await _paymentCompleter!.future
+      final result = await _paymentCompleter!.future
           .timeout(const Duration(minutes: 2), onTimeout: () => 400)
           .whenComplete(() {
             paymentPortal.close();
             closeCheckoutTimer.cancel();
           });
+
+      if (result == 400) {
+        throw Exception("Payment was not confirmed");
+      }
+
+      return PaymentResult.success;
     } catch (e) {
       rethrow;
     }

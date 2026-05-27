@@ -8,6 +8,7 @@ export interface PaymentIntentDeps {
 
 export interface PaymentIntentResult {
   clientSecret: string | null;
+  paymentIntentId: string;
 }
 
 export type PaymentPurpose = "walletLoad" | "directMachinePayment";
@@ -31,7 +32,9 @@ export async function createPaymentIntent(
 ): Promise<PaymentIntentResult> {
   const metadata: Record<string, string> = {
     user_id: userId,
-    purpose: purpose === "walletLoad" ? "wallet_load" : "direct_machine_payment",
+    purpose: purpose === "walletLoad"
+      ? "wallet_load"
+      : "direct_machine_payment",
     amount_cents: String(amount),
   };
 
@@ -46,7 +49,7 @@ export async function createPaymentIntent(
     metadata,
   });
 
-  return { clientSecret: intent.client_secret };
+  return { clientSecret: intent.client_secret, paymentIntentId: intent.id };
 }
 
 export async function getAuthenticatedUserId(

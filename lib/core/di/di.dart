@@ -47,6 +47,7 @@ Future<void> setupDependencies() async {
   final supabase = Supabase.instance.client;
 
   Stripe.publishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY']!;
+  await Stripe.instance.applySettings();
 
   getIt.registerLazySingleton<TransactionService>(
     () => SupabaseTransactionService(client: supabase),
