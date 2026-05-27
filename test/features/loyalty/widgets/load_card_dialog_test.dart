@@ -26,6 +26,11 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> acceptTerms(WidgetTester tester) async {
+    await tester.tap(find.text('I agree to the Loyalty Card Terms.'));
+    await tester.pumpAndSettle();
+  }
+
   group('LoadCardDialog', () {
     group('Initial state', () {
       testWidgets('shows Load Loyalty Card title', (tester) async {
@@ -38,10 +43,14 @@ void main() {
         expect(find.text('\$1.00'), findsOneWidget);
       });
 
-      testWidgets('shows instruction text', (tester) async {
+      testWidgets('shows loyalty terms guidance', (tester) async {
         await openDialog(tester);
         expect(
-          find.text('Select an amount to add to your card.'),
+          find.textContaining('Loyalty Card loads are final sale'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('I agree to the Loyalty Card Terms.'),
           findsOneWidget,
         );
       });
@@ -154,6 +163,7 @@ void main() {
           tester,
           onPay: (amount) async => capturedAmount = amount,
         );
+        await acceptTerms(tester);
 
         await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
         await tester.pumpAndSettle();
@@ -170,6 +180,7 @@ void main() {
 
         await tester.tap(find.text('\$25'));
         await tester.pumpAndSettle();
+        await acceptTerms(tester);
 
         await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
         await tester.pumpAndSettle();
@@ -182,6 +193,7 @@ void main() {
           tester,
           onPay: (_) async {},
         );
+        await acceptTerms(tester);
 
         await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
         await tester.pumpAndSettle();

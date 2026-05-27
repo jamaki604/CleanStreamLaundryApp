@@ -103,7 +103,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(tester.getSize(find.byType(NavBar)).height, 92);
+      expect(tester.getSize(find.byType(NavBar)).height, 96);
     });
 
     testWidgets('Tapping Home navigates to /homePage', (tester) async {

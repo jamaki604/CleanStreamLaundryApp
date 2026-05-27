@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 
 class NavBar extends StatelessWidget {
   static const double _minimumHeight = 82;
-  static const double _contentHeight = 58;
+  static const double _contentHeight = 62;
+  static const TextStyle _labelStyle = TextStyle(fontSize: 12, height: 1);
 
   static const List<_NavDestination> _destinations = [
     _NavDestination(
@@ -62,6 +63,8 @@ class NavBar extends StatelessWidget {
         backgroundColor: colorScheme.surface,
         selectedItemColor: colorScheme.primary,
         unselectedItemColor: Colors.grey,
+        selectedLabelStyle: _labelStyle,
+        unselectedLabelStyle: _labelStyle,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
           final route = _destinations[index].route;

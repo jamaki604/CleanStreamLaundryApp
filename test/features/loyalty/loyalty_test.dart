@@ -44,19 +44,34 @@ void main() {
         routes: [
           GoRoute(
             path: '/',
-            builder: (_, __) => LoyaltyPage(controller: mockController),
+            builder: (_, _) => LoyaltyPage(controller: mockController),
           ),
           GoRoute(
             path: '/scanner',
-            builder: (_, __) => const Scaffold(body: Text('Scanner')),
+            builder: (_, _) => const Scaffold(body: Text('Scanner')),
           ),
           GoRoute(
             path: '/login',
-            builder: (_, __) => const Scaffold(body: Text('Login')),
+            builder: (_, _) => const Scaffold(body: Text('Login')),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> openLoadCardDialog(WidgetTester tester) async {
+    await tester.tap(find.text('Load card'));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> acceptLoyaltyTerms(WidgetTester tester) async {
+    await tester.tap(find.text('I agree to the Loyalty Card Terms.'));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> tapPay(WidgetTester tester) async {
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
+    await tester.pumpAndSettle();
   }
 
   group('Initialization', () {
@@ -312,11 +327,9 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      await tester.tap(find.text('Load card'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-      await tester.pumpAndSettle();
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
       verify(() => mockController.loadCard(1.0)).called(1);
     });
@@ -328,11 +341,9 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      await tester.tap(find.text('Load card'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-      await tester.pumpAndSettle();
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
       expect(find.text('Payment Successful!'), findsOneWidget);
       expect(
@@ -351,11 +362,9 @@ void main() {
           await tester.pumpWidget(createWidget());
           await tester.pump();
 
-          await tester.tap(find.text('Load card'));
-          await tester.pumpAndSettle();
-
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-          await tester.pumpAndSettle();
+          await openLoadCardDialog(tester);
+          await acceptLoyaltyTerms(tester);
+          await tapPay(tester);
 
           verify(() => mockController.fetchTransactions()).called(1);
         });
@@ -368,11 +377,9 @@ void main() {
           await tester.pumpWidget(createWidget());
           await tester.pump();
 
-          await tester.tap(find.text('Load card'));
-          await tester.pumpAndSettle();
-
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-          await tester.pumpAndSettle();
+          await openLoadCardDialog(tester);
+          await acceptLoyaltyTerms(tester);
+          await tapPay(tester);
 
           expect(find.text('Payment Canceled'), findsOneWidget);
           expect(find.text('Payment of \$1.00 was canceled.'), findsOneWidget);
@@ -385,11 +392,9 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      await tester.tap(find.text('Load card'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-      await tester.pumpAndSettle();
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
       expect(find.text('Payment Failed'), findsOneWidget);
       expect(
@@ -408,11 +413,9 @@ void main() {
           await tester.pumpWidget(createWidget());
           await tester.pump();
 
-          await tester.tap(find.text('Load card'));
-          await tester.pumpAndSettle();
-
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-          await tester.pumpAndSettle();
+          await openLoadCardDialog(tester);
+          await acceptLoyaltyTerms(tester);
+          await tapPay(tester);
 
           verifyNever(() => mockController.fetchTransactions());
         });
@@ -425,11 +428,9 @@ void main() {
           await tester.pumpWidget(createWidget());
           await tester.pump();
 
-          await tester.tap(find.text('Load card'));
-          await tester.pumpAndSettle();
-
-          await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-          await tester.pumpAndSettle();
+          await openLoadCardDialog(tester);
+          await acceptLoyaltyTerms(tester);
+          await tapPay(tester);
 
           verifyNever(() => mockController.fetchTransactions());
         });
@@ -441,14 +442,13 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      await tester.tap(find.text('Load card'));
-      await tester.pumpAndSettle();
+      await openLoadCardDialog(tester);
 
       await tester.tap(find.text('\$25'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-      await tester.pumpAndSettle();
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
       verify(() => mockController.loadCard(25.0)).called(1);
     });
@@ -460,11 +460,9 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      await tester.tap(find.text('Load card'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Pay'));
-      await tester.pumpAndSettle();
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
       await tester.tap(find.text('Done'));
       await tester.pumpAndSettle();
