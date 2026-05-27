@@ -68,14 +68,14 @@ class _LoginState extends State<Login> {
             radius: const Radius.circular(8),
             child: SingleChildScrollView(
               controller: _controller.scrollController,
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.fromLTRB(24.0, 60.0, 24.0, 24.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
                     'assets/Logo.png',
-                    height: 250,
-                    width: 250,
+                    height: 300,
+                    width: 300,
                     key: const Key('app_logo'),
                   ),
                   FormFields(controller: _controller),

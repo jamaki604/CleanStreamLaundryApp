@@ -2,13 +2,15 @@ import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+const double _customAppBarHeight = 56;
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 40,
+      toolbarHeight: _customAppBarHeight,
       backgroundColor: Colors.transparent,
       elevation: 0,
       centerTitle: false,
@@ -46,5 +48,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(_customAppBarHeight);
 }

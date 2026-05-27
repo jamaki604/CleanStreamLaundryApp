@@ -14,6 +14,7 @@ ThemeData lightMode = ThemeData(
     backgroundColor: Colors.transparent,
     elevation: 0,
     surfaceTintColor: Colors.transparent,
+    toolbarHeight: kToolbarHeight,
   ),
 );
 
@@ -31,6 +32,7 @@ ThemeData darkMode = ThemeData(
     backgroundColor: Colors.transparent,
     elevation: 0,
     surfaceTintColor: Colors.transparent,
+    toolbarHeight: kToolbarHeight,
   ),
 );
 
