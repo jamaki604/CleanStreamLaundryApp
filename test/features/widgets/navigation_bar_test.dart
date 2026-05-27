@@ -4,48 +4,51 @@ import 'package:go_router/go_router.dart';
 import 'package:clean_stream_laundry_app/features/widgets/navigation_bar.dart';
 
 void main() {
-  Widget wrapWithRouter(String initialLocation) {
+  Widget wrapWithRouter(
+    String initialLocation, {
+    double bottomViewPadding = 0,
+  }) {
     final router = GoRouter(
       initialLocation: initialLocation,
       routes: [
         GoRoute(
           path: '/homePage',
-          builder: (_, __) => Scaffold(
+          builder: (context, state) => Scaffold(
             body: const Text('Home Page'),
             bottomNavigationBar: const NavBar(),
           ),
         ),
         GoRoute(
           path: '/startPage',
-          builder: (_, __) => Scaffold(
+          builder: (context, state) => Scaffold(
             body: const Text('Start Page'),
             bottomNavigationBar: const NavBar(),
           ),
         ),
         GoRoute(
           path: '/scanner',
-          builder: (_, __) => Scaffold(
+          builder: (context, state) => Scaffold(
             body: const Text('Scanner Page'),
             bottomNavigationBar: const NavBar(),
           ),
         ),
         GoRoute(
           path: '/paymentPage',
-          builder: (_, __) => Scaffold(
+          builder: (context, state) => Scaffold(
             body: const Text('Payment Page'),
             bottomNavigationBar: const NavBar(),
           ),
         ),
         GoRoute(
           path: '/loyalty',
-          builder: (_, __) => Scaffold(
+          builder: (context, state) => Scaffold(
             body: const Text('Loyalty Page'),
             bottomNavigationBar: const NavBar(),
           ),
         ),
         GoRoute(
           path: '/settings',
-          builder: (_, __) => Scaffold(
+          builder: (context, state) => Scaffold(
             body: const Text('Settings Page'),
             bottomNavigationBar: const NavBar(),
           ),
@@ -53,7 +56,22 @@ void main() {
       ],
     );
 
-    return MaterialApp.router(routerConfig: router);
+    return MaterialApp.router(
+      routerConfig: router,
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            padding: mediaQuery.padding.copyWith(bottom: 0),
+            viewPadding: mediaQuery.viewPadding.copyWith(
+              bottom: bottomViewPadding,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
   }
 
   group('NavBar Widget Tests', () {
@@ -70,6 +88,22 @@ void main() {
       expect(find.text('Start'), findsOneWidget);
       expect(find.text('Wallet'), findsOneWidget);
       expect(find.text('Settings'), findsOneWidget);
+    });
+
+    testWidgets('does not overflow with iPhone bottom safe area', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(393, 852);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      await tester.pumpWidget(
+        wrapWithRouter('/homePage', bottomViewPadding: 34),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(find.byType(NavBar)).height, 92);
     });
 
     testWidgets('Tapping Home navigates to /homePage', (tester) async {

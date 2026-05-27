@@ -1,7 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class NavBar extends StatelessWidget {
+  static const double _minimumHeight = 82;
+  static const double _contentHeight = 58;
+
   static const List<_NavDestination> _destinations = [
     _NavDestination(
       route: '/homePage',
@@ -47,9 +52,11 @@ class NavBar extends StatelessWidget {
     final location = router.routeInformationProvider.value.uri.toString();
     final currentIndex = _getIndex(location);
     final colorScheme = Theme.of(context).colorScheme;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final height = math.max(_minimumHeight, _contentHeight + bottomInset);
 
     return SizedBox(
-      height: 82,
+      height: height,
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         backgroundColor: colorScheme.surface,
