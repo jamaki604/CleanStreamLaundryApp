@@ -14,13 +14,17 @@ class AvailabilityCard extends StatelessWidget {
       future: controller.getMachineCounts(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const SizedBox(
+            height: 112,
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
 
-        final totalWashers = snapshot.data![0];
-        final idleWashers = snapshot.data![1];
-        final totalDryers = snapshot.data![2];
-        final idleDryers = snapshot.data![3];
+        final counts = snapshot.data ?? [0, 0, 0, 0];
+        final totalWashers = counts[0];
+        final idleWashers = counts[1];
+        final totalDryers = counts[2];
+        final idleDryers = counts[3];
 
         return Container(
           width: double.infinity,
@@ -33,8 +37,8 @@ class AvailabilityCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: 45,
                 alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.blue, width: 2),
@@ -44,87 +48,76 @@ class AvailabilityCard extends StatelessWidget {
                   'Availability',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.fontSecondary,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(
-                height: 80,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  '$idleWashers/$totalWashers Washers',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .fontSecondary,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.local_laundry_service,
-                              color: Colors.blue,
-                              size: 36,
-                            ),
-                          ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final iconSize = constraints.maxWidth < 340 ? 26.0 : 32.0;
+
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 70),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _MachineAvailabilityStat(
+                            label: '$idleWashers/$totalWashers Washers',
+                            iconSize: iconSize,
+                          ),
                         ),
-                      ),
-                    ),
-                    Container(width: 2, color: Colors.blue),
-                    Expanded(
-                      child: Padding(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  '$idleDryers/$totalDryers Dryers',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .fontSecondary,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.local_laundry_service,
-                              color: Colors.blue,
-                              size: 36,
-                            ),
-                          ],
+                        Container(width: 2, height: 70, color: Colors.blue),
+                        Expanded(
+                          child: _MachineAvailabilityStat(
+                            label: '$idleDryers/$totalDryers Dryers',
+                            iconSize: iconSize,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _MachineAvailabilityStat extends StatelessWidget {
+  final String label;
+  final double iconSize;
+
+  const _MachineAvailabilityStat({required this.label, required this.iconSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontSecondary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Icon(Icons.local_laundry_service, color: Colors.blue, size: iconSize),
+        ],
+      ),
     );
   }
 }

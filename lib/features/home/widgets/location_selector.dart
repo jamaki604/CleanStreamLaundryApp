@@ -68,7 +68,7 @@ class LocationSelector extends StatelessWidget {
       builder: (_) => ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: controller.locations.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
+        separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (_, index) {
           final item = controller.locations[index];
           return ListTile(

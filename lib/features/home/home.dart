@@ -50,45 +50,63 @@ class HomePageState extends State<HomePage> {
 
     return BasePage(
       key: HomePage.pageKey,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Header(
-                controller: _controller,
-                onNearestLocationTap: _controller.selectNearestLocation,
+      body: SafeArea(
+        top: false,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compactHeight = constraints.maxHeight < 620;
+            final mapHeightFactor = _controller.locationSelected ? 0.48 : 0.54;
+            final mapHeight = (constraints.maxHeight * mapHeightFactor).clamp(
+              185.0,
+              320.0,
+            );
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                10,
+                compactHeight ? 2 : 4,
+                10,
+                compactHeight ? 4 : 8,
               ),
-              const SizedBox(height: 10),
-              LocationMap(
-                locations: _controller.locations,
-                mapController: _mapController,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Header(
+                    controller: _controller,
+                    onNearestLocationTap: _controller.selectNearestLocation,
+                  ),
+                  SizedBox(height: compactHeight ? 6 : 8),
+                  LocationMap(
+                    locations: _controller.locations,
+                    mapController: _mapController,
+                    selectedLocation: _controller.selectedCoordinates,
+                    height: mapHeight,
+                  ),
+                  LocationSelector(
+                    controller: _controller,
+                    onGetDirections: () async {
+                      if (_controller.selectedName != null) {
+                        await _controller.openDirectionsFromAddress(
+                          _controller.selectedName,
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please select a location to get directions!',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: compactHeight ? 8 : 12),
+                  if (_controller.locationSelected)
+                    AvailabilityCard(controller: _controller),
+                ],
               ),
-              LocationSelector(
-                controller: _controller,
-                onGetDirections: () async {
-                  if (_controller.selectedName != null) {
-                    await _controller.openDirectionsFromAddress(
-                      _controller.selectedName,
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Please select a location to get directions!',
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 14),
-              if (_controller.locationSelected)
-                AvailabilityCard(controller: _controller),
-              const SizedBox(height: 12),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

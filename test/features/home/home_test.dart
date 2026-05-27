@@ -37,8 +37,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     when(() => mockAuthService.getCurrentUserId).thenReturn(null);
-    when(() => mockLocationService.getLocations())
-        .thenAnswer((_) async => defaultLocations);
+    when(
+      () => mockLocationService.getLocations(),
+    ).thenAnswer((_) async => defaultLocations);
   });
 
   tearDown(() => GetIt.instance.reset());
@@ -47,27 +48,31 @@ void main() {
     return MaterialApp.router(
       routerConfig: GoRouter(
         routes: [
-          GoRoute(path: '/', builder: (_, __) => const HomePage()),
+          GoRoute(path: '/', builder: (context, state) => const HomePage()),
         ],
       ),
     );
   }
 
   void mockMachineCounts(
-      String locationId, {
-        int washers = 5,
-        int idleWashers = 3,
-        int dryers = 4,
-        int idleDryers = 2,
-      }) {
-    when(() => mockMachineService.getWasherCountByLocation(locationId))
-        .thenAnswer((_) async => washers);
-    when(() => mockMachineService.getIdleWasherCountByLocation(locationId))
-        .thenAnswer((_) async => idleWashers);
-    when(() => mockMachineService.getDryerCountByLocation(locationId))
-        .thenAnswer((_) async => dryers);
-    when(() => mockMachineService.getIdleDryerCountByLocation(locationId))
-        .thenAnswer((_) async => idleDryers);
+    String locationId, {
+    int washers = 5,
+    int idleWashers = 3,
+    int dryers = 4,
+    int idleDryers = 2,
+  }) {
+    when(
+      () => mockMachineService.getWasherCountByLocation(locationId),
+    ).thenAnswer((_) async => washers);
+    when(
+      () => mockMachineService.getIdleWasherCountByLocation(locationId),
+    ).thenAnswer((_) async => idleWashers);
+    when(
+      () => mockMachineService.getDryerCountByLocation(locationId),
+    ).thenAnswer((_) async => dryers);
+    when(
+      () => mockMachineService.getIdleDryerCountByLocation(locationId),
+    ).thenAnswer((_) async => idleDryers);
   }
 
   group('Loading state', () {
@@ -96,33 +101,57 @@ void main() {
       expect(find.text('Welcome!'), findsOneWidget);
     });
 
-    testWidgets('shows welcome message with username when user loaded',
-            (tester) async {
-          when(() => mockAuthService.getCurrentUserId).thenReturn('user-1');
-          when(() => mockProfileService.getUserNameById('user-1'))
-              .thenAnswer((_) async => 'Jane');
-          when(() => mockProfileService.getUserBalanceById('user-1'))
-              .thenAnswer((_) async => {'balance': 10.00});
+    testWidgets('shows welcome message with username when user loaded', (
+      tester,
+    ) async {
+      when(() => mockAuthService.getCurrentUserId).thenReturn('user-1');
+      when(
+        () => mockProfileService.getUserNameById('user-1'),
+      ).thenAnswer((_) async => 'Jane');
+      when(
+        () => mockProfileService.getUserBalanceById('user-1'),
+      ).thenAnswer((_) async => {'balance': 10.00});
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          expect(find.text('Welcome Jane!'), findsOneWidget);
-        });
+      expect(find.text('Welcome Jane!'), findsOneWidget);
+    });
 
-    testWidgets('shows balance loading text when balance is null',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('shows balance loading text when balance is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          expect(find.textContaining('Loading...'), findsOneWidget);
-        });
+      expect(find.textContaining('Loading...'), findsOneWidget);
+    });
 
     testWidgets('has SingleChildScrollView', (tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
       expect(find.byType(SingleChildScrollView), findsOneWidget);
+    });
+
+    testWidgets('fits compact screens when a location is selected', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      SharedPreferences.setMockInitialValues({
+        'lastSelectedLocation': '123 Main St',
+        'locationSelectionMode': 'manual',
+      });
+      mockMachineCounts('1');
+
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Availability'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('displays Nearest Location button', (tester) async {
@@ -132,13 +161,14 @@ void main() {
       expect(find.text('Nearest Location'), findsOneWidget);
     });
 
-    testWidgets('displays Select Location text when no location chosen',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('displays Select Location text when no location chosen', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          expect(find.text('Select Location'), findsOneWidget);
-        });
+      expect(find.text('Select Location'), findsOneWidget);
+    });
 
     testWidgets('displays location_on icon', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -154,13 +184,14 @@ void main() {
       expect(find.byType(IconButton), findsOneWidget);
     });
 
-    testWidgets('does not show availability card before location selected',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('does not show availability card before location selected', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          expect(find.text('Availability'), findsNothing);
-        });
+      expect(find.text('Availability'), findsNothing);
+    });
   });
 
   group('Location selector', () {
@@ -175,37 +206,39 @@ void main() {
       expect(find.text('456 Oak Ave'), findsOneWidget);
     });
 
-    testWidgets('updates selected location after tapping a location',
-            (tester) async {
-          mockMachineCounts('1');
+    testWidgets('updates selected location after tapping a location', (
+      tester,
+    ) async {
+      mockMachineCounts('1');
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Select Location'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('Select Location'));
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('123 Main St'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('123 Main St'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('123 Main St'), findsOneWidget);
-        });
+      expect(find.text('123 Main St'), findsOneWidget);
+    });
 
-    testWidgets('shows availability card after selecting a location',
-            (tester) async {
-          mockMachineCounts('1');
+    testWidgets('shows availability card after selecting a location', (
+      tester,
+    ) async {
+      mockMachineCounts('1');
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Select Location'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('Select Location'));
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('123 Main St'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('123 Main St'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Availability'), findsOneWidget);
-        });
+      expect(find.text('Availability'), findsOneWidget);
+    });
 
     testWidgets('restores last selected location from storage', (tester) async {
       SharedPreferences.setMockInitialValues({
@@ -219,38 +252,46 @@ void main() {
       expect(find.text('123 Main St'), findsOneWidget);
     });
 
-    testWidgets('shows snackbar when directions tapped with no location',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+    testWidgets('shows snackbar when directions tapped with no location', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.byIcon(Icons.navigation));
-          await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.navigation));
+      await tester.pumpAndSettle();
 
-          expect(
-            find.text('Please select a location to get directions!'),
-            findsOneWidget,
-          );
-        });
+      expect(
+        find.text('Please select a location to get directions!'),
+        findsOneWidget,
+      );
+    });
   });
 
   group('Availability card', () {
-    testWidgets('shows washer and dryer counts after selecting location',
-            (tester) async {
-          mockMachineCounts('1', washers: 5, idleWashers: 3, dryers: 4, idleDryers: 2);
+    testWidgets('shows washer and dryer counts after selecting location', (
+      tester,
+    ) async {
+      mockMachineCounts(
+        '1',
+        washers: 5,
+        idleWashers: 3,
+        dryers: 4,
+        idleDryers: 2,
+      );
 
-          await tester.pumpWidget(createWidget());
-          await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('Select Location'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('Select Location'));
+      await tester.pumpAndSettle();
 
-          await tester.tap(find.text('123 Main St'));
-          await tester.pumpAndSettle();
+      await tester.tap(find.text('123 Main St'));
+      await tester.pumpAndSettle();
 
-          expect(find.text('3/5 Washers'), findsOneWidget);
-          expect(find.text('2/4 Dryers'), findsOneWidget);
-        });
+      expect(find.text('3/5 Washers'), findsOneWidget);
+      expect(find.text('2/4 Dryers'), findsOneWidget);
+    });
   });
 
   group('Nearest location button', () {
