@@ -14,12 +14,12 @@ class Header extends StatelessWidget {
     return Column(
       children: [
         CreditCard(username: controller.userName ?? 'John Doe'),
-        const SizedBox(height: 17),
+        const SizedBox(height: 12),
         Text(
           'Loyalty Balance: \$${controller.userBalance?.toStringAsFixed(2) ?? '0.00'}',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 26,
+            fontSize: 22,
             fontWeight: FontWeight.w500,
             color: Theme.of(context).colorScheme.fontSecondary,
           ),
@@ -28,7 +28,7 @@ class Header extends StatelessWidget {
           'Paid \$${controller.paidBalance?.toStringAsFixed(2) ?? '0.00'} | Promo \$${controller.promoBalance?.toStringAsFixed(2) ?? '0.00'}',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
             color: Theme.of(context).colorScheme.fontSecondary,
           ),
@@ -41,7 +41,7 @@ class Header extends StatelessWidget {
               '\$${(20 - (controller.userReward ?? 0)).toStringAsFixed(2)} until next reward',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.fontSecondary,
               ),
@@ -50,7 +50,7 @@ class Header extends StatelessWidget {
             IconButton(
               onPressed: onInfoTap,
               icon: const Icon(Icons.info_outline),
-              iconSize: 18,
+              iconSize: 17,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               color: Colors.blue,

@@ -30,173 +30,177 @@ class _LoadCardDialogState extends State<LoadCardDialog> {
           ),
         ),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              OutlinedButton(
-                onPressed: selectedAmount > 1.0
-                    ? () => setState(() {
-                        selectedAmount = (selectedAmount - 0.25).clamp(
-                          1.0,
-                          500.0,
-                        );
-                      })
-                    : null,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: selectedAmount > 1.0 ? Colors.blue : Colors.grey,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton(
+                  onPressed: selectedAmount > 1.0
+                      ? () => setState(() {
+                          selectedAmount = (selectedAmount - 0.25).clamp(
+                            1.0,
+                            500.0,
+                          );
+                        })
+                      : null,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: selectedAmount > 1.0 ? Colors.blue : Colors.grey,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  '-25¢',
-                  style: TextStyle(
-                    color: selectedAmount > 1.0 ? Colors.blue : Colors.grey,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '\$${selectedAmount.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.fontInverted,
-                ),
-              ),
-              const SizedBox(width: 12),
-              OutlinedButton(
-                onPressed: selectedAmount < 500.0
-                    ? () => setState(() {
-                        selectedAmount = (selectedAmount + 0.25).clamp(
-                          1.0,
-                          500.0,
-                        );
-                      })
-                    : null,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: selectedAmount < 500.0 ? Colors.blue : Colors.grey,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  '+25¢',
-                  style: TextStyle(
-                    color: selectedAmount < 500.0 ? Colors.blue : Colors.grey,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: [10, 15, 25].map((amount) {
-              return ChoiceChip(
-                label: Text('\$$amount'),
-                labelStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.fontInverted,
-                ),
-                shape: StadiumBorder(
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 1.5,
-                  ),
-                ),
-                selected: selectedAmount == amount.toDouble(),
-                onSelected: (_) =>
-                    setState(() => selectedAmount = amount.toDouble()),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 6,
-              activeTrackColor: Colors.blue,
-              inactiveTrackColor: Colors.blue.withAlpha(3),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
-              tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 0),
-            ),
-            child: SizedBox(
-              width: 650,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Slider(
-                      value: selectedAmount,
-                      min: 1,
-                      max: 500,
-                      onChanged: (value) => setState(
-                        () => selectedAmount = value.roundToDouble(),
-                      ),
+                  child: Text(
+                    '-25¢',
+                    style: TextStyle(
+                      color: selectedAmount > 1.0 ? Colors.blue : Colors.grey,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
-                ],
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '\$${selectedAmount.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.fontInverted,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton(
+                  onPressed: selectedAmount < 500.0
+                      ? () => setState(() {
+                          selectedAmount = (selectedAmount + 0.25).clamp(
+                            1.0,
+                            500.0,
+                          );
+                        })
+                      : null,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: selectedAmount < 500.0 ? Colors.blue : Colors.grey,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    '+25¢',
+                    style: TextStyle(
+                      color: selectedAmount < 500.0 ? Colors.blue : Colors.grey,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [10, 15, 25].map((amount) {
+                return ChoiceChip(
+                  label: Text('\$$amount'),
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.fontInverted,
+                  ),
+                  shape: StadiumBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  selected: selectedAmount == amount.toDouble(),
+                  onSelected: (_) =>
+                      setState(() => selectedAmount = amount.toDouble()),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 6,
+                activeTrackColor: Colors.blue,
+                inactiveTrackColor: Colors.blue.withAlpha(3),
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
+                tickMarkShape: const RoundSliderTickMarkShape(
+                  tickMarkRadius: 0,
+                ),
+              ),
+              child: SizedBox(
+                width: 650,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        value: selectedAmount,
+                        min: 1,
+                        max: 500,
+                        onChanged: (value) => setState(
+                          () => selectedAmount = value.roundToDouble(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Text(
-            'Loyalty Card loads are final sale prepaid Clean Stream Laundry credit. Balance is usable only for eligible Clean Stream Laundry services, is not a bank account, does not earn interest, and is not redeemable for cash except where required by law. Promotional bonus credits have no cash value and may be subject to separate terms.',
-            style: TextStyle(
-              color: Theme.of(
-                context,
-              ).colorScheme.fontInverted.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: 12),
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            value: termsAccepted,
-            onChanged: (value) {
-              setState(() => termsAccepted = value ?? false);
-            },
-            title: Text(
-              'I agree to the Loyalty Card Terms.',
+            Text(
+              'Loyalty Card loads are final sale prepaid Clean Stream Laundry credit. Balance is usable only for eligible Clean Stream Laundry services, is not a bank account, does not earn interest, and is not redeemable for cash except where required by law. Promotional bonus credits have no cash value and may be subject to separate terms.',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.fontInverted,
-                fontSize: 13,
+                color: Theme.of(
+                  context,
+                ).colorScheme.fontInverted.withValues(alpha: 0.7),
               ),
             ),
-            subtitle: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                context.push('/legal/loyalty-card');
+            const SizedBox(height: 12),
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              value: termsAccepted,
+              onChanged: (value) {
+                setState(() => termsAccepted = value ?? false);
               },
-              style: TextButton.styleFrom(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.zero,
+              title: Text(
+                'I agree to the Loyalty Card Terms.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.fontInverted,
+                  fontSize: 13,
+                ),
               ),
-              child: const Text('View terms'),
+              subtitle: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.push('/legal/loyalty-card');
+                },
+                style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.zero,
+                ),
+                child: const Text('View terms'),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(

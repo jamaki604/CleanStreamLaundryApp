@@ -12,9 +12,7 @@ class TransactionList extends StatelessWidget {
     if (controller.recentTransactions.isEmpty) {
       return Text(
         'No transactions found.',
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.fontSecondary,
-        ),
+        style: TextStyle(color: Theme.of(context).colorScheme.fontSecondary),
       );
     }
 
@@ -22,7 +20,8 @@ class TransactionList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: ListView(
         cacheExtent: 1000,
-        physics: const AlwaysScrollableScrollPhysics(),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

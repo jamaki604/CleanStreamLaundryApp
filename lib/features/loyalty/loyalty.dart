@@ -22,7 +22,7 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
   @override
   void initState() {
     super.initState();
-    controller = widget.controller ??LoyaltyController();
+    controller = widget.controller ?? LoyaltyController();
     controller.addListener(_rebuild);
     controller.initialize();
   }
@@ -96,7 +96,7 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
         context,
         title: 'Payment Successful!',
         message:
-        'Thank you! Your payment of \$${amount.toStringAsFixed(2)} was processed successfully.',
+            'Thank you! Your payment of \$${amount.toStringAsFixed(2)} was processed successfully.',
         isSuccess: true,
       );
     } else if (result == PaymentResult.canceled) {
@@ -106,12 +106,20 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
         message: 'Payment of \$${amount.toStringAsFixed(2)} was canceled.',
         isSuccess: false,
       );
+    } else if (result == PaymentResult.pending) {
+      statusDialog(
+        context,
+        title: 'Payment Processing',
+        message:
+            'Your payment is still processing. Your wallet balance will update shortly.',
+        isSuccess: true,
+      );
     } else {
       statusDialog(
         context,
         title: 'Payment Failed',
         message:
-        'An error occurred while processing your payment. Please try again.',
+            'An error occurred while processing your payment. Please try again.',
         isSuccess: false,
       );
     }
@@ -126,38 +134,47 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
     }
 
     return BasePage(
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          Header(
-            controller: controller,
-            onInfoTap: _showRewardInfoDialog,
-          ),
-          const SizedBox(height: 7),
-          ElevatedButton(
-            onPressed: _showLoadCardDialog,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              disabledBackgroundColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Header(
+                    controller: controller,
+                    onInfoTap: _showRewardInfoDialog,
+                  ),
+                  const SizedBox(height: 6),
+                  ElevatedButton(
+                    onPressed: _showLoadCardDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      disabledBackgroundColor: Colors.grey,
+                      minimumSize: const Size(112, 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      'Load card',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TransactionList(controller: controller),
+                ],
               ),
-              elevation: 2,
             ),
-            child: const Text(
-              'Load card',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          Expanded(
-            child: TransactionList(controller: controller),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
