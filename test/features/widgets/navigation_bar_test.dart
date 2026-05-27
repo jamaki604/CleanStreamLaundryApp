@@ -79,10 +79,13 @@ void main() {
       await tester.pumpWidget(wrapWithRouter('/homePage'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.home), findsOneWidget);
-      expect(find.byIcon(Icons.local_laundry_service_sharp), findsOneWidget);
-      expect(find.byIcon(Icons.wallet), findsOneWidget);
-      expect(find.byIcon(Icons.settings), findsOneWidget);
+      expect(find.byIcon(Icons.home_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.local_laundry_service_outlined), findsOneWidget);
+      expect(
+        find.byIcon(Icons.account_balance_wallet_outlined),
+        findsOneWidget,
+      );
+      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
 
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Start'), findsOneWidget);

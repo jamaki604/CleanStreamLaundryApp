@@ -70,13 +70,17 @@ class RouterService {
       ),
       GoRoute(
         path: '/loyalty',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: LoyaltyPage(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-          transitionsBuilder: (_, _, _, child) => child,
-        ),
+        pageBuilder: (context, state) {
+          final openLoadCard = state.uri.queryParameters['loadCard'] == 'true';
+
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: LoyaltyPage(openLoadCardOnStart: openLoadCard),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            transitionsBuilder: (_, _, _, child) => child,
+          );
+        },
       ),
       GoRoute(
         path: '/admin/wallets',

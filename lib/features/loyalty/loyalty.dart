@@ -10,7 +10,13 @@ import 'package:go_router/go_router.dart';
 
 class LoyaltyPage extends StatefulWidget {
   final LoyaltyController? controller;
-  const LoyaltyPage({super.key, this.controller});
+  final bool openLoadCardOnStart;
+
+  const LoyaltyPage({
+    super.key,
+    this.controller,
+    this.openLoadCardOnStart = false,
+  });
 
   @override
   State<LoyaltyPage> createState() => _LoyaltyPageState();
@@ -25,6 +31,12 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
     controller = widget.controller ?? LoyaltyController();
     controller.addListener(_rebuild);
     controller.initialize();
+
+    if (widget.openLoadCardOnStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showLoadCardDialog();
+      });
+    }
   }
 
   @override

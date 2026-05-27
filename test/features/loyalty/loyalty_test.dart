@@ -38,13 +38,16 @@ void main() {
     await GetIt.instance.reset();
   });
 
-  Widget createWidget() {
+  Widget createWidget({bool openLoadCardOnStart = false}) {
     return MaterialApp.router(
       routerConfig: GoRouter(
         routes: [
           GoRoute(
             path: '/',
-            builder: (_, _) => LoyaltyPage(controller: mockController),
+            builder: (_, _) => LoyaltyPage(
+              controller: mockController,
+              openLoadCardOnStart: openLoadCardOnStart,
+            ),
           ),
           GoRoute(
             path: '/scanner',
@@ -75,11 +78,12 @@ void main() {
   }
 
   group('Initialization', () {
-    testWidgets('calls initialize on viewModel during initState',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          verify(() => mockController.initialize()).called(1);
-        });
+    testWidgets('calls initialize on viewModel during initState', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      verify(() => mockController.initialize()).called(1);
+    });
 
     testWidgets('adds listener to viewModel', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -109,38 +113,48 @@ void main() {
       expect(card.username, 'Jane Doe');
     });
 
-    testWidgets('displays default username when userName is null',
-            (tester) async {
-          when(() => mockController.userName).thenReturn(null);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+    testWidgets('displays default username when userName is null', (
+      tester,
+    ) async {
+      when(() => mockController.userName).thenReturn(null);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          final card = tester.widget<CreditCard>(find.byType(CreditCard));
-          expect(card.username, 'John Doe');
-        });
+      final card = tester.widget<CreditCard>(find.byType(CreditCard));
+      expect(card.username, 'John Doe');
+    });
 
-    testWidgets('displays correct balance with two decimal places',
-            (tester) async {
-          when(() => mockController.userBalance).thenReturn(42.75);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+    testWidgets('displays correct balance with two decimal places', (
+      tester,
+    ) async {
+      when(() => mockController.userBalance).thenReturn(42.75);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          expect(find.text('Loyalty Balance: \$42.75'), findsOneWidget);
-        });
+      expect(find.text('Loyalty Balance: \$42.75'), findsOneWidget);
+    });
 
-    testWidgets('displays default balance when userBalance is null',
-            (tester) async {
-          when(() => mockController.userBalance).thenReturn(null);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+    testWidgets('displays default balance when userBalance is null', (
+      tester,
+    ) async {
+      when(() => mockController.userBalance).thenReturn(null);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
-        });
+      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
+    });
 
     testWidgets('displays Load card button', (tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pump();
       expect(find.text('Load card'), findsOneWidget);
+    });
+
+    testWidgets('opens load card dialog from route trigger', (tester) async {
+      await tester.pumpWidget(createWidget(openLoadCardOnStart: true));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Load Loyalty Card'), findsOneWidget);
     });
 
     testWidgets('displays info button', (tester) async {
@@ -165,76 +179,90 @@ void main() {
   });
 
   group('Transactions', () {
-    testWidgets('shows No transactions found when list is empty',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          expect(find.text('No transactions found.'), findsOneWidget);
-          expect(find.text('Transactions'), findsNothing);
-        });
+    testWidgets('shows No transactions found when list is empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+      expect(find.text('No transactions found.'), findsOneWidget);
+      expect(find.text('Transactions'), findsNothing);
+    });
 
-    testWidgets('shows transaction header when transactions exist',
-            (tester) async {
-          when(() => mockController.recentTransactions)
-              .thenReturn(['Test transaction']);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          expect(find.text('Transactions'), findsOneWidget);
-        });
+    testWidgets('shows transaction header when transactions exist', (
+      tester,
+    ) async {
+      when(
+        () => mockController.recentTransactions,
+      ).thenReturn(['Test transaction']);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+      expect(find.text('Transactions'), findsOneWidget);
+    });
 
-    testWidgets('shows Show More when showPastTransactions is false',
-            (tester) async {
-          when(() => mockController.recentTransactions)
-              .thenReturn(['Test transaction']);
-          when(() => mockController.showPastTransactions).thenReturn(false);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          expect(find.text('Show More'), findsOneWidget);
-          expect(find.byIcon(Icons.expand_more), findsOneWidget);
-        });
+    testWidgets('shows Show More when showPastTransactions is false', (
+      tester,
+    ) async {
+      when(
+        () => mockController.recentTransactions,
+      ).thenReturn(['Test transaction']);
+      when(() => mockController.showPastTransactions).thenReturn(false);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+      expect(find.text('Show More'), findsOneWidget);
+      expect(find.byIcon(Icons.expand_more), findsOneWidget);
+    });
 
-    testWidgets('shows Show Less when showPastTransactions is true',
-            (tester) async {
-          when(() => mockController.recentTransactions)
-              .thenReturn(['Test transaction']);
-          when(() => mockController.showPastTransactions).thenReturn(true);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          expect(find.text('Show Less'), findsOneWidget);
-          expect(find.byIcon(Icons.expand_less), findsOneWidget);
-        });
+    testWidgets('shows Show Less when showPastTransactions is true', (
+      tester,
+    ) async {
+      when(
+        () => mockController.recentTransactions,
+      ).thenReturn(['Test transaction']);
+      when(() => mockController.showPastTransactions).thenReturn(true);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+      expect(find.text('Show Less'), findsOneWidget);
+      expect(find.byIcon(Icons.expand_less), findsOneWidget);
+    });
 
-    testWidgets('calls toggleTransactionView when Show More tapped',
-            (tester) async {
-          when(() => mockController.recentTransactions)
-              .thenReturn(['Test transaction']);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          await tester.tap(find.text('Show More'));
-          await tester.pump();
-          verify(() => mockController.toggleTransactionView()).called(1);
-        });
+    testWidgets('calls toggleTransactionView when Show More tapped', (
+      tester,
+    ) async {
+      when(
+        () => mockController.recentTransactions,
+      ).thenReturn(['Test transaction']);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+      await tester.tap(find.text('Show More'));
+      await tester.pump();
+      verify(() => mockController.toggleTransactionView()).called(1);
+    });
 
-    testWidgets('calls toggleTransactionView when Show Less tapped',
-            (tester) async {
-          when(() => mockController.recentTransactions)
-              .thenReturn(['Test transaction']);
-          when(() => mockController.showPastTransactions).thenReturn(true);
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          await tester.tap(find.text('Show Less'));
-          await tester.pump();
-          verify(() => mockController.toggleTransactionView()).called(1);
-        });
+    testWidgets('calls toggleTransactionView when Show Less tapped', (
+      tester,
+    ) async {
+      when(
+        () => mockController.recentTransactions,
+      ).thenReturn(['Test transaction']);
+      when(() => mockController.showPastTransactions).thenReturn(true);
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+      await tester.tap(find.text('Show Less'));
+      await tester.pump();
+      verify(() => mockController.toggleTransactionView()).called(1);
+    });
 
     testWidgets('displays transaction cards with receipt icon', (tester) async {
-      when(() => mockController.recentTransactions)
-          .thenReturn(['Test transaction']);
+      when(
+        () => mockController.recentTransactions,
+      ).thenReturn(['Test transaction']);
       await tester.pumpWidget(createWidget());
       await tester.pump();
       expect(find.byType(Card, skipOffstage: false), findsWidgets);
-      expect(find.byIcon(Icons.receipt_long, skipOffstage: false),
-          findsOneWidget);
+      expect(
+        find.byIcon(Icons.receipt_long, skipOffstage: false),
+        findsOneWidget,
+      );
     });
   });
 
@@ -250,19 +278,22 @@ void main() {
       expect(find.byIcon(Icons.error), findsOneWidget);
     });
 
-    testWidgets('navigates to /scanner when error is "Failed to fetch balance"',
-            (tester) async {
-          when(() => mockController.errorMessage)
-              .thenReturn('Failed to fetch balance');
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
-          await tester.pump();
+    testWidgets(
+      'navigates to /scanner when error is "Failed to fetch balance"',
+      (tester) async {
+        when(
+          () => mockController.errorMessage,
+        ).thenReturn('Failed to fetch balance');
+        await tester.pumpWidget(createWidget());
+        await tester.pump();
+        await tester.pump();
 
-          await tester.tap(find.text('OK'));
-          await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
 
-          expect(find.text('Scanner'), findsOneWidget);
-        });
+        expect(find.text('Scanner'), findsOneWidget);
+      },
+    );
 
     testWidgets('navigates to /login for other errors', (tester) async {
       when(() => mockController.errorMessage).thenReturn('User not known');
@@ -277,8 +308,9 @@ void main() {
     });
 
     testWidgets('displays only one error dialog', (tester) async {
-      when(() => mockController.errorMessage)
-          .thenReturn('Something went wrong');
+      when(
+        () => mockController.errorMessage,
+      ).thenReturn('Something went wrong');
       await tester.pumpWidget(createWidget());
       await tester.pump();
       await tester.pump();
@@ -288,22 +320,23 @@ void main() {
   });
 
   group('Reward info dialog', () {
-    testWidgets('opens reward info dialog when info button tapped',
-            (tester) async {
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+    testWidgets('opens reward info dialog when info button tapped', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          await tester.tap(find.byIcon(Icons.info_outline));
-          await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
 
-          expect(find.text('Rewards program'), findsOneWidget);
-          expect(
-            find.text(
-              'For every \$20 you spend, you get an extra \$5 automatically added to your loyalty balance.',
-            ),
-            findsOneWidget,
-          );
-        });
+      expect(find.text('Rewards program'), findsOneWidget);
+      expect(
+        find.text(
+          'For every \$20 you spend, you get an extra \$5 automatically added to your loyalty balance.',
+        ),
+        findsOneWidget,
+      );
+    });
 
     testWidgets('closes reward info dialog when Got it tapped', (tester) async {
       await tester.pumpWidget(createWidget());
@@ -320,9 +353,12 @@ void main() {
   });
 
   group('Payment handling', () {
-    testWidgets('calls loadCard with correct amount on Pay tap', (tester) async {
-      when(() => mockController.loadCard(any()))
-          .thenAnswer((_) async => PaymentResult.success);
+    testWidgets('calls loadCard with correct amount on Pay tap', (
+      tester,
+    ) async {
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.success);
 
       await tester.pumpWidget(createWidget());
       await tester.pump();
@@ -335,8 +371,9 @@ void main() {
     });
 
     testWidgets('shows success dialog on successful payment', (tester) async {
-      when(() => mockController.loadCard(any()))
-          .thenAnswer((_) async => PaymentResult.success);
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.success);
 
       await tester.pumpWidget(createWidget());
       await tester.pump();
@@ -354,40 +391,45 @@ void main() {
       );
     });
 
-    testWidgets('calls fetchTransactions after successful payment',
-            (tester) async {
-          when(() => mockController.loadCard(any()))
-              .thenAnswer((_) async => PaymentResult.success);
+    testWidgets('calls fetchTransactions after successful payment', (
+      tester,
+    ) async {
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.success);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          await openLoadCardDialog(tester);
-          await acceptLoyaltyTerms(tester);
-          await tapPay(tester);
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
-          verify(() => mockController.fetchTransactions()).called(1);
-        });
+      verify(() => mockController.fetchTransactions()).called(1);
+    });
 
-    testWidgets('shows canceled dialog when payment is canceled',
-            (tester) async {
-          when(() => mockController.loadCard(any()))
-              .thenAnswer((_) async => PaymentResult.canceled);
+    testWidgets('shows canceled dialog when payment is canceled', (
+      tester,
+    ) async {
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.canceled);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          await openLoadCardDialog(tester);
-          await acceptLoyaltyTerms(tester);
-          await tapPay(tester);
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
-          expect(find.text('Payment Canceled'), findsOneWidget);
-          expect(find.text('Payment of \$1.00 was canceled.'), findsOneWidget);
-        });
+      expect(find.text('Payment Canceled'), findsOneWidget);
+      expect(find.text('Payment of \$1.00 was canceled.'), findsOneWidget);
+    });
 
     testWidgets('shows failed dialog when payment fails', (tester) async {
-      when(() => mockController.loadCard(any()))
-          .thenAnswer((_) async => PaymentResult.failed);
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.failed);
 
       await tester.pumpWidget(createWidget());
       await tester.pump();
@@ -405,39 +447,44 @@ void main() {
       );
     });
 
-    testWidgets('does not call fetchTransactions on failed payment',
-            (tester) async {
-          when(() => mockController.loadCard(any()))
-              .thenAnswer((_) async => PaymentResult.failed);
+    testWidgets('does not call fetchTransactions on failed payment', (
+      tester,
+    ) async {
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.failed);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          await openLoadCardDialog(tester);
-          await acceptLoyaltyTerms(tester);
-          await tapPay(tester);
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
-          verifyNever(() => mockController.fetchTransactions());
-        });
+      verifyNever(() => mockController.fetchTransactions());
+    });
 
-    testWidgets('does not call fetchTransactions on canceled payment',
-            (tester) async {
-          when(() => mockController.loadCard(any()))
-              .thenAnswer((_) async => PaymentResult.canceled);
+    testWidgets('does not call fetchTransactions on canceled payment', (
+      tester,
+    ) async {
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.canceled);
 
-          await tester.pumpWidget(createWidget());
-          await tester.pump();
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
 
-          await openLoadCardDialog(tester);
-          await acceptLoyaltyTerms(tester);
-          await tapPay(tester);
+      await openLoadCardDialog(tester);
+      await acceptLoyaltyTerms(tester);
+      await tapPay(tester);
 
-          verifyNever(() => mockController.fetchTransactions());
-        });
+      verifyNever(() => mockController.fetchTransactions());
+    });
 
     testWidgets('handles custom amount payment', (tester) async {
-      when(() => mockController.loadCard(any()))
-          .thenAnswer((_) async => PaymentResult.success);
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.success);
 
       await tester.pumpWidget(createWidget());
       await tester.pump();
@@ -454,8 +501,9 @@ void main() {
     });
 
     testWidgets('closes success dialog when Done tapped', (tester) async {
-      when(() => mockController.loadCard(any()))
-          .thenAnswer((_) async => PaymentResult.success);
+      when(
+        () => mockController.loadCard(any()),
+      ).thenAnswer((_) async => PaymentResult.success);
 
       await tester.pumpWidget(createWidget());
       await tester.pump();
