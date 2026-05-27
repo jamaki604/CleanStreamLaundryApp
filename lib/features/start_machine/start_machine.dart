@@ -109,68 +109,142 @@ class _StartPageState extends State<StartPage> {
     return BasePage(
       body: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 6, 20, 4),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final contentWidth = math.min(constraints.maxWidth, 520.0);
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final horizontalPadding = constraints.maxWidth < 380 ? 16.0 : 20.0;
+            final availableWidth = math.max(
+              0.0,
+              constraints.maxWidth - (horizontalPadding * 2),
+            );
+            final contentWidth = math.min(availableWidth, 520.0);
+            final baseScale = (contentWidth / 340).clamp(0.94, 1.0).toDouble();
+            final baseMetrics = _StartLayoutMetrics(scale: baseScale);
+            final verticalPadding = baseMetrics.gap(4);
+            final canvasHeight = math.max(
+              0.0,
+              constraints.maxHeight - (verticalPadding * 2),
+            );
+            final heightScale = canvasHeight <= 0
+                ? 1.0
+                : (canvasHeight / baseMetrics.baseContentHeight)
+                      .clamp(1.0, 1.05)
+                      .toDouble();
+            final layoutScale = (baseScale * heightScale)
+                .clamp(0.94, 1.04)
+                .toDouble();
+            final scaledMetrics = _StartLayoutMetrics(scale: layoutScale);
+            final sectionGapBoost =
+                ((canvasHeight - scaledMetrics.baseContentHeight) / 5.35)
+                    .clamp(0.0, 14.0)
+                    .toDouble();
+            final metrics = _StartLayoutMetrics(
+              scale: layoutScale,
+              sectionGapBoost: sectionGapBoost,
+            );
+            final targetHeight = math.max(
+              canvasHeight,
+              metrics.baseContentHeight,
+            );
+            final media = MediaQuery.of(context);
+            final textScale = MediaQuery.textScalerOf(context).scale(1);
+            final cappedTextScale = math.min(textScale, 1.08).toDouble();
 
-              return Center(
-                child: SizedBox(
-                  width: contentWidth,
-                  height: constraints.maxHeight,
-                  child: FittedBox(
-                    alignment: Alignment.topCenter,
-                    fit: BoxFit.scaleDown,
-                    child: SizedBox(
-                      width: contentWidth,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const _StartHeader(),
-                          const SizedBox(height: 8),
-                          TapToPayCard(
-                            key: const ValueKey('tap-to-pay-card'),
-                            onTap: _showTapToPayInstructions,
-                          ),
-                          const SizedBox(height: 8),
-                          _PrimaryScanCard(
-                            onPressed: () => context.go('/scanner'),
-                          ),
-                          const SizedBox(height: 10),
-                          const _HowItWorksSection(),
-                          const SizedBox(height: 10),
-                          const _SectionHeading(
-                            icon: Icons.dark_mode_rounded,
-                            title: 'After Hours',
-                          ),
-                          const SizedBox(height: 6),
-                          _OutlinedActionCard(
-                            cardKey: const ValueKey('unlock-door-card'),
-                            icon: Icons.lock_outline_rounded,
-                            title: 'Unlock Door',
-                            description: 'Unlock the facility door.',
-                            onPressed: _onUnlockPressed,
-                          ),
-                          const SizedBox(height: 8),
-                          const _AfterHoursSteps(),
-                        ],
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                verticalPadding,
+                horizontalPadding,
+                verticalPadding,
+              ),
+              child: MediaQuery(
+                data: media.copyWith(
+                  textScaler: TextScaler.linear(cappedTextScale),
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: contentWidth,
+                    height: canvasHeight,
+                    child: FittedBox(
+                      alignment: Alignment.topCenter,
+                      fit: BoxFit.scaleDown,
+                      child: SizedBox(
+                        width: contentWidth,
+                        height: targetHeight,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _StartHeader(metrics: metrics),
+                            SizedBox(height: metrics.sectionGap(8)),
+                            TapToPayCard(
+                              key: const ValueKey('tap-to-pay-card'),
+                              layoutScale: metrics.scale,
+                              onTap: _showTapToPayInstructions,
+                            ),
+                            SizedBox(height: metrics.sectionGap(8)),
+                            _PrimaryScanCard(
+                              metrics: metrics,
+                              onPressed: () => context.go('/scanner'),
+                            ),
+                            SizedBox(height: metrics.sectionGap(10)),
+                            _HowItWorksSection(metrics: metrics),
+                            SizedBox(height: metrics.sectionGap(10)),
+                            _SectionHeading(
+                              metrics: metrics,
+                              icon: Icons.dark_mode_rounded,
+                              title: 'After Hours',
+                            ),
+                            SizedBox(height: metrics.compactSectionGap(6)),
+                            _OutlinedActionCard(
+                              metrics: metrics,
+                              cardKey: const ValueKey('unlock-door-card'),
+                              icon: Icons.lock_outline_rounded,
+                              title: 'Unlock Door',
+                              description: 'Unlock the facility door.',
+                              onPressed: _onUnlockPressed,
+                            ),
+                            SizedBox(height: metrics.sectionGap(8)),
+                            _AfterHoursSteps(metrics: metrics),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
+class _StartLayoutMetrics {
+  final double scale;
+  final double sectionGapBoost;
+
+  const _StartLayoutMetrics({required this.scale, this.sectionGapBoost = 0});
+
+  double gap(double value) => value * scale;
+
+  double sectionGap(double value) => gap(value) + sectionGapBoost;
+
+  double compactSectionGap(double value) =>
+      gap(value) + (sectionGapBoost * 0.35);
+
+  double size(double value) => value * scale;
+
+  double font(double value) =>
+      (value * scale).clamp(value * 0.88, value * 1.03).toDouble();
+
+  double get baseContentHeight => size(610);
+}
+
 class _StartHeader extends StatelessWidget {
-  const _StartHeader();
+  final _StartLayoutMetrics metrics;
+
+  const _StartHeader({required this.metrics});
 
   @override
   Widget build(BuildContext context) {
@@ -189,19 +263,20 @@ class _StartHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: colors.fontInverted,
-                  fontSize: 27,
+                  fontSize: metrics.font(27),
                   fontWeight: FontWeight.w900,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            const _InfoPill(
+            SizedBox(width: metrics.gap(12)),
+            _InfoPill(
+              metrics: metrics,
               icon: Icons.contactless_rounded,
               label: 'NFC or QR',
             ),
           ],
         ),
-        const SizedBox(height: 5),
+        SizedBox(height: metrics.gap(5)),
         Text(
           'Choose a method and start your machine.',
           maxLines: 1,
@@ -218,31 +293,36 @@ class _StartHeader extends StatelessWidget {
 }
 
 class _AfterHoursSteps extends StatelessWidget {
-  const _AfterHoursSteps();
+  final _StartLayoutMetrics metrics;
+
+  const _AfterHoursSteps({required this.metrics});
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: _AfterHoursStep(
+            metrics: metrics,
             number: '1',
             icon: Icons.account_balance_wallet_outlined,
             label: r'Load $20 on loyalty card',
           ),
         ),
-        _AfterHoursConnector(),
+        _AfterHoursConnector(metrics: metrics),
         Expanded(
           child: _AfterHoursStep(
+            metrics: metrics,
             number: '2',
             icon: Icons.lock_open_rounded,
             label: 'Tap Unlock button',
           ),
         ),
-        _AfterHoursConnector(),
+        _AfterHoursConnector(metrics: metrics),
         Expanded(
           child: _AfterHoursStep(
+            metrics: metrics,
             number: '3',
             icon: Icons.contactless_rounded,
             label: 'Place phone on door lock',
@@ -254,11 +334,13 @@ class _AfterHoursSteps extends StatelessWidget {
 }
 
 class _AfterHoursStep extends StatelessWidget {
+  final _StartLayoutMetrics metrics;
   final String number;
   final IconData icon;
   final String label;
 
   const _AfterHoursStep({
+    required this.metrics,
     required this.number,
     required this.icon,
     required this.label,
@@ -272,29 +354,33 @@ class _AfterHoursStep extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 42,
-          height: 37,
+          width: metrics.size(42),
+          height: metrics.size(37),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: metrics.size(32),
+                  height: metrics.size(32),
                   decoration: BoxDecoration(
                     color: colors.primary.withValues(alpha: 0.09),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: colors.primary, size: 18),
+                  child: Icon(
+                    icon,
+                    color: colors.primary,
+                    size: metrics.size(18),
+                  ),
                 ),
               ),
               Positioned(
-                left: 5,
+                left: metrics.size(5),
                 top: 0,
                 child: Container(
-                  width: 17,
-                  height: 17,
+                  width: metrics.size(17),
+                  height: metrics.size(17),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: colors.primary,
@@ -304,7 +390,7 @@ class _AfterHoursStep extends StatelessWidget {
                     number,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: metrics.font(10),
                       fontWeight: FontWeight.w900,
                       height: 1,
                     ),
@@ -314,7 +400,7 @@ class _AfterHoursStep extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 3),
+        SizedBox(height: metrics.gap(3)),
         Text(
           label,
           maxLines: 2,
@@ -322,7 +408,7 @@ class _AfterHoursStep extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: colors.fontSecondary,
-            fontSize: 11,
+            fontSize: metrics.font(11),
             fontWeight: FontWeight.w900,
             height: 1.08,
           ),
@@ -333,23 +419,25 @@ class _AfterHoursStep extends StatelessWidget {
 }
 
 class _AfterHoursConnector extends StatelessWidget {
-  const _AfterHoursConnector();
+  final _StartLayoutMetrics metrics;
+
+  const _AfterHoursConnector({required this.metrics});
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 18),
+      padding: EdgeInsets.only(top: metrics.gap(18)),
       child: SizedBox(
-        width: 28,
+        width: metrics.size(28),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(
             3,
             (_) => Container(
-              width: 7,
-              height: 2,
+              width: metrics.size(7),
+              height: metrics.size(2),
               decoration: BoxDecoration(
                 color: colors.outline.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(999),
@@ -363,17 +451,25 @@ class _AfterHoursConnector extends StatelessWidget {
 }
 
 class _InfoPill extends StatelessWidget {
+  final _StartLayoutMetrics metrics;
   final IconData icon;
   final String label;
 
-  const _InfoPill({required this.icon, required this.label});
+  const _InfoPill({
+    required this.metrics,
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: metrics.gap(9),
+        vertical: metrics.gap(6),
+      ),
       decoration: BoxDecoration(
         color: colors.primary.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
@@ -381,8 +477,8 @@ class _InfoPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: colors.primary),
-          const SizedBox(width: 5),
+          Icon(icon, size: metrics.size(14), color: colors.primary),
+          SizedBox(width: metrics.gap(5)),
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -397,9 +493,10 @@ class _InfoPill extends StatelessWidget {
 }
 
 class _PrimaryScanCard extends StatelessWidget {
+  final _StartLayoutMetrics metrics;
   final VoidCallback onPressed;
 
-  const _PrimaryScanCard({required this.onPressed});
+  const _PrimaryScanCard({required this.metrics, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -414,7 +511,7 @@ class _PrimaryScanCard extends StatelessWidget {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(18),
         child: Ink(
-          height: 120,
+          height: metrics.size(120),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [colors.primary, const Color(0xFF007DCE)],
@@ -429,12 +526,17 @@ class _PrimaryScanCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 12, 8),
+                    padding: EdgeInsets.fromLTRB(
+                      metrics.gap(14),
+                      metrics.gap(12),
+                      metrics.gap(12),
+                      metrics.gap(8),
+                    ),
                     child: Row(
                       children: [
                         Container(
-                          width: 54,
-                          height: 54,
+                          width: metrics.size(54),
+                          height: metrics.size(54),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
@@ -442,10 +544,10 @@ class _PrimaryScanCard extends StatelessWidget {
                           child: Icon(
                             Icons.qr_code_scanner_rounded,
                             color: colors.primary,
-                            size: 32,
+                            size: metrics.size(32),
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: metrics.gap(14)),
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -458,11 +560,11 @@ class _PrimaryScanCard extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleLarge
                                     ?.copyWith(
                                       color: Colors.white,
-                                      fontSize: 23,
+                                      fontSize: metrics.font(23),
                                       fontWeight: FontWeight.w900,
                                     ),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: metrics.gap(4)),
                               Text(
                                 'Use your loyalty balance.',
                                 maxLines: 1,
@@ -479,30 +581,30 @@ class _PrimaryScanCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: metrics.gap(6)),
                         Icon(
                           Icons.chevron_right_rounded,
                           color: Colors.white.withValues(alpha: 0.88),
-                          size: 30,
+                          size: metrics.size(30),
                         ),
                       ],
                     ),
                   ),
                 ),
                 Container(
-                  height: 30,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  height: metrics.size(30),
+                  padding: EdgeInsets.symmetric(horizontal: metrics.gap(12)),
                   color: const Color(0xFF0065AA).withValues(alpha: 0.78),
                   alignment: Alignment.center,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.verified_user_outlined,
                         color: Colors.white,
-                        size: 15,
+                        size: metrics.size(15),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: metrics.gap(8)),
                       Flexible(
                         child: Text(
                           'Fast  •  Secure  •  No extra fees',
@@ -528,41 +630,47 @@ class _PrimaryScanCard extends StatelessWidget {
 }
 
 class _HowItWorksSection extends StatelessWidget {
-  const _HowItWorksSection();
+  final _StartLayoutMetrics metrics;
+
+  const _HowItWorksSection({required this.metrics});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionHeading(
+          metrics: metrics,
           icon: Icons.info_outline_rounded,
           title: 'How it works',
         ),
-        SizedBox(height: 6),
+        SizedBox(height: metrics.gap(6)),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _HowItWorksStep(
+                metrics: metrics,
                 number: '1',
                 icon: Icons.qr_code_scanner_rounded,
                 title: 'Scan',
                 description: 'Scan QR Code.',
               ),
             ),
-            _DashedConnector(),
+            _DashedConnector(metrics: metrics),
             Expanded(
               child: _HowItWorksStep(
+                metrics: metrics,
                 number: '2',
                 icon: Icons.check_circle_outline_rounded,
                 title: 'Confirm',
                 description: 'Confirm details.',
               ),
             ),
-            _DashedConnector(),
+            _DashedConnector(metrics: metrics),
             Expanded(
               child: _HowItWorksStep(
+                metrics: metrics,
                 number: '3',
                 icon: Icons.play_arrow_rounded,
                 title: 'Start',
@@ -577,12 +685,14 @@ class _HowItWorksSection extends StatelessWidget {
 }
 
 class _HowItWorksStep extends StatelessWidget {
+  final _StartLayoutMetrics metrics;
   final String number;
   final IconData icon;
   final String title;
   final String description;
 
   const _HowItWorksStep({
+    required this.metrics,
     required this.number,
     required this.icon,
     required this.title,
@@ -596,29 +706,33 @@ class _HowItWorksStep extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          width: 46,
-          height: 42,
+          width: metrics.size(46),
+          height: metrics.size(42),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: 36,
-                  width: 36,
+                  height: metrics.size(36),
+                  width: metrics.size(36),
                   decoration: BoxDecoration(
                     color: colors.primary.withValues(alpha: 0.09),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: colors.primary, size: 21),
+                  child: Icon(
+                    icon,
+                    color: colors.primary,
+                    size: metrics.size(21),
+                  ),
                 ),
               ),
               Positioned(
-                left: 4,
+                left: metrics.size(4),
                 top: 0,
                 child: Container(
-                  width: 18,
-                  height: 18,
+                  width: metrics.size(18),
+                  height: metrics.size(18),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: colors.primary,
@@ -636,7 +750,7 @@ class _HowItWorksStep extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 3),
+        SizedBox(height: metrics.gap(3)),
         Text(
           title,
           maxLines: 1,
@@ -644,10 +758,11 @@ class _HowItWorksStep extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             color: colors.primary,
+            fontSize: metrics.font(13),
             fontWeight: FontWeight.w900,
           ),
         ),
-        const SizedBox(height: 1),
+        SizedBox(height: metrics.gap(1)),
         Text(
           description,
           maxLines: 2,
@@ -665,21 +780,23 @@ class _HowItWorksStep extends StatelessWidget {
 }
 
 class _DashedConnector extends StatelessWidget {
-  const _DashedConnector();
+  final _StartLayoutMetrics metrics;
+
+  const _DashedConnector({required this.metrics});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 22),
+      padding: EdgeInsets.only(top: metrics.gap(22)),
       child: SizedBox(
-        width: 24,
+        width: metrics.size(24),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(
             3,
             (_) => Container(
-              width: 7,
-              height: 2,
+              width: metrics.size(7),
+              height: metrics.size(2),
               margin: EdgeInsets.zero,
               decoration: BoxDecoration(
                 color: Theme.of(
@@ -696,6 +813,7 @@ class _DashedConnector extends StatelessWidget {
 }
 
 class _OutlinedActionCard extends StatelessWidget {
+  final _StartLayoutMetrics metrics;
   final Key? cardKey;
   final IconData icon;
   final String title;
@@ -703,6 +821,7 @@ class _OutlinedActionCard extends StatelessWidget {
   final VoidCallback onPressed;
 
   const _OutlinedActionCard({
+    required this.metrics,
     this.cardKey,
     required this.icon,
     required this.title,
@@ -727,8 +846,11 @@ class _OutlinedActionCard extends StatelessWidget {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(18),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 84),
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          constraints: BoxConstraints(minHeight: metrics.size(84)),
+          padding: EdgeInsets.symmetric(
+            horizontal: metrics.gap(15),
+            vertical: metrics.gap(10),
+          ),
           decoration: BoxDecoration(
             border: Border.all(color: colors.primary.withValues(alpha: 0.28)),
             borderRadius: BorderRadius.circular(18),
@@ -736,15 +858,19 @@ class _OutlinedActionCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                height: 48,
-                width: 48,
+                height: metrics.size(48),
+                width: metrics.size(48),
                 decoration: BoxDecoration(
                   color: colors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: Icon(icon, color: colors.primary, size: 28),
+                child: Icon(
+                  icon,
+                  color: colors.primary,
+                  size: metrics.size(28),
+                ),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: metrics.gap(14)),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -756,11 +882,11 @@ class _OutlinedActionCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: colors.fontInverted,
-                        fontSize: 20,
+                        fontSize: metrics.font(20),
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    SizedBox(height: metrics.gap(3)),
                     Text(
                       description,
                       maxLines: 1,
@@ -774,11 +900,11 @@ class _OutlinedActionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: metrics.gap(8)),
               Icon(
                 Icons.chevron_right_rounded,
                 color: colors.primary,
-                size: 26,
+                size: metrics.size(26),
               ),
             ],
           ),
@@ -789,10 +915,15 @@ class _OutlinedActionCard extends StatelessWidget {
 }
 
 class _SectionHeading extends StatelessWidget {
+  final _StartLayoutMetrics metrics;
   final IconData icon;
   final String title;
 
-  const _SectionHeading({required this.icon, required this.title});
+  const _SectionHeading({
+    required this.metrics,
+    required this.icon,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -801,15 +932,15 @@ class _SectionHeading extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 26,
-          height: 26,
+          width: metrics.size(26),
+          height: metrics.size(26),
           decoration: BoxDecoration(
             color: colors.primary.withValues(alpha: 0.09),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: colors.primary, size: 16),
+          child: Icon(icon, color: colors.primary, size: metrics.size(16)),
         ),
-        const SizedBox(width: 9),
+        SizedBox(width: metrics.gap(9)),
         Flexible(
           fit: FlexFit.loose,
           child: Text(
@@ -818,12 +949,12 @@ class _SectionHeading extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: colors.fontInverted,
-              fontSize: 19,
+              fontSize: metrics.font(19),
               fontWeight: FontWeight.w900,
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: metrics.gap(10)),
         Expanded(
           child: Divider(
             color: colors.outline.withValues(alpha: 0.22),

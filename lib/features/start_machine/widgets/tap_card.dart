@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 
 class TapToPayCard extends StatelessWidget {
   final VoidCallback? onTap;
+  final double layoutScale;
 
-  const TapToPayCard({super.key, this.onTap});
+  const TapToPayCard({super.key, this.onTap, this.layoutScale = 1});
+
+  double _gap(double value) => value * layoutScale;
+
+  double _size(double value) => value * layoutScale;
+
+  double _font(double value) =>
+      (value * layoutScale).clamp(value * 0.88, value * 1.03).toDouble();
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +30,11 @@ class TapToPayCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 84),
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          constraints: BoxConstraints(minHeight: _size(84)),
+          padding: EdgeInsets.symmetric(
+            horizontal: _gap(15),
+            vertical: _gap(10),
+          ),
           decoration: BoxDecoration(
             border: Border.all(color: colors.primary.withValues(alpha: 0.72)),
             borderRadius: BorderRadius.circular(18),
@@ -32,8 +43,8 @@ class TapToPayCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: _size(48),
+                height: _size(48),
                 decoration: BoxDecoration(
                   color: colors.primary.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(18),
@@ -41,10 +52,10 @@ class TapToPayCard extends StatelessWidget {
                 child: Icon(
                   Icons.tap_and_play,
                   color: colors.primary,
-                  size: 28,
+                  size: _size(28),
                 ),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: _gap(14)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,11 +67,11 @@ class TapToPayCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: colors.fontInverted,
-                        fontSize: 20,
+                        fontSize: _font(20),
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    SizedBox(height: _gap(3)),
                     Text(
                       'Pay at the machine reader with your mobile wallet.',
                       maxLines: 1,
@@ -75,11 +86,11 @@ class TapToPayCard extends StatelessWidget {
                 ),
               ),
               if (onTap != null) ...[
-                const SizedBox(width: 8),
+                SizedBox(width: _gap(8)),
                 Icon(
                   Icons.chevron_right_rounded,
                   color: colors.primary,
-                  size: 26,
+                  size: _size(26),
                 ),
               ],
             ],

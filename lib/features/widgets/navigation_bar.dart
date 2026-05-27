@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 class NavBar extends StatelessWidget {
   static const double _minimumHeight = 82;
-  static const double _contentHeight = 62;
   static const TextStyle _labelStyle = TextStyle(fontSize: 12, height: 1);
 
   static const List<_NavDestination> _destinations = [
@@ -54,7 +53,10 @@ class NavBar extends StatelessWidget {
     final currentIndex = _getIndex(location);
     final colorScheme = Theme.of(context).colorScheme;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-    final height = math.max(_minimumHeight, _contentHeight + bottomInset);
+    final height = math.max(
+      _minimumHeight,
+      kBottomNavigationBarHeight + bottomInset,
+    );
 
     return SizedBox(
       height: height,
@@ -63,6 +65,8 @@ class NavBar extends StatelessWidget {
         backgroundColor: colorScheme.surface,
         selectedItemColor: colorScheme.primary,
         unselectedItemColor: Colors.grey,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
         selectedLabelStyle: _labelStyle,
         unselectedLabelStyle: _labelStyle,
         type: BottomNavigationBarType.fixed,
