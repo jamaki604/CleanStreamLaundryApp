@@ -9,7 +9,7 @@ class LocationMap extends StatelessWidget {
   final List<Map<String, dynamic>> locations;
   final MapController mapController;
   final LatLng? selectedLocation;
-  final double height;
+  final double? height;
 
   const LocationMap({
     super.key,
@@ -24,30 +24,36 @@ class LocationMap extends StatelessWidget {
     final markers = LocationParser.parseLocations(locations);
     final initialCenter = selectedLocation ?? _defaultCenter;
 
-    return Container(
-      height: height,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade400, width: 1),
-      ),
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
-      child: FlutterMap(
-        mapController: mapController,
-        options: MapOptions(
-          initialCenter: initialCenter,
-          initialZoom: selectedLocation == null ? 7.2 : 15,
-          keepAlive: true,
-          maxZoom: 15,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'https://cleanstreamlaundry.com/',
-            tileProvider: NetworkTileProvider(),
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.black.withValues(alpha: 0.18),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.20)),
+      ),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: FlutterMap(
+          mapController: mapController,
+          options: MapOptions(
+            initialCenter: initialCenter,
+            initialZoom: selectedLocation == null ? 7.2 : 15,
+            keepAlive: true,
+            maxZoom: 15,
           ),
-          MarkerLayer(markers: markers),
-        ],
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'https://cleanstreamlaundry.com/',
+              tileProvider: NetworkTileProvider(),
+            ),
+            MarkerLayer(markers: markers),
+          ],
+        ),
       ),
     );
   }

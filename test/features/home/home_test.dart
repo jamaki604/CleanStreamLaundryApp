@@ -1,4 +1,5 @@
 import 'package:clean_stream_laundry_app/features/home/home.dart';
+import 'package:clean_stream_laundry_app/features/widgets/navigation_bar.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
@@ -49,6 +50,18 @@ void main() {
       routerConfig: GoRouter(
         routes: [
           GoRoute(path: '/', builder: (context, state) => const HomePage()),
+          GoRoute(
+            path: '/startPage',
+            builder: (context, state) => const Scaffold(body: Text('Start')),
+          ),
+          GoRoute(
+            path: '/loyalty',
+            builder: (context, state) => const Scaffold(body: Text('Wallet')),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const Scaffold(body: Text('Settings')),
+          ),
         ],
       ),
     );
@@ -115,7 +128,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('Welcome Jane!'), findsOneWidget);
+      expect(find.text('Welcome, Jane'), findsOneWidget);
     });
 
     testWidgets('shows balance loading text when balance is null', (
@@ -154,11 +167,45 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('displays Nearest Location button', (tester) async {
+    testWidgets('fills tall phone screens without bottom dead space', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.reset());
+
+      SharedPreferences.setMockInitialValues({
+        'lastSelectedLocation': '123 Main St',
+        'locationSelectionMode': 'manual',
+      });
+      mockMachineCounts('1');
+
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('Nearest Location'), findsOneWidget);
+      expect(find.byType(SingleChildScrollView), findsNothing);
+
+      final availabilityCard = find.ancestor(
+        of: find.text('Availability'),
+        matching: find.byType(Card),
+      );
+      expect(availabilityCard, findsOneWidget);
+
+      final availabilityBottom = tester.getBottomLeft(availabilityCard).dy;
+      final navTop = tester.getTopLeft(find.byType(NavBar)).dy;
+
+      expect(navTop - availabilityBottom, lessThanOrEqualTo(12));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('displays location details control', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('home-location-details-button')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays Select Location text when no location chosen', (
@@ -181,7 +228,10 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      expect(find.byType(IconButton), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('home-directions-button')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('does not show availability card before location selected', (
@@ -289,39 +339,63 @@ void main() {
       await tester.tap(find.text('123 Main St'));
       await tester.pumpAndSettle();
 
-      expect(find.text('3/5 Washers'), findsOneWidget);
-      expect(find.text('2/4 Dryers'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+      expect(find.text('washers\navailable'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('dryers\navailable'), findsOneWidget);
     });
   });
 
   group('Nearest location button', () {
-    testWidgets('nearest location button is tappable', (tester) async {
+    testWidgets('nearest location action is available in details sheet', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      final button = find.ancestor(
-        of: find.text('Nearest Location'),
-        matching: find.byType(InkWell),
-      );
+      await tester.tap(find.text('Select Location'));
+      await tester.pumpAndSettle();
+
+      final button = find.byKey(const ValueKey('home-nearest-location-button'));
 
       expect(button, findsOneWidget);
-      final inkWell = tester.widget<InkWell>(button);
-      expect(inkWell.onTap, isNotNull);
     });
 
     testWidgets('tapping nearest location calls getLocations', (tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      final button = find.ancestor(
-        of: find.text('Nearest Location'),
-        matching: find.byType(InkWell),
-      );
+      await tester.tap(find.text('Select Location'));
+      await tester.pumpAndSettle();
+
+      final button = find.byKey(const ValueKey('home-nearest-location-button'));
 
       await tester.tap(button);
       await tester.pumpAndSettle();
 
       verify(() => mockLocationService.getLocations()).called(1);
+    });
+  });
+
+  group('Home actions', () {
+    testWidgets('Start Laundry navigates to start page', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('home-start-laundry-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Start'), findsOneWidget);
+    });
+
+    testWidgets('Add funds navigates to wallet route', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('home-add-funds-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Wallet'), findsOneWidget);
     });
   });
 }
