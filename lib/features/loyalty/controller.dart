@@ -24,6 +24,7 @@ class LoyaltyController extends ChangeNotifier {
   bool showPastTransactions = false;
 
   List<String> recentTransactions = [];
+  List<String> rewardTransactions = [];
 
   Future<void> initialize() async {
     await Future.wait([_fetchBalance(), _fetchTransactions()]);
@@ -61,14 +62,22 @@ class LoyaltyController extends ChangeNotifier {
       final ledger = await _walletService.getLedger();
       final limit = showPastTransactions ? 100 : 3;
       final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
-
-      recentTransactions = ledger
+      final recentLedger = ledger
           .where((entry) => entry.createdAt.isAfter(thirtyDaysAgo))
+          .toList();
+
+      rewardTransactions = recentLedger
+          .where(_isRewardLedgerEntry)
+          .map(_formatWalletLedgerEntry)
+          .toList();
+
+      recentTransactions = recentLedger
           .take(limit)
           .map(_formatWalletLedgerEntry)
           .toList();
     } catch (_) {
       recentTransactions = [];
+      rewardTransactions = [];
     }
 
     notifyListeners();
@@ -135,6 +144,11 @@ class LoyaltyController extends ChangeNotifier {
         }
         return 'posted to Loyalty Card';
     }
+  }
+
+  bool _isRewardLedgerEntry(WalletLedgerEntry entry) {
+    return entry.entryType == 'load_bonus' ||
+        (entry.amountCents > 0 && entry.promoAmountCents > 0);
   }
 
   @Deprecated('Rewards are now calculated by the server wallet ledger.')

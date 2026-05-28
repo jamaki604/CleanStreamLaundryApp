@@ -107,114 +107,134 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      body: SafeArea(
-        bottom: false,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final horizontalPadding = constraints.maxWidth < 380 ? 16.0 : 20.0;
-            final availableWidth = math.max(
-              0.0,
-              constraints.maxWidth - (horizontalPadding * 2),
-            );
-            final contentWidth = math.min(availableWidth, 520.0);
-            final baseScale = (contentWidth / 340).clamp(0.94, 1.0).toDouble();
-            final baseMetrics = _StartLayoutMetrics(scale: baseScale);
-            final verticalPadding = baseMetrics.gap(4);
-            final canvasHeight = math.max(
-              0.0,
-              constraints.maxHeight - (verticalPadding * 2),
-            );
-            final heightScale = canvasHeight <= 0
-                ? 1.0
-                : (canvasHeight / baseMetrics.baseContentHeight)
-                      .clamp(1.0, 1.05)
-                      .toDouble();
-            final layoutScale = (baseScale * heightScale)
-                .clamp(0.94, 1.04)
-                .toDouble();
-            final scaledMetrics = _StartLayoutMetrics(scale: layoutScale);
-            final sectionGapBoost =
-                ((canvasHeight - scaledMetrics.baseContentHeight) / 5.35)
-                    .clamp(0.0, 14.0)
-                    .toDouble();
-            final metrics = _StartLayoutMetrics(
-              scale: layoutScale,
-              sectionGapBoost: sectionGapBoost,
-            );
-            final targetHeight = math.max(
-              canvasHeight,
-              metrics.baseContentHeight,
-            );
-            final media = MediaQuery.of(context);
-            final textScale = MediaQuery.textScalerOf(context).scale(1);
-            final cappedTextScale = math.min(textScale, 1.08).toDouble();
-
-            return Padding(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                verticalPadding,
-                horizontalPadding,
-                verticalPadding,
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 106,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: Theme.of(context).colorScheme.primaryGradient,
               ),
-              child: MediaQuery(
-                data: media.copyWith(
-                  textScaler: TextScaler.linear(cappedTextScale),
-                ),
-                child: Center(
-                  child: SizedBox(
-                    width: contentWidth,
-                    height: canvasHeight,
-                    child: FittedBox(
-                      alignment: Alignment.topCenter,
-                      fit: BoxFit.scaleDown,
+            ),
+          ),
+          SafeArea(
+            top: false,
+            bottom: false,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final horizontalPadding = constraints.maxWidth < 380
+                    ? 16.0
+                    : 20.0;
+                final availableWidth = math.max(
+                  0.0,
+                  constraints.maxWidth - (horizontalPadding * 2),
+                );
+                final contentWidth = math.min(availableWidth, 520.0);
+                final baseScale = (contentWidth / 340)
+                    .clamp(0.94, 1.0)
+                    .toDouble();
+                final baseMetrics = _StartLayoutMetrics(scale: baseScale);
+                final verticalPadding = baseMetrics.gap(4);
+                final canvasHeight = math.max(
+                  0.0,
+                  constraints.maxHeight - (verticalPadding * 2),
+                );
+                final heightScale = canvasHeight <= 0
+                    ? 1.0
+                    : (canvasHeight / baseMetrics.baseContentHeight)
+                          .clamp(1.0, 1.05)
+                          .toDouble();
+                final layoutScale = (baseScale * heightScale)
+                    .clamp(0.94, 1.04)
+                    .toDouble();
+                final scaledMetrics = _StartLayoutMetrics(scale: layoutScale);
+                final sectionGapBoost =
+                    ((canvasHeight - scaledMetrics.baseContentHeight) / 5.35)
+                        .clamp(0.0, 14.0)
+                        .toDouble();
+                final metrics = _StartLayoutMetrics(
+                  scale: layoutScale,
+                  sectionGapBoost: sectionGapBoost,
+                );
+                final targetHeight = math.max(
+                  canvasHeight,
+                  metrics.baseContentHeight,
+                );
+                final media = MediaQuery.of(context);
+                final textScale = MediaQuery.textScalerOf(context).scale(1);
+                final cappedTextScale = math.min(textScale, 1.08).toDouble();
+
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    verticalPadding,
+                    horizontalPadding,
+                    verticalPadding,
+                  ),
+                  child: MediaQuery(
+                    data: media.copyWith(
+                      textScaler: TextScaler.linear(cappedTextScale),
+                    ),
+                    child: Center(
                       child: SizedBox(
                         width: contentWidth,
-                        height: targetHeight,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _StartHeader(metrics: metrics),
-                            SizedBox(height: metrics.sectionGap(8)),
-                            TapToPayCard(
-                              key: const ValueKey('tap-to-pay-card'),
-                              layoutScale: metrics.scale,
-                              onTap: _showTapToPayInstructions,
+                        height: canvasHeight,
+                        child: FittedBox(
+                          alignment: Alignment.topCenter,
+                          fit: BoxFit.scaleDown,
+                          child: SizedBox(
+                            width: contentWidth,
+                            height: targetHeight,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _StartHeader(metrics: metrics),
+                                SizedBox(height: metrics.sectionGap(8)),
+                                TapToPayCard(
+                                  key: const ValueKey('tap-to-pay-card'),
+                                  layoutScale: metrics.scale,
+                                  onTap: _showTapToPayInstructions,
+                                ),
+                                SizedBox(height: metrics.sectionGap(8)),
+                                _PrimaryScanCard(
+                                  metrics: metrics,
+                                  onPressed: () => context.go('/scanner'),
+                                ),
+                                SizedBox(height: metrics.sectionGap(10)),
+                                _HowItWorksSection(metrics: metrics),
+                                SizedBox(height: metrics.sectionGap(10)),
+                                _SectionHeading(
+                                  metrics: metrics,
+                                  icon: Icons.dark_mode_rounded,
+                                  title: 'After Hours',
+                                ),
+                                SizedBox(height: metrics.compactSectionGap(6)),
+                                _OutlinedActionCard(
+                                  metrics: metrics,
+                                  cardKey: const ValueKey('unlock-door-card'),
+                                  icon: Icons.lock_outline_rounded,
+                                  title: 'Unlock Door',
+                                  description: 'Unlock the facility door.',
+                                  onPressed: _onUnlockPressed,
+                                ),
+                                SizedBox(height: metrics.sectionGap(8)),
+                                _AfterHoursSteps(metrics: metrics),
+                              ],
                             ),
-                            SizedBox(height: metrics.sectionGap(8)),
-                            _PrimaryScanCard(
-                              metrics: metrics,
-                              onPressed: () => context.go('/scanner'),
-                            ),
-                            SizedBox(height: metrics.sectionGap(10)),
-                            _HowItWorksSection(metrics: metrics),
-                            SizedBox(height: metrics.sectionGap(10)),
-                            _SectionHeading(
-                              metrics: metrics,
-                              icon: Icons.dark_mode_rounded,
-                              title: 'After Hours',
-                            ),
-                            SizedBox(height: metrics.compactSectionGap(6)),
-                            _OutlinedActionCard(
-                              metrics: metrics,
-                              cardKey: const ValueKey('unlock-door-card'),
-                              icon: Icons.lock_outline_rounded,
-                              title: 'Unlock Door',
-                              description: 'Unlock the facility door.',
-                              onPressed: _onUnlockPressed,
-                            ),
-                            SizedBox(height: metrics.sectionGap(8)),
-                            _AfterHoursSteps(metrics: metrics),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -248,8 +268,6 @@ class _StartHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -262,7 +280,7 @@ class _StartHeader extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: colors.fontInverted,
+                  color: Colors.white,
                   fontSize: metrics.font(27),
                   fontWeight: FontWeight.w900,
                 ),
@@ -282,7 +300,7 @@ class _StartHeader extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: colors.fontSecondary,
+            color: Colors.white.withValues(alpha: 0.92),
             height: 1.16,
             fontWeight: FontWeight.w600,
           ),
@@ -471,7 +489,7 @@ class _InfoPill extends StatelessWidget {
         vertical: metrics.gap(6),
       ),
       decoration: BoxDecoration(
-        color: colors.primary.withValues(alpha: 0.10),
+        color: Colors.white.withValues(alpha: 0.94),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(

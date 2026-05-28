@@ -174,6 +174,63 @@ void main() {
       await controller.toggleTransactionView();
 
       expect(controller.recentTransactions.length, 1);
+      expect(controller.rewardTransactions, isEmpty);
+    });
+
+    test(
+      'fetchTransactions populates reward history from bonus entries',
+      () async {
+        final now = DateTime.now();
+        when(() => mockWalletService.getLedger()).thenAnswer(
+          (_) async => [
+            WalletLedgerEntry(
+              id: 1,
+              entryType: 'load_paid',
+              amountCents: 2000,
+              paidAmountCents: 2000,
+              promoAmountCents: 0,
+              createdAt: now,
+            ),
+            WalletLedgerEntry(
+              id: 2,
+              entryType: 'load_bonus',
+              amountCents: 500,
+              paidAmountCents: 0,
+              promoAmountCents: 500,
+              createdAt: now,
+            ),
+            WalletLedgerEntry(
+              id: 3,
+              entryType: 'redeem_promo',
+              amountCents: -250,
+              paidAmountCents: 0,
+              promoAmountCents: -250,
+              createdAt: now,
+            ),
+          ],
+        );
+
+        await controller.fetchTransactions();
+
+        expect(controller.rewardTransactions, hasLength(1));
+        expect(
+          controller.rewardTransactions.single,
+          contains('added as promotional credit'),
+        );
+      },
+    );
+
+    test('fetchTransactions clears reward history on ledger errors', () async {
+      controller.recentTransactions = ['old transaction'];
+      controller.rewardTransactions = ['old reward'];
+      when(
+        () => mockWalletService.getLedger(),
+      ).thenThrow(Exception('Ledger unavailable'));
+
+      await controller.fetchTransactions();
+
+      expect(controller.recentTransactions, isEmpty);
+      expect(controller.rewardTransactions, isEmpty);
     });
   });
 

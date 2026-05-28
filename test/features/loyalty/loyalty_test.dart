@@ -1,7 +1,7 @@
 import 'package:clean_stream_laundry_app/features/loyalty/loyalty.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
-import 'package:clean_stream_laundry_app/features/loyalty/widgets/credit_card.dart';
+import 'package:clean_stream_laundry_app/features/loyalty/widgets/wallet_pass_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -24,8 +24,11 @@ void main() {
     when(() => mockController.errorMessage).thenReturn(null);
     when(() => mockController.userName).thenReturn('Test User');
     when(() => mockController.userBalance).thenReturn(25.50);
+    when(() => mockController.paidBalance).thenReturn(20.50);
+    when(() => mockController.promoBalance).thenReturn(5.00);
     when(() => mockController.userReward).thenReturn(0.0);
     when(() => mockController.recentTransactions).thenReturn([]);
+    when(() => mockController.rewardTransactions).thenReturn([]);
     when(() => mockController.showPastTransactions).thenReturn(false);
     when(() => mockController.initialize()).thenAnswer((_) async {});
     when(() => mockController.fetchTransactions()).thenAnswer((_) async {});
@@ -104,12 +107,14 @@ void main() {
   });
 
   group('Content display', () {
-    testWidgets('displays CreditCard with correct username', (tester) async {
+    testWidgets('displays WalletPassCard with correct username', (
+      tester,
+    ) async {
       when(() => mockController.userName).thenReturn('Jane Doe');
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      final card = tester.widget<CreditCard>(find.byType(CreditCard));
+      final card = tester.widget<WalletPassCard>(find.byType(WalletPassCard));
       expect(card.username, 'Jane Doe');
     });
 
@@ -120,7 +125,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      final card = tester.widget<CreditCard>(find.byType(CreditCard));
+      final card = tester.widget<WalletPassCard>(find.byType(WalletPassCard));
       expect(card.username, 'John Doe');
     });
 
@@ -131,7 +136,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      expect(find.text('Loyalty Balance: \$42.75'), findsOneWidget);
+      expect(find.text('\$42.75'), findsOneWidget);
     });
 
     testWidgets('displays default balance when userBalance is null', (
@@ -141,7 +146,31 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pump();
 
-      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
+      expect(find.text('\$0.00'), findsOneWidget);
+    });
+
+    testWidgets('displays paid and promo balances', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      expect(find.text('Paid \$20.50'), findsOneWidget);
+      expect(find.text('Promo \$5.00'), findsOneWidget);
+    });
+
+    testWidgets('displays exact wallet pass slogan', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      expect(find.text('Where freshness flows.'), findsOneWidget);
+    });
+
+    testWidgets('does not display old credit-card cues', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      expect(find.byKey(const Key('cardChip')), findsNothing);
+      expect(find.byKey(const Key('mastercard')), findsNothing);
+      expect(find.text('1234   5678   9012   3456'), findsNothing);
     });
 
     testWidgets('displays Load card button', (tester) async {
@@ -167,14 +196,14 @@ void main() {
       when(() => mockController.userBalance).thenReturn(0.0);
       await tester.pumpWidget(createWidget());
       await tester.pump();
-      expect(find.text('Loyalty Balance: \$0.00'), findsOneWidget);
+      expect(find.text('\$0.00'), findsOneWidget);
     });
 
     testWidgets('displays large balance correctly', (tester) async {
       when(() => mockController.userBalance).thenReturn(9999.99);
       await tester.pumpWidget(createWidget());
       await tester.pump();
-      expect(find.text('Loyalty Balance: \$9999.99'), findsOneWidget);
+      expect(find.text('\$9999.99'), findsOneWidget);
     });
   });
 
@@ -233,7 +262,12 @@ void main() {
       ).thenReturn(['Test transaction']);
       await tester.pumpWidget(createWidget());
       await tester.pump();
-      await tester.tap(find.text('Show More'));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('transactions-toggle-button')),
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('transactions-toggle-button')),
+      );
       await tester.pump();
       verify(() => mockController.toggleTransactionView()).called(1);
     });
@@ -247,7 +281,12 @@ void main() {
       when(() => mockController.showPastTransactions).thenReturn(true);
       await tester.pumpWidget(createWidget());
       await tester.pump();
-      await tester.tap(find.text('Show Less'));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('transactions-toggle-button')),
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('transactions-toggle-button')),
+      );
       await tester.pump();
       verify(() => mockController.toggleTransactionView()).called(1);
     });
@@ -349,6 +388,46 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Rewards program'), findsNothing);
+    });
+  });
+
+  group('Rewards sheet', () {
+    testWidgets('opens rewards bottom sheet from Rewards pill', (tester) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('rewards-sheet-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reward history'), findsOneWidget);
+      expect(find.text('\$20.00 until your next \$5 reward'), findsOneWidget);
+      expect(
+        find.text('Earn \$5 promo credit for every \$20 loaded.'),
+        findsOneWidget,
+      );
+      expect(find.text('No rewards earned yet.'), findsOneWidget);
+    });
+
+    testWidgets('shows reward history entries in rewards bottom sheet', (
+      tester,
+    ) async {
+      when(() => mockController.userReward).thenReturn(5.0);
+      when(
+        () => mockController.rewardTransactions,
+      ).thenReturn(['\$5.00 added as promotional credit on May 24, 2026']);
+
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('rewards-sheet-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('\$15.00 until your next \$5 reward'), findsOneWidget);
+      expect(
+        find.text('\$5.00 added as promotional credit on May 24, 2026'),
+        findsOneWidget,
+      );
+      expect(find.text('No rewards earned yet.'), findsNothing);
     });
   });
 
