@@ -3,6 +3,7 @@ abstract class ProfileService {
   Future<Map<String, dynamic>?> getUserBalanceById(String userId);
   Future<void> updateBalanceById(String userId, double balance);
   Future<String?> getUserNameById(String userId);
+  Future<String?> getCurrentUserRole();
   Future<String?> getUserRefundAttempts(String userId);
   Future<void> updateName(String name);
   Future<int> getNotificationLeadTime();

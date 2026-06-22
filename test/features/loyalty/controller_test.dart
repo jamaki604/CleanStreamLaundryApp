@@ -4,7 +4,9 @@ import 'package:get_it/get_it.dart';
 import 'package:clean_stream_laundry_app/features/loyalty/controller.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
-import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/wallet_service.dart';
+import 'package:clean_stream_laundry_app/logic/models/wallet_balance.dart';
+import 'package:clean_stream_laundry_app/logic/models/wallet_ledger_entry.dart';
 import 'package:clean_stream_laundry_app/logic/payment/process_payment.dart';
 import 'mocks.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
@@ -13,7 +15,7 @@ void main() {
   late LoyaltyController controller;
   late MockAuthService mockAuthService;
   late MockProfileService mockProfileService;
-  late MockTransactionService mockTransactionService;
+  late MockWalletService mockWalletService;
   late MockPaymentProcessor mockPaymentProcessor;
 
   setUp(() {
@@ -21,15 +23,27 @@ void main() {
 
     mockAuthService = MockAuthService();
     mockProfileService = MockProfileService();
-    mockTransactionService = MockTransactionService();
+    mockWalletService = MockWalletService();
     mockPaymentProcessor = MockPaymentProcessor();
 
     GetIt.instance.registerSingleton<AuthService>(mockAuthService);
     GetIt.instance.registerSingleton<ProfileService>(mockProfileService);
-    GetIt.instance.registerSingleton<TransactionService>(
-      mockTransactionService,
-    );
+    GetIt.instance.registerSingleton<WalletService>(mockWalletService);
     GetIt.instance.registerSingleton<PaymentProcessor>(mockPaymentProcessor);
+
+    when(() => mockWalletService.getBalance()).thenAnswer(
+      (_) async => const WalletBalance(
+        walletAccountId: 'wallet123',
+        status: 'active',
+        paidBalanceCents: 10000,
+        promoBalanceCents: 0,
+        totalBalanceCents: 10000,
+      ),
+    );
+    when(() => mockWalletService.getLedger()).thenAnswer((_) async => []);
+    when(
+      () => mockProfileService.getUserBalanceById(any()),
+    ).thenAnswer((_) async => {'balance': 100.0, 'full_name': 'Jane Doe'});
 
     controller = LoyaltyController();
   });
@@ -42,11 +56,8 @@ void main() {
     test('should fetch balance and transactions successfully', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockProfileService.getUserBalanceById('user123'),
+        () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 100.0, 'full_name': 'Jane Doe'});
-      when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
 
       await controller.initialize();
 
@@ -57,17 +68,15 @@ void main() {
 
       verify(() => mockAuthService.getCurrentUserId).called(1);
       verify(() => mockProfileService.getUserBalanceById('user123')).called(1);
-      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+      verify(() => mockWalletService.getBalance()).called(1);
+      verify(() => mockWalletService.getLedger()).called(1);
     });
 
     test('should handle profile service error gracefully', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockProfileService.getUserBalanceById('user123'),
+        () => mockProfileService.getUserBalanceById('user123'),
       ).thenThrow(Exception('Network error'));
-      when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
 
       await controller.initialize();
 
@@ -77,8 +86,6 @@ void main() {
 
     test('initialize should handle null userId', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn(null);
-      when(() => mockTransactionService.getTransactionsForUser())
-          .thenAnswer((_) async => []);
 
       await controller.initialize();
 
@@ -91,11 +98,11 @@ void main() {
     test('should default to 0.0 balance when null', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockProfileService.getUserBalanceById('user123'),
+        () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': null, 'full_name': 'Jane Doe'});
       when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
+        () => mockWalletService.getBalance(),
+      ).thenAnswer((_) async => WalletBalance.empty());
 
       await controller.initialize();
 
@@ -106,11 +113,8 @@ void main() {
     test('should default to "John Doe" when name is null', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
       when(
-            () => mockProfileService.getUserBalanceById('user123'),
+        () => mockProfileService.getUserBalanceById('user123'),
       ).thenAnswer((_) async => {'balance': 100.0, 'full_name': null});
-      when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
 
       await controller.initialize();
 
@@ -120,23 +124,15 @@ void main() {
 
   group('toggleTransactionView', () {
     test('should toggle showPastTransactions from false to true', () async {
-      when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
-
       expect(controller.showPastTransactions, false);
 
       await controller.toggleTransactionView();
 
       expect(controller.showPastTransactions, true);
-      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+      verify(() => mockWalletService.getLedger()).called(1);
     });
 
     test('should toggle showPastTransactions from true to false', () async {
-      when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
-
       controller.showPastTransactions = true;
 
       await controller.toggleTransactionView();
@@ -146,88 +142,138 @@ void main() {
   });
 
   group('fetchTransactions', () {
-    test('should call transaction service', () async {
-      when(
-            () => mockTransactionService.getTransactionsForUser(),
-      ).thenAnswer((_) async => []);
-
+    test('should call wallet ledger service', () async {
       await controller.fetchTransactions();
 
-      verify(() => mockTransactionService.getTransactionsForUser()).called(1);
+      verify(() => mockWalletService.getLedger()).called(1);
     });
 
-    test('fetchTransactions filters out Rewards and old transactions', () async {
+    test('fetchTransactions filters out old wallet ledger entries', () async {
       final now = DateTime.now();
-      when(() => mockTransactionService.getTransactionsForUser()).thenAnswer(
-            (_) async => [
-          {
-            'created_at': now.toIso8601String(),
-            'type': 'Laundry',
-            'amount': 10,
-            'description': 'Wash',
-          },
-          {
-            'created_at': now.toIso8601String(),
-            'type': 'Rewards',
-            'amount': 1,
-            'description': 'Reward',
-          },
-          {
-            'created_at':
-            now.subtract(const Duration(days: 40)).toIso8601String(),
-            'type': 'Laundry',
-            'amount': 5,
-            'description': 'Old wash',
-          },
+      when(() => mockWalletService.getLedger()).thenAnswer(
+        (_) async => [
+          WalletLedgerEntry(
+            id: 1,
+            entryType: 'load_paid',
+            amountCents: 1000,
+            paidAmountCents: 1000,
+            promoAmountCents: 0,
+            createdAt: now,
+          ),
+          WalletLedgerEntry(
+            id: 2,
+            entryType: 'load_bonus',
+            amountCents: 500,
+            paidAmountCents: 0,
+            promoAmountCents: 500,
+            createdAt: now.subtract(const Duration(days: 40)),
+          ),
         ],
       );
 
       await controller.toggleTransactionView();
 
       expect(controller.recentTransactions.length, 1);
+      expect(controller.rewardTransactions, isEmpty);
+    });
+
+    test(
+      'fetchTransactions populates reward history from bonus entries',
+      () async {
+        final now = DateTime.now();
+        when(() => mockWalletService.getLedger()).thenAnswer(
+          (_) async => [
+            WalletLedgerEntry(
+              id: 1,
+              entryType: 'load_paid',
+              amountCents: 2000,
+              paidAmountCents: 2000,
+              promoAmountCents: 0,
+              createdAt: now,
+            ),
+            WalletLedgerEntry(
+              id: 2,
+              entryType: 'load_bonus',
+              amountCents: 500,
+              paidAmountCents: 0,
+              promoAmountCents: 500,
+              createdAt: now,
+            ),
+            WalletLedgerEntry(
+              id: 3,
+              entryType: 'redeem_promo',
+              amountCents: -250,
+              paidAmountCents: 0,
+              promoAmountCents: -250,
+              createdAt: now,
+            ),
+          ],
+        );
+
+        await controller.fetchTransactions();
+
+        expect(controller.rewardTransactions, hasLength(1));
+        expect(
+          controller.rewardTransactions.single,
+          contains('added as promotional credit'),
+        );
+      },
+    );
+
+    test('fetchTransactions clears reward history on ledger errors', () async {
+      controller.recentTransactions = ['old transaction'];
+      controller.rewardTransactions = ['old reward'];
+      when(
+        () => mockWalletService.getLedger(),
+      ).thenThrow(Exception('Ledger unavailable'));
+
+      await controller.fetchTransactions();
+
+      expect(controller.recentTransactions, isEmpty);
+      expect(controller.rewardTransactions, isEmpty);
     });
   });
 
   group('loadCard', () {
-    test('loadCard should update balance and fetch transactions on success',
-            () async {
-          when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
+    test(
+      'loadCard should update balance and fetch transactions on success',
+      () async {
+        when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
 
-          controller.userBalance = 20.0;
+        controller.userBalance = 20.0;
 
-          when(() => mockPaymentProcessor.processPayment(
-            10.0,
-            'Loyalty Card',
-          )).thenAnswer((_) async => PaymentResult.success);
+        when(
+          () => mockPaymentProcessor.processPayment(10.0, 'Loyalty Card'),
+        ).thenAnswer((_) async => PaymentResult.success);
 
-          when(() => mockProfileService.updateBalanceById('user123', 30))
-              .thenAnswer((_) async => Future.value());
+        when(() => mockWalletService.getBalance()).thenAnswer(
+          (_) async => const WalletBalance(
+            walletAccountId: 'wallet123',
+            status: 'active',
+            paidBalanceCents: 3000,
+            promoBalanceCents: 0,
+            totalBalanceCents: 3000,
+          ),
+        );
 
-          when(() => mockProfileService.updateRewardsById(any(), any()))
-              .thenAnswer((_) async => Future.value());
+        final result = await controller.loadCard(10.0);
 
-          when(() => mockTransactionService.getTransactionsForUser())
-              .thenAnswer((_) async => []);
+        expect(result, PaymentResult.success);
+        expect(controller.userBalance, 30);
 
-          final result = await controller.loadCard(10.0);
-
-          expect(result, PaymentResult.success);
-          expect(controller.userBalance, 30);
-
-          verify(() => mockProfileService.updateBalanceById('user123', 30))
-              .called(1);
-          verify(() => mockTransactionService.getTransactionsForUser()).called(1);
-        });
+        verify(() => mockWalletService.getBalance()).called(3);
+        verify(() => mockWalletService.getLedger()).called(3);
+      },
+    );
 
     test('loadCard should not update balance on failed payment', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user123');
 
       controller.userBalance = 20.0;
 
-      when(() => mockPaymentProcessor.processPayment(
-        10.0,
-        'Loyalty Card',
-      )).thenAnswer((_) async => PaymentResult.failed);
+      when(
+        () => mockPaymentProcessor.processPayment(10.0, 'Loyalty Card'),
+      ).thenAnswer((_) async => PaymentResult.failed);
 
       final result = await controller.loadCard(10.0);
 

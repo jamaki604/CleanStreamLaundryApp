@@ -9,7 +9,7 @@ import {
     return {
       updateRefund: async (_: string, __: string) => {},
       getUserEmail: async (_: string) => "test@example.com",
-      incrementLoyalty: async (_: string, __: number) => {},
+      creditWallet: async (_: string, __: number, ___: string) => {},
       sendEmail: async (_: string, __: string, ___: string, ____: string) => {},
       ...overrides,
     };
@@ -96,9 +96,9 @@ import {
     );
   });
 
-  Deno.test("propagates incrementLoyalty error", async () => {
+  Deno.test("propagates creditWallet error", async () => {
     const deps = createMockDeps({
-      incrementLoyalty: async () => {
+      creditWallet: async () => {
         throw new Error("RPC failed");
       },
     });

@@ -37,8 +37,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     when(() => mockAuthService.getCurrentUserId).thenReturn(null);
-    when(() => mockLocationService.getLocations())
-        .thenAnswer((_) async => testLocations);
+    when(
+      () => mockLocationService.getLocations(),
+    ).thenAnswer((_) async => testLocations);
   });
 
   tearDown(() => GetIt.instance.reset());
@@ -78,7 +79,9 @@ void main() {
         SharedPreferences.setMockInitialValues({
           'lastSelectedLocation': '123 Main St',
         });
-        final controller = HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
 
         await tester.pumpWidget(buildWidget(controller: controller));
@@ -99,6 +102,33 @@ void main() {
 
         expect(find.byIcon(Icons.navigation), findsOneWidget);
       });
+
+      testWidgets('uses location display fields when selected', (tester) async {
+        SharedPreferences.setMockInitialValues({
+          'lastSelectedLocation': '123 Main St',
+        });
+        when(() => mockLocationService.getLocations()).thenAnswer(
+          (_) async => [
+            {
+              'id': 1,
+              'Address': '123 Main St',
+              'Name': 'Kokomo Laundry Center',
+              'Hours': '5:00 AM - 11:00 PM',
+              'OpenHour': 5,
+              'CloseHour': 23,
+              'AfterHoursAvailable': true,
+              'Details': 'Side entrance available after hours',
+            },
+          ],
+        );
+        final controller = await buildController();
+
+        await tester.pumpWidget(buildWidget(controller: controller));
+
+        expect(find.text('Kokomo Laundry Center'), findsOneWidget);
+        expect(find.text('123 Main St'), findsOneWidget);
+        expect(find.text('5:00 AM - 11:00 PM'), findsOneWidget);
+      });
     });
 
     group('Bottom sheet', () {
@@ -113,53 +143,91 @@ void main() {
         expect(find.text('456 Oak Ave'), findsOneWidget);
       });
 
-      testWidgets('closes bottom sheet after selecting a location',
-              (tester) async {
-            final controller = await buildController();
-            await tester.pumpWidget(buildWidget(controller: controller));
+      testWidgets('chevron opens location details and picker', (tester) async {
+        SharedPreferences.setMockInitialValues({
+          'lastSelectedLocation': '123 Main St',
+        });
+        when(() => mockLocationService.getLocations()).thenAnswer(
+          (_) async => [
+            {
+              'id': 1,
+              'Address': '123 Main St',
+              'Name': 'Kokomo Laundry Center',
+              'Hours': '5:00 AM - 11:00 PM',
+              'AfterHoursAvailable': true,
+              'Details': 'Side entrance available after hours',
+            },
+            {'id': 2, 'Address': '456 Oak Ave'},
+          ],
+        );
+        final controller = await buildController();
+        await tester.pumpWidget(buildWidget(controller: controller));
 
-            await tester.tap(find.text('Select Location'));
-            await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const ValueKey('home-location-details-button')),
+        );
+        await tester.pumpAndSettle();
 
-            await tester.tap(find.text('123 Main St'));
-            await tester.pumpAndSettle();
+        expect(find.text('Location details'), findsOneWidget);
+        expect(
+          find.text('Side entrance available after hours'),
+          findsOneWidget,
+        );
+        expect(find.text('After-hours access available'), findsOneWidget);
+        expect(find.text('Change location'), findsOneWidget);
+        expect(find.text('456 Oak Ave'), findsOneWidget);
+      });
 
-            expect(find.text('456 Oak Ave'), findsNothing);
-          });
+      testWidgets('closes bottom sheet after selecting a location', (
+        tester,
+      ) async {
+        final controller = await buildController();
+        await tester.pumpWidget(buildWidget(controller: controller));
 
-      testWidgets('calls controller.selectLocation when location tapped',
-              (tester) async {
-            final controller = await buildController();
-            await tester.pumpWidget(buildWidget(controller: controller));
+        await tester.tap(find.text('Select Location'));
+        await tester.pumpAndSettle();
 
-            await tester.tap(find.text('Select Location'));
-            await tester.pumpAndSettle();
+        await tester.tap(find.text('123 Main St'));
+        await tester.pumpAndSettle();
 
-            await tester.tap(find.text('123 Main St'));
-            await tester.pumpAndSettle();
+        expect(find.text('456 Oak Ave'), findsNothing);
+      });
 
-            expect(controller.selectedName, '123 Main St');
-            expect(controller.locationSelected, isTrue);
-          });
+      testWidgets('calls controller.selectLocation when location tapped', (
+        tester,
+      ) async {
+        final controller = await buildController();
+        await tester.pumpWidget(buildWidget(controller: controller));
+
+        await tester.tap(find.text('Select Location'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('123 Main St'));
+        await tester.pumpAndSettle();
+
+        expect(controller.selectedName, '123 Main St');
+        expect(controller.locationSelected, isTrue);
+      });
     });
 
     group('Directions button', () {
-      testWidgets('calls onGetDirections when navigation icon tapped',
-              (tester) async {
-            var tapped = false;
-            final controller = await buildController();
+      testWidgets('calls onGetDirections when navigation icon tapped', (
+        tester,
+      ) async {
+        var tapped = false;
+        final controller = await buildController();
 
-            await tester.pumpWidget(
-              buildWidget(
-                controller: controller,
-                onGetDirections: () => tapped = true,
-              ),
-            );
+        await tester.pumpWidget(
+          buildWidget(
+            controller: controller,
+            onGetDirections: () => tapped = true,
+          ),
+        );
 
-            await tester.tap(find.byIcon(Icons.navigation));
+        await tester.tap(find.byIcon(Icons.navigation));
 
-            expect(tapped, isTrue);
-          });
+        expect(tapped, isTrue);
+      });
     });
   });
 }

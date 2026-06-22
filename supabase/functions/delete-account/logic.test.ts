@@ -7,11 +7,13 @@ import {
     deleteUser,
     handleDeleteUser
   } from "./logic.ts";
-  
+
   function makeAdminMock(
     result: { data?: unknown; error?: { message: string } | null } = {}
   ) {
     return {
+      rpc: (_name: string, _params: unknown) =>
+        Promise.resolve({ data: "wallet-123", error: null }),
       auth: {
         admin: {
           deleteUser: (_id: string) =>
@@ -100,6 +102,8 @@ import {
   Deno.test("deleteUser — forwards the correct user_id to Supabase", async () => {
     let capturedId: string | undefined;
     const supabaseAdmin = {
+      rpc: (_name: string, _params: unknown) =>
+        Promise.resolve({ data: "wallet-123", error: null }),
       auth: {
         admin: {
           deleteUser: (id: string) => {
@@ -109,7 +113,7 @@ import {
         },
       },
     } as any;
-  
+
     await deleteUser(supabaseAdmin, "user-xyz");
     assertEquals(capturedId, "user-xyz");
   });
@@ -176,6 +180,8 @@ import {
   Deno.test("handleDeleteUser — forwards the correct user_id to Supabase", async () => {
     let capturedId: string | undefined;
     const supabaseAdmin = {
+      rpc: (_name: string, _params: unknown) =>
+        Promise.resolve({ data: "wallet-123", error: null }),
       auth: {
         admin: {
           deleteUser: (id: string) => {
@@ -188,7 +194,6 @@ import {
   
     const req = makeRequest({ user_id: "user-xyz" });
     await handleDeleteUser(req, { supabaseAdmin });
-  
+
     assertEquals(capturedId, "user-xyz");
   });
-  

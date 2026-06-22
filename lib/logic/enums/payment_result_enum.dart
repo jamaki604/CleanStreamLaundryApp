@@ -1,1 +1,1 @@
-enum PaymentResult { success, canceled, failed }
+enum PaymentResult { success, pending, canceled, failed }

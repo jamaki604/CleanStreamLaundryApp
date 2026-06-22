@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:clean_stream_laundry_app/logic/enums/payment_result_enum.dart';
 import 'controller.dart';
 import 'widgets/load_card_dialog.dart';
@@ -10,7 +13,13 @@ import 'package:go_router/go_router.dart';
 
 class LoyaltyPage extends StatefulWidget {
   final LoyaltyController? controller;
-  const LoyaltyPage({super.key, this.controller});
+  final bool openLoadCardOnStart;
+
+  const LoyaltyPage({
+    super.key,
+    this.controller,
+    this.openLoadCardOnStart = false,
+  });
 
   @override
   State<LoyaltyPage> createState() => _LoyaltyPageState();
@@ -22,9 +31,15 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
   @override
   void initState() {
     super.initState();
-    controller = widget.controller ??LoyaltyController();
+    controller = widget.controller ?? LoyaltyController();
     controller.addListener(_rebuild);
     controller.initialize();
+
+    if (widget.openLoadCardOnStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showLoadCardDialog();
+      });
+    }
   }
 
   @override
@@ -51,6 +66,19 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showRewardsSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => _RewardsSheet(controller: controller),
     );
   }
 
@@ -96,7 +124,7 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
         context,
         title: 'Payment Successful!',
         message:
-        'Thank you! Your payment of \$${amount.toStringAsFixed(2)} was processed successfully.',
+            'Thank you! Your payment of \$${amount.toStringAsFixed(2)} was processed successfully.',
         isSuccess: true,
       );
     } else if (result == PaymentResult.canceled) {
@@ -106,12 +134,20 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
         message: 'Payment of \$${amount.toStringAsFixed(2)} was canceled.',
         isSuccess: false,
       );
+    } else if (result == PaymentResult.pending) {
+      statusDialog(
+        context,
+        title: 'Payment Processing',
+        message:
+            'Your payment is still processing. Your wallet balance will update shortly.',
+        isSuccess: true,
+      );
     } else {
       statusDialog(
         context,
         title: 'Payment Failed',
         message:
-        'An error occurred while processing your payment. Please try again.',
+            'An error occurred while processing your payment. Please try again.',
         isSuccess: false,
       );
     }
@@ -126,39 +162,580 @@ class _LoyaltyPageState extends State<LoyaltyPage> {
     }
 
     return BasePage(
-      body: Column(
+      body: Stack(
         children: [
-          const SizedBox(height: 10),
-          Header(
-            controller: controller,
-            onInfoTap: _showRewardInfoDialog,
-          ),
-          const SizedBox(height: 7),
-          ElevatedButton(
-            onPressed: _showLoadCardDialog,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              disabledBackgroundColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              'Load card',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 106,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: Theme.of(context).colorScheme.primaryGradient,
               ),
             ),
           ),
-          const SizedBox(height: 15),
-          Expanded(
-            child: TransactionList(controller: controller),
+          SafeArea(
+            top: false,
+            bottom: false,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final metrics = _LoyaltyLayoutMetrics.fromConstraints(
+                  constraints,
+                  showPastTransactions: controller.showPastTransactions,
+                );
+                final content = _LoyaltyContent(
+                  metrics: metrics,
+                  controller: controller,
+                  onInfoTap: _showRewardInfoDialog,
+                  onLoadCard: _showLoadCardDialog,
+                  onRewardsTap: _showRewardsSheet,
+                );
+
+                return _LoyaltyResponsiveWrapper(
+                  metrics: metrics,
+                  child: metrics.needsScrollFallback
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.symmetric(
+                            vertical: metrics.verticalPadding,
+                          ),
+                          child: content,
+                        )
+                      : Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: metrics.verticalPadding,
+                          ),
+                          child: content,
+                        ),
+                );
+              },
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LoyaltyContent extends StatelessWidget {
+  final _LoyaltyLayoutMetrics metrics;
+  final LoyaltyController controller;
+  final VoidCallback onInfoTap;
+  final VoidCallback onLoadCard;
+  final VoidCallback onRewardsTap;
+
+  const _LoyaltyContent({
+    required this.metrics,
+    required this.controller,
+    required this.onInfoTap,
+    required this.onLoadCard,
+    required this.onRewardsTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final header = Header(controller: controller, onInfoTap: onInfoTap);
+    final loadButton = _LoadCardButton(onPressed: onLoadCard);
+    final transactions = TransactionList(
+      controller: controller,
+      fillAvailableHeight: !metrics.needsScrollFallback,
+    );
+
+    if (metrics.needsScrollFallback) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _WalletPageTitle(onRewardsTap: onRewardsTap),
+          SizedBox(height: metrics.gap),
+          header,
+          SizedBox(height: metrics.gap),
+          loadButton,
+          SizedBox(height: metrics.gap),
+          transactions,
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _WalletPageTitle(onRewardsTap: onRewardsTap),
+        SizedBox(height: metrics.gap),
+        header,
+        SizedBox(height: metrics.gap),
+        loadButton,
+        SizedBox(height: metrics.gap),
+        Expanded(child: transactions),
+      ],
+    );
+  }
+}
+
+class _WalletPageTitle extends StatelessWidget {
+  final VoidCallback onRewardsTap;
+
+  const _WalletPageTitle({required this.onRewardsTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'Wallet',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+        ),
+        Material(
+          key: const ValueKey('rewards-sheet-button'),
+          color: colors.primary,
+          borderRadius: BorderRadius.circular(999),
+          elevation: 4,
+          shadowColor: Colors.black.withValues(alpha: 0.16),
+          child: InkWell(
+            onTap: onRewardsTap,
+            borderRadius: BorderRadius.circular(999),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.stars_rounded,
+                    color: Colors.white,
+                    size: 15,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Rewards',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RewardsSheet extends StatelessWidget {
+  static const double _rewardThreshold = 20.0;
+
+  final LoyaltyController controller;
+
+  const _RewardsSheet({required this.controller});
+
+  double get _progress {
+    return (controller.userReward ?? 0.0)
+        .clamp(0.0, _rewardThreshold)
+        .toDouble();
+  }
+
+  double get _remaining {
+    return (_rewardThreshold - _progress)
+        .clamp(0.0, _rewardThreshold)
+        .toDouble();
+  }
+
+  double get _progressValue {
+    return (_progress / _rewardThreshold).clamp(0.0, 1.0).toDouble();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final rewards = controller.rewardTransactions;
+
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Rewards',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: colors.fontInverted,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close_rounded),
+                  color: colors.fontSecondary,
+                  tooltip: 'Close',
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _RewardsStatusCard(
+              remaining: _remaining,
+              progressValue: _progressValue,
+            ),
+            const SizedBox(height: 10),
+            const _RewardsRuleCard(),
+            const SizedBox(height: 18),
+            Text(
+              'Reward history',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colors.fontInverted,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (rewards.isEmpty)
+              const _EmptyRewardsCard()
+            else
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: rewards.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    return _RewardHistoryTile(transaction: rewards[index]);
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardsStatusCard extends StatelessWidget {
+  final double remaining;
+  final double progressValue;
+
+  const _RewardsStatusCard({
+    required this.remaining,
+    required this.progressValue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _RewardsCardShell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: colors.secondary.withValues(alpha: 0.20),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.stars_rounded,
+                  color: colors.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '\$${remaining.toStringAsFixed(2)} until your next \$5 reward',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: colors.fontInverted,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Promo credit is added automatically.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.fontSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progressValue,
+              minHeight: 9,
+              backgroundColor: colors.primary.withValues(alpha: 0.12),
+              valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RewardsRuleCard extends StatelessWidget {
+  const _RewardsRuleCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _RewardsCardShell(
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: colors.primary.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.auto_awesome_rounded,
+              color: colors.primary,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Earn \$5 promo credit for every \$20 loaded.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colors.fontInverted,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyRewardsCard extends StatelessWidget {
+  const _EmptyRewardsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _RewardsCardShell(
+      child: Text(
+        'No rewards earned yet.',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: colors.fontSecondary,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardHistoryTile extends StatelessWidget {
+  final String transaction;
+
+  const _RewardHistoryTile({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return _RewardsCardShell(
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: colors.secondary.withValues(alpha: 0.22),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.stars_rounded, color: colors.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              transaction,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colors.fontInverted,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RewardsCardShell extends StatelessWidget {
+  final Widget child;
+
+  const _RewardsCardShell({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final cardColor = colors.brightness == Brightness.dark
+        ? const Color(0xFF262626)
+        : Colors.white;
+
+    return Material(
+      color: cardColor,
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: 0.07),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          border: Border.all(color: colors.primary.withValues(alpha: 0.12)),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _LoadCardButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _LoadCardButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return FilledButton(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: Colors.white,
+        minimumSize: const Size.fromHeight(50),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.add_rounded, size: 24),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              'Load card',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, size: 30),
+        ],
+      ),
+    );
+  }
+}
+
+class _LoyaltyResponsiveWrapper extends StatelessWidget {
+  final _LoyaltyLayoutMetrics metrics;
+  final Widget child;
+
+  const _LoyaltyResponsiveWrapper({required this.metrics, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: metrics.horizontalPadding),
+        child: SizedBox(
+          width: metrics.contentWidth,
+          height: metrics.availableHeight,
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _LoyaltyLayoutMetrics {
+  final double availableHeight;
+  final double horizontalPadding;
+  final double contentWidth;
+  final double verticalPadding;
+  final double gap;
+  final bool needsScrollFallback;
+
+  const _LoyaltyLayoutMetrics({
+    required this.availableHeight,
+    required this.horizontalPadding,
+    required this.contentWidth,
+    required this.verticalPadding,
+    required this.gap,
+    required this.needsScrollFallback,
+  });
+
+  factory _LoyaltyLayoutMetrics.fromConstraints(
+    BoxConstraints constraints, {
+    required bool showPastTransactions,
+  }) {
+    final width = constraints.maxWidth.isFinite ? constraints.maxWidth : 390.0;
+    final height = constraints.maxHeight.isFinite
+        ? constraints.maxHeight
+        : 700.0;
+    final horizontalPadding = width < 380 ? 16.0 : 20.0;
+    final contentWidth = math.min(
+      500.0,
+      math.max(0.0, width - (horizontalPadding * 2)),
+    );
+    final compactHeight = height < 760;
+    final verticalPadding = compactHeight ? 4.0 : 8.0;
+    final gap = compactHeight ? 6.0 : 8.0;
+
+    return _LoyaltyLayoutMetrics(
+      availableHeight: height,
+      horizontalPadding: horizontalPadding,
+      contentWidth: contentWidth,
+      verticalPadding: verticalPadding,
+      gap: gap,
+      needsScrollFallback: height < 640.0 || showPastTransactions,
     );
   }
 }

@@ -21,7 +21,7 @@ import {
           const clientSecret = "clientSecret" in overrides
             ? overrides.clientSecret
             : "pi_test_secret_abc123";
-          return Promise.resolve({ client_secret: clientSecret });
+          return Promise.resolve({ id: "pi_test", client_secret: clientSecret });
         },
       },
     } as any;
@@ -102,6 +102,7 @@ import {
     const result = await createPaymentIntent(stripe, 2500);
   
     assertEquals(result.clientSecret, "pi_test_secret_abc123");
+    assertEquals(result.paymentIntentId, "pi_test");
   });
   
   Deno.test("createPaymentIntent — passes correct amount to Stripe", async () => {
@@ -110,7 +111,7 @@ import {
       paymentIntents: {
         create: (params: unknown) => {
           capturedParams = params;
-          return Promise.resolve({ client_secret: "pi_test_secret" });
+          return Promise.resolve({ id: "pi_test", client_secret: "pi_test_secret" });
         },
       },
     } as any;
@@ -147,6 +148,7 @@ import {
   
     assertEquals(res.status, 200);
     assertEquals(body.clientSecret, "pi_test_secret_abc123");
+    assertEquals(body.paymentIntentId, "pi_test");
   });
   
   Deno.test("handleCreatePaymentIntent — throws Missing amount when body has no amount", async () => {

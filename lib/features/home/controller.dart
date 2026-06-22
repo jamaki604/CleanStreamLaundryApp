@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clean_stream_laundry_app/logic/parsing/location_parser.dart';
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
@@ -5,12 +7,16 @@ import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/core/storage/storage_service.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePageController extends ChangeNotifier {
+  static const _lastSelectedLocationKey = 'lastSelectedLocation';
+  static const _locationSelectionModeKey = 'locationSelectionMode';
+  static const _manualSelectionMode = 'manual';
+  static const _nearestSelectionMode = 'nearest';
+
   final AuthService authService = GetIt.instance<AuthService>();
   final ProfileService profileService = GetIt.instance<ProfileService>();
   final LocationService locationService = GetIt.instance<LocationService>();
@@ -18,7 +24,7 @@ class HomePageController extends ChangeNotifier {
   final LocationParser locationParser;
 
   HomePageController({LocationParser? locationParser})
-      : locationParser = locationParser ?? LocationParser();
+    : locationParser = locationParser ?? LocationParser();
 
   String? selectedName;
   String? username;
@@ -30,8 +36,12 @@ class HomePageController extends ChangeNotifier {
   int? locationIDSelected;
   bool isLoading = true;
   StorageService storage = StorageService();
+  String _selectionMode = _nearestSelectionMode;
 
   void Function(LatLng coords, double zoom)? onZoom;
+
+  LatLng? get selectedCoordinates =>
+      selectedName == null ? null : locationCoordinates[selectedName];
 
   Future<void> init() async {
     await Future.wait([_initStorage(), _loadUserData()]);
@@ -42,8 +52,13 @@ class HomePageController extends ChangeNotifier {
 
   Future<void> _initStorage() async {
     await storage.init();
-    final lastVal = await storage.getValue('lastSelectedLocation');
-    selectedName = lastVal;
+    final storedMode = await storage.getValue(_locationSelectionModeKey);
+    final lastVal = await storage.getValue(_lastSelectedLocationKey);
+
+    _selectionMode =
+        storedMode ??
+        (lastVal == null ? _nearestSelectionMode : _manualSelectionMode);
+    selectedName = _selectionMode == _manualSelectionMode ? lastVal : null;
   }
 
   Future<void> _loadUserData() async {
@@ -64,36 +79,110 @@ class HomePageController extends ChangeNotifier {
 
       if (address != null && id != null) locationID[address] = id;
       if (address != null && lat != null && lng != null) {
-        locationCoordinates[address] = LatLng(lat as double, lng as double);
+        locationCoordinates[address] = LatLng(
+          (lat as num).toDouble(),
+          (lng as num).toDouble(),
+        );
       }
     }
 
-    if (selectedName != null && locationID.containsKey(selectedName)) {
-      locationSelected = true;
-      locationIDSelected = locationID[selectedName!];
+    final storedManualLocation = selectedName;
+    if (_selectionMode == _manualSelectionMode &&
+        storedManualLocation != null &&
+        locationID.containsKey(storedManualLocation)) {
+      _selectLocationInMemory(
+        storedManualLocation,
+        mode: _manualSelectionMode,
+        shouldNotify: false,
+        shouldZoom: false,
+      );
+      return;
+    }
+
+    if (_selectionMode == _manualSelectionMode) {
+      selectedName = null;
+      locationSelected = false;
+      locationIDSelected = null;
+      _selectionMode = _nearestSelectionMode;
+    }
+
+    if (locationCoordinates.isNotEmpty) {
+      await _selectNearestLocation(shouldNotify: false, shouldZoom: false);
     }
   }
 
   void selectLocation(String address) {
+    final selected = _selectLocationInMemory(
+      address,
+      mode: _manualSelectionMode,
+    );
+    if (!selected) return;
+
+    unawaited(
+      _persistSelection(
+        address,
+        _manualSelectionMode,
+      ).catchError((e) => debugPrint('Unable to save selected location: $e')),
+    );
+  }
+
+  Future<void> selectNearestLocation() async {
+    await _selectNearestLocation();
+  }
+
+  Future<void> _selectNearestLocation({
+    bool shouldNotify = true,
+    bool shouldZoom = true,
+  }) async {
+    if (locations.isEmpty || locationCoordinates.isEmpty) return;
+
+    Map<String, dynamic>? nearest;
+    try {
+      nearest = await locationParser.getNearestLocation(locations);
+    } catch (e) {
+      debugPrint('Unable to select nearest location: $e');
+      return;
+    }
+
+    if (nearest != null) {
+      final address = nearest['Address'] as String?;
+      if (address == null) return;
+
+      final selected = _selectLocationInMemory(
+        address,
+        mode: _nearestSelectionMode,
+        shouldNotify: shouldNotify,
+        shouldZoom: shouldZoom,
+      );
+      if (selected) await _persistSelection(address, _nearestSelectionMode);
+    }
+  }
+
+  bool _selectLocationInMemory(
+    String address, {
+    required String mode,
+    bool shouldNotify = true,
+    bool shouldZoom = true,
+  }) {
     final id = locationID[address];
-    if (id == null) return;
+    if (id == null) return false;
 
     selectedName = address;
     locationSelected = true;
     locationIDSelected = id;
-    storage.setValue('lastSelectedLocation', address);
-    notifyListeners();
+    _selectionMode = mode;
 
-    if (locationCoordinates.containsKey(address)) {
+    if (shouldZoom && locationCoordinates.containsKey(address)) {
       onZoom?.call(locationCoordinates[address]!, 15.0);
     }
+
+    if (shouldNotify) notifyListeners();
+    return true;
   }
 
-  Future<void> selectNearestLocation() async {
-    final nearest = await locationParser.getNearestLocation(locations);
-    if (nearest != null) {
-      selectLocation(nearest['Address'] as String);
-    }
+  Future<void> _persistSelection(String address, String mode) async {
+    await storage.setValue(_locationSelectionModeKey, mode);
+    await storage.setValue(_lastSelectedLocationKey, address);
   }
 
   Future<List<int>> getMachineCounts() async {

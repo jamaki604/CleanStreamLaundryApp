@@ -14,10 +14,37 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const jwt = authHeader.replace(/^Bearer\s+/i, "");
+
+    if (!jwt) {
+      return new Response(JSON.stringify({ error: "Missing authorization" }), {
+        status: 401,
+        headers: CORS_HEADERS,
+      });
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    const body = await req.clone().json();
+    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(jwt);
+
+    if (userError || !userData.user) {
+      return new Response(JSON.stringify({ error: "Invalid authorization" }), {
+        status: 401,
+        headers: CORS_HEADERS,
+      });
+    }
+
+    if (body?.user_id !== userData.user.id) {
+      return new Response(JSON.stringify({ error: "Cannot delete another user" }), {
+        status: 403,
+        headers: CORS_HEADERS,
+      });
+    }
 
     const response = await handleDeleteUser(req, { supabaseAdmin });
 

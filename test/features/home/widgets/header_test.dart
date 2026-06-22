@@ -32,22 +32,20 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     when(() => mockAuthService.getCurrentUserId).thenReturn(null);
-    when(() => mockLocationService.getLocations())
-        .thenAnswer((_) async => <Map<String, dynamic>>[]);
+    when(
+      () => mockLocationService.getLocations(),
+    ).thenAnswer((_) async => <Map<String, dynamic>>[]);
   });
 
   tearDown(() => GetIt.instance.reset());
 
   Widget buildWidget({
     required HomePageController controller,
-    VoidCallback? onNearestLocationTap,
+    VoidCallback? onAddFunds,
   }) {
     return MaterialApp(
       home: Scaffold(
-        body: Header(
-          controller: controller,
-          onNearestLocationTap: onNearestLocationTap ?? () {},
-        ),
+        body: Header(controller: controller, onAddFunds: onAddFunds ?? () {}),
       ),
     );
   }
@@ -60,7 +58,9 @@ void main() {
 
   group('WelcomeHeader', () {
     group('Welcome text', () {
-      testWidgets('shows generic welcome when username is null', (tester) async {
+      testWidgets('shows generic welcome when username is null', (
+        tester,
+      ) async {
         final controller = await buildController();
         await tester.pumpWidget(buildWidget(controller: controller));
 
@@ -69,17 +69,21 @@ void main() {
 
       testWidgets('shows username in welcome text when set', (tester) async {
         when(() => mockAuthService.getCurrentUserId).thenReturn('user-1');
-        when(() => mockProfileService.getUserNameById('user-1'))
-            .thenAnswer((_) async => 'Jane');
-        when(() => mockProfileService.getUserBalanceById('user-1'))
-            .thenAnswer((_) async => {'balance': 10.0});
+        when(
+          () => mockProfileService.getUserNameById('user-1'),
+        ).thenAnswer((_) async => 'Jane');
+        when(
+          () => mockProfileService.getUserBalanceById('user-1'),
+        ).thenAnswer((_) async => {'balance': 10.0});
 
-        final controller = HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
 
         await tester.pumpWidget(buildWidget(controller: controller));
 
-        expect(find.text('Welcome Jane!'), findsOneWidget);
+        expect(find.text('Welcome, Jane'), findsOneWidget);
       });
     });
 
@@ -93,12 +97,16 @@ void main() {
 
       testWidgets('shows formatted balance when available', (tester) async {
         when(() => mockAuthService.getCurrentUserId).thenReturn('user-1');
-        when(() => mockProfileService.getUserNameById('user-1'))
-            .thenAnswer((_) async => 'Jane');
-        when(() => mockProfileService.getUserBalanceById('user-1'))
-            .thenAnswer((_) async => {'balance': 12.5});
+        when(
+          () => mockProfileService.getUserNameById('user-1'),
+        ).thenAnswer((_) async => 'Jane');
+        when(
+          () => mockProfileService.getUserBalanceById('user-1'),
+        ).thenAnswer((_) async => {'balance': 12.5});
 
-        final controller = HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
 
         await tester.pumpWidget(buildWidget(controller: controller));
@@ -107,44 +115,33 @@ void main() {
       });
     });
 
-    group('Nearest Location button', () {
-      testWidgets('displays Nearest Location text', (tester) async {
+    group('Add funds button', () {
+      testWidgets('displays Add funds text', (tester) async {
         final controller = await buildController();
         await tester.pumpWidget(buildWidget(controller: controller));
 
-        expect(find.text('Nearest Location'), findsOneWidget);
+        expect(find.text('Add funds'), findsOneWidget);
       });
 
-      testWidgets('is wrapped in InkWell', (tester) async {
+      testWidgets('has add funds button key', (tester) async {
         final controller = await buildController();
         await tester.pumpWidget(buildWidget(controller: controller));
 
         expect(
-          find.ancestor(
-            of: find.text('Nearest Location'),
-            matching: find.byType(InkWell),
-          ),
+          find.byKey(const ValueKey('home-add-funds-button')),
           findsOneWidget,
         );
       });
 
-      testWidgets('calls onNearestLocationTap when tapped', (tester) async {
+      testWidgets('calls onAddFunds when tapped', (tester) async {
         var tapped = false;
         final controller = await buildController();
 
         await tester.pumpWidget(
-          buildWidget(
-            controller: controller,
-            onNearestLocationTap: () => tapped = true,
-          ),
+          buildWidget(controller: controller, onAddFunds: () => tapped = true),
         );
 
-        await tester.tap(
-          find.ancestor(
-            of: find.text('Nearest Location'),
-            matching: find.byType(InkWell),
-          ),
-        );
+        await tester.tap(find.text('Add funds'));
 
         expect(tapped, isTrue);
       });

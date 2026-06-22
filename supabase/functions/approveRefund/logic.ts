@@ -1,7 +1,7 @@
 export interface RefundDependencies {
     updateRefund: (transactionId: string, note: string) => Promise<void>;
     getUserEmail: (userId: string) => Promise<string>;
-    incrementLoyalty: (userId: string, amount: number) => Promise<void>;
+    creditWallet: (userId: string, amount: number, note: string) => Promise<void>;
     sendEmail: (email: string, transactionId: string, amount: string, note: string) => Promise<void>;
   }
   
@@ -30,7 +30,7 @@ export interface RefundDependencies {
       throw new Error("User email not found");
     }
   
-    await deps.incrementLoyalty(userId, Number(amount));
+    await deps.creditWallet(userId, Number(amount), note);
   
     await deps.sendEmail(email, transactionId, amount, note);
   

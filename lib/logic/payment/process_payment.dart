@@ -6,22 +6,32 @@ import 'package:get_it/get_it.dart';
 
 class PaymentProcessor {
   final PaymentService _paymentService = GetIt.instance<PaymentService>();
-  final TransactionService _transactionService = GetIt.instance<TransactionService>();
-
+  final TransactionService _transactionService =
+      GetIt.instance<TransactionService>();
 
   Future<PaymentResult> processPayment(
     double amount,
     String description,
   ) async {
     try {
-      await _paymentService.makePayment(amount);
-      _transactionService.recordTransaction(
-        amount: amount,
-        description: description,
-        type: "Laundry",
+      final purpose = description == "Loyalty Card"
+          ? PaymentPurpose.walletLoad
+          : PaymentPurpose.directMachinePayment;
+      final result = await _paymentService.makePayment(
+        amount,
+        purpose: purpose,
       );
 
-      return PaymentResult.success;
+      if (result == PaymentResult.success &&
+          purpose == PaymentPurpose.directMachinePayment) {
+        _transactionService.recordTransaction(
+          amount: amount,
+          description: description,
+          type: "Laundry",
+        );
+      }
+
+      return result;
     } on StripeException {
       return PaymentResult.canceled;
     } catch (_) {

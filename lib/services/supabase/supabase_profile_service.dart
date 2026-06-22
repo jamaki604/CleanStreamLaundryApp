@@ -21,13 +21,13 @@ class SupabaseProfileService extends ProfileService {
         await _client
             .from('profiles')
             .upsert(
-          {'id': id, 'full_name': name},
-          onConflict: 'id',
-          ignoreDuplicates: true,
-        );
+              {'id': id, 'full_name': name},
+              onConflict: 'id',
+              ignoreDuplicates: true,
+            );
       }
-    } catch (e) {
-      print(e);
+    } catch (_) {
+      return;
     }
   }
 
@@ -110,6 +110,25 @@ class SupabaseProfileService extends ProfileService {
   }
 
   @override
+  Future<String?> getCurrentUserRole() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return null;
+
+    try {
+      final response = await _client
+          .from('profiles')
+          .select('roles')
+          .eq('id', userId)
+          .single();
+      return response['roles'] as String?;
+    } on PostgrestException {
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
   Future<String?> getUserRefundAttempts(String userId) async {
     try {
       final response = await _client
@@ -130,13 +149,22 @@ class SupabaseProfileService extends ProfileService {
     final user = _client.auth.currentUser;
     if (user == null) return 5;
 
-    final response = await _client
-        .from('profiles')
-        .select('notif_lead_time')
-        .eq('id', user.id)
-        .single();
+    try {
+      final response = await _client
+          .from('profiles')
+          .select('notif_lead_time')
+          .eq('id', user.id)
+          .maybeSingle();
 
-    return (response['notif_lead_time'] as int?) ?? 5;
+      final value = response?['notif_lead_time'];
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      return 5;
+    } on PostgrestException {
+      return 5;
+    } catch (_) {
+      return 5;
+    }
   }
 
   @override

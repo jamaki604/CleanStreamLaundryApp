@@ -1,12 +1,9 @@
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-late bool cancelSearch = false;
+bool cancelSearch = false;
 
-void showSearchingDialog(
-    BuildContext context,
-    VoidCallback onCancel,
-    ) {
+void showSearchingDialog(BuildContext context, VoidCallback onCancel) {
   cancelSearch = false;
 
   showDialog(
@@ -47,17 +44,17 @@ void showSearchingDialog(
               style: TextButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: const Text(
                 "Cancel",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ],

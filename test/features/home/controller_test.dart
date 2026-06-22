@@ -38,8 +38,12 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     when(() => mockAuthService.getCurrentUserId).thenReturn(null);
-    when(() => mockLocationService.getLocations())
-        .thenAnswer((_) async => testLocations);
+    when(
+      () => mockLocationService.getLocations(),
+    ).thenAnswer((_) async => testLocations);
+    when(
+      () => mockLocationParser.getNearestLocation(any()),
+    ).thenAnswer((_) async => null);
   });
 
   tearDown(() => GetIt.instance.reset());
@@ -96,10 +100,12 @@ void main() {
 
     test('loads username and balance when userId is set', () async {
       when(() => mockAuthService.getCurrentUserId).thenReturn('user-1');
-      when(() => mockProfileService.getUserNameById('user-1'))
-          .thenAnswer((_) async => 'John Doe');
-      when(() => mockProfileService.getUserBalanceById('user-1'))
-          .thenAnswer((_) async => {'balance': 12.50});
+      when(
+        () => mockProfileService.getUserNameById('user-1'),
+      ).thenAnswer((_) async => 'John Doe');
+      when(
+        () => mockProfileService.getUserBalanceById('user-1'),
+      ).thenAnswer((_) async => {'balance': 12.50});
 
       final controller = buildController();
       await controller.init();
@@ -111,6 +117,7 @@ void main() {
     test('restores last selected location from storage', () async {
       SharedPreferences.setMockInitialValues({
         'lastSelectedLocation': '123 Main St',
+        'locationSelectionMode': 'manual',
       });
 
       final controller = buildController();
@@ -121,18 +128,59 @@ void main() {
       expect(controller.locationIDSelected, 1);
     });
 
-    test('does not restore location if stored address not in locations',
-            () async {
-          SharedPreferences.setMockInitialValues({
-            'lastSelectedLocation': 'Unknown Address',
-          });
-
-          final controller = buildController();
-          await controller.init();
-
-          expect(controller.locationSelected, isFalse);
-          expect(controller.locationIDSelected, isNull);
+    test(
+      'does not restore location if stored address not in locations',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          'lastSelectedLocation': 'Unknown Address',
+          'locationSelectionMode': 'manual',
         });
+
+        final controller = buildController();
+        await controller.init();
+
+        expect(controller.locationSelected, isFalse);
+        expect(controller.locationIDSelected, isNull);
+      },
+    );
+
+    test(
+      'selects nearest location by default without manual preference',
+      () async {
+        when(
+          () => mockLocationParser.getNearestLocation(any()),
+        ).thenAnswer((_) async => testLocations.last);
+
+        final controller = buildController();
+        await controller.init();
+
+        expect(controller.selectedName, '456 Oak Ave');
+        expect(controller.locationSelected, isTrue);
+        expect(controller.locationIDSelected, 2);
+
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString('locationSelectionMode'), 'nearest');
+        expect(prefs.getString('lastSelectedLocation'), '456 Oak Ave');
+      },
+    );
+
+    test('manual location preference overrides nearest default', () async {
+      SharedPreferences.setMockInitialValues({
+        'lastSelectedLocation': '123 Main St',
+        'locationSelectionMode': 'manual',
+      });
+      when(
+        () => mockLocationParser.getNearestLocation(any()),
+      ).thenAnswer((_) async => testLocations.last);
+
+      final controller = buildController();
+      await controller.init();
+
+      expect(controller.selectedName, '123 Main St');
+      expect(controller.locationSelected, isTrue);
+      expect(controller.locationIDSelected, 1);
+      verifyNever(() => mockLocationParser.getNearestLocation(any()));
+    });
   });
 
   group('selectLocation', () {
@@ -162,9 +210,11 @@ void main() {
       await controller.init();
 
       controller.selectLocation('123 Main St');
+      await Future<void>.delayed(Duration.zero);
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('lastSelectedLocation'), '123 Main St');
+      expect(prefs.getString('locationSelectionMode'), 'manual');
     });
 
     test('calls onZoom when coordinates exist', () async {
@@ -187,8 +237,9 @@ void main() {
 
   group('selectNearestLocation', () {
     test('selects the nearest location when one is found', () async {
-      when(() => mockLocationParser.getNearestLocation(any()))
-          .thenAnswer((_) async => testLocations.first);
+      when(
+        () => mockLocationParser.getNearestLocation(any()),
+      ).thenAnswer((_) async => testLocations.first);
 
       final controller = buildController();
       await controller.init();
@@ -197,11 +248,16 @@ void main() {
 
       expect(controller.selectedName, '123 Main St');
       expect(controller.locationSelected, isTrue);
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('locationSelectionMode'), 'nearest');
+      expect(prefs.getString('lastSelectedLocation'), '123 Main St');
     });
 
     test('does nothing when no nearest location found', () async {
-      when(() => mockLocationParser.getNearestLocation(any()))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockLocationParser.getNearestLocation(any()),
+      ).thenAnswer((_) async => null);
 
       final controller = buildController();
       await controller.init();
@@ -212,17 +268,20 @@ void main() {
     });
   });
 
-
   group('getMachineCounts', () {
     setUp(() {
-      when(() => mockMachineService.getWasherCountByLocation(any()))
-          .thenAnswer((_) async => 5);
-      when(() => mockMachineService.getIdleWasherCountByLocation(any()))
-          .thenAnswer((_) async => 3);
-      when(() => mockMachineService.getDryerCountByLocation(any()))
-          .thenAnswer((_) async => 4);
-      when(() => mockMachineService.getIdleDryerCountByLocation(any()))
-          .thenAnswer((_) async => 2);
+      when(
+        () => mockMachineService.getWasherCountByLocation(any()),
+      ).thenAnswer((_) async => 5);
+      when(
+        () => mockMachineService.getIdleWasherCountByLocation(any()),
+      ).thenAnswer((_) async => 3);
+      when(
+        () => mockMachineService.getDryerCountByLocation(any()),
+      ).thenAnswer((_) async => 4);
+      when(
+        () => mockMachineService.getIdleDryerCountByLocation(any()),
+      ).thenAnswer((_) async => 2);
     });
 
     test('returns [0,0,0,0] when no location selected', () async {
@@ -252,11 +311,13 @@ void main() {
       await controller.getMachineCounts();
 
       verify(() => mockMachineService.getWasherCountByLocation('1')).called(1);
-      verify(() => mockMachineService.getIdleWasherCountByLocation('1'))
-          .called(1);
+      verify(
+        () => mockMachineService.getIdleWasherCountByLocation('1'),
+      ).called(1);
       verify(() => mockMachineService.getDryerCountByLocation('1')).called(1);
-      verify(() => mockMachineService.getIdleDryerCountByLocation('1'))
-          .called(1);
+      verify(
+        () => mockMachineService.getIdleDryerCountByLocation('1'),
+      ).called(1);
     });
   });
 }

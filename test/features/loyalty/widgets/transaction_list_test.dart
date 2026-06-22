@@ -20,9 +20,7 @@ void main() {
 
   Widget buildWidget() {
     return MaterialApp(
-      home: Scaffold(
-        body: TransactionList(controller: mockController),
-      ),
+      home: Scaffold(body: TransactionList(controller: mockController)),
     );
   }
 
@@ -46,8 +44,9 @@ void main() {
 
     group('Populated state', () {
       setUp(() {
-        when(() => mockController.recentTransactions)
-            .thenReturn(['Transaction A', 'Transaction B']);
+        when(
+          () => mockController.recentTransactions,
+        ).thenReturn(['Transaction A', 'Transaction B']);
       });
 
       testWidgets('shows Transactions header', (tester) async {
@@ -63,7 +62,9 @@ void main() {
         expect(find.text('Transaction B'), findsOneWidget);
       });
 
-      testWidgets('shows receipt_long icon for each transaction', (tester) async {
+      testWidgets('shows receipt_long icon for each transaction', (
+        tester,
+      ) async {
         await tester.pumpWidget(buildWidget());
         await tester.pump();
         expect(find.byIcon(Icons.receipt_long), findsNWidgets(2));
@@ -78,45 +79,54 @@ void main() {
 
     group('Toggle button', () {
       setUp(() {
-        when(() => mockController.recentTransactions)
-            .thenReturn(['Transaction A']);
+        when(
+          () => mockController.recentTransactions,
+        ).thenReturn(['Transaction A']);
       });
 
-      testWidgets('shows Show More when showPastTransactions is false',
-              (tester) async {
-            await tester.pumpWidget(buildWidget());
-            await tester.pump();
-            expect(find.text('Show More'), findsOneWidget);
-            expect(find.byIcon(Icons.expand_more), findsOneWidget);
-          });
+      testWidgets('shows Show More when showPastTransactions is false', (
+        tester,
+      ) async {
+        await tester.pumpWidget(buildWidget());
+        await tester.pump();
+        expect(find.text('Show More'), findsOneWidget);
+        expect(find.byIcon(Icons.expand_more), findsOneWidget);
+      });
 
-      testWidgets('shows Show Less when showPastTransactions is true',
-              (tester) async {
-            when(() => mockController.showPastTransactions).thenReturn(true);
-            await tester.pumpWidget(buildWidget());
-            await tester.pump();
-            expect(find.text('Show Less'), findsOneWidget);
-            expect(find.byIcon(Icons.expand_less), findsOneWidget);
-          });
+      testWidgets('shows Show Less when showPastTransactions is true', (
+        tester,
+      ) async {
+        when(() => mockController.showPastTransactions).thenReturn(true);
+        await tester.pumpWidget(buildWidget());
+        await tester.pump();
+        expect(find.text('Show Less'), findsOneWidget);
+        expect(find.byIcon(Icons.expand_less), findsOneWidget);
+      });
 
-      testWidgets('calls toggleTransactionView when Show More tapped',
-              (tester) async {
-            await tester.pumpWidget(buildWidget());
-            await tester.pump();
-            await tester.tap(find.text('Show More'));
-            await tester.pump();
-            verify(() => mockController.toggleTransactionView()).called(1);
-          });
+      testWidgets('calls toggleTransactionView when Show More tapped', (
+        tester,
+      ) async {
+        await tester.pumpWidget(buildWidget());
+        await tester.pump();
+        await tester.tap(
+          find.byKey(const ValueKey('transactions-toggle-button')),
+        );
+        await tester.pump();
+        verify(() => mockController.toggleTransactionView()).called(1);
+      });
 
-      testWidgets('calls toggleTransactionView when Show Less tapped',
-              (tester) async {
-            when(() => mockController.showPastTransactions).thenReturn(true);
-            await tester.pumpWidget(buildWidget());
-            await tester.pump();
-            await tester.tap(find.text('Show Less'));
-            await tester.pump();
-            verify(() => mockController.toggleTransactionView()).called(1);
-          });
+      testWidgets('calls toggleTransactionView when Show Less tapped', (
+        tester,
+      ) async {
+        when(() => mockController.showPastTransactions).thenReturn(true);
+        await tester.pumpWidget(buildWidget());
+        await tester.pump();
+        await tester.tap(
+          find.byKey(const ValueKey('transactions-toggle-button')),
+        );
+        await tester.pump();
+        verify(() => mockController.toggleTransactionView()).called(1);
+      });
     });
   });
 }

@@ -65,16 +65,36 @@ let userId: string, transactionId: string, amount: string, note: string;
         return data.user.email;
       },
 
-      incrementLoyalty: async (userId: string, amount: number) => {
-        const { error } = await supabase.rpc(
-          "increment_loyalty_balance",
-          {
-            user_id: userId,
-            increment_amount: amount,
-          }
+      creditWallet: async (userId: string, amount: number, note: string) => {
+        const amountCents = Math.round(amount * 100);
+        const { data: walletId, error: walletError } = await supabase.rpc(
+          "get_or_create_wallet_account",
+          { target_user_id: userId }
         );
 
-        if (error) throw new Error(error.message);
+        if (walletError || !walletId) {
+          throw new Error(walletError?.message ?? "Wallet not found");
+        }
+
+        const { error: ledgerError } = await supabase
+          .from("wallet_ledger_entries")
+          .insert({
+            wallet_account_id: walletId,
+            entry_type: "admin_adjustment",
+            amount_cents: amountCents,
+            paid_amount_cents: 0,
+            promo_amount_cents: amountCents,
+            note: `Approved laundry refund: ${note ?? ""}`,
+          });
+
+        if (ledgerError) throw new Error(ledgerError.message);
+
+        const { error: syncError } = await supabase.rpc(
+          "sync_profile_wallet_balance",
+          { wallet_id: walletId }
+        );
+
+        if (syncError) throw new Error(syncError.message);
       },
 
       sendEmail: async (

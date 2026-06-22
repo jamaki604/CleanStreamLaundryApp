@@ -5,24 +5,36 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:get_it/get_it.dart';
 
+class AppNotification {
+  final int id;
+  final String title;
+  final String body;
+
+  const AppNotification({
+    required this.id,
+    required this.title,
+    required this.body,
+  });
+}
 
 class NotificationService {
   final flutterLocalNotificationsPlugin =
-    GetIt.instance<FlutterLocalNotificationsPlugin>();
+      GetIt.instance<FlutterLocalNotificationsPlugin>();
 
   final profileService = GetIt.instance<ProfileService>();
+  final List<AppNotification> _pendingNotifications = [];
 
   NotificationService() {
     _init();
   }
 
   Future<bool> _requestPermission() async {
-
     // iOS permission
     if (Platform.isIOS) {
       final ios = flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
+            IOSFlutterLocalNotificationsPlugin
+          >();
       final result = await ios?.requestPermissions(
         alert: true,
         badge: true,
@@ -44,19 +56,20 @@ class NotificationService {
   Future<void> _init() async {
     tz.initializeTimeZones();
 
-    const androidSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     const iosSettings = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-        defaultPresentAlert: true
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      defaultPresentAlert: true,
     );
 
     const initSettings = InitializationSettings(
-        android: androidSettings,
-        iOS: iosSettings
+      android: androidSettings,
+      iOS: iosSettings,
     );
 
     await flutterLocalNotificationsPlugin.initialize(initSettings);
@@ -70,7 +83,8 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
   }
 
@@ -85,23 +99,28 @@ class NotificationService {
       return;
     }
 
+    _rememberPendingNotification(
+      AppNotification(id: id, title: title, body: body),
+    );
+
     Future.delayed(delay, () async {
+      _removePendingNotification(id);
       await flutterLocalNotificationsPlugin.show(
         id,
         title,
         body,
         const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'your_channel_id',
-              'Your Channel',
-              importance: Importance.high,
-              priority: Priority.high,
-            ),
-            iOS: DarwinNotificationDetails(
-              presentAlert: true,
-              presentBadge: true,
-              presentSound: true,
-            )
+          android: AndroidNotificationDetails(
+            'your_channel_id',
+            'Your Channel',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
       );
     });
@@ -110,7 +129,7 @@ class NotificationService {
   Future<void> scheduleEarlyMachineNotification({
     required int id,
     required Duration machineTime,
-    required String machineName
+    required String machineName,
   }) async {
     final allowed = await _requestPermission();
     if (!allowed) return;
@@ -129,19 +148,22 @@ class NotificationService {
       final roundedTime = machineTime.inMinutes;
       final unit = roundedTime == 1 ? "minute" : "minutes";
       notifBody = "$machineName will be finished in $roundedTime $unit!";
-    }
-    else if(userLeadTime == 0){
+    } else if (userLeadTime == 0) {
       notifTitle = "Machine Finished!";
       notifBody = "$machineName is finished";
-    }
-    else {
+    } else {
       notifTitle = "Machine Almost Ready";
 
       final unit = userLeadTime == 1 ? "minute" : "minutes";
       notifBody = "$machineName will be finished in $userLeadTime $unit!";
     }
 
+    _rememberPendingNotification(
+      AppNotification(id: id, title: notifTitle, body: notifBody),
+    );
+
     Future.delayed(arrivalTime, () async {
+      _removePendingNotification(id);
       await flutterLocalNotificationsPlugin.show(
         id,
         notifTitle,
@@ -161,5 +183,37 @@ class NotificationService {
         ),
       );
     });
+  }
+
+  Future<List<AppNotification>> getPendingNotifications() async {
+    final scheduledRequests = await flutterLocalNotificationsPlugin
+        .pendingNotificationRequests();
+
+    final notificationsById = <int, AppNotification>{
+      for (final notification in _pendingNotifications)
+        notification.id: notification,
+    };
+
+    for (final request in scheduledRequests) {
+      notificationsById.putIfAbsent(
+        request.id,
+        () => AppNotification(
+          id: request.id,
+          title: request.title ?? 'Notification',
+          body: request.body ?? '',
+        ),
+      );
+    }
+
+    return notificationsById.values.toList(growable: false);
+  }
+
+  void _rememberPendingNotification(AppNotification notification) {
+    _pendingNotifications.removeWhere((item) => item.id == notification.id);
+    _pendingNotifications.add(notification);
+  }
+
+  void _removePendingNotification(int id) {
+    _pendingNotifications.removeWhere((item) => item.id == id);
   }
 }

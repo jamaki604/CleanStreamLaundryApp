@@ -23,17 +23,15 @@ void main() {
 
   testWidgets('renders value correctly', (WidgetTester tester) async {
     await tester.pumpWidget(
-      createWidgetUnderTest(
-        value: 5,
-        onIncrement: () {},
-        onDecrement: () {},
-      ),
+      createWidgetUnderTest(value: 5, onIncrement: () {}, onDecrement: () {}),
     );
 
-    expect(find.text('  5'), findsOneWidget);
+    expect(find.text('5'), findsOneWidget);
   });
 
-  testWidgets('calls onIncrement when + button is tapped', (WidgetTester tester) async {
+  testWidgets('calls onIncrement when + button is tapped', (
+    WidgetTester tester,
+  ) async {
     bool incrementCalled = false;
 
     await tester.pumpWidget(
@@ -52,7 +50,9 @@ void main() {
     expect(incrementCalled, true);
   });
 
-  testWidgets('calls onDecrement when - button is tapped', (WidgetTester tester) async {
+  testWidgets('calls onDecrement when - button is tapped', (
+    WidgetTester tester,
+  ) async {
     bool decrementCalled = false;
 
     await tester.pumpWidget(
@@ -73,14 +73,23 @@ void main() {
 
   testWidgets('renders both control buttons', (WidgetTester tester) async {
     await tester.pumpWidget(
-      createWidgetUnderTest(
-        value: 1,
-        onIncrement: () {},
-        onDecrement: () {},
-      ),
+      createWidgetUnderTest(value: 1, onIncrement: () {}, onDecrement: () {}),
     );
 
     expect(find.byIcon(Icons.add), findsOneWidget);
     expect(find.byIcon(Icons.remove), findsOneWidget);
+  });
+
+  testWidgets('renders decrement before increment', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      createWidgetUnderTest(value: 1, onIncrement: () {}, onDecrement: () {}),
+    );
+
+    final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
+
+    expect(icons[0].icon, Icons.remove);
+    expect(icons[1].icon, Icons.add);
   });
 }

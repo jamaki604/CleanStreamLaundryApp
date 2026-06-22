@@ -32,9 +32,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     when(() => mockAuthService.getCurrentUserId).thenReturn(null);
-    when(() => mockLocationService.getLocations()).thenAnswer((_) async => [
-      {'id': 1, 'Address': '123 Main St'},
-    ]);
+    when(() => mockLocationService.getLocations()).thenAnswer(
+      (_) async => [
+        {'id': 1, 'Address': '123 Main St'},
+      ],
+    );
   });
 
   tearDown(() => GetIt.instance.reset());
@@ -45,56 +47,62 @@ void main() {
     int dryers = 4,
     int idleDryers = 2,
   }) {
-    when(() => mockMachineService.getWasherCountByLocation(any()))
-        .thenAnswer((_) async => washers);
-    when(() => mockMachineService.getIdleWasherCountByLocation(any()))
-        .thenAnswer((_) async => idleWashers);
-    when(() => mockMachineService.getDryerCountByLocation(any()))
-        .thenAnswer((_) async => dryers);
-    when(() => mockMachineService.getIdleDryerCountByLocation(any()))
-        .thenAnswer((_) async => idleDryers);
+    when(
+      () => mockMachineService.getWasherCountByLocation(any()),
+    ).thenAnswer((_) async => washers);
+    when(
+      () => mockMachineService.getIdleWasherCountByLocation(any()),
+    ).thenAnswer((_) async => idleWashers);
+    when(
+      () => mockMachineService.getDryerCountByLocation(any()),
+    ).thenAnswer((_) async => dryers);
+    when(
+      () => mockMachineService.getIdleDryerCountByLocation(any()),
+    ).thenAnswer((_) async => idleDryers);
   }
 
   Widget buildWidget(HomePageController controller) {
     return MaterialApp(
-      home: Scaffold(
-        body: AvailabilityCard(controller: controller),
-      ),
+      home: Scaffold(body: AvailabilityCard(controller: controller)),
     );
   }
 
   group('AvailabilityCard', () {
     group('Loading state', () {
-      testWidgets('shows CircularProgressIndicator while loading',
-              (tester) async {
-            mockMachineCounts();
+      testWidgets('shows CircularProgressIndicator while loading', (
+        tester,
+      ) async {
+        mockMachineCounts();
 
-            final controller =
-            HomePageController(locationParser: MockLocationParser());
-            await controller.init();
-            controller.selectLocation('123 Main St');
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
+        await controller.init();
+        controller.selectLocation('123 Main St');
 
-            when(() => mockMachineService.getWasherCountByLocation(any()))
-                .thenAnswer((_) async {
-              await Future.delayed(const Duration(milliseconds: 100));
-              return 5;
-            });
+        when(
+          () => mockMachineService.getWasherCountByLocation(any()),
+        ).thenAnswer((_) async {
+          await Future.delayed(const Duration(milliseconds: 100));
+          return 5;
+        });
 
-            await tester.pumpWidget(buildWidget(controller));
-            await tester.pump();
+        await tester.pumpWidget(buildWidget(controller));
+        await tester.pump();
 
-            expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-            await tester.pumpAndSettle();
-          });
+        await tester.pumpAndSettle();
+      });
     });
 
     group('Loaded state', () {
       testWidgets('displays Availability header', (tester) async {
         mockMachineCounts();
 
-        final controller =
-        HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
         controller.selectLocation('123 Main St');
 
@@ -107,55 +115,63 @@ void main() {
       testWidgets('displays washer count text', (tester) async {
         mockMachineCounts(washers: 5, idleWashers: 3);
 
-        final controller =
-        HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
         controller.selectLocation('123 Main St');
 
         await tester.pumpWidget(buildWidget(controller));
         await tester.pumpAndSettle();
 
-        expect(find.text('3/5 Washers'), findsOneWidget);
+        expect(find.text('3'), findsOneWidget);
+        expect(find.text('washers\navailable'), findsOneWidget);
       });
 
       testWidgets('displays dryer count text', (tester) async {
         mockMachineCounts(dryers: 4, idleDryers: 2);
 
-        final controller =
-        HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
         controller.selectLocation('123 Main St');
 
         await tester.pumpWidget(buildWidget(controller));
         await tester.pumpAndSettle();
 
-        expect(find.text('2/4 Dryers'), findsOneWidget);
+        expect(find.text('2'), findsOneWidget);
+        expect(find.text('dryers\navailable'), findsOneWidget);
       });
 
       testWidgets('displays laundry service icons', (tester) async {
         mockMachineCounts();
 
-        final controller =
-        HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
         controller.selectLocation('123 Main St');
 
         await tester.pumpWidget(buildWidget(controller));
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.local_laundry_service), findsNWidgets(2));
+        expect(
+          find.byIcon(Icons.local_laundry_service_outlined),
+          findsNWidgets(2),
+        );
       });
 
       testWidgets('shows all zeros when no location selected', (tester) async {
-        final controller =
-        HomePageController(locationParser: MockLocationParser());
+        final controller = HomePageController(
+          locationParser: MockLocationParser(),
+        );
         await controller.init();
 
         await tester.pumpWidget(buildWidget(controller));
         await tester.pumpAndSettle();
 
-        expect(find.text('0/0 Washers'), findsOneWidget);
-        expect(find.text('0/0 Dryers'), findsOneWidget);
+        expect(find.text('0'), findsNWidgets(2));
       });
     });
   });

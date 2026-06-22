@@ -6,22 +6,19 @@ import 'package:clean_stream_laundry_app/logic/services/machine_communication_se
 import 'package:clean_stream_laundry_app/logic/services/machine_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/profile_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/transaction_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/wallet_service.dart';
 import 'package:clean_stream_laundry_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-enum PaymentOutcome {
-  success,
-  machineError,
-  failed,
-  canceled,
-}
+enum PaymentOutcome { success, machineError, failed, canceled }
 
 class PaymentController extends ChangeNotifier {
   final AuthService authService;
   final MachineService machineService;
   final ProfileService profileService;
   final TransactionService transactionService;
+  final WalletService walletService;
   final MachineCommunicationService machineCommunicator;
   final NotificationService notificationService;
   final PaymentProcessor paymentProcessor;
@@ -34,21 +31,22 @@ class PaymentController extends ChangeNotifier {
     MachineService? machineService,
     ProfileService? profileService,
     TransactionService? transactionService,
+    WalletService? walletService,
     MachineCommunicationService? machineCommunicator,
     NotificationService? notificationService,
     PaymentProcessor? paymentProcessor,
-  })  : authService = authService ?? GetIt.instance<AuthService>(),
-        machineService = machineService ?? GetIt.instance<MachineService>(),
-        profileService = profileService ?? GetIt.instance<ProfileService>(),
-        transactionService =
-            transactionService ?? GetIt.instance<TransactionService>(),
-        machineCommunicator = machineCommunicator ??
-            GetIt.instance<MachineCommunicationService>(),
-        notificationService =
-            notificationService ?? GetIt.instance<NotificationService>(),
-        paymentProcessor =
-            paymentProcessor ?? GetIt.instance<PaymentProcessor>();
-
+  }) : authService = authService ?? GetIt.instance<AuthService>(),
+       machineService = machineService ?? GetIt.instance<MachineService>(),
+       profileService = profileService ?? GetIt.instance<ProfileService>(),
+       transactionService =
+           transactionService ?? GetIt.instance<TransactionService>(),
+       walletService = walletService ?? GetIt.instance<WalletService>(),
+       machineCommunicator =
+           machineCommunicator ?? GetIt.instance<MachineCommunicationService>(),
+       notificationService =
+           notificationService ?? GetIt.instance<NotificationService>(),
+       paymentProcessor =
+           paymentProcessor ?? GetIt.instance<PaymentProcessor>();
 
   bool isLoading = true;
   bool paymentCompleted = false;
@@ -62,8 +60,7 @@ class PaymentController extends ChangeNotifier {
   int dryerMinutes = 5;
 
   bool get isDryer =>
-      machineName != null &&
-          machineName!.toLowerCase().contains('dryer');
+      machineName != null && machineName!.toLowerCase().contains('dryer');
 
   Future<void> init() async {
     final data = await machineService.getMachineById(machineId);
@@ -75,12 +72,12 @@ class PaymentController extends ChangeNotifier {
       return;
     }
 
-    final balance = await profileService.getUserBalanceById(userId);
+    final balance = await walletService.getBalance();
 
-    if (data != null && balance != null) {
+    if (data != null) {
       _basePrice = (data['Price'] as num).toDouble();
       machineName = data['Name'] as String?;
-      userBalance = (balance['balance'] as num).toDouble();
+      userBalance = balance.totalBalance;
       price = _basePrice;
     } else {
       userBalance = 0;
@@ -139,7 +136,11 @@ class PaymentController extends ChangeNotifier {
   }
 
   Future<PaymentOutcome> processLoyaltyPayment() async {
-    final userId = authService.getCurrentUserId;
+    final machineIdNumber = int.tryParse(machineId);
+    if (machineIdNumber == null) {
+      return PaymentOutcome.failed;
+    }
+
     final updatedBalance = userBalance! - price!;
     userBalance = updatedBalance;
     notifyListeners();
@@ -152,7 +153,18 @@ class PaymentController extends ChangeNotifier {
       return PaymentOutcome.machineError;
     }
 
-    await profileService.updateBalanceById(userId!, updatedBalance);
+    try {
+      await walletService.redeemForMachine(
+        machineId: machineIdNumber,
+        amountCents: (price! * 100).round(),
+        note:
+            'Loyalty payment on ${MachineFormatter.formatMachineType(machineName.toString())}',
+      );
+    } catch (_) {
+      userBalance = userBalance! + price!;
+      notifyListeners();
+      return PaymentOutcome.failed;
+    }
 
     paymentCompleted = true;
     notifyListeners();
@@ -160,7 +172,7 @@ class PaymentController extends ChangeNotifier {
     await transactionService.recordTransaction(
       amount: price!,
       description:
-      'Loyalty payment on ${MachineFormatter.formatMachineType(machineName.toString())}',
+          'Loyalty payment on ${MachineFormatter.formatMachineType(machineName.toString())}',
       type: 'laundry',
     );
 
