@@ -1173,5 +1173,9 @@ void main() {
 
       expect(response, AuthenticationResponses.failure);
     });
+    test("Tests that the last signedUpUserId is returned correctly", () {
+      authenticator.lastSignedUpUserId = "testID";
+      expect(authenticator.getLastSignedUpUserId(), "testID");
+    });
   });
 }
