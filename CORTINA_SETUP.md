@@ -2,6 +2,15 @@
 
 The code is implemented but intentionally does not enable or deploy production vending. Complete these items in order.
 
+## Current sandbox state
+
+- The Cortina database migrations are applied to Clean Stream Supabase project `dnuuhupoxjtwqzaqylvb`.
+- `cortina-vend`, `nayax-sale-end-sandbox`, `nayax-sale-end`, and the Cortina-aware `stripeWebhook` are deployed.
+- The web preview is configured as the temporary payment origin and return URL.
+- Live quote and callback smoke tests pass. Existing machine mappings remain disabled and require review.
+- The database currently contains one 12 kg washer at its preserved $2.00 price. There is no dryer machine row yet.
+- The Nayax one-time secret link in the integration email has expired. A replacement token and the exact payment-method name used in the Start URL are required before a hardware vend.
+
 ## 1. Nayax
 
 Obtain and set separate sandbox and production values:
@@ -19,6 +28,8 @@ Ask Nayax to register these callback bases and append the documented routes:
 - Routes: `/Cortina/StaticQR/Sale`, `/Cortina/StaticQR/Void`, `/Cortina/SaleEndNotification`
 
 Confirm that a single Start request containing the selected dryer amount produces five minutes per $0.25. Also confirm callback authentication and whether Nayax requires fixed IP allowlisting, VPN, or mTLS.
+
+Nayax's June 29 email says the dryer supports up to six configured multi-price options. The customer UI currently offers 18 amounts from $0.25 through $4.50, so do not enable a dryer until Nayax confirms whether one Pulse Line Start with an arbitrary `Price` creates the corresponding number of five-minute credits. If it does not, limit the UI to the configured product options returned by Clean Stream.
 
 ## 2. Supabase secrets
 
@@ -49,7 +60,7 @@ The webhook only starts Cortina when Stripe metadata, amount, PaymentIntent, and
 
 ## 4. Database and functions
 
-Apply migration `supabase/migrations/20260803150427_cortina_qr_remote_vend.sql`, then deploy:
+Apply migrations `supabase/migrations/20260803150427_cortina_qr_remote_vend.sql` and `supabase/migrations/20260804015500_cortina_rls_policy_cleanup.sql`, then deploy:
 
 ```text
 cortina-vend
