@@ -9,15 +9,18 @@ The code is implemented but intentionally does not enable or deploy production v
 - The web preview is configured as the temporary payment origin and return URL.
 - Live quote and callback smoke tests pass. Existing machine mappings remain disabled and require review.
 - The database currently contains one 12 kg washer at its preserved $2.00 price. There is no dryer machine row yet.
-- The Nayax one-time secret link in the integration email has expired. A replacement token and the exact payment-method name used in the Start URL are required before a hardware vend.
+- The Nayax one-time secret link in the integration email has expired. A replacement token is required before a hardware vend.
 
 ## 1. Nayax
 
-Obtain and set separate sandbox and production values:
+The Clean Stream Start endpoints are configured as:
 
-- Cortina StaticQR Start endpoint URL
+- Sandbox: `https://qa2-lynx.nayax.com/payment/v2/transactions/cortina/Clean%20Stream%20Laundry%20Solutions/start`
+- Production: `https://lynx.nayax.com/payment/v2/transactions/cortina/Clean%20Stream%20Laundry%20Solutions/start`
+
+The sandbox route was verified against Nayax QA with an empty request and returned a structured Nayax decline. Obtain and set the remaining credential:
+
 - Secret token
-- Payment-method name, if Nayax requires it during account provisioning
 - `TerminalId` or full `UniQR` for each device
 - `PulseLineNumber` for each connected washer and dryer
 
@@ -27,9 +30,11 @@ Ask Nayax to register these callback bases and append the documented routes:
 - Production: `https://dnuuhupoxjtwqzaqylvb.supabase.co/functions/v1/nayax-sale-end`
 - Routes: `/Cortina/StaticQR/Sale`, `/Cortina/StaticQR/Void`, `/Cortina/SaleEndNotification`
 
-Confirm that a single Start request containing the selected dryer amount produces five minutes per $0.25. Also confirm callback authentication and whether Nayax requires fixed IP allowlisting, VPN, or mTLS.
+Confirm callback authentication and whether Nayax requires fixed IP allowlisting, VPN, or mTLS.
 
-Nayax's June 29 email says the dryer supports up to six configured multi-price options. The customer UI currently offers 18 amounts from $0.25 through $4.50, so do not enable a dryer until Nayax confirms whether one Pulse Line Start with an arbitrary `Price` creates the corresponding number of five-minute credits. If it does not, limit the UI to the configured product options returned by Clean Stream.
+Nayax's June 29 email says the dryer supports up to six configured multi-price options. For Pulse 1-6 / Pulse Line configurations, the StaticQR documentation requires `PulseLineNumber` starting at 1 instead of a product `Code`. The device template maps each line to its configured price and pulse behavior. Do not enable a dryer until the device-configuration contact provides the available pulse-line, amount, and resulting-time map; the customer UI must offer only those configured options.
+
+For a custom Clean Stream QR, obtain the Nayax UniQRCode hash assigned to the virtual machine and retain the full `https://qr.nayax.com/v1/...` UniQR value for the Start request. The QR may direct to Clean Stream while using the hash as the public machine selector.
 
 ## 2. Supabase secrets
 
