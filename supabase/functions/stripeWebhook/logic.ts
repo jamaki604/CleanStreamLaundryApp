@@ -20,6 +20,14 @@ export interface StripeEvent {
       stripe_charge_id?: string | null;
       stripe_event_id?: string | null;
     }) => Promise<void>;
+    recordCortinaPayment?: (payload: {
+      event_id: string;
+      session_id: string;
+      amount_cents: number;
+      stripe_payment_intent_id: string;
+      stripe_checkout_session_id?: string | null;
+      stripe_charge_id?: string | null;
+    }) => Promise<void>;
   }
   
   export async function handleStripeWebhook(
@@ -30,7 +38,12 @@ export interface StripeEvent {
     deps: Dependencies
   ) {
     const { rawBody, signature } = params;
-    const { verifyAndConstructEvent, broadcastPaymentSuccess, recordWalletLoad } = deps;
+    const {
+      verifyAndConstructEvent,
+      broadcastPaymentSuccess,
+      recordWalletLoad,
+      recordCortinaPayment,
+    } = deps;
   
     if (!signature) {
       return { status: 400, body: "No signature" };
@@ -62,6 +75,19 @@ export interface StripeEvent {
           stripe_event_id: event.id ?? null,
         });
       }
+
+      if (
+        purpose === "cortina_vend" && session.metadata?.cortina_session_id &&
+        amount && typeof session.payment_intent === "string"
+      ) {
+        await recordCortinaPayment?.({
+          event_id: event.id ?? `checkout:${session.id}`,
+          session_id: session.metadata.cortina_session_id,
+          amount_cents: amount,
+          stripe_payment_intent_id: session.payment_intent,
+          stripe_checkout_session_id: session.id,
+        });
+      }
   
       await broadcastPaymentSuccess({
         user_id: userId,
@@ -85,6 +111,20 @@ export interface StripeEvent {
               ? paymentIntent.latest_charge
               : paymentIntent.latest_charge?.id ?? null,
           stripe_event_id: event.id ?? null,
+        });
+      }
+
+
+      if (purpose === "cortina_vend" && paymentIntent.metadata?.cortina_session_id) {
+        await recordCortinaPayment?.({
+          event_id: event.id ?? `payment-intent:${paymentIntent.id}`,
+          session_id: paymentIntent.metadata.cortina_session_id,
+          amount_cents: amount,
+          stripe_payment_intent_id: paymentIntent.id,
+          stripe_charge_id:
+            typeof paymentIntent.latest_charge === "string"
+              ? paymentIntent.latest_charge
+              : paymentIntent.latest_charge?.id ?? null,
         });
       }
     }

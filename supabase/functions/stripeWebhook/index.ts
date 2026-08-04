@@ -2,6 +2,10 @@ import { serve } from "https://deno.land/std@0.223.0/http/server.ts";
 import Stripe from "npm:stripe@14";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleStripeWebhook } from "./logic.ts";
+import {
+  createAdminClient,
+  markCortinaCardPaid,
+} from "../_shared/cortina.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2023-10-16",
@@ -13,6 +17,7 @@ serve(async (req) => {
   const rawBody = await req.text();
 
   const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
+  const admin = createAdminClient();
 
   const result = await handleStripeWebhook(
     { rawBody, signature },
@@ -41,12 +46,7 @@ serve(async (req) => {
       },
 
       recordWalletLoad: async (payload) => {
-        const supabase = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-        );
-
-        const { error } = await supabase.rpc("record_wallet_load_from_stripe", {
+        const { error } = await admin.rpc("record_wallet_load_from_stripe", {
           target_user_id: payload.user_id,
           amount_cents: payload.amount_cents,
           stripe_payment_intent_id: payload.stripe_payment_intent_id ?? null,
@@ -58,6 +58,20 @@ serve(async (req) => {
         if (error) {
           throw new Error(error.message);
         }
+      },
+
+      recordCortinaPayment: async (payload) => {
+        await markCortinaCardPaid(
+          {
+            eventId: payload.event_id,
+            sessionId: payload.session_id,
+            amountCents: payload.amount_cents,
+            paymentIntentId: payload.stripe_payment_intent_id,
+            checkoutSessionId: payload.stripe_checkout_session_id,
+            chargeId: payload.stripe_charge_id,
+          },
+          { admin, stripe },
+        );
       },
     }
   );

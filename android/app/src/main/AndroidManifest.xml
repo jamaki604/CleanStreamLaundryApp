@@ -55,6 +55,16 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="clean-stream" android:host="change-email" />
             </intent-filter>
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="cleanstreamlaundry.com"
+                    android:pathPrefix="/pay" />
+            </intent-filter>
         </activity>
 
         <!-- Don't delete the meta-data below.

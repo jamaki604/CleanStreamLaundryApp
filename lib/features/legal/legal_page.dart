@@ -1,6 +1,7 @@
 import 'package:clean_stream_laundry_app/core/theme/theme.dart';
 import 'package:clean_stream_laundry_app/features/widgets/base_page.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum LegalPageType { privacy, terms, loyaltyCard }
 
@@ -17,14 +18,14 @@ class LegalPage extends StatelessWidget {
 
   List<String> get paragraphs => switch (type) {
     LegalPageType.privacy => const [
-      'Clean Stream may collect account, contact, payment reference, machine usage, refund, maintenance, and support information needed to provide laundry services and operate the app.',
-      'When an account is deleted, app access is removed and personal profile information is removed or anonymized where possible. Clean Stream may retain limited transaction, wallet, balance, dispute, fraud-prevention, tax, accounting, and compliance records where legally or operationally required.',
-      'Final public legal URLs should replace this in-app placeholder before release.',
+      'Clean Stream collects the account, contact, payment reference, machine usage, refund, maintenance, location, and support information needed to provide laundry services and operate the app.',
+      'Clean Stream does not sell personal information or store complete payment-card numbers. Card payments are processed by Stripe, machine vending is provided through Nayax, and application data is hosted through Supabase.',
+      'When an account is deleted, app access and profile information are removed or anonymized. Limited transaction, wallet, dispute, fraud-prevention, tax, accounting, and compliance records may be retained as described in the current public policy.',
     ],
     LegalPageType.terms => const [
       'Use of Clean Stream Laundry services is subject to account eligibility, payment authorization, machine availability, and posted service rules.',
-      'Laundry refunds may be reviewed by support when a machine or service issue occurs. Approved remedies may be returned to the wallet or handled another way at Clean Stream discretion and as required by law.',
-      'Final public legal URLs should replace this in-app placeholder before release.',
+      'If a paid machine vend is rejected, voided, or times out, Clean Stream will initiate the applicable card refund or wallet reversal. Laundry refunds may be reviewed by support using the related payment and machine records.',
+      'The current public Terms of Service govern use of the website, app, payments, wallet, and connected laundry services.',
     ],
     LegalPageType.loyaltyCard => const [
       'Loyalty Card loads are final sale prepaid Clean Stream Laundry credit. Balance is usable only for eligible Clean Stream Laundry services, is not a bank account, does not earn interest, and is not redeemable for cash except where required by law.',
@@ -32,6 +33,21 @@ class LegalPage extends StatelessWidget {
       'Deleting your account removes app access. Clean Stream may retain anonymized wallet, ledger, load, redemption, and complaint records for legal, tax, accounting, dispute, fraud-prevention, and compliance purposes. Deleted wallets are not normally restored or reattached.',
     ],
   };
+
+  Uri get publicUrl => Uri.parse(switch (type) {
+    LegalPageType.privacy => 'https://cleanstreamlaundry.com/privacy',
+    LegalPageType.terms => 'https://cleanstreamlaundry.com/terms',
+    LegalPageType.loyaltyCard => 'https://cleanstreamlaundry.com/terms',
+  });
+
+  Future<void> _openPublicPolicy(BuildContext context) async {
+    if (!await launchUrl(publicUrl, mode: LaunchMode.externalApplication) &&
+        context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open the public policy.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +80,12 @@ class LegalPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                 ],
+                const SizedBox(height: 4),
+                FilledButton.icon(
+                  onPressed: () => _openPublicPolicy(context),
+                  icon: const Icon(Icons.open_in_new),
+                  label: const Text('View current policy'),
+                ),
               ],
             ),
           ),

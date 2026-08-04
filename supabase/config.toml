@@ -372,6 +372,18 @@ deno_version = 2
 enabled = true
 verify_jwt = false
 
+[functions.cortina-vend]
+enabled = true
+verify_jwt = false
+
+[functions.nayax-sale-end]
+enabled = true
+verify_jwt = false
+
+[functions.nayax-sale-end-sandbox]
+enabled = true
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

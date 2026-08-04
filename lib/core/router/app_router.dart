@@ -1,6 +1,7 @@
 import 'package:app_links/app_links.dart';
 import 'package:clean_stream_laundry_app/features/admin_wallets/admin_wallets.dart';
 import 'package:clean_stream_laundry_app/features/change_email_verification/change_email_verification.dart';
+import 'package:clean_stream_laundry_app/features/cortina_payment/cortina_payment.dart';
 import 'package:clean_stream_laundry_app/features/edit_profile/edit_profile.dart';
 import 'package:clean_stream_laundry_app/features/legal/legal_page.dart';
 import 'package:clean_stream_laundry_app/features/verify_code/verify_code.dart';
@@ -52,6 +53,19 @@ class RouterService {
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
           child: ScannerPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          transitionsBuilder: (_, _, _, child) => child,
+        ),
+      ),
+      GoRoute(
+        path: '/pay',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: CortinaPaymentPage(
+            machineToken: state.uri.queryParameters['machine'],
+            uniQr: state.uri.queryParameters['uniqr'],
+          ),
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
           transitionsBuilder: (_, _, _, child) => child,

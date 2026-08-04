@@ -103,3 +103,40 @@ import {
     assertEquals(result.status, 200);
     assertEquals(broadcastCalled, false);
   });
+
+  Deno.test("routes Cortina PaymentIntent success to vend orchestration", async () => {
+    let captured: any = null;
+    const result = await handleStripeWebhook(
+      { rawBody: "{}", signature: "sig" },
+      {
+        verifyAndConstructEvent: async () => ({
+          id: "evt_cortina",
+          type: "payment_intent.succeeded",
+          data: {
+            object: {
+              id: "pi_cortina",
+              amount_received: 450,
+              latest_charge: "ch_cortina",
+              metadata: {
+                purpose: "cortina_vend",
+                cortina_session_id: "vend-123",
+              },
+            },
+          },
+        }),
+        broadcastPaymentSuccess: async () => {},
+        recordCortinaPayment: async (payload) => {
+          captured = payload;
+        },
+      },
+    );
+
+    assertEquals(result.status, 200);
+    assertEquals(captured, {
+      event_id: "evt_cortina",
+      session_id: "vend-123",
+      amount_cents: 450,
+      stripe_payment_intent_id: "pi_cortina",
+      stripe_charge_id: "ch_cortina",
+    });
+  });

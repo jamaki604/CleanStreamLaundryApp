@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 // services
 import 'package:clean_stream_laundry_app/logic/services/auth_service.dart';
+import 'package:clean_stream_laundry_app/logic/services/cortina_vend_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/edge_function_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/location_service.dart';
 import 'package:clean_stream_laundry_app/logic/services/machine_communication_service.dart';
@@ -19,6 +20,7 @@ import 'package:clean_stream_laundry_app/logic/services/admin_wallet_service.dar
 
 // implementations
 import 'package:clean_stream_laundry_app/services/supabase/supabase_auth_service.dart';
+import 'package:clean_stream_laundry_app/services/supabase/supabase_cortina_vend_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_edge_function_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_location_service.dart';
 import 'package:clean_stream_laundry_app/services/supabase/supabase_machine_service.dart';
@@ -71,6 +73,10 @@ Future<void> setupDependencies() async {
 
   getIt.registerLazySingleton<AuthService>(
     () => SupabaseAuthService(client: supabase),
+  );
+
+  getIt.registerLazySingleton<CortinaVendService>(
+    () => SupabaseCortinaVendService(client: supabase),
   );
 
   getIt.registerLazySingleton<PaymentService>(() => StripeService());
