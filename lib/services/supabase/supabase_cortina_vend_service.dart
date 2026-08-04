@@ -11,10 +11,19 @@ class SupabaseCortinaVendService implements CortinaVendService {
     String route,
     Map<String, dynamic> body,
   ) async {
-    final response = await client.functions.invoke(
-      'cortina-vend/$route',
-      body: body,
-    );
+    late final FunctionResponse response;
+    try {
+      response = await client.functions.invoke(
+        'cortina-vend/$route',
+        body: body,
+      );
+    } on FunctionException catch (error) {
+      final details = error.details;
+      if (details is Map && details['error'] is String) {
+        throw StateError(details['error'] as String);
+      }
+      rethrow;
+    }
     final data = response.data;
     if (data is! Map) {
       throw StateError('Cortina returned an invalid response');
