@@ -67,7 +67,7 @@ The webhook only starts Cortina when Stripe metadata, amount, PaymentIntent, and
 
 ## 4. Database and functions
 
-Apply migrations `supabase/migrations/20260803150427_cortina_qr_remote_vend.sql` and `supabase/migrations/20260804015500_cortina_rls_policy_cleanup.sql`, then deploy:
+Apply migrations `supabase/migrations/20260803150427_cortina_qr_remote_vend.sql`, `supabase/migrations/20260804015500_cortina_rls_policy_cleanup.sql`, and `supabase/migrations/20260807195409_configure_dryer_time_options.sql`, then deploy:
 
 ```text
 cortina-vend
@@ -89,7 +89,18 @@ In the web location administration page:
 5. Save, run a physical sandbox vend, and enable only after the mapping is verified.
 6. Download and print the generated Clean Stream QR label.
 
-Dryers always quote $0.25 per five minutes. Customers select $0.25 through $4.50, with $1.50 as the default.
+Dryers always quote $0.25 per five minutes. The six server-controlled products are:
+
+| Pulse line | Time | Price |
+|---|---:|---:|
+| 1 | 10 minutes | $0.50 |
+| 2 | 20 minutes | $1.00 |
+| 3 | 30 minutes | $1.50 |
+| 4 | 40 minutes | $2.00 |
+| 5 | 60 minutes | $3.00 |
+| 6 | 90 minutes | $4.50 |
+
+The customer defaults to 30 minutes. The selected pulse line is stored with the vend session before payment and is used for the one Nayax Start product. Confirm these exact pulse-line, price, and time mappings in the Nayax dryer template before enabling the machine.
 
 ## 6. Domain links
 
@@ -102,7 +113,7 @@ The host must serve `/pay` as the React application and both `.well-known` files
 Certify on Nayax sandbox hardware before production:
 
 - Washer flat-rate card and wallet vends
-- Every dryer amount and five-minute conversion
+- All six dryer time, amount, and pulse-line products
 - Decline, Start rejection, callback mismatch, duplicate callbacks, Void, timeout, refund, and wallet reversal
 - iOS Universal Link, Android App Link, ordinary camera browser fallback, and in-app scanner handling
 

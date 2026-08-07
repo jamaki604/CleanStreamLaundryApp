@@ -10,10 +10,15 @@ export const CORS_HEADERS = {
   "Vary": "Origin",
 };
 
-export const DRYER_INCREMENT_CENTS = 25;
-export const DRYER_MIN_CENTS = 25;
-export const DRYER_MAX_CENTS = 450;
 export const DRYER_DEFAULT_CENTS = 150;
+export const DRYER_OPTIONS = [
+  { minutes: 10, amountCents: 50, pulseLineNumber: 1 },
+  { minutes: 20, amountCents: 100, pulseLineNumber: 2 },
+  { minutes: 30, amountCents: 150, pulseLineNumber: 3 },
+  { minutes: 40, amountCents: 200, pulseLineNumber: 4 },
+  { minutes: 60, amountCents: 300, pulseLineNumber: 5 },
+  { minutes: 90, amountCents: 450, pulseLineNumber: 6 },
+] as const;
 
 export type MachineType = "washer" | "dryer";
 export type VendStatus =
@@ -38,11 +43,8 @@ export interface CortinaQuote {
   washerSizeLabel: string | null;
   amountCents: number;
   dryer: {
-    incrementCents: number;
-    minutesPerIncrement: number;
-    minimumCents: number;
-    maximumCents: number;
     defaultCents: number;
+    options: Array<{ minutes: number; amountCents: number }>;
   } | null;
 }
 
@@ -52,6 +54,7 @@ export interface VendSession {
   user_id: string | null;
   amount_cents: number;
   dryer_minutes: number | null;
+  pulse_line_number: number | null;
   currency: string;
   payment_method: "card" | "wallet";
   channel: "app" | "web";
@@ -96,7 +99,11 @@ export function centsFromNayaxAmount(value: unknown): number | null {
 export function validateVendAmount(
   quote: CortinaQuote,
   requestedAmount: unknown,
-): { amountCents: number; dryerMinutes: number | null } {
+): {
+  amountCents: number;
+  dryerMinutes: number | null;
+  pulseLineNumber: number | null;
+} {
   const parsed = numberValue(requestedAmount);
   if (parsed === null || !Number.isInteger(parsed)) {
     throw new HttpError(400, "Amount must be provided in cents", "invalid_amount");
@@ -106,23 +113,28 @@ export function validateVendAmount(
     if (parsed !== quote.amountCents) {
       throw new HttpError(409, "Washer price has changed", "price_changed");
     }
-    return { amountCents: parsed, dryerMinutes: null };
+    return {
+      amountCents: parsed,
+      dryerMinutes: null,
+      pulseLineNumber: null,
+    };
   }
 
-  if (
-    parsed < DRYER_MIN_CENTS || parsed > DRYER_MAX_CENTS ||
-    parsed % DRYER_INCREMENT_CENTS !== 0
-  ) {
+  const option = DRYER_OPTIONS.find((candidate) =>
+    candidate.amountCents === parsed
+  );
+  if (!option) {
     throw new HttpError(
       400,
-      "Dryer amount must be between $0.25 and $4.50 in $0.25 increments",
+      "Select one of the available dryer times",
       "invalid_dryer_amount",
     );
   }
 
   return {
-    amountCents: parsed,
-    dryerMinutes: (parsed / DRYER_INCREMENT_CENTS) * 5,
+    amountCents: option.amountCents,
+    dryerMinutes: option.minutes,
+    pulseLineNumber: option.pulseLineNumber,
   };
 }
 
@@ -228,11 +240,11 @@ export async function resolveQuote(
     amountCents,
     dryer: machineType === "dryer"
       ? {
-        incrementCents: DRYER_INCREMENT_CENTS,
-        minutesPerIncrement: 5,
-        minimumCents: DRYER_MIN_CENTS,
-        maximumCents: DRYER_MAX_CENTS,
         defaultCents: DRYER_DEFAULT_CENTS,
+        options: DRYER_OPTIONS.map(({ minutes, amountCents }) => ({
+          minutes,
+          amountCents,
+        })),
       }
       : null,
   };
@@ -245,6 +257,7 @@ export async function createVendSession(
     userId: string | null;
     amountCents: number;
     dryerMinutes: number | null;
+    pulseLineNumber: number | null;
     paymentMethod: "card" | "wallet";
     channel: "app" | "web";
     clientRequestId: string;
@@ -259,6 +272,7 @@ export async function createVendSession(
     washer_size_rate_id: quote.washerSizeRateId,
     amount_cents: input.amountCents,
     dryer_minutes: input.dryerMinutes,
+    pulse_line_number: input.pulseLineNumber,
     payment_method: input.paymentMethod,
     channel: input.channel,
     transaction_id: randomTransactionId(),
@@ -283,6 +297,7 @@ export async function createVendSession(
     existing.machine_id !== quote.machineId ||
     existing.user_id !== input.userId ||
     existing.amount_cents !== input.amountCents ||
+    existing.pulse_line_number !== input.pulseLineNumber ||
     existing.payment_method !== input.paymentMethod ||
     existing.channel !== input.channel
   ) {
@@ -402,7 +417,7 @@ export async function startCortinaVend(
   try {
     const settings = nayaxSettings(config.environment);
     const product: Record<string, unknown> = {
-      PulseLineNumber: config.pulse_line_number,
+      PulseLineNumber: session.pulse_line_number ?? config.pulse_line_number,
       Price: session.amount_cents / 100,
     };
     const payload: Record<string, unknown> = {

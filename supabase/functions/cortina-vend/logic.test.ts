@@ -4,6 +4,7 @@ import {
 } from "https://deno.land/std@0.224.0/testing/asserts.ts";
 import {
   DRYER_DEFAULT_CENTS,
+  DRYER_OPTIONS,
   functionRoute,
   HttpError,
   validateVendAmount,
@@ -29,11 +30,11 @@ const dryerQuote = {
   washerSizeLabel: null,
   amountCents: DRYER_DEFAULT_CENTS,
   dryer: {
-    incrementCents: 25,
-    minutesPerIncrement: 5,
-    minimumCents: 25,
-    maximumCents: 450,
     defaultCents: 150,
+    options: DRYER_OPTIONS.map(({ minutes, amountCents }) => ({
+      minutes,
+      amountCents,
+    })),
   },
 };
 
@@ -41,22 +42,29 @@ Deno.test("washer accepts only the current server price", () => {
   assertEquals(validateVendAmount(washerQuote, 450), {
     amountCents: 450,
     dryerMinutes: null,
+    pulseLineNumber: null,
   });
   const error = assertThrows(() => validateVendAmount(washerQuote, 475));
   assertEquals((error as HttpError).code, "price_changed");
 });
 
-Deno.test("dryer amount converts to five-minute increments", () => {
+Deno.test("dryer options map to fixed minutes and pulse lines", () => {
   assertEquals(validateVendAmount(dryerQuote, 150), {
     amountCents: 150,
     dryerMinutes: 30,
+    pulseLineNumber: 3,
   });
-  assertEquals(validateVendAmount(dryerQuote, 25).dryerMinutes, 5);
-  assertEquals(validateVendAmount(dryerQuote, 450).dryerMinutes, 90);
+  for (const option of DRYER_OPTIONS) {
+    assertEquals(validateVendAmount(dryerQuote, option.amountCents), {
+      amountCents: option.amountCents,
+      dryerMinutes: option.minutes,
+      pulseLineNumber: option.pulseLineNumber,
+    });
+  }
 });
 
-Deno.test("dryer rejects amounts outside quarter increments", () => {
-  for (const amount of [0, 30, 475]) {
+Deno.test("dryer rejects amounts outside the six configured products", () => {
+  for (const amount of [0, 25, 75, 250, 475]) {
     const error = assertThrows(() => validateVendAmount(dryerQuote, amount));
     assertEquals((error as HttpError).code, "invalid_dryer_amount");
   }

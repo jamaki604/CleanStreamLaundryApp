@@ -19,10 +19,15 @@ const dryerQuote = CortinaQuote(
   machineType: 'dryer',
   washerSizeLabel: null,
   amountCents: 150,
-  dryerMinimumCents: 25,
-  dryerMaximumCents: 450,
   dryerDefaultCents: 150,
-  dryerIncrementCents: 25,
+  dryerOptions: [
+    CortinaDryerOption(minutes: 10, amountCents: 50),
+    CortinaDryerOption(minutes: 20, amountCents: 100),
+    CortinaDryerOption(minutes: 30, amountCents: 150),
+    CortinaDryerOption(minutes: 40, amountCents: 200),
+    CortinaDryerOption(minutes: 60, amountCents: 300),
+    CortinaDryerOption(minutes: 90, amountCents: 450),
+  ],
 );
 
 void main() {
@@ -71,17 +76,20 @@ void main() {
     verifyNever(() => walletService.getBalance());
   });
 
-  test('dryer selection remains in quarter increments', () async {
+  test('dryer selection accepts only configured time products', () async {
     when(
       () => vendService.quote(machineToken: 'token-1', uniQr: null),
     ).thenAnswer((_) async => dryerQuote);
     final subject = controller();
     await subject.init();
 
-    subject.setDryerAmount(163);
+    subject.setDryerAmount(200);
 
-    expect(subject.amountCents, 150);
-    expect(subject.dryerMinutes, 30);
+    expect(subject.amountCents, 200);
+    expect(subject.dryerMinutes, 40);
+
+    subject.setDryerAmount(250);
+    expect(subject.amountCents, 200);
   });
 
   test('card payment completes after the webhook starts the machine', () async {

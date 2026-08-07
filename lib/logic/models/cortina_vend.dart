@@ -1,13 +1,24 @@
+class CortinaDryerOption {
+  final int minutes;
+  final int amountCents;
+
+  const CortinaDryerOption({required this.minutes, required this.amountCents});
+
+  factory CortinaDryerOption.fromJson(Map<String, dynamic> json) =>
+      CortinaDryerOption(
+        minutes: (json['minutes'] as num).toInt(),
+        amountCents: (json['amountCents'] as num).toInt(),
+      );
+}
+
 class CortinaQuote {
   final int machineId;
   final String machineName;
   final String machineType;
   final String? washerSizeLabel;
   final int amountCents;
-  final int dryerMinimumCents;
-  final int dryerMaximumCents;
   final int dryerDefaultCents;
-  final int dryerIncrementCents;
+  final List<CortinaDryerOption> dryerOptions;
 
   const CortinaQuote({
     required this.machineId,
@@ -15,10 +26,8 @@ class CortinaQuote {
     required this.machineType,
     required this.washerSizeLabel,
     required this.amountCents,
-    required this.dryerMinimumCents,
-    required this.dryerMaximumCents,
     required this.dryerDefaultCents,
-    required this.dryerIncrementCents,
+    required this.dryerOptions,
   });
 
   bool get isDryer => machineType.toLowerCase() == 'dryer';
@@ -31,10 +40,13 @@ class CortinaQuote {
       machineType: json['machineType'] as String,
       washerSizeLabel: json['washerSizeLabel'] as String?,
       amountCents: (json['amountCents'] as num).toInt(),
-      dryerMinimumCents: (dryer?['minimumCents'] as num?)?.toInt() ?? 25,
-      dryerMaximumCents: (dryer?['maximumCents'] as num?)?.toInt() ?? 450,
       dryerDefaultCents: (dryer?['defaultCents'] as num?)?.toInt() ?? 150,
-      dryerIncrementCents: (dryer?['incrementCents'] as num?)?.toInt() ?? 25,
+      dryerOptions: (dryer?['options'] as List<dynamic>? ?? const <dynamic>[])
+          .map(
+            (option) =>
+                CortinaDryerOption.fromJson(option as Map<String, dynamic>),
+          )
+          .toList(growable: false),
     );
   }
 }

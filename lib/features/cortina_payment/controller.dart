@@ -49,7 +49,12 @@ class CortinaPaymentController extends ChangeNotifier {
   bool get isDryer => quote?.isDryer ?? false;
   bool get isSignedIn => authService.getCurrentUserId != null;
   double get price => amountCents / 100;
-  int get dryerMinutes => (amountCents ~/ 25) * 5;
+  int get dryerMinutes {
+    for (final option in quote?.dryerOptions ?? const <CortinaDryerOption>[]) {
+      if (option.amountCents == amountCents) return option.minutes;
+    }
+    return 0;
+  }
 
   static Future<void> _showPaymentSheet(String clientSecret) async {
     await Stripe.instance.initPaymentSheet(
@@ -89,13 +94,12 @@ class CortinaPaymentController extends ChangeNotifier {
   void setDryerAmount(int cents) {
     final currentQuote = quote;
     if (currentQuote == null || !currentQuote.isDryer) return;
-    final bounded = cents.clamp(
-      currentQuote.dryerMinimumCents,
-      currentQuote.dryerMaximumCents,
-    );
-    amountCents =
-        (bounded ~/ currentQuote.dryerIncrementCents) *
-        currentQuote.dryerIncrementCents;
+    if (!currentQuote.dryerOptions.any(
+      (option) => option.amountCents == cents,
+    )) {
+      return;
+    }
+    amountCents = cents;
     _cardRequestId = null;
     _walletRequestId = null;
     notifyListeners();

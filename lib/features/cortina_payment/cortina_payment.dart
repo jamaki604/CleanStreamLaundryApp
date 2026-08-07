@@ -171,9 +171,7 @@ class _CortinaPaymentPageState extends State<CortinaPaymentPage> {
                 if (quote.isDryer)
                   DryerAmountSelector(
                     amountCents: controller.amountCents,
-                    minimumCents: quote.dryerMinimumCents,
-                    maximumCents: quote.dryerMaximumCents,
-                    incrementCents: quote.dryerIncrementCents,
+                    options: quote.dryerOptions,
                     onChanged: controller.setDryerAmount,
                   )
                 else
